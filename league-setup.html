@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    Setup Lega - Fantacalcio Live
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="style.css?v=13"
+  >
+
+</head>
+
+
+<body>
+
+<main class="page-shell">
+
+
+  <header class="page-header">
+
+    <div>
+
+      <h1 id="league-title">
+        Setup Lega
+      </h1>
+
+      <p>
+        Configurazione dell'asta
+      </p>
+
+    </div>
+
+
+    <a
+      class="back-home"
+      href="league.html"
+    >
+      ← Lega
+    </a>
+
+  </header>
+
+
+  <nav class="tabs league-tabs">
+
+    <a
+      href="league.html"
+      class="tab"
+    >
+      <span class="tab-title">
+        Home
+      </span>
+
+      <span class="tab-description">
+        Dashboard
+      </span>
+    </a>
+
+
+    <span class="tab disabled">
+
+      <span class="tab-title">
+        Asta
+      </span>
+
+      <span class="tab-description">
+        Live
+      </span>
+
+    </span>
+
+
+    <span class="tab disabled">
+
+      <span class="tab-title">
+        Rose
+      </span>
+
+      <span class="tab-description">
+        Squadre
+      </span>
+
+    </span>
+
+
+    <span class="tab disabled">
+
+      <span class="tab-title">
+        Listone
+      </span>
+
+      <span class="tab-description">
+        Giocatori
+      </span>
+
+    </span>
+
+
+    <a
+      href="league-setup.html"
+      class="tab active"
+    >
+
+      <span class="tab-title">
+        Setup
+      </span>
+
+      <span class="tab-description">
+        Configurazione
+      </span>
+
+    </a>
+
+  </nav>
+
+
+  <p
+    id="page-message"
+    class="message"
+    aria-live="polite"
+  ></p>
+
+
+  <form id="setup-form">
+
+
+    <!-- FORMATO -->
+
+    <section class="card">
+
+      <div class="section-heading">
+
+        <span class="section-label">
+          MODE
+        </span>
+
+        <div>
+
+          <h2>Formato lega</h2>
+
+          <p>
+            Regole generali e composizione rosa
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="form-grid">
+
+
+        <label class="form-field">
+
+          Modalità
+
+          <select id="fantasy-mode">
+
+            <option value="classic">
+              Classic
+            </option>
+
+            <option value="mantra">
+              Mantra
+            </option>
+
+          </select>
+
+        </label>
+
+
+        <label class="form-field">
+
+          Crediti iniziali
+
+          <input
+            id="initial-credits"
+            type="number"
+            min="1"
+            max="1000000"
+            step="1"
+            required
+          >
+
+        </label>
+
+
+        <label class="form-field">
+
+          Numero squadre
+
+          <input
+            id="team-count"
+            type="number"
+            min="2"
+            max="30"
+            step="1"
+            required
+          >
+
+        </label>
+
+      </div>
+
+
+      <div
+        id="classic-roster"
+        class="conditional-panel"
+      >
+
+        <h3>
+          Rosa Classic
+        </h3>
+
+
+        <div class="form-grid roster-grid">
+
+
+          <label class="form-field">
+
+            Portieri
+
+            <input
+              id="slot-p"
+              type="number"
+              min="0"
+              max="50"
+              step="1"
+            >
+
+          </label>
+
+
+          <label class="form-field">
+
+            Difensori
+
+            <input
+              id="slot-d"
+              type="number"
+              min="0"
+              max="50"
+              step="1"
+            >
+
+          </label>
+
+
+          <label class="form-field">
+
+            Centrocampisti
+
+            <input
+              id="slot-c"
+              type="number"
+              min="0"
+              max="50"
+              step="1"
+            >
+
+          </label>
+
+
+          <label class="form-field">
+
+            Attaccanti
+
+            <input
+              id="slot-a"
+              type="number"
+              min="0"
+              max="50"
+              step="1"
+            >
+
+          </label>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="mantra-roster"
+        class="conditional-panel"
+        hidden
+      >
+
+        <h3>
+          Rosa Mantra
+        </h3>
+
+
+        <label class="form-field">
+
+          Numero totale giocatori
+
+          <input
+            id="mantra-slots"
+            type="number"
+            min="1"
+            max="100"
+            step="1"
+          >
+
+        </label>
+
+      </div>
+
+    </section>
+
+
+    <!-- CHIAMATA -->
+
+    <section class="card">
+
+      <div class="section-heading">
+
+        <span class="section-label">
+          CALL
+        </span>
+
+        <div>
+
+          <h2>Chiamata giocatori</h2>
+
+          <p>
+            Come viene scelto il prossimo giocatore
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="form-grid">
+
+
+        <label class="form-field">
+
+          Modalità di chiamata
+
+          <select id="nomination-mode">
+
+            <option value="call">
+              A chiamata
+            </option>
+
+            <option value="list">
+              Da listone
+            </option>
+
+            <option value="random">
+              Casuale
+            </option>
+
+          </select>
+
+        </label>
+
+      </div>
+
+
+      <div
+        id="list-settings"
+        class="conditional-panel"
+        hidden
+      >
+
+        <div class="form-grid">
+
+
+          <label class="form-field">
+
+            Ordina per
+
+            <select id="list-sort-by">
+
+              <option value="alphabetical">
+                Ordine alfabetico
+              </option>
+
+              <option value="quotation">
+                Quotazione
+              </option>
+
+            </select>
+
+          </label>
+
+
+          <label class="form-field">
+
+            Direzione
+
+            <select id="list-sort-direction">
+
+              <option value="asc">
+                Crescente
+              </option>
+
+              <option value="desc">
+                Decrescente
+              </option>
+
+            </select>
+
+          </label>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ASTA -->
+
+    <section class="card">
+
+      <div class="section-heading">
+
+        <span class="section-label">
+          BID
+        </span>
+
+        <div>
+
+          <h2>Asta</h2>
+
+          <p>
+            Base d'asta e modalità di rilancio
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="form-grid">
+
+
+        <label class="form-field">
+
+          Base d'asta
+
+          <select id="auction-base-mode">
+
+            <option value="free">
+              Libera
+            </option>
+
+            <option value="quotation">
+              Quotazione Fantacalcio.it
+            </option>
+
+          </select>
+
+        </label>
+
+
+        <label class="form-field">
+
+          Modalità rilancio
+
+          <select id="bid-mode">
+
+            <option value="wild">
+              Rilancio selvaggio
+            </option>
+
+            <option value="turn">
+              Rilancio a turno
+            </option>
+
+          </select>
+
+        </label>
+
+      </div>
+
+
+      <div
+        id="turn-settings"
+        class="conditional-panel"
+        hidden
+      >
+
+        <label class="form-field">
+
+          Direzione dei turni
+
+          <select id="turn-direction">
+
+            <option value="clockwise">
+              Senso orario
+            </option>
+
+            <option value="counterclockwise">
+              Senso antiorario
+            </option>
+
+          </select>
+
+        </label>
+
+      </div>
+
+
+      <p class="setting-help">
+        L'incremento minimo è sempre di
+        <strong>1 credito</strong>.
+      </p>
+
+    </section>
+
+
+    <!-- TIMER -->
+
+    <section class="card">
+
+      <div class="section-heading">
+
+        <span class="section-label">
+          TIME
+        </span>
+
+        <div>
+
+          <h2>Timer</h2>
+
+          <p>
+            Durata del conto alla rovescia
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <label class="form-field">
+
+        Modalità timer
+
+        <select id="timer-mode">
+
+          <option value="dynamic">
+            Dinamico
+          </option>
+
+          <option value="fixed">
+            Fisso
+          </option>
+
+        </select>
+
+      </label>
+
+
+      <div
+        id="fixed-timer-settings"
+        class="conditional-panel"
+        hidden
+      >
+
+        <label class="form-field">
+
+          Secondi
+
+          <input
+            id="fixed-timer-seconds"
+            type="number"
+            min="1"
+            max="120"
+            step="1"
+          >
+
+        </label>
+
+      </div>
+
+
+      <div
+        id="dynamic-timer-settings"
+        class="conditional-panel"
+      >
+
+        <p class="setting-help">
+          La fascia viene calcolata sul rapporto tra
+          prezzo corrente e crediti iniziali.
+        </p>
+
+
+        <div class="timer-band-grid">
+
+          <strong>
+            Fino al %
+          </strong>
+
+          <strong>
+            Secondi
+          </strong>
+
+
+          <input
+            id="timer-percent-1"
+            type="number"
+            min="0.1"
+            max="100"
+            step="0.1"
+          >
+
+          <input
+            id="timer-seconds-1"
+            type="number"
+            min="1"
+            max="120"
+            step="1"
+          >
+
+
+          <input
+            id="timer-percent-2"
+            type="number"
+            min="0.1"
+            max="100"
+            step="0.1"
+          >
+
+          <input
+            id="timer-seconds-2"
+            type="number"
+            min="1"
+            max="120"
+            step="1"
+          >
+
+
+          <input
+            id="timer-percent-3"
+            type="number"
+            min="0.1"
+            max="100"
+            step="0.1"
+          >
+
+          <input
+            id="timer-seconds-3"
+            type="number"
+            min="1"
+            max="120"
+            step="1"
+          >
+
+
+          <input
+            id="timer-percent-4"
+            type="number"
+            min="0.1"
+            max="100"
+            step="0.1"
+          >
+
+          <input
+            id="timer-seconds-4"
+            type="number"
+            min="1"
+            max="120"
+            step="1"
+          >
+
+
+          <span>
+            Oltre
+          </span>
+
+          <input
+            id="timer-seconds-5"
+            type="number"
+            min="1"
+            max="120"
+            step="1"
+          >
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <section class="card">
+
+      <button
+        id="save-setup"
+        type="submit"
+      >
+        Salva Setup
+      </button>
+
+    </section>
+
+
+  </form>
+
+</main>
+
+
+<script src="league-setup.js?v=1"></script>
+
+</body>
+
+</html>
