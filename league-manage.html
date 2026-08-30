@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Membri e squadre - Fantacalcio Live</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css?v=15"
+  >
+</head>
+
+<body>
+
+<main class="page-shell">
+
+  <header class="page-header">
+
+    <div>
+      <h1 id="league-title">Membri e squadre</h1>
+      <p>Gestione partecipanti, ruoli e squadre</p>
+    </div>
+
+    <a
+      class="back-home"
+      href="league.html"
+    >
+      ← Lega
+    </a>
+
+  </header>
+
+
+  <p
+    id="page-message"
+    class="message"
+    aria-live="polite"
+  ></p>
+
+
+  <section class="card">
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        TEAM
+      </span>
+
+      <div>
+        <h2>Squadre</h2>
+        <p>Squadre attive nella lega</p>
+      </div>
+
+    </div>
+
+
+    <div
+      id="create-team-area"
+      hidden
+    >
+
+      <form id="create-team-form">
+
+        <label class="form-field">
+
+          Nuova squadra
+
+          <input
+            id="new-team-name"
+            type="text"
+            minlength="2"
+            maxlength="60"
+            placeholder="Nome squadra"
+            required
+          >
+
+        </label>
+
+        <button type="submit">
+          Crea squadra
+        </button>
+
+      </form>
+
+      <div class="divider"></div>
+
+    </div>
+
+
+    <div
+      id="teams-list"
+      class="league-list"
+    ></div>
+
+  </section>
+
+
+  <section class="card">
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        USER
+      </span>
+
+      <div>
+        <h2>Membri</h2>
+        <p>Utenti attivi e ruoli nella lega</p>
+      </div>
+
+    </div>
+
+
+    <div
+      id="members-list"
+      class="users-list"
+    ></div>
+
+  </section>
+
+
+  <section
+    id="vice-section"
+    class="card"
+    hidden
+  >
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        VICE
+      </span>
+
+      <div>
+        <h2>Richieste Vice</h2>
+        <p>Candidature da approvare per la tua squadra</p>
+      </div>
+
+    </div>
+
+
+    <div
+      id="vice-requests"
+      class="league-list"
+    ></div>
+
+  </section>
+
+</main>
+
+
+<script src="league-manage.js?v=1"></script>
+
+</body>
+
+</html>
