@@ -28,17 +28,9 @@
   <header class="page-header">
 
     <div>
-
-      <h1 id="league-title">
-        Asta
-      </h1>
-
-      <p id="league-subtitle">
-        Caricamento...
-      </p>
-
+      <h1 id="league-title">Asta</h1>
+      <p id="league-subtitle">Caricamento...</p>
     </div>
-
 
     <a
       class="back-home"
@@ -52,14 +44,10 @@
 
   <nav class="tabs league-tabs">
 
-    <a
-      href="league.html"
-      class="tab"
-    >
+    <a href="league.html" class="tab">
       <span class="tab-title">Home</span>
       <span class="tab-description">Dashboard</span>
     </a>
-
 
     <a
       href="league-auction.html"
@@ -69,24 +57,15 @@
       <span class="tab-description">Live</span>
     </a>
 
-
-    <a
-      href="league-rosters.html"
-      class="tab"
-    >
+    <a href="league-rosters.html" class="tab">
       <span class="tab-title">Rose</span>
       <span class="tab-description">Squadre</span>
     </a>
 
-
-    <a
-      href="league-list.html"
-      class="tab"
-    >
+    <a href="league-list.html" class="tab">
       <span class="tab-title">Listone</span>
       <span class="tab-description">Giocatori</span>
     </a>
-
 
     <a
       id="setup-tab"
@@ -113,12 +92,17 @@
     <div class="section-heading">
 
       <span class="section-label">
-        LOBBY
+        ASTA
       </span>
 
       <div>
-        <h2>Preparazione asta</h2>
-        <p>Controlli prima dell’avvio</p>
+        <h2 id="auction-phase-title">
+          Preparazione
+        </h2>
+
+        <p id="auction-phase-subtitle">
+          Controlli prima dell’avvio
+        </p>
       </div>
 
     </div>
@@ -138,6 +122,7 @@
 
     <div
       id="auction-control-area"
+      class="league-actions"
       hidden
     >
 
@@ -153,7 +138,10 @@
   </section>
 
 
-  <div class="form-grid">
+  <div
+    id="lobby-grid"
+    class="form-grid"
+  >
 
 
     <section class="card">
@@ -189,8 +177,8 @@
         </span>
 
         <div>
-          <h2>Regole snapshot</h2>
-          <p>Configurazione che verrà congelata per l’asta</p>
+          <h2>Regole</h2>
+          <p>Configurazione della sessione</p>
         </div>
 
       </div>
@@ -216,12 +204,12 @@
     <div class="section-heading">
 
       <span class="section-label">
-        READY
+        ORDER
       </span>
 
       <div>
-        <h2>Sessione preparata</h2>
-        <p>Ordine squadre provvisorio</p>
+        <h2>Ordine squadre</h2>
+        <p>Definisce il primo turno di chiamata</p>
       </div>
 
     </div>
@@ -233,11 +221,126 @@
     ></div>
 
 
-    <p class="setting-help">
-      Nel prossimo step renderemo modificabile
-      l’ordine delle squadre e abiliteremo l’avvio
-      effettivo dell’asta.
-    </p>
+    <div
+      id="team-order-actions"
+      class="league-actions"
+      hidden
+    >
+
+      <button
+        id="save-team-order-button"
+        type="button"
+        class="secondary"
+      >
+        Salva ordine
+      </button>
+
+
+      <button
+        id="start-auction-button"
+        type="button"
+      >
+        Avvia asta
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <section
+    id="live-section"
+    class="card"
+    hidden
+  >
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        LIVE
+      </span>
+
+      <div>
+        <h2>Giocatore corrente</h2>
+        <p id="live-help">Asta in corso</p>
+      </div>
+
+    </div>
+
+
+    <div
+      id="current-player-box"
+    ></div>
+
+
+    <div
+      id="call-panel"
+      hidden
+    >
+
+      <div class="divider"></div>
+
+
+      <h3 id="call-team-title">
+        Chiamata
+      </h3>
+
+
+      <p
+        id="call-permission-help"
+        class="setting-help"
+      ></p>
+
+
+      <div
+        id="call-form-area"
+        hidden
+      >
+
+        <div class="form-grid">
+
+          <label class="form-field">
+
+            Cerca giocatore
+
+            <input
+              id="call-player-search"
+              type="search"
+              autocomplete="off"
+              placeholder="Nome o squadra..."
+            >
+
+          </label>
+
+
+          <label
+            id="opening-bid-field"
+            class="form-field"
+          >
+
+            Base d’asta
+
+            <input
+              id="opening-bid"
+              type="number"
+              min="1"
+              step="1"
+              value="1"
+            >
+
+          </label>
+
+        </div>
+
+
+        <div
+          id="call-candidates"
+          class="list"
+        ></div>
+
+      </div>
+
+    </div>
 
   </section>
 
@@ -245,7 +348,7 @@
 </main>
 
 
-<script src="league-auction.js?v=1"></script>
+<script src="league-auction.js?v=2"></script>
 
 </body>
 
