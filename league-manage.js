@@ -1,58 +1,41 @@
 const SUPABASE_URL =
-  'https://yyklmhzjxzkvycmxkegx.supabase.co'
+  'https://yyklmhzjxzkvycmxkegx.supabase.co';
 
 const API_URL =
-  `${SUPABASE_URL}/functions/v1/league-api`
+  `${SUPABASE_URL}/functions/v1/league-api`;
 
+let selectedLeague = null;
+let managementData = null;
 
-let selectedLeague = null
-let managementData = null
-
+const $ = id =>
+  document.getElementById(id);
 
 const leagueTitle =
-  document.getElementById(
-    'league-title'
-  )
+  $('league-title');
 
 const message =
-  document.getElementById(
-    'page-message'
-  )
+  $('page-message');
 
 const createTeamArea =
-  document.getElementById(
-    'create-team-area'
-  )
+  $('create-team-area');
 
 const createTeamForm =
-  document.getElementById(
-    'create-team-form'
-  )
+  $('create-team-form');
 
 const newTeamName =
-  document.getElementById(
-    'new-team-name'
-  )
+  $('new-team-name');
 
 const teamsList =
-  document.getElementById(
-    'teams-list'
-  )
+  $('teams-list');
 
 const membersList =
-  document.getElementById(
-    'members-list'
-  )
+  $('members-list');
 
 const viceSection =
-  document.getElementById(
-    'vice-section'
-  )
+  $('vice-section');
 
 const viceRequests =
-  document.getElementById(
-    'vice-requests'
-  )
+  $('vice-requests');
 
 
 /* =========================================================
@@ -66,15 +49,15 @@ function getSession() {
     const raw =
       localStorage.getItem(
         'fantacalcio_session'
-      )
+      );
 
     return raw
       ? JSON.parse(raw)
-      : null
+      : null;
 
   } catch {
 
-    return null
+    return null;
   }
 }
 
@@ -86,15 +69,15 @@ function getSelectedLeague() {
     const raw =
       localStorage.getItem(
         'fantacalcio_selected_league'
-      )
+      );
 
     return raw
       ? JSON.parse(raw)
-      : null
+      : null;
 
   } catch {
 
-    return null
+    return null;
   }
 }
 
@@ -109,21 +92,38 @@ function showMessage(
 ) {
 
   message.textContent =
-    text
+    text;
 
   message.className =
-    `message ${type}`
+    `message ${type}`;
 }
 
 
 function escapeHtml(value) {
 
-  return String(value ?? '')
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;')
+  return String(
+    value ?? ''
+  )
+    .replaceAll(
+      '&',
+      '&amp;'
+    )
+    .replaceAll(
+      '<',
+      '&lt;'
+    )
+    .replaceAll(
+      '>',
+      '&gt;'
+    )
+    .replaceAll(
+      '"',
+      '&quot;'
+    )
+    .replaceAll(
+      "'",
+      '&#039;'
+    );
 }
 
 
@@ -145,10 +145,11 @@ function roleLabel(role) {
 
     vice:
       'Vice'
-  }
+  };
 
 
-  return labels[role] || role
+  return labels[role]
+    || role;
 }
 
 
@@ -159,19 +160,19 @@ function roleLabel(role) {
 async function callApi(body) {
 
   const session =
-    getSession()
+    getSession();
 
 
   if (!session?.token) {
 
     window.location.href =
-      'index.html'
+      'index.html';
 
-    return null
+    return null;
   }
 
 
-  let response
+  let response;
 
 
   try {
@@ -199,29 +200,29 @@ async function callApi(body) {
                 session.token
             })
         }
-      )
+      );
 
   } catch {
 
     throw new Error(
       'Impossibile contattare il server.'
-    )
+    );
   }
 
 
-  let data
+  let data;
 
 
   try {
 
     data =
-      await response.json()
+      await response.json();
 
   } catch {
 
     throw new Error(
       'Risposta non valida dal server.'
-    )
+    );
   }
 
 
@@ -230,13 +231,13 @@ async function callApi(body) {
   ) {
 
     window.location.href =
-      'index.html'
+      'index.html';
 
-    return null
+    return null;
   }
 
 
-  return data
+  return data;
 }
 
 
@@ -247,10 +248,19 @@ async function callApi(body) {
 function renderTeams() {
 
   const teams =
-    managementData.teams || []
+    managementData?.teams
+    || [];
 
 
-  teamsList.innerHTML = ''
+  const limit =
+    Number(
+      managementData?.teamLimit
+      || 0
+    );
+
+
+  teamsList.innerHTML =
+    '';
 
 
   if (
@@ -260,10 +270,15 @@ function renderTeams() {
     teamsList.innerHTML = `
       <div class="empty-state">
         Nessuna squadra presente.
+        ${
+          limit
+            ? `Puoi crearne fino a ${limit}.`
+            : ''
+        }
       </div>
-    `
+    `;
 
-    return
+    return;
   }
 
 
@@ -274,11 +289,12 @@ function renderTeams() {
 
     const card =
       document.createElement(
-        'article'
-      )
+        'div'
+      );
+
 
     card.className =
-      'league-card'
+      'league-card';
 
 
     card.innerHTML = `
@@ -293,66 +309,121 @@ function renderTeams() {
             )}
           </h3>
 
-          ${
-            team.status === 'active'
-
-              ? `
-                <span class="badge good">
-                  ATTIVA
-                </span>
-              `
-
-              : `
-                <span class="badge">
-                  IN ATTESA
-                </span>
-              `
-          }
-
           <p>
-            Presidente:
-            <strong>
-              ${escapeHtml(
-                team.presidentUsername
-                || 'non assegnato'
-              )}
-            </strong>
+            ${
+              team.presidentUsername
+
+                ? `
+                  Presidente:
+                  <strong>
+                    ${escapeHtml(
+                      team.presidentUsername
+                    )}
+                  </strong>
+                `
+
+                : 'Nessun Presidente assegnato'
+            }
           </p>
 
         </div>
 
+
+        <span
+          class="badge ${
+            team.status === 'active'
+              ? 'good'
+              : ''
+          }"
+        >
+          ${
+            team.status === 'active'
+              ? 'ATTIVA'
+              : escapeHtml(
+                  team.status
+                )
+          }
+        </span>
+
       </div>
 
-    `
+    `;
 
 
     teamsList.appendChild(
       card
-    )
+    );
   }
 
 
-  if (
-    managementData.teamLimit
-    !== null
-  ) {
+  if (limit) {
 
     const info =
       document.createElement(
         'p'
-      )
+      );
+
 
     info.className =
-      'setting-help'
+      'setting-help';
+
 
     info.textContent =
-      `${teams.length} / ${managementData.teamLimit} squadre`
+      `${teams.length} di ${limit} squadre create`;
 
 
-    teamsList.prepend(
+    teamsList.appendChild(
       info
-    )
+    );
   }
+}
+
+
+/* =========================================================
+   BADGE MEMBRO
+   ========================================================= */
+
+function renderMemberBadges(member) {
+
+  const badges = [];
+
+
+  for (
+    const role
+    of member.leagueRoles || []
+  ) {
+
+    badges.push(`
+      <span class="badge admin">
+        ${escapeHtml(
+          roleLabel(role)
+        )}
+      </span>
+    `);
+  }
+
+
+  if (
+    member.team
+  ) {
+
+    badges.push(`
+      <span class="badge good">
+        ${escapeHtml(
+          roleLabel(
+            member.team.role
+          )
+        )}
+        ·
+        ${escapeHtml(
+          member.team.teamName
+        )}
+      </span>
+    `);
+  }
+
+
+  return badges.join('');
 }
 
 
@@ -363,10 +434,12 @@ function renderTeams() {
 function renderMembers() {
 
   const members =
-    managementData.members || []
+    managementData?.members
+    || [];
 
 
-  membersList.innerHTML = ''
+  membersList.innerHTML =
+    '';
 
 
   if (
@@ -377,10 +450,17 @@ function renderMembers() {
       <div class="empty-state">
         Nessun membro attivo.
       </div>
-    `
+    `;
 
-    return
+    return;
   }
+
+
+  const canManageRoles =
+    managementData
+      ?.permissions
+      ?.canManageRoles
+    === true;
 
 
   for (
@@ -388,32 +468,24 @@ function renderMembers() {
     of members
   ) {
 
-    const details =
+    const row =
       document.createElement(
         'details'
-      )
-
-    details.className =
-      'user-row'
+      );
 
 
-    const roles =
+    row.className =
+      'user-row';
+
+
+    const currentRoles =
       new Set(
-        member.leagueRoles || []
-      )
+        member.leagueRoles
+        || []
+      );
 
 
-    const teamDescription =
-      member.team
-
-        ? `${member.team.name} · ${roleLabel(
-            member.team.role
-          )}`
-
-        : 'Nessuna squadra'
-
-
-    details.innerHTML = `
+    row.innerHTML = `
 
       <summary>
 
@@ -426,9 +498,23 @@ function renderMembers() {
           </strong>
 
           <small>
-            ${escapeHtml(
-              teamDescription
-            )}
+            ${
+              member.team
+
+                ? `
+                  ${escapeHtml(
+                    member.team.teamName
+                  )}
+                  ·
+                  ${escapeHtml(
+                    roleLabel(
+                      member.team.role
+                    )
+                  )}
+                `
+
+                : 'Nessuna squadra'
+            }
           </small>
 
         </div>
@@ -436,66 +522,9 @@ function renderMembers() {
 
         <div class="user-summary-status">
 
-          ${
-            roles.has(
-              'league_admin'
-            )
-
-              ? `
-                <span class="badge admin">
-                  ADMIN LEGA
-                </span>
-              `
-
-              : ''
-          }
-
-
-          ${
-            roles.has(
-              'auctioneer'
-            )
-
-              ? `
-                <span class="badge">
-                  BANDITORE
-                </span>
-              `
-
-              : ''
-          }
-
-
-          ${
-            roles.has(
-              'presenter'
-            )
-
-              ? `
-                <span class="badge">
-                  PRESENTATORE
-                </span>
-              `
-
-              : ''
-          }
-
-
-          ${
-            member.team
-
-              ? `
-                <span class="badge good">
-                  ${escapeHtml(
-                    roleLabel(
-                      member.team.role
-                    )
-                  )}
-                </span>
-              `
-
-              : ''
-          }
+          ${renderMemberBadges(
+            member
+          )}
 
         </div>
 
@@ -510,242 +539,204 @@ function renderMembers() {
       <div class="user-detail">
 
         ${
-          member.team
-
-            ? `
-              <p>
-                Squadra:
-                <strong>
-                  ${escapeHtml(
-                    member.team.name
-                  )}
-                </strong>
-              </p>
-
-              <p>
-                Ruolo squadra:
-                <strong>
-                  ${escapeHtml(
-                    roleLabel(
-                      member.team.role
-                    )
-                  )}
-                </strong>
-              </p>
-            `
-
-            : `
-              <p class="setting-help">
-                Questo utente non è associato
-                ad alcuna squadra.
-              </p>
-            `
-        }
-
-
-        ${
-          managementData
-            .permissions
-            .canManageRoles
+          canManageRoles
 
             ? `
 
-              <div class="divider"></div>
+              <div class="user-metadata">
 
-              <p class="setting-help">
-                Ruoli di lega
-              </p>
+                <label>
 
+                  <input
+                    type="checkbox"
+                    data-member-role="league_admin"
+                    ${
+                      currentRoles.has(
+                        'league_admin'
+                      )
+                        ? 'checked'
+                        : ''
+                    }
+                  >
 
-              <label class="setting-row">
+                  Admin Lega
 
-                <span>
-                  <strong>
-                    Admin Lega
-                  </strong>
-
-                  <small>
-                    Gestione completa della lega.
-                  </small>
-                </span>
-
-                <input
-                  class="role-admin"
-                  type="checkbox"
-
-                  ${
-                    roles.has(
-                      'league_admin'
-                    )
-                      ? 'checked'
-                      : ''
-                  }
-                >
-
-              </label>
+                </label>
 
 
-              <label class="setting-row">
+                <label>
 
-                <span>
-                  <strong>
-                    Banditore
-                  </strong>
+                  <input
+                    type="checkbox"
+                    data-member-role="auctioneer"
+                    ${
+                      currentRoles.has(
+                        'auctioneer'
+                      )
+                        ? 'checked'
+                        : ''
+                    }
+                  >
 
-                  <small>
-                    Gestisce l'asta live
-                    e conferma le assegnazioni.
-                  </small>
-                </span>
+                  Banditore
 
-                <input
-                  class="role-auctioneer"
-                  type="checkbox"
-
-                  ${
-                    roles.has(
-                      'auctioneer'
-                    )
-                      ? 'checked'
-                      : ''
-                  }
-                >
-
-              </label>
+                </label>
 
 
-              <label class="setting-row">
+                <label>
 
-                <span>
-                  <strong>
-                    Presentatore
-                  </strong>
+                  <input
+                    type="checkbox"
+                    data-member-role="presenter"
+                    ${
+                      currentRoles.has(
+                        'presenter'
+                      )
+                        ? 'checked'
+                        : ''
+                    }
+                  >
 
-                  <small>
-                    Accesso alla visualizzazione
-                    TV/proiettore.
-                  </small>
-                </span>
+                  Presentatore
 
-                <input
-                  class="role-presenter"
-                  type="checkbox"
+                </label>
 
-                  ${
-                    roles.has(
-                      'presenter'
-                    )
-                      ? 'checked'
-                      : ''
-                  }
-                >
-
-              </label>
+              </div>
 
 
               <button
-                class="save-roles"
                 type="button"
+                class="secondary"
+                data-save-member-roles
+                data-user-id="${escapeHtml(
+                  member.userId
+                )}"
               >
                 Salva ruoli
               </button>
 
             `
 
-            : ''
+            : `
+
+              <p class="setting-help">
+                Solo un Admin Lega può modificare
+                i ruoli.
+              </p>
+
+            `
         }
 
       </div>
 
-    `
+    `;
 
 
-    if (
-      managementData
-        .permissions
-        .canManageRoles
-    ) {
+    /*
+     * Conserviamo i ruoli attuali direttamente
+     * sull'elemento per calcolare solo le modifiche.
+     */
 
-      const saveButton =
-        details.querySelector(
-          '.save-roles'
-        )
-
-
-      saveButton.addEventListener(
-        'click',
-        async () => {
-
-          await saveMemberRoles(
-            member,
-            details,
-            saveButton
-          )
-        }
-      )
-    }
+    row.dataset.currentRoles =
+      JSON.stringify(
+        member.leagueRoles
+        || []
+      );
 
 
     membersList.appendChild(
-      details
-    )
+      row
+    );
   }
 }
 
 
 /* =========================================================
-   SALVATAGGIO RUOLI
+   SALVA RUOLI
    ========================================================= */
 
 async function saveMemberRoles(
-  member,
-  details,
   button
 ) {
 
-  showMessage('')
+  const userId =
+    button.dataset.userId;
 
 
-  const desired = {
+  const row =
+    button.closest(
+      '.user-row'
+    );
 
-    league_admin:
-      details
-        .querySelector(
-          '.role-admin'
-        )
-        .checked,
 
-    auctioneer:
-      details
-        .querySelector(
-          '.role-auctioneer'
-        )
-        .checked,
+  if (
+    !userId
+    ||
+    !row
+  ) {
 
-    presenter:
-      details
-        .querySelector(
-          '.role-presenter'
-        )
-        .checked
+    return;
   }
 
 
-  const current =
+  let originalRoles = [];
+
+
+  try {
+
+    originalRoles =
+      JSON.parse(
+        row.dataset
+          .currentRoles
+        || '[]'
+      );
+
+  } catch {
+
+    originalRoles = [];
+  }
+
+
+  const originalSet =
     new Set(
-      member.leagueRoles || []
-    )
+      originalRoles
+    );
+
+
+  const desiredSet =
+    new Set(
+      [
+        ...row.querySelectorAll(
+          '[data-member-role]'
+        )
+      ]
+        .filter(
+          checkbox =>
+            checkbox.checked
+        )
+        .map(
+          checkbox =>
+            checkbox.dataset
+              .memberRole
+        )
+    );
+
+
+  const allRoles = [
+    'league_admin',
+    'auctioneer',
+    'presenter'
+  ];
 
 
   const changes =
-    Object.entries(
-      desired
-    )
+    allRoles
       .filter(
-        ([role, enabled]) =>
-          current.has(role)
-          !== enabled
-      )
+        role =>
+          originalSet.has(role)
+          !==
+          desiredSet.has(role)
+      );
 
 
   if (
@@ -755,115 +746,122 @@ async function saveMemberRoles(
     showMessage(
       'Nessuna modifica da salvare.',
       'success'
-    )
+    );
 
-    return
+    return;
   }
 
 
   button.disabled =
-    true
+    true;
 
 
-  const originalText =
-    button.textContent
+  const oldText =
+    button.textContent;
 
 
   button.textContent =
-    'Salvataggio...'
+    'Salvataggio...';
 
 
   try {
 
     for (
-      const [
-        role,
-        enabled
-      ]
+      const role
       of changes
     ) {
 
-      const data =
+      const result =
         await callApi({
 
           action:
             'setMemberRole',
 
           targetUserId:
-            member.userId,
+            userId,
 
           role,
 
-          enabled
-        })
+          enabled:
+            desiredSet.has(role)
+        });
 
 
-      if (!data?.ok) {
+      if (!result?.ok) {
 
         throw new Error(
-          data?.error ||
-          'Impossibile aggiornare il ruolo.'
-        )
+          result?.error
+          ||
+          'Impossibile modificare il ruolo.'
+        );
       }
     }
 
 
     showMessage(
-      `Ruoli di ${member.username} aggiornati.`,
+      'Ruoli aggiornati.',
       'success'
-    )
+    );
 
 
-    await loadManagement()
+    await loadManagement();
 
 
   } catch (error) {
 
-    console.error(error)
+    console.error(error);
 
 
     showMessage(
-      error.message ||
+      error.message
+      ||
       'Errore durante il salvataggio.',
       'error'
-    )
+    );
+
 
   } finally {
 
     button.disabled =
-      false
+      false;
+
 
     button.textContent =
-      originalText
+      oldText;
   }
 }
 
 
 /* =========================================================
-   RICHIESTE VICE
+   VICE
    ========================================================= */
 
 function renderViceRequests() {
 
   const requests =
-    managementData.viceRequests || []
+    managementData
+      ?.viceRequests
+    || [];
+
+
+  const canApprove =
+    managementData
+      ?.permissions
+      ?.canApproveVice
+    === true;
 
 
   viceSection.hidden =
-    !managementData
-      .permissions
-      .canApproveVice
+    !canApprove;
 
 
-  if (
-    viceSection.hidden
-  ) {
+  viceRequests.innerHTML =
+    '';
 
-    return
+
+  if (!canApprove) {
+    return;
   }
-
-
-  viceRequests.innerHTML = ''
 
 
   if (
@@ -872,12 +870,11 @@ function renderViceRequests() {
 
     viceRequests.innerHTML = `
       <div class="empty-state">
-        Nessuna candidatura Vice
-        in attesa.
+        Nessuna richiesta Vice da approvare.
       </div>
-    `
+    `;
 
-    return
+    return;
   }
 
 
@@ -886,16 +883,17 @@ function renderViceRequests() {
     of requests
   ) {
 
-    const card =
+    const row =
       document.createElement(
-        'article'
-      )
-
-    card.className =
-      'league-card'
+        'div'
+      );
 
 
-    card.innerHTML = `
+    row.className =
+      'league-card';
+
+
+    row.innerHTML = `
 
       <div class="league-card-header">
 
@@ -907,310 +905,314 @@ function renderViceRequests() {
             )}
           </h3>
 
-          ${
-            request.leagueApproved
+          <p>
+            ${
+              request.leagueApproved
 
-              ? `
-                <span class="badge good">
-                  LEGA APPROVATA
-                </span>
-              `
+                ? 'Approvato dall’Admin Lega'
 
-              : `
-                <span class="badge">
-                  ATTESA ADMIN LEGA
-                </span>
-              `
-          }
-
-          <p class="setting-help">
-            Vuole diventare Vice
-            della tua squadra.
+                : 'In attesa dell’Admin Lega'
+            }
           </p>
 
         </div>
 
+
+        <span
+          class="badge ${
+            request.leagueApproved
+              ? 'good'
+              : ''
+          }"
+        >
+          VICE
+        </span>
+
       </div>
 
-    `
+
+      <div class="league-actions">
+
+        <button
+          type="button"
+          class="success"
+          data-approve-vice
+          data-user-id="${escapeHtml(
+            request.userId
+          )}"
+        >
+          Approva
+        </button>
 
 
-    const actions =
-      document.createElement(
-        'div'
-      )
+        <button
+          type="button"
+          class="danger"
+          data-reject-vice
+          data-user-id="${escapeHtml(
+            request.userId
+          )}"
+        >
+          Rifiuta
+        </button>
 
-    actions.className =
-      'league-actions'
+      </div>
 
-
-    const approveButton =
-      document.createElement(
-        'button'
-      )
-
-    approveButton.type =
-      'button'
-
-    approveButton.textContent =
-      'Approva Vice'
-
-
-    const rejectButton =
-      document.createElement(
-        'button'
-      )
-
-    rejectButton.type =
-      'button'
-
-    rejectButton.className =
-      'danger'
-
-    rejectButton.textContent =
-      'Rifiuta'
-
-
-    approveButton.addEventListener(
-      'click',
-      async () => {
-
-        await handleViceAction(
-          'approveVice',
-          request,
-          approveButton,
-          rejectButton
-        )
-      }
-    )
-
-
-    rejectButton.addEventListener(
-      'click',
-      async () => {
-
-        await handleViceAction(
-          'rejectVice',
-          request,
-          rejectButton,
-          approveButton
-        )
-      }
-    )
-
-
-    actions.append(
-      approveButton,
-      rejectButton
-    )
-
-
-    card.appendChild(
-      actions
-    )
+    `;
 
 
     viceRequests.appendChild(
-      card
-    )
-  }
-}
-
-
-async function handleViceAction(
-  action,
-  request,
-  button,
-  otherButton
-) {
-
-  showMessage('')
-
-
-  button.disabled =
-    true
-
-  otherButton.disabled =
-    true
-
-
-  const originalText =
-    button.textContent
-
-
-  button.textContent =
-    action === 'approveVice'
-      ? 'Approvazione...'
-      : 'Rifiuto...'
-
-
-  try {
-
-    const data =
-      await callApi({
-
-        action,
-
-        viceUserId:
-          request.userId
-      })
-
-
-    if (!data?.ok) {
-
-      throw new Error(
-        data?.error ||
-        'Operazione non riuscita.'
-      )
-    }
-
-
-    showMessage(
-      action === 'approveVice'
-
-        ? `${request.username} approvato come Vice.`
-
-        : `Candidatura di ${request.username} rifiutata.`,
-      'success'
-    )
-
-
-    await loadManagement()
-
-
-  } catch (error) {
-
-    console.error(error)
-
-
-    showMessage(
-      error.message ||
-      'Errore durante l’operazione.',
-      'error'
-    )
-
-  } finally {
-
-    button.disabled =
-      false
-
-    otherButton.disabled =
-      false
-
-    button.textContent =
-      originalText
+      row
+    );
   }
 }
 
 
 /* =========================================================
-   CREA SQUADRA
+   CREATE TEAM
    ========================================================= */
 
-createTeamForm.addEventListener(
-  'submit',
-  async event => {
+createTeamForm
+  .addEventListener(
+    'submit',
+    async event => {
 
-    event.preventDefault()
-
-
-    showMessage('')
+      event.preventDefault();
 
 
-    const name =
-      newTeamName
-        .value
-        .trim()
+      showMessage('');
 
 
-    if (
-      name.length < 2
-    ) {
-
-      showMessage(
-        'Inserisci un nome squadra valido.',
-        'error'
-      )
-
-      return
-    }
+      const teamName =
+        newTeamName
+          .value
+          .trim();
 
 
-    const button =
-      createTeamForm
-        .querySelector(
-          'button[type="submit"]'
-        )
+      if (
+        teamName.length < 2
+      ) {
 
+        showMessage(
+          'Inserisci un nome valido per la squadra.',
+          'error'
+        );
 
-    button.disabled =
-      true
-
-
-    const originalText =
-      button.textContent
-
-
-    button.textContent =
-      'Creazione...'
-
-
-    try {
-
-      const data =
-        await callApi({
-
-          action:
-            'createTeam',
-
-          teamName:
-            name
-        })
-
-
-      if (!data?.ok) {
-
-        throw new Error(
-          data?.error ||
-          'Impossibile creare la squadra.'
-        )
+        return;
       }
 
 
-      newTeamName.value =
-        ''
+      const button =
+        createTeamForm
+          .querySelector(
+            'button[type="submit"]'
+          );
 
-
-      showMessage(
-        `Squadra "${name}" creata.`,
-        'success'
-      )
-
-
-      await loadManagement()
-
-
-    } catch (error) {
-
-      console.error(error)
-
-
-      showMessage(
-        error.message ||
-        'Errore durante la creazione.',
-        'error'
-      )
-
-    } finally {
 
       button.disabled =
-        false
+        true;
+
+
+      const oldText =
+        button.textContent;
+
 
       button.textContent =
-        originalText
+        'Creazione...';
+
+
+      try {
+
+        const result =
+          await callApi({
+
+            action:
+              'createTeam',
+
+            teamName
+          });
+
+
+        if (!result?.ok) {
+
+          throw new Error(
+            result?.error
+            ||
+            'Impossibile creare la squadra.'
+          );
+        }
+
+
+        newTeamName.value =
+          '';
+
+
+        showMessage(
+          'Squadra creata.',
+          'success'
+        );
+
+
+        await loadManagement();
+
+
+      } catch (error) {
+
+        console.error(error);
+
+
+        showMessage(
+          error.message
+          ||
+          'Errore durante la creazione.',
+          'error'
+        );
+
+
+      } finally {
+
+        button.disabled =
+          false;
+
+
+        button.textContent =
+          oldText;
+      }
     }
-  }
-)
+  );
+
+
+/* =========================================================
+   EVENTI MEMBRI
+   ========================================================= */
+
+membersList
+  .addEventListener(
+    'click',
+    event => {
+
+      const button =
+        event.target.closest(
+          '[data-save-member-roles]'
+        );
+
+
+      if (!button) {
+        return;
+      }
+
+
+      saveMemberRoles(
+        button
+      );
+    }
+  );
+
+
+/* =========================================================
+   EVENTI VICE
+   ========================================================= */
+
+viceRequests
+  .addEventListener(
+    'click',
+    async event => {
+
+      const approveButton =
+        event.target.closest(
+          '[data-approve-vice]'
+        );
+
+
+      const rejectButton =
+        event.target.closest(
+          '[data-reject-vice]'
+        );
+
+
+      const button =
+        approveButton
+        ||
+        rejectButton;
+
+
+      if (!button) {
+        return;
+      }
+
+
+      const userId =
+        button.dataset.userId;
+
+
+      if (!userId) {
+        return;
+      }
+
+
+      const action =
+        approveButton
+          ? 'approveVice'
+          : 'rejectVice';
+
+
+      button.disabled =
+        true;
+
+
+      try {
+
+        const result =
+          await callApi({
+
+            action,
+
+            targetUserId:
+              userId
+          });
+
+
+        if (!result?.ok) {
+
+          throw new Error(
+            result?.error
+            ||
+            'Impossibile completare l’operazione.'
+          );
+        }
+
+
+        showMessage(
+          approveButton
+            ? 'Vice approvato.'
+            : 'Richiesta Vice rifiutata.',
+          'success'
+        );
+
+
+        await loadManagement();
+
+
+      } catch (error) {
+
+        console.error(error);
+
+
+        showMessage(
+          error.message
+          ||
+          'Errore durante l’operazione.',
+          'error'
+        );
+
+
+      } finally {
+
+        button.disabled =
+          false;
+      }
+    }
+  );
 
 
 /* =========================================================
@@ -1219,7 +1221,7 @@ createTeamForm.addEventListener(
 
 async function loadManagement() {
 
-  showMessage('')
+  showMessage('');
 
 
   try {
@@ -1228,51 +1230,55 @@ async function loadManagement() {
       await callApi({
         action:
           'getManagementData'
-      })
+      });
 
 
     if (!data?.ok) {
 
       showMessage(
-        data?.error ||
+        data?.error
+        ||
         'Impossibile caricare la gestione della lega.',
         'error'
-      )
+      );
 
-      return
+      return;
     }
 
 
     managementData =
-      data
+      data;
 
 
     leagueTitle.textContent =
-      `Membri e squadre · ${data.league.name}`
+      `Membri e squadre · ${
+        data.league.name
+      }`;
 
 
     createTeamArea.hidden =
       !data.permissions
-        .canCreateTeam
+        .canCreateTeam;
 
 
-    renderTeams()
+    renderTeams();
 
-    renderMembers()
+    renderMembers();
 
-    renderViceRequests()
+    renderViceRequests();
 
 
   } catch (error) {
 
-    console.error(error)
+    console.error(error);
 
 
     showMessage(
-      error.message ||
+      error.message
+      ||
       'Errore durante il caricamento.',
       'error'
-    )
+    );
   }
 }
 
@@ -1282,15 +1288,15 @@ async function loadManagement() {
    ========================================================= */
 
 selectedLeague =
-  getSelectedLeague()
+  getSelectedLeague();
 
 
 if (!selectedLeague?.id) {
 
   window.location.href =
-    'leagues.html'
+    'leagues.html';
 
 } else {
 
-  loadManagement()
+  loadManagement();
 }
