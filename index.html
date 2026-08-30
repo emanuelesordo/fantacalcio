@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
   <meta charset="UTF-8">
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
@@ -9,37 +11,52 @@
 
   <title>Fantacalcio Live</title>
 
-  <link rel="stylesheet" href="style.css">
+  <link
+    rel="stylesheet"
+    href="style.css?v=3"
+  >
 </head>
+
 
 <body>
 
   <main>
 
+    <!-- AREA LOGIN -->
     <section id="login-area">
+
       <h1>Fantacalcio Live</h1>
 
       <form id="login-form">
 
-        <label>
+        <label for="username">
           Username
-          <input
-            id="username"
-            type="text"
-            autocomplete="username"
-            required
-          >
         </label>
 
-        <label>
+        <input
+          id="username"
+          name="username"
+          type="text"
+          autocomplete="username"
+          minlength="2"
+          maxlength="30"
+          required
+        >
+
+
+        <label for="password">
           Password
-          <input
-            id="password"
-            type="password"
-            autocomplete="current-password"
-            required
-          >
         </label>
+
+        <input
+          id="password"
+          name="password"
+          type="password"
+          autocomplete="current-password"
+          minlength="6"
+          required
+        >
+
 
         <button type="submit">
           Entra
@@ -47,20 +64,35 @@
 
       </form>
 
-      <p id="message"></p>
+
+      <p
+        id="message"
+        aria-live="polite"
+      ></p>
+
     </section>
 
 
-    <section id="logged-area" hidden>
+
+    <!-- AREA UTENTE LOGGATO -->
+    <section
+      id="logged-area"
+      hidden
+    >
 
       <h1>
         Ciao,
         <span id="current-username"></span>
       </h1>
 
-      <p>Accesso effettuato correttamente.</p>
+      <p>
+        Accesso effettuato correttamente.
+      </p>
 
-      <button id="logout-button">
+      <button
+        id="logout-button"
+        type="button"
+      >
         Esci
       </button>
 
@@ -68,10 +100,13 @@
 
   </main>
 
-  <script
-    type="module"
-    src="app.js">
-  </script>
+
+  <!--
+    Carichiamo SOLO il nuovo app.js.
+    Nessun supabase.js e nessun vecchio script Auth.
+  -->
+  <script src="app.js?v=3"></script>
 
 </body>
+
 </html>
