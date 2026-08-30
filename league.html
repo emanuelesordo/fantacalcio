@@ -2,108 +2,49 @@
 <html lang="it">
 
 <head>
-
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lega - Fantacalcio Live</title>
-
-  <link
-    rel="stylesheet"
-    href="style.css?v=15"
-  >
-
+  <link rel="stylesheet" href="style.css?v=16">
 </head>
-
 
 <body>
 
 <main class="page-shell">
 
-
   <header class="page-header">
-
     <div>
-
-      <h1 id="league-title">
-        Lega
-      </h1>
-
-      <p id="league-subtitle">
-        Caricamento...
-      </p>
-
+      <h1 id="league-title">Lega</h1>
+      <p id="league-subtitle">Caricamento...</p>
     </div>
 
-
-    <a
-      class="back-home"
-      href="leagues.html"
-    >
+    <a class="back-home" href="leagues.html">
       ← Le leghe
     </a>
-
   </header>
 
 
   <nav class="tabs league-tabs">
 
-    <a
-      href="league.html"
-      class="tab active"
-    >
-      <span class="tab-title">
-        Home
-      </span>
-
-      <span class="tab-description">
-        Dashboard
-      </span>
+    <a href="league.html" class="tab active">
+      <span class="tab-title">Home</span>
+      <span class="tab-description">Dashboard</span>
     </a>
 
-
     <span class="tab disabled">
-
-      <span class="tab-title">
-        Asta
-      </span>
-
-      <span class="tab-description">
-        Live
-      </span>
-
+      <span class="tab-title">Asta</span>
+      <span class="tab-description">Live</span>
     </span>
 
-
     <span class="tab disabled">
-
-      <span class="tab-title">
-        Rose
-      </span>
-
-      <span class="tab-description">
-        Squadre
-      </span>
-
+      <span class="tab-title">Rose</span>
+      <span class="tab-description">Squadre</span>
     </span>
 
-
-    <span class="tab disabled">
-
-      <span class="tab-title">
-        Listone
-      </span>
-
-      <span class="tab-description">
-        Giocatori
-      </span>
-
-    </span>
-
+    <a href="league-list.html" class="tab">
+      <span class="tab-title">Listone</span>
+      <span class="tab-description">Giocatori</span>
+    </a>
 
     <a
       id="setup-tab"
@@ -111,15 +52,8 @@
       class="tab"
       hidden
     >
-
-      <span class="tab-title">
-        Setup
-      </span>
-
-      <span class="tab-description">
-        Configurazione
-      </span>
-
+      <span class="tab-title">Setup</span>
+      <span class="tab-description">Configurazione</span>
     </a>
 
   </nav>
@@ -135,55 +69,24 @@
   <section class="card">
 
     <div class="section-heading">
-
-      <span class="section-label">
-        LEGA
-      </span>
-
+      <span class="section-label">LEGA</span>
       <div>
-
         <h2>Panoramica</h2>
-
-        <p>
-          Informazioni e ruolo corrente
-        </p>
-
+        <p>Informazioni e ruolo corrente</p>
       </div>
-
     </div>
 
 
     <div class="stats-grid">
 
       <div class="stat-card">
-
-        <span class="stat-label">
-          Codice
-        </span>
-
-        <span
-          id="league-code"
-          class="stat-value"
-        >
-          —
-        </span>
-
+        <span class="stat-label">Codice</span>
+        <span id="league-code" class="stat-value">—</span>
       </div>
 
-
       <div class="stat-card">
-
-        <span class="stat-label">
-          Squadre
-        </span>
-
-        <span
-          id="teams-count"
-          class="stat-value"
-        >
-          —
-        </span>
-
+        <span class="stat-label">Squadre</span>
+        <span id="teams-count" class="stat-value">—</span>
       </div>
 
     </div>
@@ -193,13 +96,8 @@
 
 
     <div>
-
-      <p class="setting-help">
-        I tuoi ruoli
-      </p>
-
+      <p class="setting-help">I tuoi ruoli</p>
       <div id="my-roles"></div>
-
     </div>
 
 
@@ -219,23 +117,12 @@
   <section class="card">
 
     <div class="section-heading">
-
-      <span class="section-label">
-        TEAM
-      </span>
-
+      <span class="section-label">TEAM</span>
       <div>
-
         <h2>La tua squadra</h2>
-
-        <p>
-          Squadra e ruolo associato
-        </p>
-
+        <p>Squadra e ruolo associato</p>
       </div>
-
     </div>
-
 
     <div id="my-team"></div>
 
@@ -245,28 +132,14 @@
   <section class="card">
 
     <div class="section-heading">
-
-      <span class="section-label">
-        CLUB
-      </span>
-
+      <span class="section-label">CLUB</span>
       <div>
-
         <h2>Squadre</h2>
-
-        <p>
-          Squadre presenti nella lega
-        </p>
-
+        <p>Squadre presenti nella lega</p>
       </div>
-
     </div>
 
-
-    <div
-      id="teams-list"
-      class="league-list"
-    ></div>
+    <div id="teams-list" class="league-list"></div>
 
   </section>
 
@@ -278,31 +151,16 @@
   >
 
     <div class="section-heading">
-
-      <span class="section-label">
-        ADMIN
-      </span>
-
+      <span class="section-label">ADMIN</span>
       <div>
-
         <h2>Amministrazione</h2>
-
-        <p>
-          Richieste di ingresso nella lega
-        </p>
-
+        <p>Richieste di ingresso nella lega</p>
       </div>
-
     </div>
 
-
-    <div
-      id="pending-requests"
-      class="league-list"
-    ></div>
+    <div id="pending-requests" class="league-list"></div>
 
   </section>
-
 
 </main>
 
