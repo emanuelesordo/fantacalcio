@@ -1,6 +1,10 @@
 const SUPABASE_URL =
   'https://yyklmhzjxzkvycmxkegx.supabase.co'
 
+const AUTH_URL =
+  `${SUPABASE_URL}/functions/v1/simple-auth`
+
+
 const loginForm =
   document.getElementById('login-form')
 
@@ -43,14 +47,15 @@ function saveSession(data) {
       user: data.user
     })
   )
-
 }
 
 
-function getSession() {
+function readLocalSession() {
 
   const raw =
-    localStorage.getItem('fantacalcio_session')
+    localStorage.getItem(
+      'fantacalcio_session'
+    )
 
   if (!raw) {
     return null
@@ -58,31 +63,30 @@ function getSession() {
 
   try {
 
-    const session = JSON.parse(raw)
-
-    if (
-      new Date(session.expiresAt).getTime()
-      <= Date.now()
-    ) {
-
-      localStorage.removeItem(
-        'fantacalcio_session'
-      )
-
-      return null
-    }
-
-    return session
+    return JSON.parse(raw)
 
   } catch {
 
-    localStorage.removeItem(
-      'fantacalcio_session'
-    )
-
+    clearLocalSession()
     return null
   }
+}
 
+
+function clearLocalSession() {
+
+  localStorage.removeItem(
+    'fantacalcio_session'
+  )
+}
+
+
+function showLogin() {
+
+  loggedArea.hidden = true
+  loginArea.hidden = false
+
+  passwordInput.value = ''
 }
 
 
@@ -93,10 +97,34 @@ function showLoggedUser(session) {
 
   loginArea.hidden = true
   loggedArea.hidden = false
-
 }
 
 
+async function callAuth(body) {
+
+  const response =
+    await fetch(
+      AUTH_URL,
+      {
+        method: 'POST',
+
+        headers: {
+          'Content-Type':
+            'application/json'
+        },
+
+        body:
+          JSON.stringify(body)
+      }
+    )
+
+  return await response.json()
+}
+
+
+/*
+ * LOGIN
+ */
 loginForm.addEventListener(
   'submit',
   async event => {
@@ -111,56 +139,58 @@ loginForm.addEventListener(
     const password =
       passwordInput.value
 
+
     if (username.length < 2) {
+
       showMessage(
         'Inserisci un username valido.',
         'error'
       )
+
       return
     }
 
+
     if (password.length < 6) {
+
       showMessage(
         'La password deve avere almeno 6 caratteri.',
         'error'
       )
+
       return
     }
 
+
     try {
 
-      const response = await fetch(
-        `${SUPABASE_URL}/functions/v1/simple-auth`,
-        {
-          method: 'POST',
+      const data =
+        await callAuth({
+          action: 'login',
+          username,
+          password
+        })
 
-          headers: {
-            'Content-Type': 'application/json'
-          },
-
-          body: JSON.stringify({
-            username,
-            password
-          })
-        }
-      )
-
-      const data = await response.json()
 
       if (!data.ok) {
+
         showMessage(
           data.error ||
           'Errore durante l’accesso.',
           'error'
         )
+
         return
       }
 
+
       saveSession(data)
 
-      showLoggedUser(
-        getSession()
-      )
+      showLoggedUser({
+        user: data.user,
+        expiresAt: data.expiresAt
+      })
+
 
     } catch (error) {
 
@@ -170,34 +200,143 @@ loginForm.addEventListener(
         'Impossibile contattare il server.',
         'error'
       )
-
     }
-
   }
 )
 
 
+/*
+ * LOGOUT
+ */
 logoutButton.addEventListener(
   'click',
-  () => {
+  async () => {
 
-    localStorage.removeItem(
-      'fantacalcio_session'
-    )
+    const session =
+      readLocalSession()
 
-    loggedArea.hidden = true
-    loginArea.hidden = false
 
-    passwordInput.value = ''
+    /*
+     * Prima togliamo immediatamente
+     * la sessione dal browser.
+     */
+    clearLocalSession()
 
+    showLogin()
     showMessage('')
 
+
+    /*
+     * Poi chiediamo al server
+     * di revocarla.
+     */
+    if (session?.token) {
+
+      try {
+
+        await callAuth({
+          action: 'logout',
+          sessionToken:
+            session.token
+        })
+
+      } catch (error) {
+
+        console.error(
+          'Errore logout server:',
+          error
+        )
+      }
+    }
   }
 )
 
 
-const currentSession = getSession()
+/*
+ * AVVIO APP:
+ * controlliamo sul SERVER
+ * l'eventuale sessione salvata.
+ */
+async function initializeApp() {
 
-if (currentSession) {
-  showLoggedUser(currentSession)
+  const localSession =
+    readLocalSession()
+
+
+  if (!localSession?.token) {
+
+    showLogin()
+    return
+  }
+
+
+  try {
+
+    const data =
+      await callAuth({
+        action: 'validate',
+        sessionToken:
+          localSession.token
+      })
+
+
+    if (
+      !data.ok ||
+      !data.valid
+    ) {
+
+      clearLocalSession()
+      showLogin()
+
+      return
+    }
+
+
+    /*
+     * Aggiorniamo i dati locali
+     * con quelli ufficiali server.
+     */
+    localStorage.setItem(
+      'fantacalcio_session',
+      JSON.stringify({
+        token:
+          localSession.token,
+
+        expiresAt:
+          data.expiresAt,
+
+        user:
+          data.user
+      })
+    )
+
+
+    showLoggedUser({
+      user: data.user,
+      expiresAt: data.expiresAt
+    })
+
+
+  } catch (error) {
+
+    console.error(
+      'Errore validazione sessione:',
+      error
+    )
+
+    /*
+     * Se il server è temporaneamente
+     * irraggiungibile non cancelliamo
+     * subito la sessione.
+     */
+    showLogin()
+
+    showMessage(
+      'Impossibile verificare la sessione.',
+      'error'
+    )
+  }
 }
+
+
+initializeApp()
