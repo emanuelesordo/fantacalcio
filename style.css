@@ -1561,3 +1561,35 @@ and
       100vh;
   }
 }
+
+/* =========================================================
+   NAV LEGA
+   ========================================================= */
+
+.league-tabs {
+  grid-template-columns:
+    repeat(
+      5,
+      minmax(0, 1fr)
+    );
+}
+
+
+@media
+(max-width: 700px) {
+
+  .league-tabs {
+    display: flex;
+
+    overflow-x: auto;
+
+    padding-bottom: 4px;
+  }
+
+
+  .league-tabs .tab {
+    min-width: 90px;
+
+    flex: 1 0 auto;
+  }
+}
