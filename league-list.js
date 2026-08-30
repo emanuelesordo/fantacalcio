@@ -1,545 +1,228 @@
-const SUPABASE_URL =
-  'https://yyklmhzjxzkvycmxkegx.supabase.co'
+const SUPABASE_URL = 'https://yyklmhzjxzkvycmxkegx.supabase.co';
+const API_URL = `${SUPABASE_URL}/functions/v1/list-api`;
+const NATIONALITY_API_URL = `${SUPABASE_URL}/functions/v1/nationality-api`;
+const IMPORT_CHUNK_SIZE = 75;
 
-const API_URL =
-  `${SUPABASE_URL}/functions/v1/list-api`
+let selectedLeague = null;
+let listData = null;
+let activeRole = 'all';
+let sortState = { key: 'name', direction: 'asc' };
 
-const IMPORT_CHUNK_SIZE = 75
+const $ = id => document.getElementById(id);
 
+const leagueTitle = $('league-title');
+const leagueSubtitle = $('league-subtitle');
+const message = $('page-message');
+const setupTab = $('setup-tab');
 
-let selectedLeague = null
-let listData = null
+const listImportSection = $('list-import-section');
+const listImportForm = $('list-import-form');
+const listFile = $('list-file');
+const listReferenceDate = $('list-reference-date');
+const listImportButton = $('list-import-button');
+const listImportProgress = $('list-import-progress');
 
+const importInfo = $('import-info');
+const playersCount = $('players-count');
+const fantasyMode = $('fantasy-mode');
+const importDetails = $('import-details');
 
-/* =========================================================
-   DOM
-   ========================================================= */
+const roleFilterBar = $('role-filter-bar');
+const playerFilterGrid = $('player-filter-grid');
+const playerSearch = $('player-search');
+const teamFilter = $('player-team-filter');
+const slotFilter = $('player-slot-filter');
+const flagFilter = $('player-flag-filter');
+const filterResetButton = $('player-filter-reset');
+const playerCountLine = $('player-count-line');
+const filteredCount = $('filtered-count');
+const playerTableWrap = $('player-table-wrap');
+const playersTableBody = $('players-table-body');
+const playersEmpty = $('players-empty');
+const sortButtons = [...document.querySelectorAll('.player-sort-button')];
 
-const leagueTitle =
-  document.getElementById(
-    'league-title'
-  )
+const superAdminNationalitySection = $('superadmin-nationality-section');
+const nationalityEnrichButton = $('nationality-enrich-button');
+const nationalityProgress = $('nationality-progress');
 
-const leagueSubtitle =
-  document.getElementById(
-    'league-subtitle'
-  )
-
-const message =
-  document.getElementById(
-    'page-message'
-  )
-
-const setupTab =
-  document.getElementById(
-    'setup-tab'
-  )
-
-
-const listImportSection =
-  document.getElementById(
-    'list-import-section'
-  )
-
-const listImportForm =
-  document.getElementById(
-    'list-import-form'
-  )
-
-const listFile =
-  document.getElementById(
-    'list-file'
-  )
-
-const listReferenceDate =
-  document.getElementById(
-    'list-reference-date'
-  )
-
-const listImportButton =
-  document.getElementById(
-    'list-import-button'
-  )
-
-const listImportProgress =
-  document.getElementById(
-    'list-import-progress'
-  )
-
-
-const importInfo =
-  document.getElementById(
-    'import-info'
-  )
-
-const playersCount =
-  document.getElementById(
-    'players-count'
-  )
-
-const fantasyMode =
-  document.getElementById(
-    'fantasy-mode'
-  )
-
-const importDetails =
-  document.getElementById(
-    'import-details'
-  )
-
-
-const toolbar =
-  document.getElementById(
-    'list-toolbar'
-  )
-
-const playerSearch =
-  document.getElementById(
-    'player-search'
-  )
-
-const roleFilter =
-  document.getElementById(
-    'player-role-filter'
-  )
-
-const playerSort =
-  document.getElementById(
-    'player-sort'
-  )
-
-const filteredCount =
-  document.getElementById(
-    'filtered-count'
-  )
-
-const playersList =
-  document.getElementById(
-    'players-list'
-  )
-
-
-const superAdminStatsSection =
-  document.getElementById(
-    'superadmin-stats-section'
-  )
-
-const advisoryImportForm =
-  document.getElementById(
-    'advisory-import-form'
-  )
-
-const advisoryLabel =
-  document.getElementById(
-    'advisory-label'
-  )
-
-const advisorySeason =
-  document.getElementById(
-    'advisory-season'
-  )
-
-const advisoryReferenceDate =
-  document.getElementById(
-    'advisory-reference-date'
-  )
-
-const advisoryFile =
-  document.getElementById(
-    'advisory-file'
-  )
-
-const advisoryImportButton =
-  document.getElementById(
-    'advisory-import-button'
-  )
-
-const advisoryProgress =
-  document.getElementById(
-    'advisory-progress'
-  )
-
-const advisoryDatasets =
-  document.getElementById(
-    'advisory-datasets'
-  )
-
-
-/* =========================================================
-   STORAGE
-   ========================================================= */
+const superAdminStatsSection = $('superadmin-stats-section');
+const advisoryImportForm = $('advisory-import-form');
+const advisoryLabel = $('advisory-label');
+const advisorySeason = $('advisory-season');
+const advisoryReferenceDate = $('advisory-reference-date');
+const advisoryFile = $('advisory-file');
+const advisoryImportButton = $('advisory-import-button');
+const advisoryProgress = $('advisory-progress');
+const advisoryDatasets = $('advisory-datasets');
 
 function getSession() {
-
   try {
-
-    const raw =
-      localStorage.getItem(
-        'fantacalcio_session'
-      )
-
-    return raw
-      ? JSON.parse(raw)
-      : null
-
+    const raw = localStorage.getItem('fantacalcio_session');
+    return raw ? JSON.parse(raw) : null;
   } catch {
-
-    return null
+    return null;
   }
 }
-
 
 function getSelectedLeague() {
-
   try {
-
-    const raw =
-      localStorage.getItem(
-        'fantacalcio_selected_league'
-      )
-
-    return raw
-      ? JSON.parse(raw)
-      : null
-
+    const raw = localStorage.getItem('fantacalcio_selected_league');
+    return raw ? JSON.parse(raw) : null;
   } catch {
-
-    return null
+    return null;
   }
 }
 
-
-/* =========================================================
-   UTILITY GENERALI
-   ========================================================= */
-
-function showMessage(
-  text = '',
-  type = ''
-) {
-
-  message.textContent =
-    text
-
-  message.className =
-    `message ${type}`
+function showMessage(text = '', type = '') {
+  message.textContent = text;
+  message.className = `message ${type}`;
 }
-
 
 function escapeHtml(value) {
-
-  return String(
-    value ?? ''
-  )
-    .replaceAll(
-      '&',
-      '&amp;'
-    )
-    .replaceAll(
-      '<',
-      '&lt;'
-    )
-    .replaceAll(
-      '>',
-      '&gt;'
-    )
-    .replaceAll(
-      '"',
-      '&quot;'
-    )
-    .replaceAll(
-      "'",
-      '&#039;'
-    )
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
 }
-
 
 function formatDate(value) {
+  if (!value) return '—';
 
-  if (!value) {
-    return '—'
-  }
+  const date = new Date(value);
 
-
-  const date =
-    new Date(value)
-
-
-  if (
-    Number.isNaN(
-      date.getTime()
-    )
-  ) {
-
-    return String(value)
-  }
-
-
-  return date
-    .toLocaleDateString(
-      'it-IT'
-    )
+  return Number.isNaN(date.getTime())
+    ? String(value)
+    : date.toLocaleDateString('it-IT');
 }
-
 
 function formatDateTime(value) {
+  if (!value) return '—';
 
-  if (!value) {
-    return '—'
-  }
+  const date = new Date(value);
 
-
-  const date =
-    new Date(value)
-
-
-  if (
-    Number.isNaN(
-      date.getTime()
-    )
-  ) {
-
-    return String(value)
-  }
-
-
-  return date
-    .toLocaleString(
-      'it-IT',
-      {
-        dateStyle:
-          'short',
-
-        timeStyle:
-          'short'
-      }
-    )
+  return Number.isNaN(date.getTime())
+    ? String(value)
+    : date.toLocaleString(
+        'it-IT',
+        {
+          dateStyle: 'short',
+          timeStyle: 'short'
+        }
+      );
 }
 
-
-function formatNumber(
-  value,
-  digits = 1
-) {
-
+function formatNumber(value, digits = 1) {
   if (
-    value === null
-    ||
-    value === undefined
-    ||
-    Number.isNaN(
-      Number(value)
-    )
+    value === null ||
+    value === undefined ||
+    Number.isNaN(Number(value))
   ) {
-
-    return '—'
+    return '—';
   }
 
-
-  return Number(value)
-    .toLocaleString(
-      'it-IT',
-      {
-        maximumFractionDigits:
-          digits
-      }
-    )
+  return Number(value).toLocaleString(
+    'it-IT',
+    {
+      maximumFractionDigits: digits
+    }
+  );
 }
-
 
 function formatPercent(value) {
-
-  if (
-    value === null
-    ||
-    value === undefined
-  ) {
-
-    return '—'
-  }
-
-
-  return `${formatNumber(
-    value,
-    1
-  )}%`
+  return value === null || value === undefined
+    ? '—'
+    : `${formatNumber(value, 1)}%`;
 }
-
 
 function fantasyModeLabel(mode) {
-
-  if (
-    mode === 'classic'
-  ) {
-
-    return 'Classic'
-  }
-
-
-  if (
-    mode === 'mantra'
-  ) {
-
-    return 'Mantra'
-  }
-
-
-  return '—'
+  return mode === 'classic'
+    ? 'Classic'
+    : mode === 'mantra'
+      ? 'Mantra'
+      : '—';
 }
-
 
 function normalizeKey(value) {
-
-  return String(
-    value ?? ''
-  )
+  return String(value ?? '')
     .trim()
     .toLowerCase()
     .normalize('NFD')
-    .replace(
-      /[\u0300-\u036f]/g,
-      ''
-    )
-    .replace(
-      /[^a-z0-9]+/g,
-      '-'
-    )
-    .replace(
-      /^-+|-+$/g,
-      ''
-    )
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
-
 
 function normalizeHeader(value) {
-
-  return String(
-    value ?? ''
-  )
+  return String(value ?? '')
     .trim()
     .toLowerCase()
     .normalize('NFD')
-    .replace(
-      /[\u0300-\u036f]/g,
-      ''
-    )
-    .replace(
-      /[^a-z0-9]/g,
-      ''
-    )
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]/g, '');
 }
-
 
 function nullableNumber(value) {
-
   if (
-    value === null
-    ||
-    value === undefined
-    ||
+    value === null ||
+    value === undefined ||
     value === ''
   ) {
-
-    return null
+    return null;
   }
 
-
-  if (
-    typeof value === 'number'
-  ) {
-
+  if (typeof value === 'number') {
     return Number.isFinite(value)
       ? value
-      : null
+      : null;
   }
 
+  let text = String(value)
+    .trim()
+    .replace(/%$/, '');
 
-  let text =
-    String(value)
-      .trim()
-      .replace(
-        /%$/,
-        ''
-      )
-
-
-  if (!text) {
-    return null
-  }
-
+  if (!text) return null;
 
   if (
-    text.includes(',')
-    &&
+    text.includes(',') &&
     !text.includes('.')
   ) {
-
-    text =
-      text.replace(
-        ',',
-        '.'
-      )
+    text = text.replace(',', '.');
   }
 
+  const n = Number(text);
 
-  const number =
-    Number(text)
-
-
-  return Number.isFinite(number)
-    ? number
-    : null
+  return Number.isFinite(n)
+    ? n
+    : null;
 }
-
 
 function nullableInteger(value) {
+  const n = nullableNumber(value);
 
-  const number =
-    nullableNumber(value)
-
-
-  if (number === null) {
-    return null
-  }
-
-
-  return Math.round(number)
+  return n === null
+    ? null
+    : Math.round(n);
 }
 
-
 function toBoolean(value) {
-
   if (
-    value === true
-    ||
+    value === true ||
     value === 1
   ) {
-
-    return true
+    return true;
   }
-
 
   if (
-    value === false
-    ||
-    value === 0
-    ||
-    value === null
-    ||
-    value === undefined
-    ||
+    value === false ||
+    value === 0 ||
+    value === null ||
+    value === undefined ||
     value === ''
   ) {
-
-    return false
+    return false;
   }
-
-
-  const text =
-    String(value)
-      .trim()
-      .toLowerCase()
-
 
   return [
     'true',
@@ -547,408 +230,294 @@ function toBoolean(value) {
     'yes',
     'si',
     'sì'
-  ]
-    .includes(text)
+  ].includes(
+    String(value)
+      .trim()
+      .toLowerCase()
+  );
 }
-
 
 function splitMantraRoles(value) {
-
-  if (!value) {
-    return []
-  }
-
-
-  return String(value)
-    .split(',')
-    .map(
-      role =>
-        role.trim()
-    )
-    .filter(Boolean)
+  return value
+    ? String(value)
+        .split(',')
+        .map(v => v.trim())
+        .filter(Boolean)
+    : [];
 }
-
 
 function hasValue(value) {
-
   return !(
-    value === null
-    ||
-    value === undefined
-    ||
-    value === ''
-    ||
+    value === null ||
+    value === undefined ||
+    value === '' ||
     value === 0
-  )
+  );
 }
-
 
 function getTodayLocal() {
+  const now = new Date();
 
-  const now =
-    new Date()
+  const y = now.getFullYear();
 
+  const m = String(
+    now.getMonth() + 1
+  ).padStart(2, '0');
 
-  const year =
-    now.getFullYear()
+  const d = String(
+    now.getDate()
+  ).padStart(2, '0');
 
-  const month =
-    String(
-      now.getMonth() + 1
-    )
-      .padStart(
-        2,
-        '0'
-      )
-
-  const day =
-    String(
-      now.getDate()
-    )
-      .padStart(
-        2,
-        '0'
-      )
-
-
-  return `${year}-${month}-${day}`
+  return `${y}-${m}-${d}`;
 }
 
+function countryCodeToEmoji(code) {
+  const iso = String(code || '')
+    .trim()
+    .toUpperCase();
 
-/* =========================================================
-   API
-   ========================================================= */
+  if (!/^[A-Z]{2}$/.test(iso)) {
+    return '';
+  }
 
-async function callApi(body) {
+  return String.fromCodePoint(
+    ...[...iso].map(
+      letter =>
+        127397 +
+        letter.charCodeAt(0)
+    )
+  );
+}
 
-  const session =
-    getSession()
+function roleCssClass(role) {
+  return `role-${String(role)
+    .trim()
+    .toLowerCase()}`;
+}
 
+async function callEndpoint(url, body) {
+  const session = getSession();
 
   if (!session?.token) {
-
-    window.location.href =
-      'index.html'
-
-    return null
+    window.location.href = 'index.html';
+    return null;
   }
 
-
-  let response
-
+  let response;
 
   try {
+    response = await fetch(
+      url,
+      {
+        method: 'POST',
 
-    response =
-      await fetch(
-        API_URL,
-        {
-          method:
-            'POST',
+        headers: {
+          'Content-Type':
+            'application/json'
+        },
 
-          headers: {
-            'Content-Type':
-              'application/json'
-          },
+        body: JSON.stringify({
+          ...body,
 
-          body:
-            JSON.stringify({
-              ...body,
+          leagueId:
+            selectedLeague.id,
 
-              leagueId:
-                selectedLeague.id,
-
-              sessionToken:
-                session.token
-            })
-        }
-      )
-
+          sessionToken:
+            session.token
+        })
+      }
+    );
   } catch {
-
     throw new Error(
       'Impossibile contattare il server.'
-    )
+    );
   }
 
-
-  let data
-
+  let data;
 
   try {
-
-    data =
-      await response.json()
-
+    data = await response.json();
   } catch {
-
     throw new Error(
       'Risposta non valida dal server.'
-    )
+    );
   }
 
-
-  if (
-    response.status === 401
-  ) {
-
+  if (response.status === 401) {
     window.location.href =
-      'index.html'
+      'index.html';
 
-    return null
+    return null;
   }
 
-
-  return data
+  return data;
 }
 
+const callApi = body =>
+  callEndpoint(
+    API_URL,
+    body
+  );
 
-/* =========================================================
-   LETTURA XLSX / CSV
-   ========================================================= */
+const callNationalityApi = body =>
+  callEndpoint(
+    NATIONALITY_API_URL,
+    body
+  );
 
 async function readSpreadsheetFile(
   file,
   preferAllSheet = true
 ) {
-
   if (
     typeof XLSX === 'undefined'
   ) {
-
     throw new Error(
       'Libreria XLSX non caricata.'
-    )
+    );
   }
-
 
   const extension =
     file.name
       .split('.')
       .pop()
-      ?.toLowerCase()
-      || ''
-
-
-  const buffer =
-    await file.arrayBuffer()
-
+      ?.toLowerCase() || '';
 
   const workbook =
     XLSX.read(
-      buffer,
+      await file.arrayBuffer(),
       {
-        type:
-          'array',
-
-        cellDates:
-          false
+        type: 'array',
+        cellDates: false
       }
-    )
+    );
 
-
-  if (
-    !workbook.SheetNames
-      ?.length
-  ) {
-
+  if (!workbook.SheetNames?.length) {
     throw new Error(
       'Il file non contiene fogli leggibili.'
-    )
+    );
   }
 
-
-  let sheetName = null
-
+  let sheetName;
 
   if (
-    preferAllSheet
-    &&
-    workbook.SheetNames
-      .includes('ALL')
+    preferAllSheet &&
+    workbook.SheetNames.includes('ALL')
   ) {
-
-    sheetName =
-      'ALL'
-
+    sheetName = 'ALL';
   } else {
-
     sheetName =
-      workbook.SheetNames
-        .find(
-          name =>
-            name
-              .trim()
-              .toLowerCase()
-            !== 'info'
-        )
-      ||
-      workbook.SheetNames[0]
+      workbook.SheetNames.find(
+        name =>
+          name
+            .trim()
+            .toLowerCase() !== 'info'
+      ) ||
+      workbook.SheetNames[0];
   }
-
-
-  const sheet =
-    workbook.Sheets[
-      sheetName
-    ]
-
 
   const rows =
-    XLSX.utils
-      .sheet_to_json(
-        sheet,
-        {
-          defval:
-            null,
+    XLSX.utils.sheet_to_json(
+      workbook.Sheets[sheetName],
+      {
+        defval: null,
+        raw: true
+      }
+    );
 
-          raw:
-            true
-        }
-      )
-
-
-  if (
-    rows.length === 0
-  ) {
-
+  if (!rows.length) {
     throw new Error(
       'Il foglio selezionato non contiene righe.'
-    )
+    );
   }
-
-
-  const columns =
-    Object.keys(
-      rows[0]
-    )
-
 
   return {
-
     rows,
-
-    columns,
-
+    columns:
+      Object.keys(rows[0]),
     sheetName,
-
     format:
       extension || 'xlsx'
-  }
+  };
 }
 
-
-/* =========================================================
-   MAPPATURA FANTACULO
-   ========================================================= */
-
 function findOriginalId(row) {
-
-  const possibleKeys = [
-    'id',
-    'playerId',
-    'playerID',
-    'player_id',
-    'idPlayer',
-    'idCalciatore',
-    'idGiocatore'
-  ]
-
-
   for (
     const key
-    of possibleKeys
+    of [
+      'id',
+      'playerId',
+      'playerID',
+      'player_id',
+      'idPlayer',
+      'idCalciatore',
+      'idGiocatore'
+    ]
   ) {
-
     if (
-      row[key] !== null
-      &&
-      row[key] !== undefined
-      &&
+      row[key] !== null &&
+      row[key] !== undefined &&
       row[key] !== ''
     ) {
-
-      return String(
-        row[key]
-      )
+      return String(row[key]);
     }
   }
 
-
-  return null
+  return null;
 }
-
 
 function normalizeFantaculoRow(
   row,
   rowIndex
 ) {
-
   const name =
     String(
       row.name ?? ''
-    )
-      .trim()
-
+    ).trim();
 
   const team =
     String(
       row.team ?? ''
-    )
-      .trim()
-
+    ).trim();
 
   const teamSlug =
     String(
-      row.teamSlug
-      ?? team
-    )
-      .trim()
-
+      row.teamSlug ?? team
+    ).trim();
 
   const classicRole =
     String(
       row.role ?? ''
-    )
-      .trim()
-
+    ).trim();
 
   const mantraRoles =
     splitMantraRoles(
       row.roleMantra
-    )
-
+    );
 
   const originalId =
-    findOriginalId(row)
-
+    findOriginalId(row);
 
   const sourcePlayerId =
-    originalId
-    ||
+    originalId ||
     [
       'fantaculo',
       normalizeKey(name),
       normalizeKey(teamSlug),
       normalizeKey(
-        row.roleMantra
-        || classicRole
+        row.roleMantra ||
+        classicRole
       ),
       rowIndex
-    ]
-      .join(':')
-
+    ].join(':');
 
   return {
-
     rowIndex,
 
     sourcePlayerId,
 
-
     normalized: {
-
       name,
-
       team,
 
       classic_role:
@@ -957,26 +526,18 @@ function normalizeFantaculoRow(
           'D',
           'C',
           'A'
-        ]
-          .includes(
-            classicRole
-          )
+        ].includes(classicRole)
           ? classicRole
           : null,
 
       mantra_roles:
         mantraRoles,
 
-
       pma:
-        nullableNumber(
-          row.pma
-        ),
+        nullableNumber(row.pma),
 
       pfc:
-        nullableNumber(
-          row.pfc
-        ),
+        nullableNumber(row.pfc),
 
       pfc_pma_delta:
         nullableNumber(
@@ -984,18 +545,13 @@ function normalizeFantaculoRow(
         ),
 
       pma_range:
-        row.pmaRange
-        ?? null,
+        row.pmaRange ?? null,
 
       pfc_range:
-        row.pfcRange
-        ?? null,
+        row.pfcRange ?? null,
 
       slot:
-        nullableInteger(
-          row.slot
-        ),
-
+        nullableInteger(row.slot),
 
       expected_titolarity:
         nullableNumber(
@@ -1006,7 +562,6 @@ function normalizeFantaculoRow(
         nullableNumber(
           row.expectedFantamedia
         ),
-
 
       penalty_probability:
         nullableNumber(
@@ -1023,15 +578,11 @@ function normalizeFantaculoRow(
           row.unavailableUntilRound
         ),
 
-
       tier_classic:
-        row.fasciaFc
-        ?? null,
+        row.fasciaFc ?? null,
 
       tier_mantra:
-        row.fasciaFr
-        ?? null,
-
+        row.fasciaFr ?? null,
 
       uncertain_return:
         toBoolean(
@@ -1046,17 +597,12 @@ function normalizeFantaculoRow(
       market_flag:
         Boolean(
           String(
-            row.calciomercato
-            ?? ''
-          )
-            .trim()
+            row.calciomercato ?? ''
+          ).trim()
         ),
 
-
       source_updated_at:
-        row.updatedAt
-        ?? null,
-
+        row.updatedAt ?? null,
 
       last_three_year_titolarity:
         nullableNumber(
@@ -1078,7 +624,6 @@ function normalizeFantaculoRow(
           row.lastFiveYearTitolarity
         ),
 
-
       last_year_base_rating:
         nullableNumber(
           row.lastYearVotoBase
@@ -1094,7 +639,6 @@ function normalizeFantaculoRow(
           row.lastYearTitolarity
         ),
 
-
       last_five_matches_base_rating:
         nullableNumber(
           row.lastFiveMatchesVotoBase
@@ -1109,7 +653,6 @@ function normalizeFantaculoRow(
         nullableNumber(
           row.lastFiveMatchesTitolarity
         ),
-
 
       current_season_base_rating:
         nullableNumber(
@@ -1127,68 +670,40 @@ function normalizeFantaculoRow(
         )
     },
 
-
-    /*
-     * Qui conserviamo TUTTE le colonne
-     * presenti nel file originale.
-     */
-    raw:
-      row
-  }
+    raw: row
+  };
 }
-
-
-/* =========================================================
-   IMPORT LISTONE
-   ========================================================= */
 
 async function importFantaculoList(
   file,
   referenceDate
 ) {
-
   const parsed =
     await readSpreadsheetFile(
       file,
       true
-    )
-
-
-  const requiredColumns = [
-    'name',
-    'team',
-    'role'
-  ]
-
+    );
 
   const missing =
-    requiredColumns
-      .filter(
-        column =>
-          !parsed.columns
-            .includes(column)
-      )
+    [
+      'name',
+      'team',
+      'role'
+    ].filter(
+      column =>
+        !parsed.columns.includes(column)
+    );
 
-
-  if (
-    missing.length > 0
-  ) {
-
+  if (missing.length) {
     throw new Error(
-      `Il file non sembra un listone Fantaculo. Colonne mancanti: ${
-        missing.join(', ')
-      }.`
-    )
+      `Il file non sembra un listone Fantaculo. Colonne mancanti: ${missing.join(', ')}.`
+    );
   }
-
 
   const normalizedRows =
     parsed.rows
       .map(
-        (
-          row,
-          index
-        ) =>
+        (row, index) =>
           normalizeFantaculoRow(
             row,
             index + 1
@@ -1197,28 +712,19 @@ async function importFantaculoList(
       .filter(
         item =>
           item.normalized.name
-      )
+      );
 
-
-  if (
-    normalizedRows.length === 0
-  ) {
-
+  if (!normalizedRows.length) {
     throw new Error(
       'Nessun giocatore valido trovato.'
-    )
+    );
   }
 
-
   listImportProgress.textContent =
-    `Preparazione di ${
-      normalizedRows.length
-    } giocatori...`
-
+    `Preparazione di ${normalizedRows.length} giocatori...`;
 
   const begin =
     await callApi({
-
       action:
         'beginListImport',
 
@@ -1232,1508 +738,1232 @@ async function importFantaculoList(
         parsed.columns,
 
       referenceDate
-    })
-
+    });
 
   if (!begin?.ok) {
-
     throw new Error(
-      begin?.error
-      ||
+      begin?.error ||
       'Impossibile iniziare l’import.'
-    )
+    );
   }
-
-
-  const batchId =
-    begin.batchId
-
 
   for (
     let start = 0;
     start < normalizedRows.length;
     start += IMPORT_CHUNK_SIZE
   ) {
-
     const end =
       Math.min(
         start + IMPORT_CHUNK_SIZE,
         normalizedRows.length
-      )
-
-
-    const chunk =
-      normalizedRows
-        .slice(
-          start,
-          end
-        )
-
+      );
 
     listImportProgress.textContent =
-      `Importazione ${
-        end
-      } / ${
-        normalizedRows.length
-      }...`
-
+      `Importazione ${end} / ${normalizedRows.length}...`;
 
     const append =
       await callApi({
-
         action:
           'appendListImport',
 
-        batchId,
+        batchId:
+          begin.batchId,
 
         rows:
-          chunk
-      })
-
+          normalizedRows.slice(
+            start,
+            end
+          )
+      });
 
     if (!append?.ok) {
-
       throw new Error(
-        append?.error
-        ||
+        append?.error ||
         'Errore durante il caricamento del listone.'
-      )
+      );
     }
   }
 
-
   listImportProgress.textContent =
-    'Finalizzazione listone...'
-
+    'Finalizzazione listone...';
 
   const finish =
     await callApi({
-
       action:
         'finishListImport',
 
-      batchId
-    })
-
+      batchId:
+        begin.batchId
+    });
 
   if (!finish?.ok) {
-
     throw new Error(
-      finish?.error
-      ||
+      finish?.error ||
       'Impossibile finalizzare il listone.'
-    )
+    );
   }
 
-
-  return finish.rowCount
+  return finish.rowCount;
 }
 
+listImportForm.addEventListener(
+  'submit',
+  async event => {
+    event.preventDefault();
 
-listImportForm
-  .addEventListener(
-    'submit',
-    async event => {
+    showMessage('');
 
-      event.preventDefault()
+    const file =
+      listFile.files?.[0];
 
+    if (!file) {
+      return showMessage(
+        'Seleziona un file XLSX o CSV.',
+        'error'
+      );
+    }
 
-      showMessage('')
+    if (
+      !listReferenceDate.value
+    ) {
+      return showMessage(
+        'Indica la data di riferimento.',
+        'error'
+      );
+    }
 
+    listImportButton.disabled =
+      true;
 
-      const file =
-        listFile.files?.[0]
+    const originalText =
+      listImportButton.textContent;
 
+    listImportButton.textContent =
+      'Importazione...';
 
-      if (!file) {
+    try {
+      const rowCount =
+        await importFantaculoList(
+          file,
+          listReferenceDate.value
+        );
 
-        showMessage(
-          'Seleziona un file XLSX o CSV.',
-          'error'
-        )
+      listImportProgress.textContent =
+        `Import completato: ${rowCount} giocatori.`;
 
-        return
-      }
+      showMessage(
+        'Listone aggiornato correttamente.',
+        'success'
+      );
 
+      listFile.value = '';
 
-      if (
-        !listReferenceDate.value
-      ) {
+      await loadList();
 
-        showMessage(
-          'Indica la data di riferimento.',
-          'error'
-        )
+    } catch (error) {
+      console.error(error);
 
-        return
-      }
+      listImportProgress.textContent =
+        '';
 
+      showMessage(
+        error.message ||
+        'Errore durante l’importazione.',
+        'error'
+      );
 
+    } finally {
       listImportButton.disabled =
-        true
-
-
-      const originalText =
-        listImportButton.textContent
-
+        false;
 
       listImportButton.textContent =
-        'Importazione...'
-
-
-      try {
-
-        const rowCount =
-          await importFantaculoList(
-            file,
-            listReferenceDate.value
-          )
-
-
-        listImportProgress.textContent =
-          `Import completato: ${
-            rowCount
-          } giocatori.`
-
-
-        showMessage(
-          'Listone aggiornato correttamente.',
-          'success'
-        )
-
-
-        listFile.value =
-          ''
-
-
-        await loadList()
-
-
-      } catch (error) {
-
-        console.error(error)
-
-
-        listImportProgress.textContent =
-          ''
-
-
-        showMessage(
-          error.message
-          ||
-          'Errore durante l’importazione.',
-          'error'
-        )
-
-      } finally {
-
-        listImportButton.disabled =
-          false
-
-
-        listImportButton.textContent =
-          originalText
-      }
+        originalText;
     }
-  )
+  }
+);
 
+function getAvailableRoles() {
+  return listData
+    ?.settings
+    ?.fantasyMode === 'mantra'
+    ? [
+        'Por',
+        'B',
+        'Dd',
+        'Ds',
+        'Dc',
+        'E',
+        'M',
+        'C',
+        'T',
+        'W',
+        'A',
+        'Pc'
+      ]
+    : [
+        'P',
+        'D',
+        'C',
+        'A'
+      ];
+}
 
-/* =========================================================
-   RUOLI E FILTRI
-   ========================================================= */
+function getPlayerRoles(player) {
+  return listData
+    ?.settings
+    ?.fantasyMode === 'mantra'
+    ? (
+        player.mantra_roles ||
+        []
+      )
+    : (
+        player.classic_role
+          ? [player.classic_role]
+          : []
+      );
+}
 
-function configureRoleFilter() {
+function renderRoleBadges(player) {
+  return getPlayerRoles(player)
+    .map(
+      role =>
+        `<span class="role-badge ${roleCssClass(role)}">${escapeHtml(role)}</span>`
+    )
+    .join('');
+}
 
-  const mode =
-    listData
-      ?.settings
-      ?.fantasyMode
+function renderRoleFilters() {
+  const roles = [
+    'all',
+    ...getAvailableRoles()
+  ];
 
+  roleFilterBar.innerHTML =
+    roles.map(
+      role => {
+        const label =
+          role === 'all'
+            ? 'ALL'
+            : role;
 
-  if (
-    mode === 'mantra'
-  ) {
+        const cssRole =
+          role === 'all'
+            ? 'role-all'
+            : roleCssClass(role);
 
-    const roles = [
-      'Por',
-      'B',
-      'Dc',
-      'Dd',
-      'Ds',
-      'E',
-      'W',
-      'M',
-      'C',
-      'T',
-      'A',
-      'Pc'
-    ]
-
-
-    roleFilter.innerHTML = `
-      <option value="all">
-        Tutti i ruoli
-      </option>
-
-      ${
-        roles
-          .map(
-            role => `
-              <option value="${role}">
-                ${role}
-              </option>
-            `
-          )
-          .join('')
+        return `
+          <button
+            type="button"
+            class="role-filter-button ${cssRole} ${activeRole === role ? 'active' : ''}"
+            data-role="${escapeHtml(role)}"
+          >
+            ${escapeHtml(label)}
+          </button>
+        `;
       }
-    `
-
-  } else {
-
-    roleFilter.innerHTML = `
-      <option value="all">
-        Tutti i ruoli
-      </option>
-
-      <option value="P">P</option>
-      <option value="D">D</option>
-      <option value="C">C</option>
-      <option value="A">A</option>
-    `
-  }
+    ).join('');
 }
 
-
-function getPlayerRole(player) {
-
-  const mode =
-    listData
-      ?.settings
-      ?.fantasyMode
-
-
-  if (
-    mode === 'mantra'
-  ) {
-
-    return (
-      player.mantra_roles
-      || []
-    )
-      .join(', ')
-      || '—'
-  }
-
-
-  return player.classic_role
-    || '—'
+function playerMatchesRole(player) {
+  return (
+    activeRole === 'all' ||
+    getPlayerRoles(player)
+      .includes(activeRole)
+  );
 }
 
+function configureSecondaryFilters() {
+  const players =
+    listData?.players || [];
 
-function getPlayerTier(player) {
-
-  const mode =
-    listData
-      ?.settings
-      ?.fantasyMode
-
-
-  if (
-    mode === 'mantra'
-  ) {
-
-    return player.tier_mantra
-      || '—'
-  }
-
-
-  return player.tier_classic
-    || '—'
-}
-
-
-function playerMatchesRole(
-  player,
-  role
-) {
-
-  if (
-    role === 'all'
-  ) {
-
-    return true
-  }
-
-
-  const mode =
-    listData
-      ?.settings
-      ?.fantasyMode
-
-
-  if (
-    mode === 'mantra'
-  ) {
-
-    return (
-      player.mantra_roles
-      || []
-    )
-      .includes(role)
-  }
-
-
-  return player.classic_role
-    === role
-}
-
-
-/* =========================================================
-   ORDINAMENTO
-   ========================================================= */
-
-function numericSortValue(
-  value,
-  fallback = -Infinity
-) {
-
-  const number =
-    Number(value)
-
-
-  return Number.isFinite(number)
-    ? number
-    : fallback
-}
-
-
-function sortPlayers(players) {
-
-  const mode =
-    playerSort.value
-
-
-  const result =
-    [...players]
-
-
-  if (
-    mode === 'pfc-desc'
-  ) {
-
-    result.sort(
+  const teams =
+    [
+      ...new Set(
+        players
+          .map(
+            p =>
+              p.serie_a_team
+          )
+          .filter(Boolean)
+      )
+    ].sort(
       (a, b) =>
-        numericSortValue(
-          b.pfc
-        )
-        -
-        numericSortValue(
-          a.pfc
-        )
-    )
-
-  } else if (
-    mode === 'pma-desc'
-  ) {
-
-    result.sort(
-      (a, b) =>
-        numericSortValue(
-          b.pma
-        )
-        -
-        numericSortValue(
-          a.pma
-        )
-    )
-
-  } else if (
-    mode === 'delta-desc'
-  ) {
-
-    result.sort(
-      (a, b) =>
-        numericSortValue(
-          b.pfc_pma_delta
-        )
-        -
-        numericSortValue(
-          a.pfc_pma_delta
-        )
-    )
-
-  } else if (
-    mode === 'fm-desc'
-  ) {
-
-    result.sort(
-      (a, b) =>
-        numericSortValue(
-          b.expected_fantasy_avg
-        )
-        -
-        numericSortValue(
-          a.expected_fantasy_avg
-        )
-    )
-
-  } else if (
-    mode === 'tit-desc'
-  ) {
-
-    result.sort(
-      (a, b) =>
-        numericSortValue(
-          b.expected_titolarity
-        )
-        -
-        numericSortValue(
-          a.expected_titolarity
-        )
-    )
-
-  } else if (
-    mode === 'slot-asc'
-  ) {
-
-    result.sort(
-      (a, b) =>
-        numericSortValue(
-          a.slot,
-          Infinity
-        )
-        -
-        numericSortValue(
-          b.slot,
-          Infinity
-        )
-    )
-
-  } else {
-
-    result.sort(
-      (a, b) =>
-        String(
-          a.name
-        )
+        String(a)
           .localeCompare(
-            String(
-              b.name
-            ),
+            String(b),
             'it'
           )
-    )
-  }
+    );
 
+  teamFilter.innerHTML =
+    '<option value="all">Tutte</option>' +
+    teams.map(
+      team =>
+        `<option value="${escapeHtml(team)}">${escapeHtml(team)}</option>`
+    ).join('');
 
-  return result
+  const slots =
+    [
+      ...new Set(
+        players
+          .map(
+            p =>
+              Number(p.slot)
+          )
+          .filter(
+            n =>
+              Number.isFinite(n) &&
+              n > 0
+          )
+      )
+    ].sort(
+      (a, b) =>
+        a - b
+    );
+
+  slotFilter.innerHTML =
+    '<option value="all">Tutti</option>' +
+    slots.map(
+      slot =>
+        `<option value="${slot}">${slot}</option>`
+    ).join('');
 }
 
+function matchesFlagFilter(player) {
+  switch (flagFilter.value) {
+    case 'market':
+      return player.market_flag === true;
 
-/* =========================================================
-   FILTRO LISTA
-   ========================================================= */
+    case 'injury':
+      return (
+        player.uncertain_return === true ||
+        hasValue(
+          player.unavailable_until_round
+        )
+      );
+
+    case 'new':
+      return player.new_arrival === true;
+
+    case 'penalties':
+      return Number(
+        player.penalty_probability || 0
+      ) > 0;
+
+    default:
+      return true;
+  }
+}
+
+function getSortValue(player, key) {
+  const map = {
+    name:
+      player.name,
+
+    team:
+      player.serie_a_team,
+
+    slot:
+      player.slot,
+
+    pma:
+      player.pma,
+
+    pfc:
+      player.pfc,
+
+    delta:
+      player.pfc_pma_delta,
+
+    fm:
+      player.expected_fantasy_avg,
+
+    tit:
+      player.expected_titolarity
+  };
+
+  return map[key];
+}
+
+function comparePlayers(a, b) {
+  const va =
+    getSortValue(
+      a,
+      sortState.key
+    );
+
+  const vb =
+    getSortValue(
+      b,
+      sortState.key
+    );
+
+  const mult =
+    sortState.direction === 'asc'
+      ? 1
+      : -1;
+
+  if (
+    va === null ||
+    va === undefined ||
+    va === ''
+  ) {
+    return 1;
+  }
+
+  if (
+    vb === null ||
+    vb === undefined ||
+    vb === ''
+  ) {
+    return -1;
+  }
+
+  const na =
+    Number(va);
+
+  const nb =
+    Number(vb);
+
+  const bothNumeric =
+    Number.isFinite(na) &&
+    Number.isFinite(nb) &&
+    !Number.isNaN(
+      Number(String(va))
+    ) &&
+    !Number.isNaN(
+      Number(String(vb))
+    );
+
+  if (bothNumeric) {
+    if (na === nb) {
+      return String(a.name)
+        .localeCompare(
+          String(b.name),
+          'it'
+        );
+    }
+
+    return (
+      na - nb
+    ) * mult;
+  }
+
+  return String(va)
+    .localeCompare(
+      String(vb),
+      'it',
+      {
+        sensitivity: 'base'
+      }
+    ) * mult;
+}
+
+function updateSortHeader() {
+  sortButtons.forEach(
+    button => {
+      const active =
+        button.dataset.sort ===
+        sortState.key;
+
+      button.classList.toggle(
+        'active',
+        active
+      );
+
+      button.querySelector(
+        '.player-sort-indicator'
+      ).textContent =
+        active
+          ? (
+              sortState.direction === 'asc'
+                ? '↑'
+                : '↓'
+            )
+          : '↕';
+    }
+  );
+}
 
 function getFilteredPlayers() {
-
-  const players =
-    listData?.players
-    || []
-
-
   const search =
-    playerSearch
-      .value
+    playerSearch.value
       .trim()
-      .toLowerCase()
+      .toLowerCase();
 
-
-  const role =
-    roleFilter.value
-
-
-  const filtered =
-    players
-      .filter(
-        player => {
-
-          if (
-            !playerMatchesRole(
-              player,
-              role
-            )
-          ) {
-
-            return false
-          }
-
-
-          if (!search) {
-            return true
-          }
-
-
-          const haystack =
-            [
-              player.name,
-              player.serie_a_team,
-              player.classic_role,
-              ...(player.mantra_roles || []),
-              player.tier_classic,
-              player.tier_mantra
-            ]
-              .filter(Boolean)
-              .join(' ')
-              .toLowerCase()
-
-
-          return haystack
-            .includes(search)
-        }
-      )
-
-
-  return sortPlayers(
-    filtered
+  return (
+    listData?.players || []
   )
+    .filter(
+      player => {
+        if (
+          !playerMatchesRole(player)
+        ) {
+          return false;
+        }
+
+        if (
+          teamFilter.value !== 'all' &&
+          player.serie_a_team !==
+            teamFilter.value
+        ) {
+          return false;
+        }
+
+        if (
+          slotFilter.value !== 'all' &&
+          String(player.slot) !==
+            slotFilter.value
+        ) {
+          return false;
+        }
+
+        if (
+          !matchesFlagFilter(player)
+        ) {
+          return false;
+        }
+
+        if (!search) {
+          return true;
+        }
+
+        const haystack =
+          [
+            player.name,
+            player.serie_a_team,
+            player.classic_role,
+            ...(
+              player.mantra_roles ||
+              []
+            ),
+            player.tier_classic,
+            player.tier_mantra,
+            player.nationality_name
+          ]
+            .filter(Boolean)
+            .join(' ')
+            .toLowerCase();
+
+        return haystack
+          .includes(search);
+      }
+    )
+    .sort(comparePlayers);
 }
 
+function getPlayerTier(player) {
+  return listData
+    ?.settings
+    ?.fantasyMode === 'mantra'
+    ? (
+        player.tier_mantra ||
+        '—'
+      )
+    : (
+        player.tier_classic ||
+        '—'
+      );
+}
 
-/* =========================================================
-   BADGE GIOCATORE
-   ========================================================= */
+function detailItem(
+  label,
+  value
+) {
+  return `
+    <div class="player-detail-item">
+      <span>${escapeHtml(label)}</span>
+      <strong>${escapeHtml(value)}</strong>
+    </div>
+  `;
+}
 
-function deltaBadge(player) {
+function renderSignalBadges(player) {
+  const badges = [];
 
   if (
-    player.pfc_pma_delta
-    === null
-    ||
-    player.pfc_pma_delta
-    === undefined
+    hasValue(
+      player.penalty_probability
+    )
   ) {
-
-    return ''
+    badges.push(
+      `<span class="badge good">Rigori ${escapeHtml(formatPercent(player.penalty_probability))}</span>`
+    );
   }
 
-
-  const delta =
-    Number(
-      player.pfc_pma_delta
+  if (
+    hasValue(
+      player.free_kick_probability
     )
+  ) {
+    badges.push(
+      `<span class="badge">Punizioni ${escapeHtml(formatPercent(player.free_kick_probability))}</span>`
+    );
+  }
 
+  if (player.new_arrival) {
+    badges.push(
+      '<span class="badge">NUOVO ARRIVO</span>'
+    );
+  }
 
-  const sign =
-    delta > 0
-      ? '+'
-      : ''
+  if (player.market_flag) {
+    badges.push(
+      '<span class="badge warning">MERCATO</span>'
+    );
+  }
 
+  if (player.uncertain_return) {
+    badges.push(
+      '<span class="badge warning">RIENTRO INCERTO</span>'
+    );
+  }
 
-  const cssClass =
-    delta > 0
-      ? 'good'
-      : delta < 0
-        ? 'warning'
-        : ''
+  if (
+    hasValue(
+      player.unavailable_until_round
+    )
+  ) {
+    badges.push(
+      `<span class="badge warning">OUT FINO G. ${escapeHtml(player.unavailable_until_round)}</span>`
+    );
+  }
 
+  return badges.join('');
+}
+
+function renderPlayerDetail(player) {
+  const items = [
+    detailItem(
+      'PFC range',
+      player.pfc_range || '—'
+    ),
+
+    detailItem(
+      'PMA range',
+      player.pma_range || '—'
+    ),
+
+    detailItem(
+      'Fascia',
+      getPlayerTier(player)
+    ),
+
+    detailItem(
+      'Nazionalità',
+      player.nationality_name || '—'
+    ),
+
+    detailItem(
+      'Ultima stagione FM',
+      formatNumber(
+        player.last_year_fantasy_avg,
+        2
+      )
+    ),
+
+    detailItem(
+      'Ultima stagione tit.',
+      formatPercent(
+        player.last_year_titolarity
+      )
+    ),
+
+    detailItem(
+      'Ultime 5 FM',
+      formatNumber(
+        player.last_five_matches_fantasy_avg,
+        2
+      )
+    ),
+
+    detailItem(
+      'Ultime 5 tit.',
+      formatPercent(
+        player.last_five_matches_titolarity
+      )
+    )
+  ];
 
   return `
-    <span class="badge ${cssClass}">
-      Δ ${sign}${escapeHtml(
-        formatNumber(
-          delta,
-          0
-        )
-      )}
-    </span>
-  `
+    <div class="player-detail-grid">
+      ${items.join('')}
+    </div>
+
+    <div class="player-detail-flags">
+      ${renderSignalBadges(player)}
+    </div>
+
+    ${
+      player.source_updated_at
+        ? `
+          <p class="setting-help">
+            Dati sorgente aggiornati
+            ${escapeHtml(
+              formatDateTime(
+                player.source_updated_at
+              )
+            )}
+          </p>
+        `
+        : ''
+    }
+  `;
 }
 
-
-/* =========================================================
-   RENDER GIOCATORI
-   ========================================================= */
-
 function renderPlayers() {
-
   const players =
-    getFilteredPlayers()
+    getFilteredPlayers();
 
-
-  playersList.innerHTML =
-    ''
-
+  playersTableBody.innerHTML = '';
 
   filteredCount.textContent =
-    `${players.length} di ${
+    `${players.length} di ${listData?.players?.length || 0} giocatori`;
+
+  if (!players.length) {
+    playersEmpty.hidden = false;
+
+    playersEmpty.textContent =
       listData?.players?.length
-      || 0
-    } giocatori`
+        ? 'Nessun giocatore corrisponde ai filtri.'
+        : 'Nessun listone importato.';
 
+    playerTableWrap.hidden =
+      true;
 
-  if (
-    players.length === 0
-  ) {
-
-    playersList.innerHTML = `
-      <div class="empty-state">
-        Nessun giocatore trovato.
-      </div>
-    `
-
-    return
+    return;
   }
 
+  playersEmpty.hidden = true;
+  playerTableWrap.hidden = false;
+
+  const fragment =
+    document.createDocumentFragment();
 
   for (
     const player
     of players
   ) {
+    const flag =
+      countryCodeToEmoji(
+        player.nationality_iso2
+      );
+
+    const delta =
+      player.pfc_pma_delta === null ||
+      player.pfc_pma_delta === undefined
+        ? null
+        : Number(
+            player.pfc_pma_delta
+          );
+
+    const deltaClass =
+      delta === null
+        ? 'player-table-muted'
+        : delta > 0
+          ? 'player-delta-positive'
+          : delta < 0
+            ? 'player-delta-negative'
+            : '';
+
+    const deltaLabel =
+      delta === null
+        ? '—'
+        : `${delta > 0 ? '+' : ''}${formatNumber(delta, 0)}`;
 
     const row =
-      document.createElement(
-        'details'
-      )
-
+      document.createElement('tr');
 
     row.className =
-      'user-row'
+      'player-row';
 
+    row.tabIndex = 0;
 
-    const tier =
-      getPlayerTier(
-        player
-      )
-
-
-    const lastYearVisible =
-      hasValue(
-        player.last_year_fantasy_avg
-      )
-      ||
-      hasValue(
-        player.last_year_titolarity
-      )
-      ||
-      hasValue(
-        player.last_year_base_rating
-      )
-
-
-    const lastFiveVisible =
-      hasValue(
-        player.last_five_matches_fantasy_avg
-      )
-      ||
-      hasValue(
-        player.last_five_matches_titolarity
-      )
-      ||
-      hasValue(
-        player.last_five_matches_base_rating
-      )
-
-
-    const currentSeasonVisible =
-      hasValue(
-        player.current_season_fantasy_avg
-      )
-      ||
-      hasValue(
-        player.current_season_titolarity
-      )
-      ||
-      hasValue(
-        player.current_season_base_rating
-      )
-
+    row.dataset.playerId =
+      player.id;
 
     row.innerHTML = `
+      <td>
+        <div class="player-main-cell">
 
-      <summary>
+          <span
+            class="player-flag"
+            title="${escapeHtml(player.nationality_name || '')}"
+          >
+            ${escapeHtml(flag)}
+          </span>
 
-        <div class="user-summary-name">
+          <div class="player-name-block">
 
-          <strong>
-            ${escapeHtml(
-              player.name
-            )}
-          </strong>
-
-          <small>
-            ${escapeHtml(
-              player.serie_a_team
-              || '—'
-            )}
-            ·
-            ${escapeHtml(
-              getPlayerRole(
-                player
-              )
-            )}
-          </small>
-
-        </div>
-
-
-        <div class="user-summary-status">
-
-          ${
-            player.pfc_range
-
-              ? `
-                <span class="badge admin">
-                  PFC ${
-                    escapeHtml(
-                      player.pfc_range
-                    )
-                  }
-                </span>
-              `
-
-              : ''
-          }
-
-
-          ${
-            player.pma_range
-
-              ? `
-                <span class="badge">
-                  PMA ${
-                    escapeHtml(
-                      player.pma_range
-                    )
-                  }
-                </span>
-              `
-
-              : ''
-          }
-
-
-          ${deltaBadge(player)}
-
-
-          ${
-            player.slot
-
-              ? `
-                <span class="badge">
-                  Slot ${
-                    escapeHtml(
-                      player.slot
-                    )
-                  }
-                </span>
-              `
-
-              : ''
-          }
-
-        </div>
-
-
-        <span class="user-chevron">
-          ⌄
-        </span>
-
-      </summary>
-
-
-      <div class="user-detail">
-
-
-        <div class="stats-grid">
-
-          <div class="stat-card">
-
-            <span class="stat-label">
-              Expected FM
+            <span class="player-name">
+              ${escapeHtml(player.name)}
             </span>
 
-            <span class="stat-value">
-              ${escapeHtml(
-                formatNumber(
-                  player.expected_fantasy_avg,
-                  2
-                )
-              )}
-            </span>
-
-          </div>
-
-
-          <div class="stat-card">
-
-            <span class="stat-label">
-              Titolarità attesa
-            </span>
-
-            <span class="stat-value">
-              ${escapeHtml(
-                formatPercent(
-                  player.expected_titolarity
-                )
-              )}
-            </span>
-
-          </div>
-
-
-          <div class="stat-card">
-
-            <span class="stat-label">
-              PFC
-            </span>
-
-            <span class="stat-value">
-              ${escapeHtml(
-                formatNumber(
-                  player.pfc,
-                  1
-                )
-              )}
-            </span>
-
-          </div>
-
-
-          <div class="stat-card">
-
-            <span class="stat-label">
-              PMA
-            </span>
-
-            <span class="stat-value">
-              ${escapeHtml(
-                formatNumber(
-                  player.pma,
-                  1
-                )
-              )}
+            <span class="player-role-badges">
+              ${renderRoleBadges(player)}
             </span>
 
           </div>
 
         </div>
+      </td>
 
+      <td class="player-team">
+        ${escapeHtml(player.serie_a_team || '—')}
+      </td>
 
-        <div class="divider"></div>
+      <td class="player-number">
+        ${escapeHtml(player.slot ?? '—')}
+      </td>
 
+      <td class="player-number">
+        ${escapeHtml(formatNumber(player.pma, 0))}
+      </td>
 
-        <p>
-          Fascia:
-          <strong>
-            ${escapeHtml(tier)}
-          </strong>
-        </p>
+      <td class="player-number strong">
+        ${escapeHtml(formatNumber(player.pfc, 0))}
+      </td>
 
+      <td class="player-number ${deltaClass}">
+        ${escapeHtml(deltaLabel)}
+      </td>
 
-        ${
-          hasValue(
-            player.penalty_probability
-          )
+      <td class="player-number">
+        ${escapeHtml(formatNumber(player.expected_fantasy_avg, 2))}
+      </td>
 
-            ? `
-              <span class="badge good">
-                Rigori ${
-                  escapeHtml(
-                    formatPercent(
-                      player.penalty_probability
-                    )
-                  )
-                }
-              </span>
-            `
+      <td class="player-number">
+        ${escapeHtml(formatPercent(player.expected_titolarity))}
+      </td>
+    `;
 
-            : ''
+    const detailRow =
+      document.createElement('tr');
+
+    detailRow.className =
+      'player-detail-row';
+
+    detailRow.innerHTML =
+      `<td colspan="8">${renderPlayerDetail(player)}</td>`;
+
+    const toggleDetail = () => {
+      const open =
+        !detailRow.classList.contains(
+          'is-open'
+        );
+
+      row.classList.toggle(
+        'is-open',
+        open
+      );
+
+      detailRow.classList.toggle(
+        'is-open',
+        open
+      );
+    };
+
+    row.addEventListener(
+      'click',
+      toggleDetail
+    );
+
+    row.addEventListener(
+      'keydown',
+      event => {
+        if (
+          event.key === 'Enter' ||
+          event.key === ' '
+        ) {
+          event.preventDefault();
+          toggleDetail();
         }
+      }
+    );
 
-
-        ${
-          hasValue(
-            player.free_kick_probability
-          )
-
-            ? `
-              <span class="badge">
-                Punizioni ${
-                  escapeHtml(
-                    formatPercent(
-                      player.free_kick_probability
-                    )
-                  )
-                }
-              </span>
-            `
-
-            : ''
-        }
-
-
-        ${
-          player.new_arrival
-
-            ? `
-              <span class="badge">
-                NUOVO ARRIVO
-              </span>
-            `
-
-            : ''
-        }
-
-
-        ${
-          player.market_flag
-
-            ? `
-              <span class="badge warning">
-                MERCATO DA MONITORARE
-              </span>
-            `
-
-            : ''
-        }
-
-
-        ${
-          player.uncertain_return
-
-            ? `
-              <span class="badge warning">
-                RIENTRO INCERTO
-              </span>
-            `
-
-            : ''
-        }
-
-
-        ${
-          hasValue(
-            player.unavailable_until_round
-          )
-
-            ? `
-              <p class="setting-help">
-                Indisponibile indicativamente
-                fino alla giornata
-                <strong>
-                  ${
-                    escapeHtml(
-                      player.unavailable_until_round
-                    )
-                  }
-                </strong>.
-              </p>
-            `
-
-            : ''
-        }
-
-
-        ${
-          lastYearVisible
-
-            ? `
-              <div class="divider"></div>
-
-              <h3>
-                Ultima stagione
-              </h3>
-
-              <p>
-                Voto base:
-                <strong>
-                  ${
-                    escapeHtml(
-                      formatNumber(
-                        player.last_year_base_rating,
-                        2
-                      )
-                    )
-                  }
-                </strong>
-                · Fantamedia:
-                <strong>
-                  ${
-                    escapeHtml(
-                      formatNumber(
-                        player.last_year_fantasy_avg,
-                        2
-                      )
-                    )
-                  }
-                </strong>
-                · Titolarità:
-                <strong>
-                  ${
-                    escapeHtml(
-                      formatPercent(
-                        player.last_year_titolarity
-                      )
-                    )
-                  }
-                </strong>
-              </p>
-            `
-
-            : ''
-        }
-
-
-        ${
-          lastFiveVisible
-
-            ? `
-              <div class="divider"></div>
-
-              <h3>
-                Ultime 5 partite
-              </h3>
-
-              <p>
-                Voto base:
-                <strong>
-                  ${
-                    escapeHtml(
-                      formatNumber(
-                        player.last_five_matches_base_rating,
-                        2
-                      )
-                    )
-                  }
-                </strong>
-                · Fantamedia:
-                <strong>
-                  ${
-                    escapeHtml(
-                      formatNumber(
-                        player.last_five_matches_fantasy_avg,
-                        2
-                      )
-                    )
-                  }
-                </strong>
-                · Titolarità:
-                <strong>
-                  ${
-                    escapeHtml(
-                      formatPercent(
-                        player.last_five_matches_titolarity
-                      )
-                    )
-                  }
-                </strong>
-              </p>
-            `
-
-            : ''
-        }
-
-
-        ${
-          currentSeasonVisible
-
-            ? `
-              <div class="divider"></div>
-
-              <h3>
-                Stagione corrente
-              </h3>
-
-              <p>
-                Voto base:
-                <strong>
-                  ${
-                    escapeHtml(
-                      formatNumber(
-                        player.current_season_base_rating,
-                        2
-                      )
-                    )
-                  }
-                </strong>
-                · Fantamedia:
-                <strong>
-                  ${
-                    escapeHtml(
-                      formatNumber(
-                        player.current_season_fantasy_avg,
-                        2
-                      )
-                    )
-                  }
-                </strong>
-                · Titolarità:
-                <strong>
-                  ${
-                    escapeHtml(
-                      formatPercent(
-                        player.current_season_titolarity
-                      )
-                    )
-                  }
-                </strong>
-              </p>
-            `
-
-            : ''
-        }
-
-
-        ${
-          player.source_updated_at
-
-            ? `
-              <p class="setting-help">
-                Dati aggiornati:
-                ${
-                  escapeHtml(
-                    formatDateTime(
-                      player.source_updated_at
-                    )
-                  )
-                }
-              </p>
-            `
-
-            : ''
-        }
-
-      </div>
-
-    `
-
-
-    playersList.appendChild(
-      row
-    )
+    fragment.append(
+      row,
+      detailRow
+    );
   }
+
+  playersTableBody.appendChild(
+    fragment
+  );
 }
 
-
-/* =========================================================
-   INFO IMPORT
-   ========================================================= */
-
 function renderImportInfo() {
-
   const players =
-    listData.players
-    || []
+    listData.players || [];
 
+  const isSuperAdmin =
+    listData.permissions
+      .isSuperAdmin;
 
   setupTab.hidden =
-    !listData
-      .permissions
-      .isLeagueAdmin
-
+    !listData.permissions
+      .isLeagueAdmin;
 
   listImportSection.hidden =
-    !listData
-      .permissions
-      .isLeagueAdmin
-
+    !listData.permissions
+      .isLeagueAdmin;
 
   superAdminStatsSection.hidden =
-    !listData
-      .permissions
-      .isSuperAdmin
+    !isSuperAdmin;
 
+  superAdminNationalitySection.hidden =
+    !isSuperAdmin;
 
   playersCount.textContent =
-    players.length
-
+    players.length;
 
   fantasyMode.textContent =
     fantasyModeLabel(
-      listData
-        .settings
+      listData.settings
         ?.fantasyMode
-    )
+    );
 
+  renderRoleFilters();
+  configureSecondaryFilters();
 
-  configureRoleFilter()
+  const hasPlayers =
+    players.length > 0;
 
+  roleFilterBar.hidden =
+    !hasPlayers;
 
-  if (
-    players.length === 0
-  ) {
+  playerFilterGrid.hidden =
+    !hasPlayers;
 
-    importInfo.hidden =
-      true
+  playerCountLine.hidden =
+    !hasPlayers;
 
+  if (!hasPlayers) {
+    importInfo.hidden = true;
 
-    toolbar.hidden =
-      true
+    playersEmpty.hidden = false;
 
+    playersEmpty.textContent =
+      'Nessun listone importato.';
 
-    filteredCount.textContent =
-      ''
+    playerTableWrap.hidden =
+      true;
 
+    filteredCount.textContent = '';
 
-    playersList.innerHTML = `
-      <div class="empty-state">
-        Nessun listone importato.
-      </div>
-    `
-
-
-    return
+    return;
   }
 
-
-  importInfo.hidden =
-    false
-
-
-  toolbar.hidden =
-    false
-
+  importInfo.hidden = false;
 
   const batch =
-    listData.importBatch
+    listData.importBatch;
 
+  importDetails.textContent =
+    batch
+      ? [
+          batch.source_filename ||
+          'Listone',
 
-  if (batch) {
+          batch.reference_date
+            ? `riferimento ${formatDate(batch.reference_date)}`
+            : null,
 
-    importDetails.textContent =
-      [
-        batch.source_filename
-        || 'Listone',
+          `${batch.row_count} giocatori`,
 
-        batch.reference_date
-          ? `riferimento ${
-              formatDate(
-                batch.reference_date
-              )
-            }`
-          : null,
+          batch.completed_at
+            ? `importato ${formatDateTime(batch.completed_at)}`
+            : null
+        ]
+          .filter(Boolean)
+          .join(' · ')
+      : 'Listone presente.';
 
-        `${batch.row_count} giocatori`,
-
-        batch.completed_at
-          ? `importato ${
-              formatDateTime(
-                batch.completed_at
-              )
-            }`
-          : null
-      ]
-        .filter(Boolean)
-        .join(' · ')
-
-  } else {
-
-    importDetails.textContent =
-      'Listone presente.'
-  }
-
-
-  renderPlayers()
+  renderPlayers();
 }
 
+roleFilterBar.addEventListener(
+  'click',
+  event => {
+    const button =
+      event.target.closest(
+        '.role-filter-button'
+      );
 
-/* =========================================================
-   DATASET SUPER ADMIN
-   ========================================================= */
+    if (!button) return;
+
+    activeRole =
+      button.dataset.role ||
+      'all';
+
+    renderRoleFilters();
+    renderPlayers();
+  }
+);
+
+[
+  playerSearch,
+  teamFilter,
+  slotFilter,
+  flagFilter
+].forEach(
+  control => {
+    control.addEventListener(
+      control === playerSearch
+        ? 'input'
+        : 'change',
+      renderPlayers
+    );
+  }
+);
+
+filterResetButton.addEventListener(
+  'click',
+  () => {
+    activeRole = 'all';
+    playerSearch.value = '';
+    teamFilter.value = 'all';
+    slotFilter.value = 'all';
+    flagFilter.value = 'all';
+
+    renderRoleFilters();
+    renderPlayers();
+  }
+);
+
+sortButtons.forEach(
+  button => {
+    button.addEventListener(
+      'click',
+      () => {
+        const key =
+          button.dataset.sort;
+
+        if (!key) return;
+
+        if (
+          sortState.key === key
+        ) {
+          sortState.direction =
+            sortState.direction === 'asc'
+              ? 'desc'
+              : 'asc';
+
+        } else {
+          sortState.key = key;
+
+          sortState.direction =
+            [
+              'name',
+              'team',
+              'slot'
+            ].includes(key)
+              ? 'asc'
+              : 'desc';
+        }
+
+        updateSortHeader();
+        renderPlayers();
+      }
+    );
+  }
+);
+
+nationalityEnrichButton.addEventListener(
+  'click',
+  async () => {
+    showMessage('');
+
+    nationalityEnrichButton.disabled =
+      true;
+
+    const originalText =
+      nationalityEnrichButton.textContent;
+
+    nationalityEnrichButton.textContent =
+      'Ricerca in corso...';
+
+    let processed = 0;
+    let resolved = 0;
+    let review = 0;
+    let notFound = 0;
+
+    try {
+      for (
+        let cycle = 0;
+        cycle < 90;
+        cycle++
+      ) {
+        const data =
+          await callNationalityApi({
+            action:
+              'enrichBatch',
+
+            limit: 6
+          });
+
+        if (!data?.ok) {
+          throw new Error(
+            data?.error ||
+            'Errore durante la ricerca delle nazionalità.'
+          );
+        }
+
+        processed +=
+          data.processed || 0;
+
+        resolved +=
+          data.resolved || 0;
+
+        review +=
+          data.review || 0;
+
+        notFound +=
+          data.notFound || 0;
+
+        nationalityProgress.textContent =
+          `Analizzati ${processed} · trovati ${resolved} · da verificare ${review} · non trovati ${notFound} · mancanti ${data.remaining || 0}`;
+
+        if (
+          !data.remaining ||
+          data.processed === 0
+        ) {
+          break;
+        }
+      }
+
+      await loadList();
+
+      showMessage(
+        'Ricerca nazionalità completata.',
+        'success'
+      );
+
+    } catch (error) {
+      console.error(error);
+
+      showMessage(
+        error.message ||
+        'Errore durante la ricerca delle nazionalità.',
+        'error'
+      );
+
+    } finally {
+      nationalityEnrichButton.disabled =
+        false;
+
+      nationalityEnrichButton.textContent =
+        originalText;
+    }
+  }
+);
 
 function renderAdvisoryDatasets() {
-
-  advisoryDatasets.innerHTML =
-    ''
-
-
   const datasets =
     listData
-      ?.advisoryDatasets
-    || []
+      ?.advisoryDatasets ||
+    [];
 
+  advisoryDatasets.innerHTML =
+    datasets.length
+      ? datasets.map(
+          dataset => `
+            <div class="list-row">
 
-  if (
-    datasets.length === 0
-  ) {
+              <div class="list-row-main">
 
-    advisoryDatasets.innerHTML = `
-      <div class="empty-state">
-        Nessun dataset aggiuntivo importato.
-      </div>
-    `
+                <div class="list-row-title">
 
-    return
-  }
+                  <strong>
+                    ${escapeHtml(dataset.label)}
+                  </strong>
 
+                  <small>
+                    ${escapeHtml(dataset.season || 'Stagione non indicata')}
+                    ·
+                    ${escapeHtml(dataset.row_count)}
+                    righe
+                  </small>
 
-  for (
-    const dataset
-    of datasets
-  ) {
+                </div>
 
-    const row =
-      document.createElement(
-        'div'
-      )
+                <span class="badge good">
+                  ATTIVO
+                </span>
 
+              </div>
 
-    row.className =
-      'list-row'
+              <p class="setting-help">
+                ${
+                  dataset.reference_date
+                    ? `Riferimento ${escapeHtml(formatDate(dataset.reference_date))} · `
+                    : ''
+                }
 
+                ${escapeHtml(dataset.source_filename || 'File')}
+              </p>
 
-    row.innerHTML = `
-
-      <div class="list-row-main">
-
-        <div class="list-row-title">
-
-          <strong>
-            ${escapeHtml(
-              dataset.label
-            )}
-          </strong>
-
-          <small>
-            ${
-              escapeHtml(
-                dataset.season
-                || 'Stagione non indicata'
-              )
-            }
-            ·
-            ${
-              escapeHtml(
-                dataset.row_count
-              )
-            }
-            righe
-          </small>
-
-        </div>
-
-
-        <span class="badge good">
-          ATTIVO
-        </span>
-
-      </div>
-
-
-      <p class="setting-help">
-        ${
-          dataset.reference_date
-            ? `Riferimento ${
-                escapeHtml(
-                  formatDate(
-                    dataset.reference_date
-                  )
-                )
-              } · `
-            : ''
-        }
-
-        ${
-          escapeHtml(
-            dataset.source_filename
-            || 'File'
-          )
-        }
-      </p>
-
-    `
-
-
-    advisoryDatasets.appendChild(
-      row
-    )
-  }
+            </div>
+          `
+        ).join('')
+      : `
+          <div class="empty-state">
+            Nessun dataset aggiuntivo importato.
+          </div>
+        `;
 }
-
-
-/* =========================================================
-   RICONOSCIMENTO COLONNE DATASET EXTRA
-   ========================================================= */
 
 function findColumnByAliases(
   columns,
   aliases
 ) {
-
   const aliasSet =
     new Set(
       aliases.map(
         normalizeHeader
       )
-    )
-
+    );
 
   return columns.find(
     column =>
       aliasSet.has(
-        normalizeHeader(
-          column
-        )
+        normalizeHeader(column)
       )
-  )
-  || null
+  ) || null;
 }
-
 
 function getNumericMetrics(
   row,
   excludedColumns = []
 ) {
-
-  const result = {}
-
-
   const excluded =
     new Set(
       excludedColumns
         .filter(Boolean)
-    )
+    );
 
+  const result = {};
 
   for (
-    const [
-      key,
-      value
-    ]
+    const [key, value]
     of Object.entries(row)
   ) {
-
     if (
       excluded.has(key)
     ) {
-
-      continue
+      continue;
     }
 
+    const n =
+      nullableNumber(value);
 
-    const number =
-      nullableNumber(
-        value
-      )
-
-
-    if (
-      number !== null
-    ) {
-
-      result[key] =
-        number
+    if (n !== null) {
+      result[key] = n;
     }
   }
 
-
-  return result
+  return result;
 }
-
-
-/* =========================================================
-   IMPORT DATASET SUPER ADMIN
-   ========================================================= */
 
 async function importAdvisoryStats(
   file,
@@ -2741,13 +1971,11 @@ async function importAdvisoryStats(
   season,
   referenceDate
 ) {
-
   const parsed =
     await readSpreadsheetFile(
       file,
       false
-    )
-
+    );
 
   const nameColumn =
     findColumnByAliases(
@@ -2762,16 +1990,13 @@ async function importAdvisoryStats(
         'nome giocatore',
         'nome calciatore'
       ]
-    )
-
+    );
 
   if (!nameColumn) {
-
     throw new Error(
       'Non riesco a individuare la colonna con il nome del giocatore.'
-    )
+    );
   }
-
 
   const teamColumn =
     findColumnByAliases(
@@ -2784,28 +2009,22 @@ async function importAdvisoryStats(
         'società',
         'team name'
       ]
-    )
+    );
 
-
-  const normalizedRows =
+  const rows =
     parsed.rows
       .map(
         row => ({
-
           playerName:
             String(
-              row[nameColumn]
-              ?? ''
-            )
-              .trim(),
+              row[nameColumn] ?? ''
+            ).trim(),
 
           team:
             teamColumn
               ? String(
-                  row[teamColumn]
-                  ?? ''
-                )
-                  .trim()
+                  row[teamColumn] ?? ''
+                ).trim()
               : '',
 
           numericMetrics:
@@ -2824,28 +2043,19 @@ async function importAdvisoryStats(
       .filter(
         row =>
           row.playerName
-      )
+      );
 
-
-  if (
-    normalizedRows.length === 0
-  ) {
-
+  if (!rows.length) {
     throw new Error(
       'Il dataset non contiene giocatori validi.'
-    )
+    );
   }
 
-
   advisoryProgress.textContent =
-    `Preparazione di ${
-      normalizedRows.length
-    } righe...`
-
+    `Preparazione di ${rows.length} righe...`;
 
   const begin =
     await callApi({
-
       action:
         'beginAdvisoryStatsImport',
 
@@ -2855,8 +2065,7 @@ async function importAdvisoryStats(
         season || null,
 
       referenceDate:
-        referenceDate
-        || null,
+        referenceDate || null,
 
       sourceFilename:
         file.name,
@@ -2866,362 +2075,225 @@ async function importAdvisoryStats(
 
       sourceColumns:
         parsed.columns
-    })
-
+    });
 
   if (!begin?.ok) {
-
     throw new Error(
-      begin?.error
-      ||
+      begin?.error ||
       'Impossibile iniziare l’import.'
-    )
+    );
   }
 
-
-  const datasetId =
-    begin.datasetId
-
-
-  let imported = 0
-
+  let imported = 0;
 
   for (
     let start = 0;
-    start < normalizedRows.length;
+    start < rows.length;
     start += IMPORT_CHUNK_SIZE
   ) {
-
     const end =
       Math.min(
         start + IMPORT_CHUNK_SIZE,
-        normalizedRows.length
-      )
-
-
-    const chunk =
-      normalizedRows.slice(
-        start,
-        end
-      )
-
+        rows.length
+      );
 
     advisoryProgress.textContent =
-      `Importazione ${
-        end
-      } / ${
-        normalizedRows.length
-      }...`
-
+      `Importazione ${end} / ${rows.length}...`;
 
     const append =
       await callApi({
-
         action:
           'appendAdvisoryStats',
 
-        datasetId,
+        datasetId:
+          begin.datasetId,
 
         rows:
-          chunk
-      })
-
+          rows.slice(
+            start,
+            end
+          )
+      });
 
     if (!append?.ok) {
-
       throw new Error(
-        append?.error
-        ||
+        append?.error ||
         'Errore durante l’importazione del dataset.'
-      )
+      );
     }
 
-
     imported +=
-      append.inserted
-      || 0
+      append.inserted || 0;
   }
 
-
   advisoryProgress.textContent =
-    'Finalizzazione dataset...'
-
+    'Finalizzazione dataset...';
 
   const finish =
     await callApi({
-
       action:
         'finishAdvisoryStatsImport',
 
-      datasetId
-    })
-
+      datasetId:
+        begin.datasetId
+    });
 
   if (!finish?.ok) {
-
     throw new Error(
-      finish?.error
-      ||
+      finish?.error ||
       'Impossibile finalizzare il dataset.'
-    )
+    );
   }
 
-
-  return imported
+  return imported;
 }
 
+advisoryImportForm.addEventListener(
+  'submit',
+  async event => {
+    event.preventDefault();
 
-advisoryImportForm
-  .addEventListener(
-    'submit',
-    async event => {
+    showMessage('');
 
-      event.preventDefault()
+    const file =
+      advisoryFile.files?.[0];
 
+    const label =
+      advisoryLabel.value.trim();
 
-      showMessage('')
+    if (!file) {
+      return showMessage(
+        'Seleziona un file XLSX o CSV.',
+        'error'
+      );
+    }
 
+    if (
+      label.length < 2
+    ) {
+      return showMessage(
+        'Inserisci un nome per il dataset.',
+        'error'
+      );
+    }
 
-      const file =
-        advisoryFile
-          .files?.[0]
+    advisoryImportButton.disabled =
+      true;
 
+    const originalText =
+      advisoryImportButton.textContent;
 
-      const label =
-        advisoryLabel
-          .value
-          .trim()
+    advisoryImportButton.textContent =
+      'Importazione...';
 
+    try {
+      const count =
+        await importAdvisoryStats(
+          file,
+          label,
+          advisorySeason.value.trim(),
+          advisoryReferenceDate.value
+        );
 
-      if (!file) {
+      advisoryProgress.textContent =
+        `Dataset importato: ${count} righe.`;
 
-        showMessage(
-          'Seleziona un file XLSX o CSV.',
-          'error'
-        )
+      showMessage(
+        'Statistiche aggiuntive importate.',
+        'success'
+      );
 
-        return
-      }
+      advisoryFile.value = '';
+      advisoryLabel.value = '';
 
+      await loadList();
 
-      if (
-        label.length < 2
-      ) {
+    } catch (error) {
+      console.error(error);
 
-        showMessage(
-          'Inserisci un nome per il dataset.',
-          'error'
-        )
+      advisoryProgress.textContent =
+        '';
 
-        return
-      }
+      showMessage(
+        error.message ||
+        'Errore durante l’importazione delle statistiche.',
+        'error'
+      );
 
-
+    } finally {
       advisoryImportButton.disabled =
-        true
-
-
-      const originalText =
-        advisoryImportButton.textContent
-
+        false;
 
       advisoryImportButton.textContent =
-        'Importazione...'
-
-
-      try {
-
-        const count =
-          await importAdvisoryStats(
-
-            file,
-
-            label,
-
-            advisorySeason
-              .value
-              .trim(),
-
-            advisoryReferenceDate
-              .value
-        )
-
-
-        advisoryProgress.textContent =
-          `Dataset importato: ${
-            count
-          } righe.`
-
-
-        showMessage(
-          'Statistiche aggiuntive importate.',
-          'success'
-        )
-
-
-        advisoryFile.value =
-          ''
-
-
-        advisoryLabel.value =
-          ''
-
-
-        await loadList()
-
-
-      } catch (error) {
-
-        console.error(error)
-
-
-        advisoryProgress.textContent =
-          ''
-
-
-        showMessage(
-          error.message
-          ||
-          'Errore durante l’importazione delle statistiche.',
-          'error'
-        )
-
-      } finally {
-
-        advisoryImportButton.disabled =
-          false
-
-
-        advisoryImportButton.textContent =
-          originalText
-      }
+        originalText;
     }
-  )
-
-
-/* =========================================================
-   LOAD
-   ========================================================= */
+  }
+);
 
 async function loadList() {
-
-  showMessage('')
-
+  showMessage('');
 
   try {
-
     const data =
       await callApi({
         action:
           'getList'
-      })
-
+      });
 
     if (!data?.ok) {
-
-      showMessage(
-        data?.error
-        ||
+      return showMessage(
+        data?.error ||
         'Impossibile caricare il listone.',
         'error'
-      )
-
-      return
+      );
     }
 
-
-    listData =
-      data
-
+    listData = data;
 
     leagueTitle.textContent =
-      `Listone · ${
-        data.league.name
-      }`
-
+      `Listone · ${data.league.name}`;
 
     leagueSubtitle.textContent =
       fantasyModeLabel(
-        data
-          .settings
+        data.settings
           ?.fantasyMode
-      )
+      );
 
+    activeRole = 'all';
 
-    renderImportInfo()
-
+    renderImportInfo();
+    updateSortHeader();
 
     if (
       data.permissions
         .isSuperAdmin
     ) {
-
-      renderAdvisoryDatasets()
+      renderAdvisoryDatasets();
     }
 
-
   } catch (error) {
-
-    console.error(error)
-
+    console.error(error);
 
     showMessage(
-      error.message
-      ||
+      error.message ||
       'Errore durante il caricamento.',
       'error'
-    )
+    );
   }
 }
 
-
-/* =========================================================
-   EVENTI FILTRI
-   ========================================================= */
-
-playerSearch
-  .addEventListener(
-    'input',
-    renderPlayers
-  )
-
-
-roleFilter
-  .addEventListener(
-    'change',
-    renderPlayers
-  )
-
-
-playerSort
-  .addEventListener(
-    'change',
-    renderPlayers
-  )
-
-
-/* =========================================================
-   START
-   ========================================================= */
-
 listReferenceDate.value =
-  getTodayLocal()
-
+  getTodayLocal();
 
 advisoryReferenceDate.value =
-  getTodayLocal()
-
+  getTodayLocal();
 
 selectedLeague =
-  getSelectedLeague()
-
+  getSelectedLeague();
 
 if (!selectedLeague?.id) {
-
   window.location.href =
-    'leagues.html'
-
+    'leagues.html';
 } else {
-
-  loadList()
+  loadList();
 }
