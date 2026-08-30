@@ -242,6 +242,35 @@ async function callApi(body) {
 
 
 /* =========================================================
+   MEMBRI LIBERI
+   ========================================================= */
+
+function getAvailableMembers() {
+
+  return (
+    managementData?.members
+    || []
+  )
+    .filter(
+      member =>
+        !member.team
+    )
+    .sort(
+      (a, b) =>
+        String(
+          a.username
+        )
+          .localeCompare(
+            String(
+              b.username
+            ),
+            'it'
+          )
+    );
+}
+
+
+/* =========================================================
    SQUADRE
    ========================================================= */
 
@@ -259,6 +288,17 @@ function renderTeams() {
     );
 
 
+  const canAssignPresident =
+    managementData
+      ?.permissions
+      ?.canAssignPresident
+    === true;
+
+
+  const availableMembers =
+    getAvailableMembers();
+
+
   teamsList.innerHTML =
     '';
 
@@ -269,12 +309,15 @@ function renderTeams() {
 
     teamsList.innerHTML = `
       <div class="empty-state">
+
         Nessuna squadra presente.
+
         ${
           limit
             ? `Puoi crearne fino a ${limit}.`
             : ''
         }
+
       </div>
     `;
 
@@ -297,6 +340,100 @@ function renderTeams() {
       'league-card';
 
 
+    let assignmentArea =
+      '';
+
+
+    if (
+      !team.presidentUsername
+      &&
+      canAssignPresident
+    ) {
+
+      if (
+        availableMembers.length
+        > 0
+      ) {
+
+        assignmentArea = `
+
+          <div class="divider"></div>
+
+
+          <div class="form-grid">
+
+            <label class="form-field">
+
+              Assegna Presidente
+
+              <select
+                data-president-select
+              >
+
+                <option value="">
+                  Seleziona membro
+                </option>
+
+                ${
+                  availableMembers
+                    .map(
+                      member => `
+                        <option
+                          value="${escapeHtml(
+                            member.userId
+                          )}"
+                        >
+                          ${escapeHtml(
+                            member.username
+                          )}
+                        </option>
+                      `
+                    )
+                    .join('')
+                }
+
+              </select>
+
+            </label>
+
+
+            <div
+              class="form-field"
+              style="align-self:end"
+            >
+
+              <button
+                type="button"
+                data-assign-president
+                data-team-id="${escapeHtml(
+                  team.id
+                )}"
+              >
+                Assegna squadra
+              </button>
+
+            </div>
+
+          </div>
+
+        `;
+
+      } else {
+
+        assignmentArea = `
+
+          <div class="divider"></div>
+
+          <p class="setting-help">
+            Nessun membro libero disponibile
+            per questa squadra.
+          </p>
+
+        `;
+      }
+    }
+
+
     card.innerHTML = `
 
       <div class="league-card-header">
@@ -309,7 +446,9 @@ function renderTeams() {
             )}
           </h3>
 
+
           <p>
+
             ${
               team.presidentUsername
 
@@ -322,8 +461,13 @@ function renderTeams() {
                   </strong>
                 `
 
-                : 'Nessun Presidente assegnato'
+                : `
+                  <span class="text-muted">
+                    Nessun Presidente assegnato
+                  </span>
+                `
             }
+
           </p>
 
         </div>
@@ -336,6 +480,7 @@ function renderTeams() {
               : ''
           }"
         >
+
           ${
             team.status === 'active'
               ? 'ATTIVA'
@@ -343,9 +488,13 @@ function renderTeams() {
                   team.status
                 )
           }
+
         </span>
 
       </div>
+
+
+      ${assignmentArea}
 
     `;
 
@@ -380,6 +529,119 @@ function renderTeams() {
 
 
 /* =========================================================
+   ASSEGNA PRESIDENTE
+   ========================================================= */
+
+async function assignPresident(
+  button
+) {
+
+  const teamId =
+    button.dataset.teamId;
+
+
+  const card =
+    button.closest(
+      '.league-card'
+    );
+
+
+  const select =
+    card?.querySelector(
+      '[data-president-select]'
+    );
+
+
+  const targetUserId =
+    select?.value;
+
+
+  if (
+    !teamId
+    ||
+    !targetUserId
+  ) {
+
+    showMessage(
+      'Seleziona un membro da assegnare alla squadra.',
+      'error'
+    );
+
+    return;
+  }
+
+
+  button.disabled =
+    true;
+
+
+  const oldText =
+    button.textContent;
+
+
+  button.textContent =
+    'Assegnazione...';
+
+
+  try {
+
+    const result =
+      await callApi({
+
+        action:
+          'assignPresident',
+
+        teamId,
+
+        targetUserId
+      });
+
+
+    if (!result?.ok) {
+
+      throw new Error(
+        result?.error
+        ||
+        'Impossibile assegnare la squadra.'
+      );
+    }
+
+
+    showMessage(
+      'Squadra assegnata al Presidente.',
+      'success'
+    );
+
+
+    await loadManagement();
+
+
+  } catch (error) {
+
+    console.error(error);
+
+
+    showMessage(
+      error.message
+      ||
+      'Errore durante l’assegnazione.',
+      'error'
+    );
+
+
+  } finally {
+
+    button.disabled =
+      false;
+
+
+    button.textContent =
+      oldText;
+  }
+}
+
+
+/* =========================================================
    BADGE MEMBRO
    ========================================================= */
 
@@ -395,9 +657,11 @@ function renderMemberBadges(member) {
 
     badges.push(`
       <span class="badge admin">
+
         ${escapeHtml(
           roleLabel(role)
         )}
+
       </span>
     `);
   }
@@ -409,15 +673,19 @@ function renderMemberBadges(member) {
 
     badges.push(`
       <span class="badge good">
+
         ${escapeHtml(
           roleLabel(
             member.team.role
           )
         )}
+
         ·
+
         ${escapeHtml(
           member.team.teamName
         )}
+
       </span>
     `);
   }
@@ -485,6 +753,13 @@ function renderMembers() {
       );
 
 
+    row.dataset.currentRoles =
+      JSON.stringify(
+        member.leagueRoles
+        || []
+      );
+
+
     row.innerHTML = `
 
       <summary>
@@ -497,7 +772,9 @@ function renderMembers() {
             )}
           </strong>
 
+
           <small>
+
             ${
               member.team
 
@@ -515,6 +792,7 @@ function renderMembers() {
 
                 : 'Nessuna squadra'
             }
+
           </small>
 
         </div>
@@ -632,18 +910,6 @@ function renderMembers() {
     `;
 
 
-    /*
-     * Conserviamo i ruoli attuali direttamente
-     * sull'elemento per calcolare solo le modifiche.
-     */
-
-    row.dataset.currentRoles =
-      JSON.stringify(
-        member.leagueRoles
-        || []
-      );
-
-
     membersList.appendChild(
       row
     );
@@ -674,7 +940,6 @@ async function saveMemberRoles(
     ||
     !row
   ) {
-
     return;
   }
 
@@ -905,7 +1170,9 @@ function renderViceRequests() {
             )}
           </h3>
 
+
           <p>
+
             ${
               request.leagueApproved
 
@@ -913,6 +1180,7 @@ function renderViceRequests() {
 
                 : 'In attesa dell’Admin Lega'
             }
+
           </p>
 
         </div>
@@ -969,7 +1237,7 @@ function renderViceRequests() {
 
 
 /* =========================================================
-   CREATE TEAM
+   CREA SQUADRA
    ========================================================= */
 
 createTeamForm
@@ -1078,6 +1346,33 @@ createTeamForm
         button.textContent =
           oldText;
       }
+    }
+  );
+
+
+/* =========================================================
+   EVENTI SQUADRE
+   ========================================================= */
+
+teamsList
+  .addEventListener(
+    'click',
+    event => {
+
+      const button =
+        event.target.closest(
+          '[data-assign-president]'
+        );
+
+
+      if (!button) {
+        return;
+      }
+
+
+      assignPresident(
+        button
+      );
     }
   );
 
