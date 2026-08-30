@@ -9,32 +9,32 @@
    ========================================================= */
 
 :root {
-  --bg: #111111;
-  --surface: #1d1d1d;
-  --surface-2: #252525;
-  --surface-3: #2d2d2d;
+  --bg: #061426;
+  --surface: #0b203d;
+  --surface-2: #102b50;
+  --surface-3: #173866;
 
-  --border: #333333;
-  --border-strong: #4b4b4b;
+  --border: #214b7d;
+  --border-strong: #32639c;
 
-  --text: #ffffff;
-  --text-soft: #b8b8b8;
-  --text-muted: #7d7d7d;
+  --text: #f7fbff;
+  --text-soft: #c9d9ef;
+  --text-muted: #819fc6;
 
-  --primary: #ffffff;
-  --primary-text: #111111;
+  --primary: #2f6fed;
+  --primary-text: #ffffff;
 
-  --success-bg: #31523b;
-  --success-text: #b8efc3;
+  --success-bg: #174d45;
+  --success-text: #9fe6d3;
 
-  --warning-bg: #654d2e;
-  --warning-text: #ffd99b;
+  --warning-bg: #664a22;
+  --warning-text: #ffd797;
 
-  --danger-bg: #633737;
-  --danger-text: #ffb0b0;
+  --danger-bg: #653444;
+  --danger-text: #ffb4c2;
 
-  --admin-bg: #51482e;
-  --admin-text: #f5e4a5;
+  --admin-bg: #30447d;
+  --admin-text: #cfdcff;
 
   --radius-sm: 7px;
   --radius-md: 10px;
@@ -42,8 +42,8 @@
   --radius-xl: 18px;
 
   --shadow:
-    0 8px 30px
-    rgba(0, 0, 0, .18);
+    0 10px 34px
+    rgba(0, 7, 20, .26);
 
   --content-width: 1100px;
 }
@@ -618,16 +618,16 @@ input:focus,
 select:focus,
 textarea:focus {
   background:
-    #292929;
+    #14345d;
 
   border-color:
-    #777777;
+    #5b82b8;
 }
 
 input::placeholder,
 textarea::placeholder {
   color:
-    #707070;
+    #7894ba;
 }
 
 input[type="checkbox"] {
@@ -755,10 +755,10 @@ input[type="checkbox"] {
     6px;
 
   background:
-    #3b3b3b;
+    #234b79;
 
   color:
-    #dddddd;
+    #dbe8f8;
 
   font-size:
     10px;
@@ -1205,11 +1205,11 @@ body:has(#login-area:not([hidden])) > main {
     6px 9px;
 
   background:
-    #151515;
+    #07192f;
 
   border:
     1px solid
-    #292929;
+    #14345d;
 
   border-radius:
     var(--radius-sm);
@@ -1725,7 +1725,7 @@ and
 .role-filter-button:hover {
   transform: none;
   opacity: 1;
-  border-color: #777777;
+  border-color: #5b82b8;
 }
 
 .role-filter-button.active {
@@ -1936,7 +1936,7 @@ and
 
 .player-sort-button:hover,
 .player-sort-button:active {
-  background: #343434;
+  background: #183c68;
   transform: none;
   opacity: 1;
 }
@@ -1958,11 +1958,11 @@ and
 }
 
 .player-row:hover {
-  background: #292929;
+  background: #14345d;
 }
 
 .player-row.is-open {
-  background: #2b2b2b;
+  background: #15365f;
 }
 
 .player-row td {
@@ -2043,7 +2043,7 @@ and
 
 .player-detail-row {
   display: none;
-  background: #181818;
+  background: #081b33;
 }
 
 .player-detail-row.is-open {
@@ -2160,4 +2160,365 @@ and
   .player-name {
     font-size: 12px;
   }
+}
+
+
+/* =========================================================
+   ROSE
+   ========================================================= */
+
+.rosters-board {
+  display: grid;
+  gap: 12px;
+}
+
+
+.roster-team {
+  overflow: hidden;
+
+  background:
+    var(--surface-2);
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius:
+    var(--radius-lg);
+}
+
+
+.roster-team summary {
+  list-style: none;
+
+  cursor: pointer;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(180px, 1fr)
+    auto;
+
+  align-items: center;
+
+  gap: 14px;
+
+  padding:
+    13px 15px;
+}
+
+
+.roster-team summary::-webkit-details-marker {
+  display: none;
+}
+
+
+.roster-team[open] {
+  border-color:
+    var(--border-strong);
+}
+
+
+.roster-team-main {
+  min-width: 0;
+}
+
+
+.roster-team-main h3 {
+  margin:
+    0 0 3px;
+
+  overflow:
+    hidden;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+
+  font-size:
+    16px;
+}
+
+
+.roster-team-main small {
+  color:
+    var(--text-muted);
+}
+
+
+.roster-team-kpis {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  justify-content:
+    flex-end;
+
+  gap: 6px;
+}
+
+
+.roster-credit {
+  font-variant-numeric:
+    tabular-nums;
+}
+
+
+.roster-body {
+  padding:
+    0 15px 15px;
+
+  border-top:
+    1px solid
+    var(--border);
+}
+
+
+.roster-progress {
+  height:
+    7px;
+
+  margin:
+    14px 0 7px;
+
+  overflow:
+    hidden;
+
+  background:
+    var(--surface);
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius:
+    999px;
+}
+
+
+.roster-progress > span {
+  display:
+    block;
+
+  height:
+    100%;
+
+  width:
+    var(--progress, 0%);
+
+  max-width:
+    100%;
+
+  background:
+    var(--primary);
+}
+
+
+.roster-constraints {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 6px;
+
+  margin:
+    10px 0 12px;
+}
+
+
+.roster-player-list {
+  display: grid;
+
+  gap: 3px;
+}
+
+
+.roster-player-row {
+  display: grid;
+
+  grid-template-columns:
+    minmax(210px, 1fr)
+    minmax(90px, 140px)
+    70px;
+
+  align-items:
+    center;
+
+  gap: 10px;
+
+  min-height:
+    38px;
+
+  padding:
+    5px 8px;
+
+  background:
+    rgba(255, 255, 255, .025);
+
+  border-bottom:
+    1px solid
+    var(--border);
+}
+
+
+.roster-player-row:last-child {
+  border-bottom:
+    0;
+}
+
+
+.roster-player-main {
+  display: flex;
+
+  align-items:
+    center;
+
+  gap: 6px;
+
+  min-width:
+    0;
+}
+
+
+.roster-player-name {
+  overflow:
+    hidden;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+
+  font-size:
+    12px;
+
+  font-weight:
+    800;
+}
+
+
+.roster-player-club {
+  overflow:
+    hidden;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+
+  color:
+    var(--text-muted);
+
+  font-size:
+    11px;
+}
+
+
+.roster-player-price {
+  text-align:
+    right;
+
+  font-variant-numeric:
+    tabular-nums;
+
+  font-weight:
+    900;
+}
+
+
+.roster-empty {
+  padding:
+    18px 8px;
+
+  color:
+    var(--text-muted);
+
+  font-size:
+    12px;
+}
+
+
+@media
+(max-width: 650px) {
+
+  .roster-team summary {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .roster-team-kpis {
+    justify-content:
+      flex-start;
+  }
+
+
+  .roster-player-row {
+    grid-template-columns:
+      minmax(190px, 1fr)
+      60px;
+  }
+
+
+  .roster-player-club {
+    display:
+      none;
+  }
+}
+
+
+/* =========================================================
+   LISTONE - ROLE MULTISELECT / NOME
+   ========================================================= */
+
+.player-main-cell {
+  gap:
+    6px;
+}
+
+
+.player-name-block {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    6px;
+
+  min-width:
+    0;
+}
+
+
+.player-role-badges {
+  order:
+    0;
+}
+
+
+.player-name {
+  order:
+    1;
+}
+
+
+.player-flag {
+  order:
+    2;
+
+  margin-left:
+    1px;
+}
+
+
+.role-filter-button.active {
+  box-shadow:
+    0 0 0 2px
+    rgba(255, 255, 255, .2);
 }
