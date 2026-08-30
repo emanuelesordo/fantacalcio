@@ -1,209 +1,186 @@
-const SUPABASE_URL =
-  'https://yyklmhzjxzkvycmxkegx.supabase.co'
+<!DOCTYPE html>
+<html lang="it">
 
-const ADMIN_URL =
-  `${SUPABASE_URL}/functions/v1/global-admin`
+<head>
+  <meta charset="UTF-8">
 
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-const message =
-  document.getElementById('admin-message')
+  <title>Setup Globale - Fantacalcio Live</title>
 
-const allowLeagueCreation =
-  document.getElementById('allow-league-creation')
+  <link
+    rel="stylesheet"
+    href="style.css?v=9"
+  >
+</head>
 
-const multiLeagueEnabled =
-  document.getElementById('multi-league-enabled')
+<body>
 
-const saveSettingsButton =
-  document.getElementById('save-global-settings')
+  <main class="page-shell">
 
+    <header class="page-header">
 
-function getSession() {
+      <div>
+        <h1>Setup Globale</h1>
+        <p>Configurazione generale dell'app</p>
+      </div>
 
-  try {
+      <a
+        class="back-home"
+        href="index.html"
+      >
+        ← Home
+      </a>
 
-    const raw =
-      localStorage.getItem(
-        'fantacalcio_session'
-      )
+    </header>
 
-    if (!raw) {
-      return null
-    }
 
-    return JSON.parse(raw)
+    <nav class="tabs">
 
-  } catch {
+      <a
+        href="setup-global.html"
+        class="tab active"
+      >
+        <span class="tab-title">
+          Configurazione
+        </span>
 
-    return null
-  }
-}
+        <span class="tab-description">
+          Impostazioni generali
+        </span>
+      </a>
 
 
-function showMessage(
-  text = '',
-  type = ''
-) {
+      <a
+        href="users-admin.html"
+        class="tab"
+      >
+        <span class="tab-title">
+          Utenti
+        </span>
 
-  message.textContent = text
-  message.className = type
-}
+        <span class="tab-description">
+          Account e privilegi
+        </span>
+      </a>
 
 
-async function callAdmin(body) {
+      <span class="tab disabled">
 
-  const session =
-    getSession()
+        <span class="tab-title">
+          Leghe
+        </span>
 
-  if (!session?.token) {
+        <span class="tab-description">
+          Prossimamente
+        </span>
 
-    window.location.href =
-      'index.html'
+      </span>
 
-    return null
-  }
+    </nav>
 
 
-  const response =
-    await fetch(
-      ADMIN_URL,
-      {
-        method: 'POST',
+    <p
+      id="admin-message"
+      class="message"
+      aria-live="polite"
+    ></p>
 
-        headers: {
-          'Content-Type':
-            'application/json'
-        },
 
-        body:
-          JSON.stringify({
-            ...body,
+    <section class="card">
 
-            sessionToken:
-              session.token
-          })
-      }
-    )
+      <div class="section-heading">
 
+        <span class="section-label">
+          APP
+        </span>
 
-  const data =
-    await response.json()
+        <div>
+          <h2>Comportamento globale</h2>
 
+          <p>
+            Impostazioni applicate all'intera piattaforma
+          </p>
+        </div>
 
-  if (
-    response.status === 401
-    ||
-    response.status === 403
-  ) {
+      </div>
 
-    throw new Error(
-      data.error ||
-      'Accesso non autorizzato.'
-    )
-  }
 
+      <label class="setting-row">
 
-  return data
-}
+        <span>
 
+          <strong>
+            Creazione nuove leghe
+          </strong>
 
+          <small>
+            Consente agli utenti autorizzati di
+            richiedere la creazione di una lega.
+          </small>
 
-async function loadSettings() {
+        </span>
 
-  try {
+        <input
+          id="allow-league-creation"
+          type="checkbox"
+        >
 
-    const data =
-      await callAdmin({
-        action: 'getDashboard'
-      })
+      </label>
 
 
-    if (!data?.ok) {
+      <p class="setting-help">
+        Il Super Admin può sempre creare nuove leghe,
+        anche quando questa opzione è disattivata.
+      </p>
 
-      showMessage(
-        data?.error ||
-        'Impossibile caricare il setup.',
-        'error'
-      )
 
-      return
-    }
+      <label class="setting-row">
 
+        <span>
 
-    allowLeagueCreation.checked =
-      data.settings.allow_league_creation
+          <strong>
+            Multi-lega globale
+          </strong>
 
+          <small>
+            Consente agli utenti di partecipare
+            a più leghe.
+          </small>
 
-    multiLeagueEnabled.checked =
-      data.settings.multi_league_enabled
+        </span>
 
+        <input
+          id="multi-league-enabled"
+          type="checkbox"
+        >
 
-  } catch (error) {
+      </label>
 
-    console.error(error)
 
-    showMessage(
-      error.message ||
-      'Accesso non autorizzato.',
-      'error'
-    )
-  }
-}
+      <p class="setting-help">
+        Gli override impostati sul singolo utente
+        hanno sempre la precedenza.
+      </p>
 
 
+      <button
+        id="save-global-settings"
+        type="button"
+      >
+        Salva impostazioni
+      </button>
 
-saveSettingsButton.addEventListener(
-  'click',
-  async () => {
+    </section>
 
-    try {
+  </main>
 
-      showMessage('')
 
+  <script src="setup-global.js?v=3"></script>
 
-      const data =
-        await callAdmin({
+</body>
 
-          action:
-            'updateSettings',
-
-          allowLeagueCreation:
-            allowLeagueCreation.checked,
-
-          multiLeagueEnabled:
-            multiLeagueEnabled.checked
-        })
-
-
-      if (!data?.ok) {
-
-        showMessage(
-          data?.error ||
-          'Errore durante il salvataggio.',
-          'error'
-        )
-
-        return
-      }
-
-
-      showMessage(
-        'Impostazioni salvate.',
-        'success'
-      )
-
-
-    } catch (error) {
-
-      console.error(error)
-
-      showMessage(
-        error.message,
-        'error'
-      )
-    }
-  }
-)
-
-
-loadSettings()
+</html>
