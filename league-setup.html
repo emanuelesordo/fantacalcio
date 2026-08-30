@@ -2,7 +2,6 @@
 <html lang="it">
 
 <head>
-
   <meta charset="UTF-8">
 
   <meta
@@ -10,37 +9,24 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>
-    Setup Lega - Fantacalcio Live
-  </title>
+  <title>Setup Lega - Fantacalcio Live</title>
 
   <link
     rel="stylesheet"
-    href="style.css?v=13"
+    href="style.css?v=14"
   >
-
 </head>
-
 
 <body>
 
 <main class="page-shell">
 
-
   <header class="page-header">
 
     <div>
-
-      <h1 id="league-title">
-        Setup Lega
-      </h1>
-
-      <p>
-        Configurazione dell'asta
-      </p>
-
+      <h1 id="league-title">Setup Lega</h1>
+      <p>Configurazione della lega e dell'asta</p>
     </div>
-
 
     <a
       class="back-home"
@@ -58,68 +44,31 @@
       href="league.html"
       class="tab"
     >
-      <span class="tab-title">
-        Home
-      </span>
-
-      <span class="tab-description">
-        Dashboard
-      </span>
+      <span class="tab-title">Home</span>
+      <span class="tab-description">Dashboard</span>
     </a>
 
-
     <span class="tab disabled">
-
-      <span class="tab-title">
-        Asta
-      </span>
-
-      <span class="tab-description">
-        Live
-      </span>
-
+      <span class="tab-title">Asta</span>
+      <span class="tab-description">Live</span>
     </span>
 
-
     <span class="tab disabled">
-
-      <span class="tab-title">
-        Rose
-      </span>
-
-      <span class="tab-description">
-        Squadre
-      </span>
-
+      <span class="tab-title">Rose</span>
+      <span class="tab-description">Squadre</span>
     </span>
 
-
     <span class="tab disabled">
-
-      <span class="tab-title">
-        Listone
-      </span>
-
-      <span class="tab-description">
-        Giocatori
-      </span>
-
+      <span class="tab-title">Listone</span>
+      <span class="tab-description">Giocatori</span>
     </span>
-
 
     <a
       href="league-setup.html"
       class="tab active"
     >
-
-      <span class="tab-title">
-        Setup
-      </span>
-
-      <span class="tab-description">
-        Configurazione
-      </span>
-
+      <span class="tab-title">Setup</span>
+      <span class="tab-description">Configurazione</span>
     </a>
 
   </nav>
@@ -135,7 +84,9 @@
   <form id="setup-form">
 
 
-    <!-- FORMATO -->
+    <!-- ===================================================
+         FORMATO LEGA
+         =================================================== -->
 
     <section class="card">
 
@@ -146,13 +97,8 @@
         </span>
 
         <div>
-
           <h2>Formato lega</h2>
-
-          <p>
-            Regole generali e composizione rosa
-          </p>
-
+          <p>Modalità, crediti e numero di squadre</p>
         </div>
 
       </div>
@@ -160,21 +106,13 @@
 
       <div class="form-grid">
 
-
         <label class="form-field">
 
           Modalità
 
           <select id="fantasy-mode">
-
-            <option value="classic">
-              Classic
-            </option>
-
-            <option value="mantra">
-              Mantra
-            </option>
-
+            <option value="classic">Classic</option>
+            <option value="mantra">Mantra</option>
           </select>
 
         </label>
@@ -213,104 +151,88 @@
 
       </div>
 
-
-      <div
-        id="classic-roster"
-        class="conditional-panel"
-      >
-
-        <h3>
-          Rosa Classic
-        </h3>
+    </section>
 
 
-        <div class="form-grid roster-grid">
+    <!-- ===================================================
+         ROSA CLASSIC
+         =================================================== -->
 
+    <section
+      id="classic-roster"
+      class="card"
+    >
 
-          <label class="form-field">
+      <div class="section-heading">
 
-            Portieri
+        <span class="section-label">
+          ROSA
+        </span>
 
-            <input
-              id="slot-p"
-              type="number"
-              min="0"
-              max="50"
-              step="1"
-            >
-
-          </label>
-
-
-          <label class="form-field">
-
-            Difensori
-
-            <input
-              id="slot-d"
-              type="number"
-              min="0"
-              max="50"
-              step="1"
-            >
-
-          </label>
-
-
-          <label class="form-field">
-
-            Centrocampisti
-
-            <input
-              id="slot-c"
-              type="number"
-              min="0"
-              max="50"
-              step="1"
-            >
-
-          </label>
-
-
-          <label class="form-field">
-
-            Attaccanti
-
-            <input
-              id="slot-a"
-              type="number"
-              min="0"
-              max="50"
-              step="1"
-            >
-
-          </label>
-
+        <div>
+          <h2>Rosa Classic</h2>
+          <p>Numero esatto di giocatori per ruolo</p>
         </div>
 
       </div>
 
 
-      <div
-        id="mantra-roster"
-        class="conditional-panel"
-        hidden
-      >
+      <div class="form-grid roster-grid">
 
-        <h3>
-          Rosa Mantra
-        </h3>
+        <label class="form-field">
+
+          Portieri (P)
+
+          <input
+            id="slot-p"
+            type="number"
+            min="0"
+            max="50"
+            step="1"
+          >
+
+        </label>
 
 
         <label class="form-field">
 
-          Numero totale giocatori
+          Difensori (D)
 
           <input
-            id="mantra-slots"
+            id="slot-d"
             type="number"
-            min="1"
-            max="100"
+            min="0"
+            max="50"
+            step="1"
+          >
+
+        </label>
+
+
+        <label class="form-field">
+
+          Centrocampisti (C)
+
+          <input
+            id="slot-c"
+            type="number"
+            min="0"
+            max="50"
+            step="1"
+          >
+
+        </label>
+
+
+        <label class="form-field">
+
+          Attaccanti (A)
+
+          <input
+            id="slot-a"
+            type="number"
+            min="0"
+            max="50"
             step="1"
           >
 
@@ -321,7 +243,234 @@
     </section>
 
 
-    <!-- CHIAMATA -->
+    <!-- ===================================================
+         ROSA MANTRA
+         =================================================== -->
+
+    <section
+      id="mantra-roster"
+      class="card"
+      hidden
+    >
+
+      <div class="section-heading">
+
+        <span class="section-label">
+          ROSA
+        </span>
+
+        <div>
+          <h2>Rosa Mantra</h2>
+          <p>Intervalli minimi e massimi consentiti</p>
+        </div>
+
+      </div>
+
+
+      <div class="conditional-panel">
+
+        <h3>Portieri (P)</h3>
+
+        <div class="form-grid">
+
+          <label class="form-field">
+
+            Minimo
+
+            <input
+              id="mantra-gk-min"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+            >
+
+          </label>
+
+          <label class="form-field">
+
+            Massimo
+
+            <input
+              id="mantra-gk-max"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+            >
+
+          </label>
+
+        </div>
+
+      </div>
+
+
+      <div class="conditional-panel">
+
+        <h3>Giocatori di movimento</h3>
+
+        <p class="setting-help">
+          Ruoli Mantra: B, Dc, Dd, Ds, E, W, M, C, T, A, Pc.
+        </p>
+
+        <div class="form-grid">
+
+          <label class="form-field">
+
+            Minimo
+
+            <input
+              id="mantra-outfield-min"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+            >
+
+          </label>
+
+          <label class="form-field">
+
+            Massimo
+
+            <input
+              id="mantra-outfield-max"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+            >
+
+          </label>
+
+        </div>
+
+      </div>
+
+
+      <div class="conditional-panel">
+
+        <h3>Totale giocatori</h3>
+
+        <p class="setting-help">
+          Il totale è la somma di Portieri e giocatori di movimento.
+        </p>
+
+        <div class="form-grid">
+
+          <label class="form-field">
+
+            Minimo totale
+
+            <input
+              id="mantra-total-min"
+              type="number"
+              min="1"
+              max="100"
+              step="1"
+            >
+
+          </label>
+
+          <label class="form-field">
+
+            Massimo totale
+
+            <input
+              id="mantra-total-max"
+              type="number"
+              min="1"
+              max="100"
+              step="1"
+            >
+
+          </label>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         UNDER
+         =================================================== -->
+
+    <section class="card">
+
+      <div class="section-heading">
+
+        <span class="section-label">
+          U
+        </span>
+
+        <div>
+          <h2>UNDER</h2>
+          <p>Vincolo minimo di giocatori UNDER in rosa</p>
+        </div>
+
+      </div>
+
+
+      <label class="setting-row">
+
+        <span>
+
+          <strong>
+            Abilita UNDER
+          </strong>
+
+          <small>
+            Impone un numero minimo di giocatori UNDER
+            nella rosa della squadra.
+          </small>
+
+        </span>
+
+        <input
+          id="under-enabled"
+          type="checkbox"
+        >
+
+      </label>
+
+
+      <div
+        id="under-settings"
+        class="conditional-panel"
+        hidden
+      >
+
+        <label class="form-field">
+
+          Numero minimo di UNDER in rosa
+
+          <input
+            id="under-min-count"
+            type="number"
+            min="1"
+            max="100"
+            step="1"
+          >
+
+        </label>
+
+        <p class="setting-help">
+          La definizione anagrafica di giocatore UNDER verrà
+          applicata ai dati del listone. Qui viene impostato
+          soltanto il numero minimo richiesto.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         CHIAMATA
+         =================================================== -->
 
     <section class="card">
 
@@ -332,44 +481,24 @@
         </span>
 
         <div>
-
           <h2>Chiamata giocatori</h2>
-
-          <p>
-            Come viene scelto il prossimo giocatore
-          </p>
-
+          <p>Come viene scelto il prossimo giocatore</p>
         </div>
 
       </div>
 
 
-      <div class="form-grid">
+      <label class="form-field">
 
+        Modalità di chiamata
 
-        <label class="form-field">
+        <select id="nomination-mode">
+          <option value="call">A chiamata</option>
+          <option value="list">Da listone</option>
+          <option value="random">Casuale</option>
+        </select>
 
-          Modalità di chiamata
-
-          <select id="nomination-mode">
-
-            <option value="call">
-              A chiamata
-            </option>
-
-            <option value="list">
-              Da listone
-            </option>
-
-            <option value="random">
-              Casuale
-            </option>
-
-          </select>
-
-        </label>
-
-      </div>
+      </label>
 
 
       <div
@@ -380,21 +509,13 @@
 
         <div class="form-grid">
 
-
           <label class="form-field">
 
             Ordina per
 
             <select id="list-sort-by">
-
-              <option value="alphabetical">
-                Ordine alfabetico
-              </option>
-
-              <option value="quotation">
-                Quotazione
-              </option>
-
+              <option value="alphabetical">Ordine alfabetico</option>
+              <option value="quotation">Quotazione</option>
             </select>
 
           </label>
@@ -405,15 +526,8 @@
             Direzione
 
             <select id="list-sort-direction">
-
-              <option value="asc">
-                Crescente
-              </option>
-
-              <option value="desc">
-                Decrescente
-              </option>
-
+              <option value="asc">Crescente</option>
+              <option value="desc">Decrescente</option>
             </select>
 
           </label>
@@ -425,7 +539,9 @@
     </section>
 
 
-    <!-- ASTA -->
+    <!-- ===================================================
+         ASTA
+         =================================================== -->
 
     <section class="card">
 
@@ -436,13 +552,8 @@
         </span>
 
         <div>
-
           <h2>Asta</h2>
-
-          <p>
-            Base d'asta e modalità di rilancio
-          </p>
-
+          <p>Base d'asta e modalità di rilancio</p>
         </div>
 
       </div>
@@ -450,21 +561,13 @@
 
       <div class="form-grid">
 
-
         <label class="form-field">
 
           Base d'asta
 
           <select id="auction-base-mode">
-
-            <option value="free">
-              Libera
-            </option>
-
-            <option value="quotation">
-              Quotazione Fantacalcio.it
-            </option>
-
+            <option value="free">Libera</option>
+            <option value="quotation">Quotazione Fantacalcio.it</option>
           </select>
 
         </label>
@@ -475,15 +578,8 @@
           Modalità rilancio
 
           <select id="bid-mode">
-
-            <option value="wild">
-              Rilancio selvaggio
-            </option>
-
-            <option value="turn">
-              Rilancio a turno
-            </option>
-
+            <option value="wild">Rilancio selvaggio</option>
+            <option value="turn">Rilancio a turno</option>
           </select>
 
         </label>
@@ -502,15 +598,8 @@
           Direzione dei turni
 
           <select id="turn-direction">
-
-            <option value="clockwise">
-              Senso orario
-            </option>
-
-            <option value="counterclockwise">
-              Senso antiorario
-            </option>
-
+            <option value="clockwise">Senso orario</option>
+            <option value="counterclockwise">Senso antiorario</option>
           </select>
 
         </label>
@@ -526,7 +615,9 @@
     </section>
 
 
-    <!-- TIMER -->
+    <!-- ===================================================
+         TIMER
+         =================================================== -->
 
     <section class="card">
 
@@ -537,13 +628,8 @@
         </span>
 
         <div>
-
           <h2>Timer</h2>
-
-          <p>
-            Durata del conto alla rovescia
-          </p>
-
+          <p>Durata del conto alla rovescia</p>
         </div>
 
       </div>
@@ -554,15 +640,8 @@
         Modalità timer
 
         <select id="timer-mode">
-
-          <option value="dynamic">
-            Dinamico
-          </option>
-
-          <option value="fixed">
-            Fisso
-          </option>
-
+          <option value="dynamic">Dinamico</option>
+          <option value="fixed">Fisso</option>
         </select>
 
       </label>
@@ -596,102 +675,64 @@
         class="conditional-panel"
       >
 
+        <h3>Timer dinamico</h3>
+
         <p class="setting-help">
-          La fascia viene calcolata sul rapporto tra
-          prezzo corrente e crediti iniziali.
+          I valori sono fissi per ora e vengono calcolati
+          sul rapporto tra prezzo corrente e crediti iniziali.
         </p>
 
+        <div class="list">
 
-        <div class="timer-band-grid">
+          <div class="list-row">
+            <div class="list-row-main">
+              <div class="list-row-title">
+                <strong>Fino al 2%</strong>
+                <small>dei crediti iniziali</small>
+              </div>
+              <strong>5 sec</strong>
+            </div>
+          </div>
 
-          <strong>
-            Fino al %
-          </strong>
+          <div class="list-row">
+            <div class="list-row-main">
+              <div class="list-row-title">
+                <strong>Fino al 5%</strong>
+                <small>dei crediti iniziali</small>
+              </div>
+              <strong>7 sec</strong>
+            </div>
+          </div>
 
-          <strong>
-            Secondi
-          </strong>
+          <div class="list-row">
+            <div class="list-row-main">
+              <div class="list-row-title">
+                <strong>Fino al 10%</strong>
+                <small>dei crediti iniziali</small>
+              </div>
+              <strong>9 sec</strong>
+            </div>
+          </div>
 
+          <div class="list-row">
+            <div class="list-row-main">
+              <div class="list-row-title">
+                <strong>Fino al 20%</strong>
+                <small>dei crediti iniziali</small>
+              </div>
+              <strong>12 sec</strong>
+            </div>
+          </div>
 
-          <input
-            id="timer-percent-1"
-            type="number"
-            min="0.1"
-            max="100"
-            step="0.1"
-          >
-
-          <input
-            id="timer-seconds-1"
-            type="number"
-            min="1"
-            max="120"
-            step="1"
-          >
-
-
-          <input
-            id="timer-percent-2"
-            type="number"
-            min="0.1"
-            max="100"
-            step="0.1"
-          >
-
-          <input
-            id="timer-seconds-2"
-            type="number"
-            min="1"
-            max="120"
-            step="1"
-          >
-
-
-          <input
-            id="timer-percent-3"
-            type="number"
-            min="0.1"
-            max="100"
-            step="0.1"
-          >
-
-          <input
-            id="timer-seconds-3"
-            type="number"
-            min="1"
-            max="120"
-            step="1"
-          >
-
-
-          <input
-            id="timer-percent-4"
-            type="number"
-            min="0.1"
-            max="100"
-            step="0.1"
-          >
-
-          <input
-            id="timer-seconds-4"
-            type="number"
-            min="1"
-            max="120"
-            step="1"
-          >
-
-
-          <span>
-            Oltre
-          </span>
-
-          <input
-            id="timer-seconds-5"
-            type="number"
-            min="1"
-            max="120"
-            step="1"
-          >
+          <div class="list-row">
+            <div class="list-row-main">
+              <div class="list-row-title">
+                <strong>Oltre il 20%</strong>
+                <small>dei crediti iniziali</small>
+              </div>
+              <strong>15 sec</strong>
+            </div>
+          </div>
 
         </div>
 
@@ -699,6 +740,10 @@
 
     </section>
 
+
+    <!-- ===================================================
+         SALVA
+         =================================================== -->
 
     <section class="card">
 
@@ -711,13 +756,12 @@
 
     </section>
 
-
   </form>
 
 </main>
 
 
-<script src="league-setup.js?v=1"></script>
+<script src="league-setup.js?v=2"></script>
 
 </body>
 
