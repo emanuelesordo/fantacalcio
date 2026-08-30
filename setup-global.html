@@ -13,44 +13,71 @@
 
   <link
     rel="stylesheet"
-    href="style.css?v=7"
+    href="style.css?v=9"
   >
 </head>
 
-
 <body>
 
-  <main class="admin-page">
+  <main class="page-shell">
 
-    <header class="admin-header">
+    <header class="page-header">
 
       <div>
         <h1>Setup Globale</h1>
         <p>Configurazione generale dell'app</p>
       </div>
 
-      <a href="index.html">
+      <a
+        class="back-home"
+        href="index.html"
+      >
         ← Home
       </a>
 
     </header>
 
 
-    <nav class="admin-nav">
+    <nav class="tabs">
 
       <a
         href="setup-global.html"
-        class="active"
+        class="tab active"
       >
-        Setup Globale
+        <span class="tab-title">
+          Configurazione
+        </span>
+
+        <span class="tab-description">
+          Impostazioni generali
+        </span>
       </a>
 
-      <a href="users-admin.html">
-        Utenti
+
+      <a
+        href="users-admin.html"
+        class="tab"
+      >
+        <span class="tab-title">
+          Utenti
+        </span>
+
+        <span class="tab-description">
+          Account e privilegi
+        </span>
       </a>
 
-      <span class="admin-nav-disabled">
-        Leghe
+
+      <span class="tab disabled">
+
+        <span class="tab-title">
+          Leghe
+        </span>
+
+        <span class="tab-description">
+          Prossimamente
+        </span>
+
       </span>
 
     </nav>
@@ -58,23 +85,43 @@
 
     <p
       id="admin-message"
+      class="message"
       aria-live="polite"
     ></p>
 
 
-    <section>
+    <section class="card">
 
-      <h2>Impostazioni globali</h2>
+      <div class="section-heading">
+
+        <span class="section-label">
+          APP
+        </span>
+
+        <div>
+          <h2>Comportamento globale</h2>
+
+          <p>
+            Impostazioni applicate all'intera piattaforma
+          </p>
+        </div>
+
+      </div>
 
 
       <label class="setting-row">
 
         <span>
-          <strong>Creazione nuove leghe</strong>
+
+          <strong>
+            Creazione nuove leghe
+          </strong>
+
           <small>
-            Consente agli utenti autorizzati di richiedere
-            la creazione di nuove leghe.
+            Consente agli utenti autorizzati di
+            richiedere la creazione di una lega.
           </small>
+
         </span>
 
         <input
@@ -87,17 +134,23 @@
 
       <p class="setting-help">
         Il Super Admin può sempre creare nuove leghe,
-        anche quando questa impostazione è disattivata.
+        anche quando questa opzione è disattivata.
       </p>
 
 
       <label class="setting-row">
 
         <span>
-          <strong>Multi-lega globale</strong>
+
+          <strong>
+            Multi-lega globale
+          </strong>
+
           <small>
-            Consente agli utenti di partecipare a più leghe.
+            Consente agli utenti di partecipare
+            a più leghe.
           </small>
+
         </span>
 
         <input
@@ -109,8 +162,8 @@
 
 
       <p class="setting-help">
-        Gli override impostati sul singolo utente hanno
-        sempre la precedenza sul setup globale.
+        Gli override impostati sul singolo utente
+        hanno sempre la precedenza.
       </p>
 
 
@@ -126,7 +179,7 @@
   </main>
 
 
-  <script src="setup-global.js?v=2"></script>
+  <script src="setup-global.js?v=3"></script>
 
 </body>
 
