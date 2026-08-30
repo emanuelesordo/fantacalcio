@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Gestione Utenti - Fantacalcio Live</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css?v=7"
+  >
+</head>
+
+
+<body>
+
+  <main class="admin-page">
+
+    <header class="admin-header">
+
+      <div>
+        <h1>Gestione Utenti</h1>
+        <p>Account registrati nell'app</p>
+      </div>
+
+      <a href="index.html">
+        ← Home
+      </a>
+
+    </header>
+
+
+    <nav class="admin-nav">
+
+      <a href="setup-global.html">
+        Setup Globale
+      </a>
+
+      <a
+        href="users-admin.html"
+        class="active"
+      >
+        Utenti
+      </a>
+
+      <span class="admin-nav-disabled">
+        Leghe
+      </span>
+
+    </nav>
+
+
+    <p
+      id="admin-message"
+      aria-live="polite"
+    ></p>
+
+
+    <section>
+
+      <div class="users-toolbar">
+
+        <input
+          id="user-search"
+          type="search"
+          placeholder="Cerca username..."
+        >
+
+
+        <select id="user-filter">
+
+          <option value="all">
+            Tutti gli utenti
+          </option>
+
+          <option value="active">
+            Attivi
+          </option>
+
+          <option value="disabled">
+            Disattivati
+          </option>
+
+          <option value="superadmin">
+            Super Admin
+          </option>
+
+          <option value="multileague">
+            Multi-lega effettivo
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <p
+        id="users-count"
+        class="setting-help"
+      ></p>
+
+
+      <div
+        id="users-list"
+        class="users-list"
+      ></div>
+
+    </section>
+
+  </main>
+
+
+  <script src="users-admin.js?v=1"></script>
+
+</body>
+
+</html>
