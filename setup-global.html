@@ -2,7 +2,6 @@
 <html lang="it">
 
 <head>
-
   <meta charset="UTF-8">
 
   <meta
@@ -10,15 +9,12 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>
-    Setup Globale - Fantacalcio Live
-  </title>
+  <title>Setup Globale - Fantacalcio Live</title>
 
   <link
     rel="stylesheet"
-    href="style.css?v=5"
+    href="style.css?v=7"
   >
-
 </head>
 
 
@@ -30,10 +26,7 @@
 
       <div>
         <h1>Setup Globale</h1>
-
-        <p>
-          Configurazione generale dell'app
-        </p>
+        <p>Configurazione generale dell'app</p>
       </div>
 
       <a href="index.html">
@@ -43,25 +36,45 @@
     </header>
 
 
+    <nav class="admin-nav">
+
+      <a
+        href="setup-global.html"
+        class="active"
+      >
+        Setup Globale
+      </a>
+
+      <a href="users-admin.html">
+        Utenti
+      </a>
+
+      <span class="admin-nav-disabled">
+        Leghe
+      </span>
+
+    </nav>
+
+
     <p
       id="admin-message"
       aria-live="polite"
     ></p>
 
 
-    <!-- SETUP GLOBALE -->
-
     <section>
 
-      <h2>
-        Impostazioni globali
-      </h2>
+      <h2>Impostazioni globali</h2>
 
 
       <label class="setting-row">
 
         <span>
-          Creazione nuove leghe
+          <strong>Creazione nuove leghe</strong>
+          <small>
+            Consente agli utenti autorizzati di richiedere
+            la creazione di nuove leghe.
+          </small>
         </span>
 
         <input
@@ -73,16 +86,18 @@
 
 
       <p class="setting-help">
-        Il Super Admin può sempre creare
-        nuove leghe, indipendentemente
-        da questa impostazione.
+        Il Super Admin può sempre creare nuove leghe,
+        anche quando questa impostazione è disattivata.
       </p>
 
 
       <label class="setting-row">
 
         <span>
-          Multi-lega globale
+          <strong>Multi-lega globale</strong>
+          <small>
+            Consente agli utenti di partecipare a più leghe.
+          </small>
         </span>
 
         <input
@@ -94,8 +109,8 @@
 
 
       <p class="setting-help">
-        Gli override impostati sui singoli
-        utenti hanno sempre la precedenza.
+        Gli override impostati sul singolo utente hanno
+        sempre la precedenza sul setup globale.
       </p>
 
 
@@ -108,30 +123,10 @@
 
     </section>
 
-
-
-    <!-- UTENTI -->
-
-    <section>
-
-      <h2>
-        Utenti
-      </h2>
-
-      <div
-        id="users-list"
-        class="users-list"
-      >
-      </div>
-
-    </section>
-
   </main>
 
 
-  <script
-    src="setup-global.js?v=1"
-  ></script>
+  <script src="setup-global.js?v=2"></script>
 
 </body>
 
