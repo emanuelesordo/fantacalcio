@@ -6,6 +6,7 @@ const API_URL =
 
 let selectedLeague = null;
 let auctionData = null;
+let localTeamOrder = [];
 
 const $ = id =>
   document.getElementById(id);
@@ -21,6 +22,12 @@ const pageMessage =
 
 const setupTab =
   $('setup-tab');
+
+const phaseTitle =
+  $('auction-phase-title');
+
+const phaseSubtitle =
+  $('auction-phase-subtitle');
 
 const statusLine =
   $('auction-status-line');
@@ -45,6 +52,48 @@ const preparedSection =
 
 const teamOrderBox =
   $('auction-team-order');
+
+const teamOrderActions =
+  $('team-order-actions');
+
+const saveTeamOrderButton =
+  $('save-team-order-button');
+
+const startAuctionButton =
+  $('start-auction-button');
+
+const liveSection =
+  $('live-section');
+
+const liveHelp =
+  $('live-help');
+
+const currentPlayerBox =
+  $('current-player-box');
+
+const callPanel =
+  $('call-panel');
+
+const callTeamTitle =
+  $('call-team-title');
+
+const callPermissionHelp =
+  $('call-permission-help');
+
+const callFormArea =
+  $('call-form-area');
+
+const callPlayerSearch =
+  $('call-player-search');
+
+const openingBidField =
+  $('opening-bid-field');
+
+const openingBid =
+  $('opening-bid');
+
+const callCandidates =
+  $('call-candidates');
 
 
 /* =========================================================
@@ -136,15 +185,99 @@ function escapeHtml(value) {
 }
 
 
+function formatNumber(
+  value,
+  digits = 1
+) {
+
+  if (
+    value === null
+    ||
+    value === undefined
+    ||
+    Number.isNaN(
+      Number(value)
+    )
+  ) {
+
+    return '—';
+  }
+
+
+  return Number(value)
+    .toLocaleString(
+      'it-IT',
+      {
+        maximumFractionDigits:
+          digits
+      }
+    );
+}
+
+
+function formatPercent(value) {
+
+  if (
+    value === null
+    ||
+    value === undefined
+  ) {
+
+    return '—';
+  }
+
+
+  return `${formatNumber(
+    value,
+    1
+  )}%`;
+}
+
+
+function countryCodeToEmoji(code) {
+
+  const iso =
+    String(code || '')
+      .trim()
+      .toUpperCase();
+
+
+  if (
+    !/^[A-Z]{2}$/.test(iso)
+  ) {
+
+    return '';
+  }
+
+
+  return String.fromCodePoint(
+    ...[...iso].map(
+      letter =>
+        127397
+        +
+        letter.charCodeAt(0)
+    )
+  );
+}
+
+
 function fantasyModeLabel(value) {
 
-  if (value === 'classic') {
+  if (
+    value === 'classic'
+  ) {
+
     return 'Classic';
   }
 
-  if (value === 'mantra') {
+
+  if (
+    value === 'mantra'
+  ) {
+
     return 'Mantra';
   }
+
 
   return '—';
 }
@@ -189,32 +322,7 @@ function bidModeLabel(value) {
 }
 
 
-function timerLabel(
-  mode,
-  seconds
-) {
-
-  if (
-    mode === 'fixed'
-  ) {
-
-    return `Fisso · ${seconds}s`;
-  }
-
-
-  if (
-    mode === 'dynamic'
-  ) {
-
-    return 'Dinamico';
-  }
-
-
-  return '—';
-}
-
-
-function sessionStatusLabel(status) {
+function sessionStatusLabel(value) {
 
   const labels = {
 
@@ -235,9 +343,65 @@ function sessionStatusLabel(status) {
   };
 
 
-  return labels[status]
-    || status
+  return labels[value]
+    || value
     || '—';
+}
+
+
+function getSessionSettings() {
+
+  return auctionData
+    ?.auctionSession
+    ?.setup_snapshot
+    ||
+    auctionData
+      ?.settings
+    ||
+    {};
+}
+
+
+function getPlayerRoles(player) {
+
+  if (!player) {
+    return [];
+  }
+
+
+  const mode =
+    getSessionSettings()
+      .fantasy_mode;
+
+
+  if (
+    mode === 'mantra'
+  ) {
+
+    return player.mantra_roles
+      || [];
+  }
+
+
+  return player.classic_role
+    ? [
+        player.classic_role
+      ]
+    : [];
+}
+
+
+function renderRoleBadges(player) {
+
+  return getPlayerRoles(player)
+    .map(
+      role => `
+        <span class="badge">
+          ${escapeHtml(role)}
+        </span>
+      `
+    )
+    .join('');
 }
 
 
@@ -393,14 +557,11 @@ function renderStatus() {
 
         ? `
           <span class="badge admin">
-
-            Sessione:
             ${escapeHtml(
               sessionStatusLabel(
                 session.status
               )
             )}
-
           </span>
         `
 
@@ -408,6 +569,44 @@ function renderStatus() {
     }
 
   `;
+
+
+  if (
+    session?.status
+    === 'live'
+  ) {
+
+    phaseTitle.textContent =
+      'Asta in corso';
+
+    phaseSubtitle.textContent =
+      nominationLabel(
+        session
+          .setup_snapshot
+          ?.nomination_mode
+      );
+
+
+  } else if (
+    session?.status
+    === 'prepared'
+  ) {
+
+    phaseTitle.textContent =
+      'Sessione preparata';
+
+    phaseSubtitle.textContent =
+      'Definisci l’ordine e avvia l’asta';
+
+
+  } else {
+
+    phaseTitle.textContent =
+      'Preparazione';
+
+    phaseSubtitle.textContent =
+      'Controlli prima dell’avvio';
+  }
 
 
   if (
@@ -425,17 +624,16 @@ function renderStatus() {
   } else {
 
     blockersBox.textContent =
-      'Tutti i requisiti necessari sono soddisfatti.';
+      session
+        ? 'Configurazione valida.'
+        : 'Tutti i requisiti necessari sono soddisfatti.';
   }
 
 
-  const canControl =
-    auctionData.permissions
-      .canControlAuction;
-
-
   controlArea.hidden =
-    !canControl
+    !auctionData
+      .permissions
+      .canControlAuction
     ||
     Boolean(session);
 
@@ -504,12 +702,14 @@ function renderTeams() {
           <small>
 
             ${
-              team.presidentUsername
+              team.president
 
                 ? `
                   Presidente:
                   ${escapeHtml(
-                    team.presidentUsername
+                    team
+                      .president
+                      .username
                   )}
                 `
 
@@ -523,14 +723,14 @@ function renderTeams() {
 
         <span
           class="badge ${
-            team.presidentUsername
+            team.president
               ? 'good'
               : 'warning'
           }"
         >
 
           ${
-            team.presidentUsername
+            team.president
               ? 'OK'
               : 'MANCA PRESIDENTE'
           }
@@ -581,22 +781,10 @@ function settingRow(
 function renderSettings() {
 
   const settings =
-    auctionData.settings;
+    getSessionSettings();
 
 
-  if (!settings) {
-
-    settingsBox.innerHTML = `
-      <div class="empty-state">
-        Setup non disponibile.
-      </div>
-    `;
-
-    return;
-  }
-
-
-  settingsBox.innerHTML = [
+  const rows = [
 
     settingRow(
       'Modalità',
@@ -605,12 +793,11 @@ function renderSettings() {
       )
     ),
 
-
     settingRow(
       'Crediti',
       settings.initial_credits
+      ?? '—'
     ),
-
 
     settingRow(
       'Nomination',
@@ -619,15 +806,13 @@ function renderSettings() {
       )
     ),
 
-
     settingRow(
-      'Base asta',
+      'Base',
       settings.auction_base_mode
-        === 'quotation'
-          ? 'Quotazione'
-          : 'Libera'
+      === 'quotation'
+        ? 'Quotazione'
+        : 'Libera'
     ),
-
 
     settingRow(
       'Rilanci',
@@ -636,60 +821,631 @@ function renderSettings() {
       )
     ),
 
-
     settingRow(
       'Timer',
-      timerLabel(
-        settings.timer_mode,
-        settings.fixed_timer_seconds
-      )
+      settings.timer_mode
+      === 'fixed'
+        ? `Fisso · ${
+            settings
+              .fixed_timer_seconds
+          }s`
+        : 'Dinamico'
     ),
 
-
     settingRow(
-      'Incremento minimo',
+      'Incremento',
       '1 credito'
     )
+  ];
 
-  ].join('');
+
+  if (
+    settings.nomination_mode
+    === 'list'
+  ) {
+
+    rows.push(
+      settingRow(
+        'Ordine lista',
+        `${
+          settings.list_sort_by
+          === 'quotation'
+            ? 'Quotazione'
+            : 'Alfabetico'
+        } · ${
+          String(
+            settings
+              .list_sort_direction
+            || 'asc'
+          )
+            .toUpperCase()
+        }`
+      )
+    );
+  }
+
+
+  if (
+    settings.bid_mode
+    === 'turn'
+  ) {
+
+    rows.push(
+      settingRow(
+        'Direzione',
+        settings.turn_direction
+        === 'counterclockwise'
+          ? 'Antiorario'
+          : 'Orario'
+      )
+    );
+  }
+
+
+  settingsBox.innerHTML =
+    rows.join('');
 }
 
 
 /* =========================================================
-   SESSIONE PREPARATA
+   ORDINE SQUADRE
    ========================================================= */
 
-function renderPreparedSession() {
+function moveTeam(
+  index,
+  direction
+) {
 
-  const session =
-    auctionData.auctionSession;
+  const newIndex =
+    index + direction;
 
 
-  preparedSection.hidden =
-    !session;
-
-
-  if (!session) {
-
-    teamOrderBox.innerHTML =
-      '';
+  if (
+    newIndex < 0
+    ||
+    newIndex
+      >= localTeamOrder.length
+  ) {
 
     return;
   }
 
 
-  const order =
-    auctionData.teamOrder
-    || [];
+  const copy =
+    [
+      ...localTeamOrder
+    ];
+
+
+  [
+    copy[index],
+    copy[newIndex]
+  ] = [
+    copy[newIndex],
+    copy[index]
+  ];
+
+
+  localTeamOrder =
+    copy;
+
+
+  renderTeamOrder();
+}
+
+
+function renderTeamOrder() {
+
+  const session =
+    auctionData
+      .auctionSession;
+
+
+  preparedSection.hidden =
+    !session
+    ||
+    session.status
+    !== 'prepared';
+
+
+  if (
+    !session
+    ||
+    session.status
+    !== 'prepared'
+  ) {
+
+    teamOrderBox.innerHTML =
+      '';
+
+    teamOrderActions.hidden =
+      true;
+
+    return;
+  }
 
 
   teamOrderBox.innerHTML =
     '';
 
 
+  const editable =
+    auctionData
+      .permissions
+      .canControlAuction;
+
+
+  localTeamOrder
+    .forEach(
+      (
+        item,
+        index
+      ) => {
+
+        const row =
+          document.createElement(
+            'div'
+          );
+
+
+        row.className =
+          'list-row';
+
+
+        row.innerHTML = `
+
+          <div class="list-row-main">
+
+            <div class="list-row-title">
+
+              <strong>
+                ${index + 1}.
+                ${escapeHtml(
+                  item.team
+                    ?.name
+                  || 'Squadra'
+                )}
+              </strong>
+
+              <small>
+                ${
+                  escapeHtml(
+                    item.team
+                      ?.president
+                      ?.username
+                    || 'Presidente'
+                  )
+                }
+              </small>
+
+            </div>
+
+
+            ${
+              editable
+
+                ? `
+                  <div class="league-actions">
+
+                    <button
+                      type="button"
+                      class="secondary"
+                      data-move-team="-1"
+                      data-index="${index}"
+                      ${
+                        index === 0
+                          ? 'disabled'
+                          : ''
+                      }
+                    >
+                      ↑
+                    </button>
+
+                    <button
+                      type="button"
+                      class="secondary"
+                      data-move-team="1"
+                      data-index="${index}"
+                      ${
+                        index
+                        ===
+                        localTeamOrder.length
+                        - 1
+                          ? 'disabled'
+                          : ''
+                      }
+                    >
+                      ↓
+                    </button>
+
+                  </div>
+                `
+
+                : ''
+            }
+
+          </div>
+
+        `;
+
+
+        teamOrderBox.appendChild(
+          row
+        );
+      }
+    );
+
+
+  teamOrderActions.hidden =
+    !editable;
+}
+
+
+/* =========================================================
+   CURRENT PLAYER
+   ========================================================= */
+
+function renderCurrentPlayer() {
+
+  const session =
+    auctionData
+      .auctionSession;
+
+
+  const isLive =
+    session
+    &&
+    (
+      session.status
+      === 'live'
+      ||
+      session.status
+      === 'paused'
+    );
+
+
+  liveSection.hidden =
+    !isLive;
+
+
+  if (!isLive) {
+
+    currentPlayerBox.innerHTML =
+      '';
+
+    callPanel.hidden =
+      true;
+
+    return;
+  }
+
+
+  const settings =
+    getSessionSettings();
+
+
+  const player =
+    auctionData
+      .currentPlayer;
+
+
+  if (player) {
+
+    const flag =
+      countryCodeToEmoji(
+        player.nationality_iso2
+      );
+
+
+    const bid =
+      session.current_bid;
+
+
+    const bidder =
+      auctionData
+        .currentBidderTeam;
+
+
+    currentPlayerBox.innerHTML = `
+
+      <div class="league-card">
+
+        <div class="league-card-header">
+
+          <div>
+
+            <h3>
+
+              ${
+                flag
+                  ? `${escapeHtml(flag)} `
+                  : ''
+              }
+
+              ${escapeHtml(
+                player.name
+              )}
+
+            </h3>
+
+            <p>
+
+              ${escapeHtml(
+                player.serie_a_team
+                || '—'
+              )}
+
+              ·
+
+              ${renderRoleBadges(
+                player
+              )}
+
+            </p>
+
+          </div>
+
+
+          <div class="user-summary-status">
+
+            ${
+              player.slot
+
+                ? `
+                  <span class="badge">
+                    Slot
+                    ${escapeHtml(
+                      player.slot
+                    )}
+                  </span>
+                `
+
+                : ''
+            }
+
+            ${
+              player.pfc
+              !== null
+              &&
+              player.pfc
+              !== undefined
+
+                ? `
+                  <span class="badge admin">
+                    PFC
+                    ${escapeHtml(
+                      formatNumber(
+                        player.pfc,
+                        0
+                      )
+                    )}
+                  </span>
+                `
+
+                : ''
+            }
+
+          </div>
+
+        </div>
+
+
+        <div class="divider"></div>
+
+
+        <div class="stats-grid">
+
+          <div class="stat-card">
+
+            <span class="stat-label">
+              Offerta corrente
+            </span>
+
+            <span class="stat-value">
+              ${escapeHtml(
+                bid ?? '—'
+              )}
+            </span>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            <span class="stat-label">
+              Leader
+            </span>
+
+            <span class="stat-value">
+              ${escapeHtml(
+                bidder
+                  ?.name
+                || 'Nessuno'
+              )}
+            </span>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            <span class="stat-label">
+              Expected FM
+            </span>
+
+            <span class="stat-value">
+              ${escapeHtml(
+                formatNumber(
+                  player
+                    .expected_fantasy_avg,
+                  2
+                )
+              )}
+            </span>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            <span class="stat-label">
+              Titolarità
+            </span>
+
+            <span class="stat-value">
+              ${escapeHtml(
+                formatPercent(
+                  player
+                    .expected_titolarity
+                )
+              )}
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    `;
+
+
+    liveHelp.textContent =
+      bidder
+
+        ? `${
+            bidder.name
+          } guida a ${
+            bid
+          }`
+
+        : (
+            bid
+            !== null
+            &&
+            bid !== undefined
+
+              ? `Base ${bid} · nessuna offerta`
+
+              : 'In attesa della prima offerta'
+          );
+
+
+    callPanel.hidden =
+      true;
+
+    return;
+  }
+
+
+  currentPlayerBox.innerHTML = `
+
+    <div class="empty-state">
+      Nessun giocatore ancora in asta.
+    </div>
+
+  `;
+
+
+  if (
+    settings.nomination_mode
+    === 'call'
+  ) {
+
+    renderCallPanel();
+
+  } else {
+
+    callPanel.hidden =
+      true;
+  }
+}
+
+
+/* =========================================================
+   CHIAMATA
+   ========================================================= */
+
+function getFilteredCallCandidates() {
+
+  const search =
+    callPlayerSearch
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const candidates =
+    auctionData
+      .callCandidates
+    || [];
+
+
+  const filtered =
+    !search
+      ? candidates
+      : candidates
+          .filter(
+            player => {
+
+              const haystack =
+                [
+                  player.name,
+                  player.serie_a_team,
+                  player.classic_role,
+                  ...(
+                    player.mantra_roles
+                    || []
+                  )
+                ]
+                  .filter(Boolean)
+                  .join(' ')
+                  .toLowerCase();
+
+
+              return haystack
+                .includes(search);
+            }
+          );
+
+
+  return filtered.slice(
+    0,
+    30
+  );
+}
+
+
+function renderCallCandidates() {
+
+  const candidates =
+    getFilteredCallCandidates();
+
+
+  callCandidates.innerHTML =
+    '';
+
+
+  if (!candidates.length) {
+
+    callCandidates.innerHTML = `
+      <div class="empty-state">
+        Nessun giocatore trovato.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const baseMode =
+    getSessionSettings()
+      .auction_base_mode;
+
+
   for (
-    const item
-    of order
+    const player
+    of candidates
   ) {
 
     const row =
@@ -710,44 +1466,354 @@ function renderPreparedSession() {
 
           <strong>
             ${escapeHtml(
-              item.position
-            )}.
-            ${escapeHtml(
-              item.team?.name
-              || 'Squadra'
+              player.name
             )}
           </strong>
 
           <small>
-            ${
-              escapeHtml(
-                item.team
-                  ?.presidentUsername
-                || 'Presidente'
+
+            ${escapeHtml(
+              player.serie_a_team
+              || '—'
+            )}
+
+            ·
+
+            ${escapeHtml(
+              getPlayerRoles(
+                player
               )
+                .join(', ')
+              || '—'
+            )}
+
+            ${
+              baseMode
+              === 'quotation'
+
+                ? `
+                  · Q.
+                  ${escapeHtml(
+                    player.quotation
+                    ?? '—'
+                  )}
+                `
+
+                : ''
             }
+
           </small>
 
         </div>
 
 
-        <span class="badge">
-          ${escapeHtml(
-            item.passes_used
-          )}
-          / 5 pass
-        </span>
+        <button
+          type="button"
+          data-call-player
+          data-player-id="${escapeHtml(
+            player.id
+          )}"
+        >
+          Chiama
+        </button>
 
       </div>
 
     `;
 
 
-    teamOrderBox.appendChild(
+    callCandidates.appendChild(
       row
     );
   }
 }
+
+
+function renderCallPanel() {
+
+  const team =
+    auctionData
+      .currentNominationTeam;
+
+
+  const canCall =
+    auctionData
+      .permissions
+      .canCallCurrentPlayer;
+
+
+  const settings =
+    getSessionSettings();
+
+
+  callPanel.hidden =
+    false;
+
+
+  callTeamTitle.textContent =
+    team
+      ? `Chiamata · ${team.name}`
+      : 'Chiamata';
+
+
+  if (canCall) {
+
+    callPermissionHelp.textContent =
+      'È il tuo turno: scegli il giocatore da chiamare.';
+
+  } else {
+
+    callPermissionHelp.textContent =
+      team
+        ? `In attesa del Presidente di ${team.name}.`
+        : 'In attesa della squadra di turno.';
+  }
+
+
+  callFormArea.hidden =
+    !canCall;
+
+
+  if (!canCall) {
+    return;
+  }
+
+
+  openingBidField.hidden =
+    settings.auction_base_mode
+    === 'quotation';
+
+
+  if (
+    settings.auction_base_mode
+    !== 'quotation'
+    &&
+    (
+      !openingBid.value
+      ||
+      Number(
+        openingBid.value
+      ) < 1
+    )
+  ) {
+
+    openingBid.value =
+      '1';
+  }
+
+
+  renderCallCandidates();
+}
+
+
+/* =========================================================
+   AZIONI ORDINE
+   ========================================================= */
+
+teamOrderBox.addEventListener(
+  'click',
+  event => {
+
+    const button =
+      event.target.closest(
+        '[data-move-team]'
+      );
+
+
+    if (!button) {
+      return;
+    }
+
+
+    moveTeam(
+      Number(
+        button.dataset.index
+      ),
+      Number(
+        button.dataset.moveTeam
+      )
+    );
+  }
+);
+
+
+saveTeamOrderButton.addEventListener(
+  'click',
+  async () => {
+
+    const session =
+      auctionData
+        .auctionSession;
+
+
+    if (!session) {
+      return;
+    }
+
+
+    saveTeamOrderButton.disabled =
+      true;
+
+
+    const oldText =
+      saveTeamOrderButton.textContent;
+
+
+    saveTeamOrderButton.textContent =
+      'Salvataggio...';
+
+
+    try {
+
+      const result =
+        await callApi({
+
+          action:
+            'saveTeamOrder',
+
+          sessionId:
+            session.id,
+
+          teamIds:
+            localTeamOrder
+              .map(
+                item =>
+                  item.team_id
+              )
+        });
+
+
+      if (!result?.ok) {
+
+        throw new Error(
+          result?.error
+          ||
+          'Impossibile salvare l’ordine.'
+        );
+      }
+
+
+      showMessage(
+        'Ordine squadre salvato.',
+        'success'
+      );
+
+
+      await loadLobby();
+
+
+    } catch (error) {
+
+      console.error(error);
+
+
+      showMessage(
+        error.message
+        ||
+        'Errore durante il salvataggio.',
+        'error'
+      );
+
+
+    } finally {
+
+      saveTeamOrderButton.disabled =
+        false;
+
+
+      saveTeamOrderButton.textContent =
+        oldText;
+    }
+  }
+);
+
+
+/* =========================================================
+   AVVIA ASTA
+   ========================================================= */
+
+startAuctionButton.addEventListener(
+  'click',
+  async () => {
+
+    const session =
+      auctionData
+        .auctionSession;
+
+
+    if (!session) {
+      return;
+    }
+
+
+    startAuctionButton.disabled =
+      true;
+
+
+    const oldText =
+      startAuctionButton.textContent;
+
+
+    startAuctionButton.textContent =
+      'Avvio...';
+
+
+    try {
+
+      const result =
+        await callApi({
+
+          action:
+            'startAuction',
+
+          sessionId:
+            session.id
+        });
+
+
+      if (!result?.ok) {
+
+        throw new Error(
+          result?.error
+          ||
+          'Impossibile avviare l’asta.'
+        );
+      }
+
+
+      showMessage(
+        'Asta avviata.',
+        'success'
+      );
+
+
+      await loadLobby();
+
+
+    } catch (error) {
+
+      console.error(error);
+
+
+      showMessage(
+        error.message
+        ||
+        'Errore durante l’avvio.',
+        'error'
+      );
+
+
+    } finally {
+
+      startAuctionButton.disabled =
+        false;
+
+
+      startAuctionButton.textContent =
+        oldText;
+    }
+  }
+);
 
 
 /* =========================================================
@@ -757,9 +1823,6 @@ function renderPreparedSession() {
 prepareButton.addEventListener(
   'click',
   async () => {
-
-    showMessage('');
-
 
     prepareButton.disabled =
       true;
@@ -828,6 +1891,191 @@ prepareButton.addEventListener(
 
 
 /* =========================================================
+   CHIAMA GIOCATORE
+   ========================================================= */
+
+callPlayerSearch.addEventListener(
+  'input',
+  renderCallCandidates
+);
+
+
+callCandidates.addEventListener(
+  'click',
+  async event => {
+
+    const button =
+      event.target.closest(
+        '[data-call-player]'
+      );
+
+
+    if (!button) {
+      return;
+    }
+
+
+    const session =
+      auctionData
+        .auctionSession;
+
+
+    const playerId =
+      button.dataset.playerId;
+
+
+    if (
+      !session
+      ||
+      !playerId
+    ) {
+
+      return;
+    }
+
+
+    const settings =
+      getSessionSettings();
+
+
+    let base =
+      null;
+
+
+    if (
+      settings.auction_base_mode
+      !== 'quotation'
+    ) {
+
+      base =
+        Number(
+          openingBid.value
+        );
+
+
+      if (
+        !Number.isInteger(base)
+        ||
+        base < 1
+      ) {
+
+        showMessage(
+          'La base d’asta deve essere almeno 1.',
+          'error'
+        );
+
+        return;
+      }
+    }
+
+
+    button.disabled =
+      true;
+
+
+    const oldText =
+      button.textContent;
+
+
+    button.textContent =
+      'Chiamata...';
+
+
+    try {
+
+      const result =
+        await callApi({
+
+          action:
+            'callPlayer',
+
+          sessionId:
+            session.id,
+
+          playerId,
+
+          openingBid:
+            base
+        });
+
+
+      if (!result?.ok) {
+
+        throw new Error(
+          result?.error
+          ||
+          'Impossibile chiamare il giocatore.'
+        );
+      }
+
+
+      showMessage(
+        'Giocatore chiamato.',
+        'success'
+      );
+
+
+      await loadLobby();
+
+
+    } catch (error) {
+
+      console.error(error);
+
+
+      showMessage(
+        error.message
+        ||
+        'Errore durante la chiamata.',
+        'error'
+      );
+
+
+    } finally {
+
+      button.disabled =
+        false;
+
+
+      button.textContent =
+        oldText;
+    }
+  }
+);
+
+
+/* =========================================================
+   RENDER COMPLETO
+   ========================================================= */
+
+function renderAll() {
+
+  renderStatus();
+
+  renderTeams();
+
+  renderSettings();
+
+
+  localTeamOrder =
+    (
+      auctionData.teamOrder
+      || []
+    )
+      .map(
+        item => ({
+          ...item
+        })
+      );
+
+
+  renderTeamOrder();
+
+  renderCurrentPlayer();
+}
+
+
+/* =========================================================
    LOAD
    ========================================================= */
 
@@ -850,7 +2098,7 @@ async function loadLobby() {
       showMessage(
         data?.error
         ||
-        'Impossibile caricare la lobby.',
+        'Impossibile caricare l’asta.',
         'error'
       );
 
@@ -863,15 +2111,21 @@ async function loadLobby() {
 
 
     leagueTitle.textContent =
-      `Asta · ${data.league.name}`;
+      `Asta · ${
+        data.league.name
+      }`;
 
 
     leagueSubtitle.textContent =
       data.auctionSession
 
-        ? `Sessione ${sessionStatusLabel(
-            data.auctionSession.status
-          )}`
+        ? `Sessione ${
+            sessionStatusLabel(
+              data
+                .auctionSession
+                .status
+            )
+          }`
 
         : 'Preparazione';
 
@@ -879,18 +2133,13 @@ async function loadLobby() {
     if (setupTab) {
 
       setupTab.hidden =
-        !data.permissions
+        !data
+          .permissions
           .isLeagueAdmin;
     }
 
 
-    renderStatus();
-
-    renderTeams();
-
-    renderSettings();
-
-    renderPreparedSession();
+    renderAll();
 
 
   } catch (error) {
