@@ -6,25 +6,41 @@ const ADMIN_URL =
 
 
 const message =
-  document.getElementById('admin-message')
+  document.getElementById(
+    'admin-message'
+  )
 
 const usersList =
-  document.getElementById('users-list')
+  document.getElementById(
+    'users-list'
+  )
 
 const userSearch =
-  document.getElementById('user-search')
+  document.getElementById(
+    'user-search'
+  )
 
 const userFilter =
-  document.getElementById('user-filter')
+  document.getElementById(
+    'user-filter'
+  )
 
 const usersCount =
-  document.getElementById('users-count')
+  document.getElementById(
+    'users-count'
+  )
 
 
 let users = []
+
 let currentUserId = null
+
 let globalMultiLeague = false
 
+
+/* =========================================================
+   SESSIONE
+   ========================================================= */
 
 function getSession() {
 
@@ -48,20 +64,32 @@ function getSession() {
 }
 
 
+/* =========================================================
+   MESSAGGI
+   ========================================================= */
+
 function showMessage(
   text = '',
   type = ''
 ) {
 
-  message.textContent = text
-  message.className = type
+  message.textContent =
+    text
+
+  message.className =
+    `message ${type}`
 }
 
+
+/* =========================================================
+   API SUPER ADMIN
+   ========================================================= */
 
 async function callAdmin(body) {
 
   const session =
     getSession()
+
 
   if (!session?.token) {
 
@@ -76,7 +104,8 @@ async function callAdmin(body) {
     await fetch(
       ADMIN_URL,
       {
-        method: 'POST',
+        method:
+          'POST',
 
         headers: {
           'Content-Type':
@@ -94,8 +123,20 @@ async function callAdmin(body) {
     )
 
 
-  const data =
-    await response.json()
+  let data
+
+
+  try {
+
+    data =
+      await response.json()
+
+  } catch {
+
+    throw new Error(
+      'Risposta non valida dal server.'
+    )
+  }
 
 
   if (
@@ -115,6 +156,9 @@ async function callAdmin(body) {
 }
 
 
+/* =========================================================
+   UTILITY
+   ========================================================= */
 
 function escapeHtml(value) {
 
@@ -127,25 +171,28 @@ function escapeHtml(value) {
 }
 
 
-
 function formatDateTime(value) {
 
   if (!value) {
     return '—'
   }
 
+
   const date =
     new Date(value)
+
 
   return date.toLocaleString(
     'it-IT',
     {
-      dateStyle: 'short',
-      timeStyle: 'short'
+      dateStyle:
+        'short',
+
+      timeStyle:
+        'short'
     }
   )
 }
-
 
 
 function formatDate(value) {
@@ -154,26 +201,45 @@ function formatDate(value) {
     return '—'
   }
 
+
   const [
     year,
     month,
     day
-  ] = value.split('-')
+  ] =
+    value.split('-')
+
 
   return `${day}/${month}/${year}`
 }
 
 
+/* =========================================================
+   MULTI LEGA EFFETTIVO
+   ========================================================= */
 
-function effectiveMultiLeague(user) {
+function effectiveMultiLeague(
+  user
+) {
+
+  /*
+   * Override OFF:
+   * vince sempre.
+   */
 
   if (
     user.multi_league_override
       === 'disabled'
   ) {
+
     return false
   }
 
+
+  /*
+   * Override ON:
+   * valido fino alla scadenza.
+   */
 
   if (
     user.multi_league_override
@@ -181,8 +247,10 @@ function effectiveMultiLeague(user) {
   ) {
 
     if (
-      !user.multi_league_override_until
+      !user
+        .multi_league_override_until
     ) {
+
       return true
     }
 
@@ -197,20 +265,30 @@ function effectiveMultiLeague(user) {
       expiry.getTime()
       >= Date.now()
     ) {
+
       return true
     }
   }
 
 
+  /*
+   * Altrimenti eredita
+   * il setup globale.
+   */
+
   return globalMultiLeague
 }
 
 
+/* =========================================================
+   FILTRI
+   ========================================================= */
 
-function filteredUsers() {
+function getFilteredUsers() {
 
   const search =
-    userSearch.value
+    userSearch
+      .value
       .trim()
       .toLowerCase()
 
@@ -222,43 +300,55 @@ function filteredUsers() {
   return users.filter(
     user => {
 
-      const matchesSearch =
+      const username =
         user.username
           .toLowerCase()
-          .includes(search)
 
 
-      if (!matchesSearch) {
+      if (
+        !username.includes(search)
+      ) {
+
         return false
       }
 
 
-      if (filter === 'active') {
-        return user.is_enabled
+      switch (filter) {
+
+        case 'active':
+
+          return user.is_enabled
+
+
+        case 'disabled':
+
+          return !user.is_enabled
+
+
+        case 'superadmin':
+
+          return user.is_super_admin
+
+
+        case 'multileague':
+
+          return effectiveMultiLeague(
+            user
+          )
+
+
+        default:
+
+          return true
       }
-
-
-      if (filter === 'disabled') {
-        return !user.is_enabled
-      }
-
-
-      if (filter === 'superadmin') {
-        return user.is_super_admin
-      }
-
-
-      if (filter === 'multileague') {
-        return effectiveMultiLeague(user)
-      }
-
-
-      return true
     }
   )
 }
 
 
+/* =========================================================
+   RENDER UTENTI
+   ========================================================= */
 
 function renderUsers() {
 
@@ -266,233 +356,399 @@ function renderUsers() {
 
 
   const visibleUsers =
-    filteredUsers()
+    getFilteredUsers()
 
 
   usersCount.textContent =
-    `${visibleUsers.length} utenti visualizzati su ${users.length}`
+    `${visibleUsers.length} di ${users.length} utenti`
 
 
-  for (const user of visibleUsers) {
+  if (
+    visibleUsers.length === 0
+  ) {
 
-    const card =
-      document.createElement('article')
+    usersList.innerHTML = `
+      <div class="empty-state">
+        Nessun utente trovato.
+      </div>
+    `
+
+    return
+  }
 
 
-    card.className =
-      'user-admin-card'
+  for (
+    const user
+    of visibleUsers
+  ) {
 
-
-    const effective =
-      effectiveMultiLeague(user)
-
-
-    const isCurrent =
+    const isCurrentUser =
       user.id === currentUserId
 
 
-    card.innerHTML = `
+    const multiLeague =
+      effectiveMultiLeague(user)
 
-      <div class="user-admin-heading">
 
-        <div>
+    const row =
+      document.createElement(
+        'details'
+      )
 
-          <strong class="user-admin-name">
-            ${escapeHtml(user.username)}
+
+    row.className =
+      'user-row'
+
+
+    row.innerHTML = `
+
+      <summary>
+
+        <div class="user-summary-name">
+
+          <strong>
+            ${escapeHtml(
+              user.username
+            )}
           </strong>
 
+
+          <small>
+            ${
+              isCurrentUser
+
+                ? 'Il tuo account'
+
+                : 'Account utente'
+            }
+          </small>
+
+        </div>
+
+
+        <div class="user-summary-status">
+
           ${
-            isCurrent
-              ? '<span class="user-badge">TU</span>'
-              : ''
+            user.is_enabled
+
+              ? `
+                <span
+                  class="badge good"
+                >
+                  ATTIVO
+                </span>
+              `
+
+              : `
+                <span
+                  class="badge warning"
+                >
+                  DISATTIVATO
+                </span>
+              `
           }
+
 
           ${
             user.is_super_admin
-              ? '<span class="user-badge">SUPER ADMIN</span>'
+
+              ? `
+                <span
+                  class="badge admin"
+                >
+                  SUPER ADMIN
+                </span>
+              `
+
               : ''
           }
+
+
+          <span class="badge">
+
+            MULTI
+            ${multiLeague
+              ? 'ON'
+              : 'OFF'}
+
+          </span>
+
+        </div>
+
+
+        <span class="user-chevron">
+          ⌄
+        </span>
+
+      </summary>
+
+
+      <div class="user-detail">
+
+
+        <div class="user-metadata">
+
+          <div>
+
+            <span>
+              Registrazione
+            </span>
+
+            <strong>
+              ${formatDateTime(
+                user.created_at
+              )}
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              Ultimo accesso
+            </span>
+
+            <strong>
+              ${formatDateTime(
+                user.last_login_at
+              )}
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <label class="setting-row">
+
+          <span>
+
+            <strong>
+              Account attivo
+            </strong>
+
+            <small>
+              Permette l'accesso
+              all'applicazione.
+            </small>
+
+          </span>
+
+
+          <input
+            class="user-enabled"
+            type="checkbox"
+
+            ${
+              user.is_enabled
+                ? 'checked'
+                : ''
+            }
+
+            ${
+              isCurrentUser
+                ? 'disabled'
+                : ''
+            }
+          >
+
+        </label>
+
+
+        <label class="setting-row">
+
+          <span>
+
+            <strong>
+              Super Admin
+            </strong>
+
+            <small>
+              Gestione globale
+              dell'app.
+            </small>
+
+          </span>
+
+
+          <input
+            class="user-super-admin"
+            type="checkbox"
+
+            ${
+              user.is_super_admin
+                ? 'checked'
+                : ''
+            }
+
+            ${
+              isCurrentUser
+                ? 'disabled'
+                : ''
+            }
+          >
+
+        </label>
+
+
+        <label
+          class="user-select-field"
+        >
+
+          <span>
+            Multi-lega
+          </span>
+
+
+          <select
+            class="user-multi-league"
+          >
+
+            <option
+              value="inherit"
+
+              ${
+                user
+                  .multi_league_override
+                  === 'inherit'
+
+                  ? 'selected'
+                  : ''
+              }
+            >
+              Eredita dal setup globale
+            </option>
+
+
+            <option
+              value="enabled"
+
+              ${
+                user
+                  .multi_league_override
+                  === 'enabled'
+
+                  ? 'selected'
+                  : ''
+              }
+            >
+              Abilitato forzatamente
+            </option>
+
+
+            <option
+              value="disabled"
+
+              ${
+                user
+                  .multi_league_override
+                  === 'disabled'
+
+                  ? 'selected'
+                  : ''
+              }
+            >
+              Disabilitato forzatamente
+            </option>
+
+          </select>
+
+        </label>
+
+
+        <p class="setting-help">
 
           ${
-            !user.is_enabled
-              ? '<span class="user-badge warning">DISATTIVATO</span>'
-              : ''
+            user
+              .multi_league_override
+              === 'enabled'
+            &&
+            user
+              .multi_league_override_until
+
+              ? `
+                Override ON valido
+                fino al
+                ${formatDate(
+                  user
+                    .multi_league_override_until
+                )}
+              `
+
+              : user
+                  .multi_league_override
+                  === 'disabled'
+
+                ? `
+                  Override personale:
+                  multi-lega OFF.
+                `
+
+                : `
+                  Il valore viene ereditato
+                  dal Setup Globale.
+                `
           }
 
-        </div>
+        </p>
 
 
-        <div class="multi-league-status">
-
-          Multi-lega
-
-          <strong>
-            ${effective ? 'ON' : 'OFF'}
-          </strong>
-
-        </div>
+        <button
+          class="save-user"
+          type="button"
+        >
+          Salva modifiche
+        </button>
 
       </div>
-
-
-      <div class="user-admin-details">
-
-        <div>
-          <span>Registrato</span>
-          <strong>
-            ${formatDateTime(user.created_at)}
-          </strong>
-        </div>
-
-        <div>
-          <span>Ultimo accesso</span>
-          <strong>
-            ${formatDateTime(user.last_login_at)}
-          </strong>
-        </div>
-
-      </div>
-
-
-      <label class="setting-row">
-
-        <span>
-          Account attivo
-        </span>
-
-        <input
-          class="user-enabled"
-          type="checkbox"
-          ${user.is_enabled ? 'checked' : ''}
-          ${isCurrent ? 'disabled' : ''}
-        >
-
-      </label>
-
-
-      <label class="setting-row">
-
-        <span>
-          Super Admin
-        </span>
-
-        <input
-          class="user-super-admin"
-          type="checkbox"
-          ${user.is_super_admin ? 'checked' : ''}
-          ${isCurrent ? 'disabled' : ''}
-        >
-
-      </label>
-
-
-      <label class="user-select-field">
-
-        <span>
-          Multi-lega
-        </span>
-
-        <select class="user-multi-league">
-
-          <option
-            value="inherit"
-            ${
-              user.multi_league_override === 'inherit'
-                ? 'selected'
-                : ''
-            }
-          >
-            Eredita dal setup globale
-          </option>
-
-          <option
-            value="enabled"
-            ${
-              user.multi_league_override === 'enabled'
-                ? 'selected'
-                : ''
-            }
-          >
-            Abilitato forzatamente
-          </option>
-
-          <option
-            value="disabled"
-            ${
-              user.multi_league_override === 'disabled'
-                ? 'selected'
-                : ''
-            }
-          >
-            Disabilitato forzatamente
-          </option>
-
-        </select>
-
-      </label>
-
-
-      <p class="setting-help">
-
-        ${
-          user.multi_league_override === 'enabled'
-          &&
-          user.multi_league_override_until
-
-            ? `Abilitazione valida fino al
-               ${formatDate(
-                 user.multi_league_override_until
-               )}`
-
-            : user.multi_league_override === 'disabled'
-
-              ? 'Multi-lega disabilitato per questo utente.'
-
-              : 'Segue il Setup Globale.'
-        }
-
-      </p>
-
-
-      <button
-        class="save-user"
-        type="button"
-      >
-        Salva modifiche
-      </button>
 
     `
 
 
     const saveButton =
-      card.querySelector(
+      row.querySelector(
         '.save-user'
       )
 
 
     saveButton.addEventListener(
       'click',
-      async () => {
+      async event => {
+
+        /*
+         * Evitiamo che il click
+         * chiuda accidentalmente
+         * il dettaglio.
+         */
+        event.stopPropagation()
+
 
         showMessage('')
 
 
         const enabled =
-          card.querySelector(
-            '.user-enabled'
-          ).checked
+          row
+            .querySelector(
+              '.user-enabled'
+            )
+            .checked
 
 
         const superAdmin =
-          card.querySelector(
-            '.user-super-admin'
-          ).checked
+          row
+            .querySelector(
+              '.user-super-admin'
+            )
+            .checked
 
 
-        const multiLeague =
-          card.querySelector(
-            '.user-multi-league'
-          ).value
+        const multiLeagueOverride =
+          row
+            .querySelector(
+              '.user-multi-league'
+            )
+            .value
 
 
         try {
@@ -512,8 +768,7 @@ function renderUsers() {
               isSuperAdmin:
                 superAdmin,
 
-              multiLeagueOverride:
-                multiLeague
+              multiLeagueOverride
             })
 
 
@@ -530,7 +785,7 @@ function renderUsers() {
 
 
           showMessage(
-            `Utente ${user.username} aggiornato.`,
+            `${user.username} aggiornato.`,
             'success'
           )
 
@@ -540,10 +795,14 @@ function renderUsers() {
 
         } catch (error) {
 
-          console.error(error)
+          console.error(
+            error
+          )
+
 
           showMessage(
-            error.message,
+            error.message ||
+            'Errore durante il salvataggio.',
             'error'
           )
         }
@@ -551,11 +810,16 @@ function renderUsers() {
     )
 
 
-    usersList.appendChild(card)
+    usersList.appendChild(
+      row
+    )
   }
 }
 
 
+/* =========================================================
+   CARICAMENTO
+   ========================================================= */
 
 async function loadUsers() {
 
@@ -563,7 +827,8 @@ async function loadUsers() {
 
     const data =
       await callAdmin({
-        action: 'getDashboard'
+        action:
+          'getDashboard'
       })
 
 
@@ -580,7 +845,7 @@ async function loadUsers() {
 
 
     users =
-      data.users
+      data.users || []
 
 
     currentUserId =
@@ -589,7 +854,8 @@ async function loadUsers() {
 
     globalMultiLeague =
       data.settings
-        .multi_league_enabled
+        ?.multi_league_enabled
+      === true
 
 
     renderUsers()
@@ -597,7 +863,10 @@ async function loadUsers() {
 
   } catch (error) {
 
-    console.error(error)
+    console.error(
+      error
+    )
+
 
     showMessage(
       error.message ||
@@ -608,6 +877,9 @@ async function loadUsers() {
 }
 
 
+/* =========================================================
+   EVENTI
+   ========================================================= */
 
 userSearch.addEventListener(
   'input',
@@ -620,5 +892,9 @@ userFilter.addEventListener(
   renderUsers
 )
 
+
+/* =========================================================
+   START
+   ========================================================= */
 
 loadUsers()
