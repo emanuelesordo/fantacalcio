@@ -1693,3 +1693,471 @@ and
       );
   }
 }
+
+/* =========================================================
+   LISTONE ASTA - RUOLI, FILTRI E TABELLA COMPATTA
+   ========================================================= */
+
+.role-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 1px 10px;
+  margin-bottom: 12px;
+  scrollbar-width: thin;
+}
+
+.role-filter-button {
+  flex: 0 0 auto;
+  min-width: 42px;
+  min-height: 38px;
+  padding: 8px 11px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.role-filter-button:hover {
+  transform: none;
+  opacity: 1;
+  border-color: #777777;
+}
+
+.role-filter-button.active {
+  background: var(--primary);
+  color: var(--primary-text);
+  border-color: var(--primary);
+}
+
+.role-filter-button.role-p,
+.role-badge.role-p,
+.role-filter-button.role-por,
+.role-badge.role-por {
+  background: #705324;
+  color: #ffe0a5;
+  border-color: #8c6b31;
+}
+
+.role-filter-button.role-d,
+.role-badge.role-d,
+.role-filter-button.role-b,
+.role-badge.role-b,
+.role-filter-button.role-dc,
+.role-badge.role-dc,
+.role-filter-button.role-dd,
+.role-badge.role-dd,
+.role-filter-button.role-ds,
+.role-badge.role-ds {
+  background: #244d34;
+  color: #b8efc3;
+  border-color: #326b49;
+}
+
+.role-filter-button.role-e,
+.role-badge.role-e,
+.role-filter-button.role-m,
+.role-badge.role-m,
+.role-filter-button.role-c,
+.role-badge.role-c {
+  background: #243e70;
+  color: #b9d1ff;
+  border-color: #315798;
+}
+
+.role-filter-button.role-t,
+.role-badge.role-t,
+.role-filter-button.role-w,
+.role-badge.role-w {
+  background: #55306f;
+  color: #e2c0f8;
+  border-color: #744396;
+}
+
+.role-filter-button.role-a,
+.role-badge.role-a,
+.role-filter-button.role-pc,
+.role-badge.role-pc {
+  background: #672a32;
+  color: #ffbec5;
+  border-color: #8f3944;
+}
+
+.role-filter-button.active.role-p,
+.role-filter-button.active.role-por,
+.role-filter-button.active.role-d,
+.role-filter-button.active.role-b,
+.role-filter-button.active.role-dc,
+.role-filter-button.active.role-dd,
+.role-filter-button.active.role-ds,
+.role-filter-button.active.role-e,
+.role-filter-button.active.role-m,
+.role-filter-button.active.role-c,
+.role-filter-button.active.role-t,
+.role-filter-button.active.role-w,
+.role-filter-button.active.role-a,
+.role-filter-button.active.role-pc {
+  box-shadow: 0 0 0 2px #ffffff;
+}
+
+.role-filter-button.role-all.active {
+  box-shadow: 0 0 0 2px var(--border-strong);
+}
+
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 29px;
+  min-height: 23px;
+  padding: 3px 7px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.player-filter-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(210px, 1fr)
+    minmax(140px, 190px)
+    minmax(110px, 150px)
+    minmax(145px, 190px)
+    auto;
+  gap: 9px;
+  align-items: end;
+  margin-bottom: 13px;
+}
+
+.player-filter-field {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.player-filter-field input,
+.player-filter-field select {
+  min-height: 39px;
+  padding: 8px 10px;
+  font-size: 12px;
+}
+
+.player-filter-reset {
+  min-height: 39px;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+.player-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+}
+
+.player-table {
+  width: 100%;
+  min-width: 960px;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 12px;
+}
+
+.player-table col.player-col-name {
+  width: 28%;
+}
+
+.player-table col.player-col-team {
+  width: 12%;
+}
+
+.player-table col.player-col-slot {
+  width: 7%;
+}
+
+.player-table col.player-col-pma,
+.player-table col.player-col-pfc,
+.player-table col.player-col-delta {
+  width: 9%;
+}
+
+.player-table col.player-col-fm {
+  width: 10%;
+}
+
+.player-table col.player-col-tit {
+  width: 10%;
+}
+
+.player-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 0;
+  background: var(--surface-3);
+  border-bottom: 1px solid var(--border-strong);
+  color: var(--text-soft);
+  text-align: left;
+  font-size: 10px;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.player-sort-button {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  min-height: 39px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+  font-weight: 900;
+  text-transform: inherit;
+  letter-spacing: inherit;
+}
+
+.player-sort-button:hover,
+.player-sort-button:active {
+  background: #343434;
+  transform: none;
+  opacity: 1;
+}
+
+.player-sort-indicator {
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+.player-sort-button.active .player-sort-indicator {
+  color: var(--text);
+}
+
+.player-row {
+  cursor: pointer;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  transition: background .1s ease;
+}
+
+.player-row:hover {
+  background: #292929;
+}
+
+.player-row.is-open {
+  background: #2b2b2b;
+}
+
+.player-row td {
+  height: 48px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-main-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.player-name-block {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.player-flag {
+  flex: 0 0 auto;
+  min-width: 22px;
+  font-size: 17px;
+  line-height: 1;
+  text-align: center;
+}
+
+.player-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.player-role-badges {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  gap: 3px;
+  flex: 0 0 auto;
+}
+
+.player-team {
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.player-number {
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+}
+
+.player-number.strong {
+  color: var(--text);
+  font-size: 13px;
+}
+
+.player-delta-positive {
+  color: var(--success-text);
+}
+
+.player-delta-negative {
+  color: var(--danger-text);
+}
+
+.player-table-muted {
+  color: var(--text-muted);
+}
+
+.player-detail-row {
+  display: none;
+  background: #181818;
+}
+
+.player-detail-row.is-open {
+  display: table-row;
+}
+
+.player-detail-row td {
+  padding: 14px 15px 16px;
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.player-detail-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(145px, 1fr)
+    );
+  gap: 8px;
+}
+
+.player-detail-item {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  padding: 9px 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.player-detail-item span {
+  color: var(--text-muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+}
+
+.player-detail-item strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+}
+
+.player-detail-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.player-count-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0 10px;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.player-nationality-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+@media
+(max-width: 900px) {
+
+  .player-filter-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+  .player-filter-reset {
+    width: 100%;
+  }
+}
+
+@media
+(max-width: 600px) {
+
+  .player-filter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .role-filter-bar {
+    margin-left: -2px;
+    margin-right: -2px;
+  }
+
+  .role-filter-button {
+    min-width: 39px;
+    min-height: 36px;
+    padding: 7px 10px;
+  }
+
+  .player-table {
+    min-width: 820px;
+  }
+
+  .player-row td {
+    height: 44px;
+    padding: 5px 8px;
+  }
+
+  .player-name {
+    font-size: 12px;
+  }
+}
