@@ -1593,3 +1593,103 @@ and
     flex: 1 0 auto;
   }
 }
+
+
+/* =========================================================
+   FORM GRID
+   ========================================================= */
+
+.form-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(180px, 1fr)
+    );
+
+  gap: 14px;
+}
+
+
+.form-field {
+  display: grid;
+
+  gap: 7px;
+
+  min-width: 0;
+}
+
+
+.conditional-panel {
+  margin-top: 20px;
+
+  padding: 16px;
+
+  background: var(--surface-2);
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius:
+    var(--radius-lg);
+}
+
+
+.conditional-panel h3 {
+  margin-bottom: 14px;
+}
+
+
+.roster-grid {
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
+}
+
+
+/* =========================================================
+   TIMER
+   ========================================================= */
+
+.timer-band-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(100px, 1fr)
+    minmax(100px, 1fr);
+
+  gap: 8px 12px;
+
+  align-items: center;
+}
+
+
+.timer-band-grid strong {
+  font-size: 12px;
+
+  color: var(--text-soft);
+}
+
+
+.timer-band-grid span {
+  color: var(--text-soft);
+
+  font-size: 13px;
+}
+
+
+@media
+(max-width: 600px) {
+
+  .roster-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+}
