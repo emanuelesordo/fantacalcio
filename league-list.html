@@ -1,113 +1,484 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
   <title>Listone - Fantacalcio Live</title>
-  <link rel="stylesheet" href="style.css?v=16">
+
+  <link
+    rel="stylesheet"
+    href="style.css?v=17"
+  >
+
 </head>
+
+
 <body>
+
 <main class="page-shell">
+
+
   <header class="page-header">
+
     <div>
-      <h1 id="league-title">Listone</h1>
-      <p id="league-subtitle">Caricamento...</p>
+
+      <h1 id="league-title">
+        Listone
+      </h1>
+
+      <p id="league-subtitle">
+        Caricamento...
+      </p>
+
     </div>
-    <a class="back-home" href="league.html">← Lega</a>
+
+
+    <a
+      class="back-home"
+      href="league.html"
+    >
+      ← Lega
+    </a>
+
   </header>
 
+
   <nav class="tabs league-tabs">
+
     <a href="league.html" class="tab">
       <span class="tab-title">Home</span>
       <span class="tab-description">Dashboard</span>
     </a>
+
     <span class="tab disabled">
       <span class="tab-title">Asta</span>
       <span class="tab-description">Live</span>
     </span>
+
     <span class="tab disabled">
       <span class="tab-title">Rose</span>
       <span class="tab-description">Squadre</span>
     </span>
+
     <a href="league-list.html" class="tab active">
       <span class="tab-title">Listone</span>
       <span class="tab-description">Giocatori</span>
     </a>
-    <a id="setup-tab" href="league-setup.html" class="tab" hidden>
+
+    <a
+      id="setup-tab"
+      href="league-setup.html"
+      class="tab"
+      hidden
+    >
       <span class="tab-title">Setup</span>
       <span class="tab-description">Configurazione</span>
     </a>
+
   </nav>
 
-  <p id="page-message" class="message" aria-live="polite"></p>
 
-  <section id="import-info" class="card" hidden>
+  <p
+    id="page-message"
+    class="message"
+    aria-live="polite"
+  ></p>
+
+
+  <!-- =====================================================
+       IMPORT LISTONE - ADMIN LEGA
+       ===================================================== -->
+
+  <section
+    id="list-import-section"
+    class="card"
+    hidden
+  >
+
     <div class="section-heading">
-      <span class="section-label">FILE</span>
-      <div>
-        <h2>Importazione</h2>
-        <p>Informazioni sul listone caricato</p>
-      </div>
-    </div>
 
-    <div class="stats-grid">
-      <div class="stat-card">
-        <span class="stat-label">Giocatori</span>
-        <span id="players-count" class="stat-value">0</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-label">Formato</span>
-        <span id="fantasy-mode" class="stat-value">—</span>
-      </div>
-    </div>
+      <span class="section-label">
+        IMPORT
+      </span>
 
-    <p id="import-details" class="setting-help"></p>
-  </section>
-
-  <section id="admin-import-note" class="card" hidden>
-    <div class="section-heading">
-      <span class="section-label">ADMIN</span>
       <div>
         <h2>Carica listone</h2>
-        <p>Import Fantacalcio.it</p>
+        <p>XLSX o CSV Fantaculo</p>
       </div>
+
     </div>
 
-    <div class="empty-state">
-      Il database è pronto per conservare il listone,
-      compresi ID originali e tutte le colonne del file.
-      <br><br>
-      Il caricamento verrà attivato dopo aver mappato
-      un file Fantacalcio reale, così non perdiamo
-      nessuna informazione del formato ufficiale.
-    </div>
+
+    <form id="list-import-form">
+
+      <div class="form-grid">
+
+        <label class="form-field">
+
+          File
+
+          <input
+            id="list-file"
+            type="file"
+            accept=".xlsx,.xls,.csv,text/csv"
+            required
+          >
+
+        </label>
+
+
+        <label class="form-field">
+
+          Data di riferimento
+
+          <input
+            id="list-reference-date"
+            type="date"
+            required
+          >
+
+        </label>
+
+      </div>
+
+
+      <p class="setting-help">
+        Un nuovo caricamento sostituisce il listone precedente
+        solo quando l'import è terminato correttamente.
+      </p>
+
+
+      <button
+        id="list-import-button"
+        type="submit"
+      >
+        Importa listone
+      </button>
+
+
+      <p
+        id="list-import-progress"
+        class="setting-help"
+      ></p>
+
+    </form>
+
   </section>
+
+
+  <!-- =====================================================
+       INFO LISTONE
+       ===================================================== -->
+
+  <section
+    id="import-info"
+    class="card"
+    hidden
+  >
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        FILE
+      </span>
+
+      <div>
+        <h2>Listone corrente</h2>
+        <p>Snapshot utilizzato dalla lega</p>
+      </div>
+
+    </div>
+
+
+    <div class="stats-grid">
+
+      <div class="stat-card">
+
+        <span class="stat-label">
+          Giocatori
+        </span>
+
+        <span
+          id="players-count"
+          class="stat-value"
+        >
+          0
+        </span>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <span class="stat-label">
+          Formato
+        </span>
+
+        <span
+          id="fantasy-mode"
+          class="stat-value"
+        >
+          —
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <p
+      id="import-details"
+      class="setting-help"
+    ></p>
+
+  </section>
+
+
+  <!-- =====================================================
+       LISTA GIOCATORI
+       ===================================================== -->
 
   <section class="card">
+
     <div class="section-heading">
-      <span class="section-label">LIST</span>
+
+      <span class="section-label">
+        LIST
+      </span>
+
       <div>
         <h2>Giocatori</h2>
-        <p>Listone corrente della lega</p>
+        <p>Dati utili durante l'asta</p>
       </div>
+
     </div>
 
-    <div id="list-toolbar" class="toolbar" hidden>
-      <input id="player-search" type="search" placeholder="Cerca giocatore o squadra..." autocomplete="off">
-      <select id="player-status-filter">
-        <option value="all">Tutti</option>
-        <option value="available">Disponibili</option>
-        <option value="in_auction">In asta</option>
-        <option value="assigned">Assegnati</option>
-        <option value="excluded">Esclusi</option>
+
+    <div
+      id="list-toolbar"
+      class="toolbar"
+      hidden
+    >
+
+      <input
+        id="player-search"
+        type="search"
+        placeholder="Cerca giocatore o squadra..."
+        autocomplete="off"
+      >
+
+
+      <select id="player-role-filter">
+
+        <option value="all">
+          Tutti i ruoli
+        </option>
+
+        <option value="P">
+          P
+        </option>
+
+        <option value="D">
+          D
+        </option>
+
+        <option value="C">
+          C
+        </option>
+
+        <option value="A">
+          A
+        </option>
+
       </select>
+
+
+      <select id="player-sort">
+
+        <option value="name">
+          Nome
+        </option>
+
+        <option value="pfc-desc">
+          PFC più alto
+        </option>
+
+        <option value="pma-desc">
+          PMA più alto
+        </option>
+
+        <option value="delta-desc">
+          Miglior PFC − PMA
+        </option>
+
+        <option value="fm-desc">
+          Expected FM
+        </option>
+
+        <option value="tit-desc">
+          Expected titolarità
+        </option>
+
+        <option value="slot-asc">
+          Slot
+        </option>
+
+      </select>
+
     </div>
 
-    <p id="filtered-count" class="setting-help"></p>
-    <div id="players-list" class="users-list"></div>
+
+    <p
+      id="filtered-count"
+      class="setting-help"
+    ></p>
+
+
+    <div
+      id="players-list"
+      class="users-list"
+    ></div>
+
   </section>
+
+
+  <!-- =====================================================
+       SUPER ADMIN - DATI PER SUGGERITORE
+       ===================================================== -->
+
+  <section
+    id="superadmin-stats-section"
+    class="card"
+    hidden
+  >
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        ENGINE
+      </span>
+
+      <div>
+        <h2>Statistiche motore suggerimenti</h2>
+        <p>Area riservata al Super Admin</p>
+      </div>
+
+    </div>
+
+
+    <p class="setting-help">
+      Questi dataset non vengono mostrati direttamente ai
+      partecipanti. Verranno usati dal futuro motore di calcolo
+      per valutazioni e suggerimenti durante l'asta.
+    </p>
+
+
+    <form id="advisory-import-form">
+
+      <div class="form-grid">
+
+        <label class="form-field">
+
+          Nome dataset
+
+          <input
+            id="advisory-label"
+            type="text"
+            maxlength="100"
+            placeholder="Es. Medie aste 8 partecipanti"
+            required
+          >
+
+        </label>
+
+
+        <label class="form-field">
+
+          Stagione
+
+          <input
+            id="advisory-season"
+            type="text"
+            maxlength="20"
+            placeholder="2026/27"
+          >
+
+        </label>
+
+
+        <label class="form-field">
+
+          Data di riferimento
+
+          <input
+            id="advisory-reference-date"
+            type="date"
+          >
+
+        </label>
+
+
+        <label class="form-field">
+
+          XLSX o CSV
+
+          <input
+            id="advisory-file"
+            type="file"
+            accept=".xlsx,.xls,.csv,text/csv"
+            required
+          >
+
+        </label>
+
+      </div>
+
+
+      <button
+        id="advisory-import-button"
+        type="submit"
+      >
+        Importa statistiche
+      </button>
+
+
+      <p
+        id="advisory-progress"
+        class="setting-help"
+      ></p>
+
+    </form>
+
+
+    <div class="divider"></div>
+
+
+    <h3>Dataset importati</h3>
+
+    <div
+      id="advisory-datasets"
+      class="list"
+    ></div>
+
+  </section>
+
+
 </main>
 
-<script src="league-list.js?v=1"></script>
+
+<script
+  src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"
+></script>
+
+<script src="league-list.js?v=2"></script>
+
 </body>
+
 </html>
