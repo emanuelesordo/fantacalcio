@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Rose - Fantacalcio Live</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css?v=20"
+  >
+
+</head>
+
+
+<body>
+
+<main class="page-shell">
+
+
+  <header class="page-header">
+
+    <div>
+
+      <h1 id="league-title">
+        Rose
+      </h1>
+
+      <p id="league-subtitle">
+        Caricamento...
+      </p>
+
+    </div>
+
+
+    <a
+      class="back-home"
+      href="league.html"
+    >
+      ← Lega
+    </a>
+
+  </header>
+
+
+  <nav class="tabs league-tabs">
+
+    <a
+      href="league.html"
+      class="tab"
+    >
+      <span class="tab-title">Home</span>
+      <span class="tab-description">Dashboard</span>
+    </a>
+
+
+    <span class="tab disabled">
+      <span class="tab-title">Asta</span>
+      <span class="tab-description">Live</span>
+    </span>
+
+
+    <a
+      href="league-rosters.html"
+      class="tab active"
+    >
+      <span class="tab-title">Rose</span>
+      <span class="tab-description">Squadre</span>
+    </a>
+
+
+    <a
+      href="league-list.html"
+      class="tab"
+    >
+      <span class="tab-title">Listone</span>
+      <span class="tab-description">Giocatori</span>
+    </a>
+
+
+    <a
+      id="setup-tab"
+      href="league-setup.html"
+      class="tab"
+      hidden
+    >
+      <span class="tab-title">Setup</span>
+      <span class="tab-description">Configurazione</span>
+    </a>
+
+  </nav>
+
+
+  <p
+    id="page-message"
+    class="message"
+    aria-live="polite"
+  ></p>
+
+
+  <section class="card">
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        ROSTER
+      </span>
+
+      <div>
+        <h2>Situazione lega</h2>
+        <p>Budget e giocatori assegnati</p>
+      </div>
+
+    </div>
+
+
+    <div class="stats-grid">
+
+      <div class="stat-card">
+
+        <span class="stat-label">
+          Squadre
+        </span>
+
+        <span
+          id="league-team-count"
+          class="stat-value"
+        >
+          —
+        </span>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <span class="stat-label">
+          Giocatori assegnati
+        </span>
+
+        <span
+          id="league-player-count"
+          class="stat-value"
+        >
+          —
+        </span>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <span class="stat-label">
+          Crediti spesi
+        </span>
+
+        <span
+          id="league-spent"
+          class="stat-value"
+        >
+          —
+        </span>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section class="card">
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        TEAM
+      </span>
+
+      <div>
+        <h2>Rose</h2>
+        <p>Situazione aggiornata squadra per squadra</p>
+      </div>
+
+    </div>
+
+
+    <div
+      id="rosters-board"
+      class="rosters-board"
+    ></div>
+
+  </section>
+
+
+</main>
+
+
+<script src="league-rosters.js?v=1"></script>
+
+</body>
+
+</html>
