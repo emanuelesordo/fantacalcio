@@ -167,3 +167,138 @@ select {
   border: 1px solid #555;
   border-radius: 8px;
 }
+
+.admin-nav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+}
+
+.admin-nav a,
+.admin-nav-disabled {
+  padding: 10px 14px;
+  border-radius: 8px;
+
+  text-decoration: none;
+  color: inherit;
+
+  white-space: nowrap;
+
+  background: #282828;
+}
+
+.admin-nav a.active {
+  background: #fff;
+  color: #111;
+  font-weight: 700;
+}
+
+.admin-nav-disabled {
+  opacity: .35;
+  cursor: not-allowed;
+}
+
+.setting-row span {
+  display: grid;
+  gap: 4px;
+}
+
+.setting-row small {
+  font-weight: 400;
+  opacity: .6;
+}
+
+.users-toolbar {
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.users-toolbar input,
+.users-toolbar select {
+  margin: 0;
+}
+
+.user-admin-name {
+  font-size: 18px;
+}
+
+.user-badge {
+  display: inline-block;
+
+  margin-left: 6px;
+  padding: 3px 6px;
+
+  border-radius: 5px;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  background: #444;
+}
+
+.user-badge.warning {
+  background: #693535;
+}
+
+.multi-league-status {
+  text-align: right;
+  font-size: 13px;
+  opacity: .8;
+}
+
+.multi-league-status strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 18px;
+  opacity: 1;
+}
+
+.user-admin-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  margin-bottom: 18px;
+}
+
+.user-admin-details div {
+  display: grid;
+  gap: 3px;
+}
+
+.user-admin-details span {
+  font-size: 12px;
+  opacity: .6;
+}
+
+.user-admin-details strong {
+  font-size: 14px;
+}
+
+.user-select-field {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+@media (max-width: 650px) {
+
+  .users-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .user-admin-heading {
+    display: grid;
+  }
+
+  .multi-league-status {
+    text-align: left;
+  }
+
+  .user-admin-details {
+    grid-template-columns: 1fr;
+  }
+}
