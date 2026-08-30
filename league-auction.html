@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Asta - Fantacalcio Live</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css?v=20"
+  >
+
+</head>
+
+
+<body>
+
+<main class="page-shell">
+
+
+  <header class="page-header">
+
+    <div>
+
+      <h1 id="league-title">
+        Asta
+      </h1>
+
+      <p id="league-subtitle">
+        Caricamento...
+      </p>
+
+    </div>
+
+
+    <a
+      class="back-home"
+      href="league.html"
+    >
+      ← Lega
+    </a>
+
+  </header>
+
+
+  <nav class="tabs league-tabs">
+
+    <a
+      href="league.html"
+      class="tab"
+    >
+      <span class="tab-title">Home</span>
+      <span class="tab-description">Dashboard</span>
+    </a>
+
+
+    <a
+      href="league-auction.html"
+      class="tab active"
+    >
+      <span class="tab-title">Asta</span>
+      <span class="tab-description">Live</span>
+    </a>
+
+
+    <a
+      href="league-rosters.html"
+      class="tab"
+    >
+      <span class="tab-title">Rose</span>
+      <span class="tab-description">Squadre</span>
+    </a>
+
+
+    <a
+      href="league-list.html"
+      class="tab"
+    >
+      <span class="tab-title">Listone</span>
+      <span class="tab-description">Giocatori</span>
+    </a>
+
+
+    <a
+      id="setup-tab"
+      href="league-setup.html"
+      class="tab"
+      hidden
+    >
+      <span class="tab-title">Setup</span>
+      <span class="tab-description">Configurazione</span>
+    </a>
+
+  </nav>
+
+
+  <p
+    id="page-message"
+    class="message"
+    aria-live="polite"
+  ></p>
+
+
+  <section class="card">
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        LOBBY
+      </span>
+
+      <div>
+        <h2>Preparazione asta</h2>
+        <p>Controlli prima dell’avvio</p>
+      </div>
+
+    </div>
+
+
+    <div
+      id="auction-status-line"
+      class="league-actions"
+    ></div>
+
+
+    <p
+      id="auction-blockers"
+      class="setting-help"
+    ></p>
+
+
+    <div
+      id="auction-control-area"
+      hidden
+    >
+
+      <button
+        id="prepare-auction-button"
+        type="button"
+      >
+        Prepara sessione d’asta
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <div class="form-grid">
+
+
+    <section class="card">
+
+      <div class="section-heading">
+
+        <span class="section-label">
+          TEAM
+        </span>
+
+        <div>
+          <h2>Squadre</h2>
+          <p>Presenze e Presidenti</p>
+        </div>
+
+      </div>
+
+
+      <div
+        id="auction-teams"
+        class="list"
+      ></div>
+
+    </section>
+
+
+    <section class="card">
+
+      <div class="section-heading">
+
+        <span class="section-label">
+          SETUP
+        </span>
+
+        <div>
+          <h2>Regole snapshot</h2>
+          <p>Configurazione che verrà congelata per l’asta</p>
+        </div>
+
+      </div>
+
+
+      <div
+        id="auction-settings"
+        class="list"
+      ></div>
+
+    </section>
+
+
+  </div>
+
+
+  <section
+    id="prepared-session-section"
+    class="card"
+    hidden
+  >
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        READY
+      </span>
+
+      <div>
+        <h2>Sessione preparata</h2>
+        <p>Ordine squadre provvisorio</p>
+      </div>
+
+    </div>
+
+
+    <div
+      id="auction-team-order"
+      class="list"
+    ></div>
+
+
+    <p class="setting-help">
+      Nel prossimo step renderemo modificabile
+      l’ordine delle squadre e abiliteremo l’avvio
+      effettivo dell’asta.
+    </p>
+
+  </section>
+
+
+</main>
+
+
+<script src="league-auction.js?v=1"></script>
+
+</body>
+
+</html>
