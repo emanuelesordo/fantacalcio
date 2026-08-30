@@ -1,1 +1,77 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
+  <title>Fantacalcio Live</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <main>
+
+    <section id="login-area">
+      <h1>Fantacalcio Live</h1>
+
+      <form id="login-form">
+
+        <label>
+          Username
+          <input
+            id="username"
+            type="text"
+            autocomplete="username"
+            required
+          >
+        </label>
+
+        <label>
+          Password
+          <input
+            id="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          >
+        </label>
+
+        <button type="submit">
+          Entra
+        </button>
+
+      </form>
+
+      <p id="message"></p>
+    </section>
+
+
+    <section id="logged-area" hidden>
+
+      <h1>
+        Ciao,
+        <span id="current-username"></span>
+      </h1>
+
+      <p>Accesso effettuato correttamente.</p>
+
+      <button id="logout-button">
+        Esci
+      </button>
+
+    </section>
+
+  </main>
+
+  <script
+    type="module"
+    src="app.js">
+  </script>
+
+</body>
+</html>
