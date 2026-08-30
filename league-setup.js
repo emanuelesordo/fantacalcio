@@ -25,7 +25,7 @@ const leagueTitle =
 
 
 /* =========================================================
-   CAMPI
+   FORMATO
    ========================================================= */
 
 const fantasyMode =
@@ -44,16 +44,14 @@ const teamCount =
   )
 
 
+/* =========================================================
+   CLASSIC
+   ========================================================= */
+
 const classicRoster =
   document.getElementById(
     'classic-roster'
   )
-
-const mantraRoster =
-  document.getElementById(
-    'mantra-roster'
-  )
-
 
 const slotP =
   document.getElementById(
@@ -75,11 +73,70 @@ const slotA =
     'slot-a'
   )
 
-const mantraSlots =
+
+/* =========================================================
+   MANTRA
+   ========================================================= */
+
+const mantraRoster =
   document.getElementById(
-    'mantra-slots'
+    'mantra-roster'
   )
 
+const mantraGkMin =
+  document.getElementById(
+    'mantra-gk-min'
+  )
+
+const mantraGkMax =
+  document.getElementById(
+    'mantra-gk-max'
+  )
+
+const mantraOutfieldMin =
+  document.getElementById(
+    'mantra-outfield-min'
+  )
+
+const mantraOutfieldMax =
+  document.getElementById(
+    'mantra-outfield-max'
+  )
+
+const mantraTotalMin =
+  document.getElementById(
+    'mantra-total-min'
+  )
+
+const mantraTotalMax =
+  document.getElementById(
+    'mantra-total-max'
+  )
+
+
+/* =========================================================
+   UNDER
+   ========================================================= */
+
+const underEnabled =
+  document.getElementById(
+    'under-enabled'
+  )
+
+const underSettings =
+  document.getElementById(
+    'under-settings'
+  )
+
+const underMinCount =
+  document.getElementById(
+    'under-min-count'
+  )
+
+
+/* =========================================================
+   CHIAMATA
+   ========================================================= */
 
 const nominationMode =
   document.getElementById(
@@ -102,11 +159,14 @@ const listSortDirection =
   )
 
 
+/* =========================================================
+   ASTA
+   ========================================================= */
+
 const auctionBaseMode =
   document.getElementById(
     'auction-base-mode'
   )
-
 
 const bidMode =
   document.getElementById(
@@ -123,6 +183,10 @@ const turnDirection =
     'turn-direction'
   )
 
+
+/* =========================================================
+   TIMER
+   ========================================================= */
 
 const timerMode =
   document.getElementById(
@@ -142,53 +206,6 @@ const dynamicTimerSettings =
 const fixedTimerSeconds =
   document.getElementById(
     'fixed-timer-seconds'
-  )
-
-
-const timerPercent1 =
-  document.getElementById(
-    'timer-percent-1'
-  )
-
-const timerPercent2 =
-  document.getElementById(
-    'timer-percent-2'
-  )
-
-const timerPercent3 =
-  document.getElementById(
-    'timer-percent-3'
-  )
-
-const timerPercent4 =
-  document.getElementById(
-    'timer-percent-4'
-  )
-
-
-const timerSeconds1 =
-  document.getElementById(
-    'timer-seconds-1'
-  )
-
-const timerSeconds2 =
-  document.getElementById(
-    'timer-seconds-2'
-  )
-
-const timerSeconds3 =
-  document.getElementById(
-    'timer-seconds-3'
-  )
-
-const timerSeconds4 =
-  document.getElementById(
-    'timer-seconds-4'
-  )
-
-const timerSeconds5 =
-  document.getElementById(
-    'timer-seconds-5'
   )
 
 
@@ -272,29 +289,41 @@ async function callApi(body) {
   }
 
 
-  const response =
-    await fetch(
-      API_URL,
-      {
-        method: 'POST',
+  let response
 
-        headers: {
-          'Content-Type':
-            'application/json'
-        },
 
-        body:
-          JSON.stringify({
-            ...body,
+  try {
 
-            leagueId:
-              selectedLeague.id,
+    response =
+      await fetch(
+        API_URL,
+        {
+          method: 'POST',
 
-            sessionToken:
-              session.token
-          })
-      }
+          headers: {
+            'Content-Type':
+              'application/json'
+          },
+
+          body:
+            JSON.stringify({
+              ...body,
+
+              leagueId:
+                selectedLeague.id,
+
+              sessionToken:
+                session.token
+            })
+        }
+      )
+
+  } catch {
+
+    throw new Error(
+      'Impossibile contattare il server.'
     )
+  }
 
 
   let data
@@ -329,7 +358,7 @@ async function callApi(body) {
 
 
 /* =========================================================
-   VISIBILITÀ CAMPI
+   VISIBILITÀ CONDIZIONALE
    ========================================================= */
 
 function updateConditionalFields() {
@@ -342,6 +371,10 @@ function updateConditionalFields() {
   mantraRoster.hidden =
     fantasyMode.value
     !== 'mantra'
+
+
+  underSettings.hidden =
+    !underEnabled.checked
 
 
   listSettings.hidden =
@@ -385,6 +418,8 @@ function populateForm(
     settings.team_count
 
 
+  /* Classic */
+
   slotP.value =
     settings
       .roster_config
@@ -417,13 +452,77 @@ function populateForm(
       ?? 6
 
 
-  mantraSlots.value =
+  /* Mantra */
+
+  mantraGkMin.value =
     settings
       .roster_config
       ?.mantra
-      ?.total_slots
+      ?.goalkeepers
+      ?.min
+      ?? 2
+
+
+  mantraGkMax.value =
+    settings
+      .roster_config
+      ?.mantra
+      ?.goalkeepers
+      ?.max
+      ?? 3
+
+
+  mantraOutfieldMin.value =
+    settings
+      .roster_config
+      ?.mantra
+      ?.outfield
+      ?.min
+      ?? 22
+
+
+  mantraOutfieldMax.value =
+    settings
+      .roster_config
+      ?.mantra
+      ?.outfield
+      ?.max
+      ?? 23
+
+
+  mantraTotalMin.value =
+    settings
+      .roster_config
+      ?.mantra
+      ?.total
+      ?.min
       ?? 25
 
+
+  mantraTotalMax.value =
+    settings
+      .roster_config
+      ?.mantra
+      ?.total
+      ?.max
+      ?? 25
+
+
+  /* UNDER */
+
+  underEnabled.checked =
+    settings.under_enabled
+    === true
+
+
+  underMinCount.value =
+    settings.under_min_count
+    > 0
+      ? settings.under_min_count
+      : 1
+
+
+  /* Chiamata */
 
   nominationMode.value =
     settings.nomination_mode
@@ -437,6 +536,8 @@ function populateForm(
     settings.list_sort_direction
 
 
+  /* Asta */
+
   auctionBaseMode.value =
     settings.auction_base_mode
 
@@ -449,6 +550,8 @@ function populateForm(
     settings.turn_direction
 
 
+  /* Timer */
+
   timerMode.value =
     settings.timer_mode
 
@@ -457,55 +560,158 @@ function populateForm(
     settings.fixed_timer_seconds
 
 
-  const bands =
-    settings
-      .dynamic_timer_config
-      ?.bands
-      || []
-
-
-  timerPercent1.value =
-    bands[0]?.max_percent
-    ?? 2
-
-  timerSeconds1.value =
-    bands[0]?.seconds
-    ?? 5
-
-
-  timerPercent2.value =
-    bands[1]?.max_percent
-    ?? 5
-
-  timerSeconds2.value =
-    bands[1]?.seconds
-    ?? 7
-
-
-  timerPercent3.value =
-    bands[2]?.max_percent
-    ?? 10
-
-  timerSeconds3.value =
-    bands[2]?.seconds
-    ?? 9
-
-
-  timerPercent4.value =
-    bands[3]?.max_percent
-    ?? 20
-
-  timerSeconds4.value =
-    bands[3]?.seconds
-    ?? 12
-
-
-  timerSeconds5.value =
-    bands[4]?.seconds
-    ?? 15
-
-
   updateConditionalFields()
+}
+
+
+/* =========================================================
+   VALIDAZIONE CLIENT
+   ========================================================= */
+
+function validateLocalSetup() {
+
+  if (
+    fantasyMode.value === 'mantra'
+  ) {
+
+    const gkMin =
+      Number(
+        mantraGkMin.value
+      )
+
+    const gkMax =
+      Number(
+        mantraGkMax.value
+      )
+
+    const outfieldMin =
+      Number(
+        mantraOutfieldMin.value
+      )
+
+    const outfieldMax =
+      Number(
+        mantraOutfieldMax.value
+      )
+
+    const totalMin =
+      Number(
+        mantraTotalMin.value
+      )
+
+    const totalMax =
+      Number(
+        mantraTotalMax.value
+      )
+
+
+    if (
+      gkMin > gkMax
+    ) {
+
+      return 'Il minimo dei Portieri non può superare il massimo.'
+    }
+
+
+    if (
+      outfieldMin > outfieldMax
+    ) {
+
+      return 'Il minimo dei giocatori di movimento non può superare il massimo.'
+    }
+
+
+    if (
+      totalMin > totalMax
+    ) {
+
+      return 'Il minimo totale non può superare il massimo totale.'
+    }
+
+
+    if (
+      totalMin <
+      gkMin + outfieldMin
+    ) {
+
+      return (
+        'Il minimo totale non può essere inferiore ' +
+        'alla somma dei minimi di Portieri e giocatori di movimento.'
+      )
+    }
+
+
+    if (
+      totalMax >
+      gkMax + outfieldMax
+    ) {
+
+      return (
+        'Il massimo totale non può essere superiore ' +
+        'alla somma dei massimi di Portieri e giocatori di movimento.'
+      )
+    }
+  }
+
+
+  if (
+    underEnabled.checked
+  ) {
+
+    const underMin =
+      Number(
+        underMinCount.value
+      )
+
+
+    if (
+      !Number.isInteger(underMin)
+      ||
+      underMin < 1
+    ) {
+
+      return 'Inserisci un numero minimo valido di giocatori UNDER.'
+    }
+
+
+    let rosterMaximum
+
+
+    if (
+      fantasyMode.value === 'classic'
+    ) {
+
+      rosterMaximum =
+        Number(slotP.value)
+        +
+        Number(slotD.value)
+        +
+        Number(slotC.value)
+        +
+        Number(slotA.value)
+
+    } else {
+
+      rosterMaximum =
+        Number(
+          mantraTotalMax.value
+        )
+    }
+
+
+    if (
+      underMin > rosterMaximum
+    ) {
+
+      return (
+        'Il numero minimo di UNDER non può superare ' +
+        'la dimensione massima della rosa.'
+      )
+    }
+  }
+
+
+  return null
 }
 
 
@@ -576,6 +782,21 @@ form.addEventListener(
     showMessage('')
 
 
+    const localError =
+      validateLocalSetup()
+
+
+    if (localError) {
+
+      showMessage(
+        localError,
+        'error'
+      )
+
+      return
+    }
+
+
     const button =
       document.getElementById(
         'save-setup'
@@ -599,10 +820,12 @@ form.addEventListener(
       fantasyMode:
         fantasyMode.value,
 
+
       initialCredits:
         Number(
           initialCredits.value
         ),
+
 
       teamCount:
         Number(
@@ -638,12 +861,62 @@ form.addEventListener(
 
         mantra: {
 
-          total_slots:
-            Number(
-              mantraSlots.value
-            )
+          goalkeepers: {
+
+            min:
+              Number(
+                mantraGkMin.value
+              ),
+
+            max:
+              Number(
+                mantraGkMax.value
+              )
+          },
+
+
+          outfield: {
+
+            min:
+              Number(
+                mantraOutfieldMin.value
+              ),
+
+            max:
+              Number(
+                mantraOutfieldMax.value
+              )
+          },
+
+
+          total: {
+
+            min:
+              Number(
+                mantraTotalMin.value
+              ),
+
+            max:
+              Number(
+                mantraTotalMax.value
+              )
+          }
         }
       },
+
+
+      underEnabled:
+        underEnabled.checked,
+
+
+      underMinCount:
+        underEnabled.checked
+
+          ? Number(
+              underMinCount.value
+            )
+
+          : 0,
 
 
       nominationMode:
@@ -677,77 +950,7 @@ form.addEventListener(
       fixedTimerSeconds:
         Number(
           fixedTimerSeconds.value
-        ),
-
-
-      dynamicTimerConfig: {
-
-        bands: [
-
-          {
-            max_percent:
-              Number(
-                timerPercent1.value
-              ),
-
-            seconds:
-              Number(
-                timerSeconds1.value
-              )
-          },
-
-
-          {
-            max_percent:
-              Number(
-                timerPercent2.value
-              ),
-
-            seconds:
-              Number(
-                timerSeconds2.value
-              )
-          },
-
-
-          {
-            max_percent:
-              Number(
-                timerPercent3.value
-              ),
-
-            seconds:
-              Number(
-                timerSeconds3.value
-              )
-          },
-
-
-          {
-            max_percent:
-              Number(
-                timerPercent4.value
-              ),
-
-            seconds:
-              Number(
-                timerSeconds4.value
-              )
-          },
-
-
-          {
-            max_percent:
-              null,
-
-            seconds:
-              Number(
-                timerSeconds5.value
-              )
-          }
-
-        ]
-      }
+        )
     }
 
 
@@ -802,6 +1005,7 @@ form.addEventListener(
       button.disabled =
         false
 
+
       button.textContent =
         originalText
     }
@@ -814,6 +1018,12 @@ form.addEventListener(
    ========================================================= */
 
 fantasyMode.addEventListener(
+  'change',
+  updateConditionalFields
+)
+
+
+underEnabled.addEventListener(
   'change',
   updateConditionalFields
 )
