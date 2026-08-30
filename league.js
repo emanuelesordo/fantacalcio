@@ -55,6 +55,11 @@ const pendingRequests =
     'pending-requests'
   )
 
+const setupTab =
+  document.getElementById(
+    'setup-tab'
+  )
+
 
 let selectedLeague = null
 
@@ -134,6 +139,7 @@ function escapeHtml(value) {
 function roleLabel(role) {
 
   const labels = {
+
     league_admin:
       'Admin Lega',
 
@@ -176,29 +182,41 @@ async function callApi(body) {
   }
 
 
-  const response =
-    await fetch(
-      API_URL,
-      {
-        method: 'POST',
+  let response
 
-        headers: {
-          'Content-Type':
-            'application/json'
-        },
 
-        body:
-          JSON.stringify({
-            ...body,
+  try {
 
-            leagueId:
-              selectedLeague.id,
+    response =
+      await fetch(
+        API_URL,
+        {
+          method: 'POST',
 
-            sessionToken:
-              session.token
-          })
-      }
+          headers: {
+            'Content-Type':
+              'application/json'
+          },
+
+          body:
+            JSON.stringify({
+              ...body,
+
+              leagueId:
+                selectedLeague.id,
+
+              sessionToken:
+                session.token
+            })
+        }
+      )
+
+  } catch {
+
+    throw new Error(
+      'Impossibile contattare il server.'
     )
+  }
 
 
   let data
@@ -242,7 +260,8 @@ function renderRoles(data) {
 
 
   if (
-    data.permissions.isSuperAdmin
+    data.permissions
+      .isSuperAdmin
   ) {
 
     roles.push(
@@ -262,7 +281,9 @@ function renderRoles(data) {
   }
 
 
-  if (data.myTeam?.role) {
+  if (
+    data.myTeam?.role
+  ) {
 
     let teamRole =
       roleLabel(
@@ -306,11 +327,13 @@ function renderRoles(data) {
 
   rolesContainer.innerHTML =
     uniqueRoles
-      .map(role => `
-        <span class="badge admin">
-          ${escapeHtml(role)}
-        </span>
-      `)
+      .map(
+        role => `
+          <span class="badge admin">
+            ${escapeHtml(role)}
+          </span>
+        `
+      )
       .join(' ')
 }
 
@@ -323,7 +346,9 @@ function renderMyTeam(
   myTeam
 ) {
 
-  if (!myTeam?.team) {
+  if (
+    !myTeam?.team
+  ) {
 
     myTeamContainer.innerHTML = `
       <div class="empty-state">
@@ -336,14 +361,14 @@ function renderMyTeam(
   }
 
 
-  let status = ''
+  let statusBadge = ''
 
 
   if (
     myTeam.status === 'active'
   ) {
 
-    status = `
+    statusBadge = `
       <span class="badge good">
         ATTIVO
       </span>
@@ -351,7 +376,7 @@ function renderMyTeam(
 
   } else {
 
-    status = `
+    statusBadge = `
       <span class="badge">
         IN ATTESA
       </span>
@@ -397,7 +422,7 @@ function renderMyTeam(
         )}
       </h3>
 
-      ${status}
+      ${statusBadge}
 
       <p>
         Ruolo:
@@ -476,6 +501,22 @@ function renderTeams(
       'league-card'
 
 
+    const statusBadge =
+      team.status === 'active'
+
+        ? `
+          <span class="badge good">
+            ATTIVA
+          </span>
+        `
+
+        : `
+          <span class="badge">
+            IN ATTESA
+          </span>
+        `
+
+
     card.innerHTML = `
 
       <div class="league-card-header">
@@ -488,23 +529,7 @@ function renderTeams(
             )}
           </h3>
 
-
-          ${
-            team.status === 'active'
-
-              ? `
-                <span class="badge good">
-                  ATTIVA
-                </span>
-              `
-
-              : `
-                <span class="badge">
-                  IN ATTESA
-                </span>
-              `
-          }
-
+          ${statusBadge}
 
           <p>
 
@@ -591,6 +616,7 @@ function renderRequests(
 
           ${
             team
+
               ? `
                 <p>
                   Squadra:
@@ -614,14 +640,17 @@ function renderRequests(
 
                 ${
                   team.teamStatus === 'pending'
+
                     ? `
                       <span class="badge">
                         NUOVA SQUADRA
                       </span>
                     `
+
                     : ''
                 }
               `
+
               : `
                 <p>
                   Nessuna candidatura squadra trovata.
@@ -650,6 +679,9 @@ function renderRequests(
         'button'
       )
 
+    approveButton.type =
+      'button'
+
     approveButton.textContent =
       'Approva'
 
@@ -658,6 +690,9 @@ function renderRequests(
       document.createElement(
         'button'
       )
+
+    rejectButton.type =
+      'button'
 
     rejectButton.textContent =
       'Rifiuta'
@@ -673,35 +708,76 @@ function renderRequests(
         showMessage('')
 
 
-        const data =
-          await callApi({
-            action:
-              'approveMember',
+        approveButton.disabled =
+          true
 
-            targetUserId:
-              request.userId
-          })
+        rejectButton.disabled =
+          true
 
 
-        if (!data?.ok) {
+        const originalText =
+          approveButton.textContent
+
+
+        approveButton.textContent =
+          'Approvazione...'
+
+
+        try {
+
+          const data =
+            await callApi({
+              action:
+                'approveMember',
+
+              targetUserId:
+                request.userId
+            })
+
+
+          if (!data?.ok) {
+
+            showMessage(
+              data?.error ||
+              'Errore durante l’approvazione.',
+              'error'
+            )
+
+            return
+          }
+
 
           showMessage(
-            data?.error ||
+            `${request.username} approvato.`,
+            'success'
+          )
+
+
+          await loadDashboard()
+
+
+        } catch (error) {
+
+          console.error(error)
+
+
+          showMessage(
+            error.message ||
             'Errore durante l’approvazione.',
             'error'
           )
 
-          return
+        } finally {
+
+          approveButton.disabled =
+            false
+
+          rejectButton.disabled =
+            false
+
+          approveButton.textContent =
+            originalText
         }
-
-
-        showMessage(
-          `${request.username} approvato.`,
-          'success'
-        )
-
-
-        await loadDashboard()
       }
     )
 
@@ -713,35 +789,76 @@ function renderRequests(
         showMessage('')
 
 
-        const data =
-          await callApi({
-            action:
-              'rejectMember',
+        approveButton.disabled =
+          true
 
-            targetUserId:
-              request.userId
-          })
+        rejectButton.disabled =
+          true
 
 
-        if (!data?.ok) {
+        const originalText =
+          rejectButton.textContent
+
+
+        rejectButton.textContent =
+          'Rifiuto...'
+
+
+        try {
+
+          const data =
+            await callApi({
+              action:
+                'rejectMember',
+
+              targetUserId:
+                request.userId
+            })
+
+
+          if (!data?.ok) {
+
+            showMessage(
+              data?.error ||
+              'Errore durante il rifiuto.',
+              'error'
+            )
+
+            return
+          }
+
 
           showMessage(
-            data?.error ||
+            `${request.username} rifiutato.`,
+            'success'
+          )
+
+
+          await loadDashboard()
+
+
+        } catch (error) {
+
+          console.error(error)
+
+
+          showMessage(
+            error.message ||
             'Errore durante il rifiuto.',
             'error'
           )
 
-          return
+        } finally {
+
+          approveButton.disabled =
+            false
+
+          rejectButton.disabled =
+            false
+
+          rejectButton.textContent =
+            originalText
         }
-
-
-        showMessage(
-          `${request.username} rifiutato.`,
-          'success'
-        )
-
-
-        await loadDashboard()
       }
     )
 
@@ -770,6 +887,9 @@ function renderRequests(
 
 async function loadDashboard() {
 
+  showMessage('')
+
+
   try {
 
     const data =
@@ -791,6 +911,10 @@ async function loadDashboard() {
     }
 
 
+    /* =====================================================
+       HEADER
+       ===================================================== */
+
     title.textContent =
       data.league.name
 
@@ -799,11 +923,17 @@ async function loadDashboard() {
       `Lega attiva · ${data.currentUser.username}`
 
 
+    /* =====================================================
+       PANORAMICA
+       ===================================================== */
+
     leagueCode.textContent =
       data.league.code
 
 
-    renderRoles(data)
+    renderRoles(
+      data
+    )
 
 
     renderMyTeam(
@@ -815,6 +945,23 @@ async function loadDashboard() {
       data.teams || []
     )
 
+
+    /* =====================================================
+       SETUP
+       Visibile solo agli Admin Lega.
+       ===================================================== */
+
+    if (setupTab) {
+
+      setupTab.hidden =
+        !data.permissions
+          .isLeagueAdmin
+    }
+
+
+    /* =====================================================
+       AMMINISTRAZIONE
+       ===================================================== */
 
     adminSection.hidden =
       !data.permissions
