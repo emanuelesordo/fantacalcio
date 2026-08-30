@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    Setup Globale - Fantacalcio Live
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="style.css?v=5"
+  >
+
+</head>
+
+
+<body>
+
+  <main class="admin-page">
+
+    <header class="admin-header">
+
+      <div>
+        <h1>Setup Globale</h1>
+
+        <p>
+          Configurazione generale dell'app
+        </p>
+      </div>
+
+      <a href="index.html">
+        ← Home
+      </a>
+
+    </header>
+
+
+    <p
+      id="admin-message"
+      aria-live="polite"
+    ></p>
+
+
+    <!-- SETUP GLOBALE -->
+
+    <section>
+
+      <h2>
+        Impostazioni globali
+      </h2>
+
+
+      <label class="setting-row">
+
+        <span>
+          Creazione nuove leghe
+        </span>
+
+        <input
+          id="allow-league-creation"
+          type="checkbox"
+        >
+
+      </label>
+
+
+      <p class="setting-help">
+        Il Super Admin può sempre creare
+        nuove leghe, indipendentemente
+        da questa impostazione.
+      </p>
+
+
+      <label class="setting-row">
+
+        <span>
+          Multi-lega globale
+        </span>
+
+        <input
+          id="multi-league-enabled"
+          type="checkbox"
+        >
+
+      </label>
+
+
+      <p class="setting-help">
+        Gli override impostati sui singoli
+        utenti hanno sempre la precedenza.
+      </p>
+
+
+      <button
+        id="save-global-settings"
+        type="button"
+      >
+        Salva impostazioni
+      </button>
+
+    </section>
+
+
+
+    <!-- UTENTI -->
+
+    <section>
+
+      <h2>
+        Utenti
+      </h2>
+
+      <div
+        id="users-list"
+        class="users-list"
+      >
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <script
+    src="setup-global.js?v=1"
+  ></script>
+
+</body>
+
+</html>
