@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    Gestione Leghe - Fantacalcio Live
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="style.css?v=10"
+  >
+
+</head>
+
+
+<body>
+
+<main class="page-shell">
+
+
+  <header class="page-header">
+
+    <div>
+
+      <h1>Leghe</h1>
+
+      <p>
+        Gestione globale e richieste
+      </p>
+
+    </div>
+
+
+    <a
+      class="back-home"
+      href="index.html"
+    >
+      ← Home
+    </a>
+
+  </header>
+
+
+  <nav class="tabs">
+
+    <a
+      href="setup-global.html"
+      class="tab"
+    >
+
+      <span class="tab-title">
+        Configurazione
+      </span>
+
+      <span class="tab-description">
+        Impostazioni generali
+      </span>
+
+    </a>
+
+
+    <a
+      href="users-admin.html"
+      class="tab"
+    >
+
+      <span class="tab-title">
+        Utenti
+      </span>
+
+      <span class="tab-description">
+        Account e privilegi
+      </span>
+
+    </a>
+
+
+    <a
+      href="leagues-admin.html"
+      class="tab active"
+    >
+
+      <span class="tab-title">
+        Leghe
+      </span>
+
+      <span class="tab-description">
+        Gestione e approvazioni
+      </span>
+
+    </a>
+
+  </nav>
+
+
+  <p
+    id="page-message"
+    class="message"
+    aria-live="polite"
+  ></p>
+
+
+  <!-- CREA LEGA -->
+
+  <section class="card">
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        NEW
+      </span>
+
+      <div>
+
+        <h2>
+          Nuova lega
+        </h2>
+
+        <p>
+          Le leghe create dal Super Admin
+          sono immediatamente attive
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <form id="create-league-form">
+
+      <label>
+
+        Nome lega
+
+        <input
+          id="league-name"
+          type="text"
+          minlength="2"
+          maxlength="80"
+          placeholder="Es. Fantacalcio 2026/27"
+          required
+        >
+
+      </label>
+
+
+      <button type="submit">
+        Crea lega
+      </button>
+
+    </form>
+
+  </section>
+
+
+  <!-- RICHIESTE -->
+
+  <section class="card">
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        WAIT
+      </span>
+
+      <div>
+
+        <h2>
+          Richieste
+        </h2>
+
+        <p>
+          Leghe in attesa di approvazione
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="pending-leagues"
+      class="league-list"
+    ></div>
+
+  </section>
+
+
+  <!-- ATTIVE -->
+
+  <section class="card">
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        LIVE
+      </span>
+
+      <div>
+
+        <h2>
+          Leghe attive
+        </h2>
+
+        <p>
+          Leghe attualmente abilitate
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="active-leagues"
+      class="league-list"
+    ></div>
+
+  </section>
+
+
+  <!-- ALTRE -->
+
+  <section class="card">
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        OFF
+      </span>
+
+      <div>
+
+        <h2>
+          Storico
+        </h2>
+
+        <p>
+          Richieste rifiutate o leghe archiviate
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="other-leagues"
+      class="league-list"
+    ></div>
+
+  </section>
+
+
+</main>
+
+
+<script src="leagues-admin.js?v=1"></script>
+
+</body>
+
+</html>
