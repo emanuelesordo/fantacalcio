@@ -102,7 +102,7 @@ function showMessage(
 
 function escapeHtml(value) {
 
-  return String(value)
+  return String(value ?? '')
     .replaceAll('&', '&amp;')
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;')
@@ -113,15 +113,17 @@ function escapeHtml(value) {
 
 function roleLabel(role) {
 
-  if (role === 'president') {
-    return 'Presidente'
+  const labels = {
+
+    president:
+      'Presidente',
+
+    vice:
+      'Vice'
   }
 
-  if (role === 'vice') {
-    return 'Vice'
-  }
 
-  return '—'
+  return labels[role] || '—'
 }
 
 
@@ -144,33 +146,60 @@ async function callApi(body) {
   }
 
 
-  const response =
-    await fetch(
-      API_URL,
-      {
-        method: 'POST',
+  let response
 
-        headers: {
-          'Content-Type':
-            'application/json'
-        },
 
-        body:
-          JSON.stringify({
-            ...body,
+  try {
 
-            sessionToken:
-              session.token
-          })
-      }
+    response =
+      await fetch(
+        API_URL,
+        {
+          method:
+            'POST',
+
+          headers: {
+            'Content-Type':
+              'application/json'
+          },
+
+          body:
+            JSON.stringify({
+              ...body,
+
+              sessionToken:
+                session.token
+            })
+        }
+      )
+
+  } catch (error) {
+
+    throw new Error(
+      'Impossibile contattare il server.'
     )
+  }
 
 
-  const data =
-    await response.json()
+  let data
 
 
-  if (response.status === 401) {
+  try {
+
+    data =
+      await response.json()
+
+  } catch {
+
+    throw new Error(
+      'Risposta non valida dal server.'
+    )
+  }
+
+
+  if (
+    response.status === 401
+  ) {
 
     window.location.href =
       'index.html'
@@ -194,8 +223,29 @@ function renderMemberships(
   myLeagues.innerHTML = ''
 
 
+  const visibleMemberships =
+    memberships.filter(
+      membership =>
+        membership.league
+        &&
+        [
+          'pending',
+          'active'
+        ].includes(
+          membership.league.status
+        )
+        &&
+        [
+          'pending',
+          'active'
+        ].includes(
+          membership.status
+        )
+    )
+
+
   if (
-    memberships.length === 0
+    visibleMemberships.length === 0
   ) {
 
     myLeagues.innerHTML = `
@@ -211,17 +261,11 @@ function renderMemberships(
 
   for (
     const membership
-    of memberships
+    of visibleMemberships
   ) {
-
-    if (!membership.league) {
-      continue
-    }
-
 
     const league =
       membership.league
-
 
     const team =
       membership.team
@@ -236,32 +280,86 @@ function renderMemberships(
       'league-card'
 
 
-    const statusBadge =
+    let statusBadge
+
+
+    if (
       membership.status === 'active'
       &&
       league.status === 'active'
+    ) {
 
-        ? `
+      statusBadge = `
+        <span class="badge good">
+          ATTIVA
+        </span>
+      `
+
+    } else {
+
+      statusBadge = `
+        <span class="badge">
+          IN ATTESA
+        </span>
+      `
+    }
+
+
+    let teamInfo = ''
+
+
+    if (team) {
+
+      let teamStatus = ''
+
+
+      if (
+        team.membershipStatus
+          === 'active'
+      ) {
+
+        teamStatus = `
           <span class="badge good">
-            ATTIVA
+            ${escapeHtml(
+              roleLabel(
+                team.role
+              )
+            )}
           </span>
         `
 
-        : membership.status === 'pending'
+      } else {
 
-          ? `
-            <span class="badge">
-              IN ATTESA
-            </span>
-          `
+        teamStatus = `
+          <span class="badge">
+            ${escapeHtml(
+              roleLabel(
+                team.role
+              )
+            )}
+            · IN ATTESA
+          </span>
+        `
+      }
 
-          : `
-            <span class="badge warning">
-              ${escapeHtml(
-                membership.status.toUpperCase()
-              )}
-            </span>
-          `
+
+      teamInfo = `
+
+        <p>
+          Squadra:
+          <strong>
+            ${escapeHtml(
+              team.name
+            )}
+          </strong>
+        </p>
+
+        <div>
+          ${teamStatus}
+        </div>
+
+      `
+    }
 
 
     card.innerHTML = `
@@ -278,32 +376,7 @@ function renderMemberships(
 
           ${statusBadge}
 
-
-          ${
-            team
-
-              ? `
-                <p>
-                  Squadra:
-                  <strong>
-                    ${escapeHtml(
-                      team.name
-                    )}
-                  </strong>
-                </p>
-
-                <p>
-                  Ruolo:
-                  <strong>
-                    ${roleLabel(
-                      team.role
-                    )}
-                  </strong>
-                </p>
-              `
-
-              : ''
-          }
+          ${teamInfo}
 
 
           ${
@@ -327,6 +400,12 @@ function renderMemberships(
     `
 
 
+    /*
+     * Solo una membership attiva
+     * permette di entrare realmente
+     * nella dashboard della lega.
+     */
+
     if (
       membership.status === 'active'
       &&
@@ -347,8 +426,11 @@ function renderMemberships(
           'button'
         )
 
+      selectButton.type =
+        'button'
+
       selectButton.textContent =
-        'Seleziona lega'
+        'Entra nella lega'
 
 
       selectButton.addEventListener(
@@ -370,10 +452,8 @@ function renderMemberships(
           )
 
 
-          showMessage(
-            `${league.name} selezionata.`,
-            'success'
-          )
+          window.location.href =
+            'league.html'
         }
       )
 
@@ -397,7 +477,7 @@ function renderMemberships(
 
 
 /* =========================================================
-   PREVIEW LEGA
+   PREVIEW CODICE LEGA
    ========================================================= */
 
 function renderLeaguePreview(
@@ -421,19 +501,30 @@ function renderLeaguePreview(
     <div class="divider"></div>
 
 
-    <h3>
-      ${escapeHtml(
-        data.league.name
-      )}
-    </h3>
+    <div class="section-heading">
 
+      <span class="section-label">
+        FOUND
+      </span>
 
-    <p class="setting-help">
-      Codice:
-      ${escapeHtml(
-        data.league.code
-      )}
-    </p>
+      <div>
+
+        <h2>
+          ${escapeHtml(
+            data.league.name
+          )}
+        </h2>
+
+        <p>
+          Codice:
+          ${escapeHtml(
+            data.league.code
+          )}
+        </p>
+
+      </div>
+
+    </div>
 
 
     <div
@@ -446,8 +537,15 @@ function renderLeaguePreview(
 
 
     <h3>
-      Crea nuova squadra
+      Crea una nuova squadra
     </h3>
+
+
+    <p class="setting-help">
+      Se la squadra non esiste ancora,
+      puoi crearla e candidarti
+      automaticamente come Presidente.
+    </p>
 
 
     <form id="new-team-form">
@@ -489,7 +587,7 @@ function renderLeaguePreview(
 
     teamList.innerHTML = `
       <div class="empty-state">
-        Nessuna squadra già disponibile.
+        Nessuna squadra disponibile.
         Puoi crearne una nuova.
       </div>
     `
@@ -510,6 +608,24 @@ function renderLeaguePreview(
         'list-row'
 
 
+      const description =
+        team.hasPresident
+
+          ? `
+            Presidente:
+            ${escapeHtml(
+              team.presidentUsername
+              || 'assegnato'
+            )}
+            · candidatura come Vice
+          `
+
+          : `
+            Nessun Presidente
+            · candidatura come Presidente
+          `
+
+
       row.innerHTML = `
 
         <div class="list-row-main">
@@ -523,18 +639,7 @@ function renderLeaguePreview(
             </strong>
 
             <small>
-              ${
-                team.hasPresident
-
-                  ? `Presidente:
-                     ${escapeHtml(
-                       team.presidentUsername
-                       || 'assegnato'
-                     )}
-                     · Ti candiderai come Vice`
-
-                  : 'Nessun Presidente · Ti candiderai come Presidente'
-              }
+              ${description}
             </small>
 
           </div>
@@ -552,19 +657,22 @@ function renderLeaguePreview(
       `
 
 
-      row
-        .querySelector(
+      const button =
+        row.querySelector(
           '.join-team-button'
         )
-        .addEventListener(
-          'click',
-          async () => {
 
-            await joinExistingTeam(
-              team.id
-            )
-          }
-        )
+
+      button.addEventListener(
+        'click',
+        async () => {
+
+          await joinExistingTeam(
+            team.id,
+            button
+          )
+        }
+      )
 
 
       teamList.appendChild(
@@ -574,60 +682,53 @@ function renderLeaguePreview(
   }
 
 
-  document
-    .getElementById(
+  const newTeamForm =
+    document.getElementById(
       'new-team-form'
     )
-    .addEventListener(
-      'submit',
-      async event => {
-
-        event.preventDefault()
 
 
-        const input =
-          document.getElementById(
-            'new-team-name'
-          )
+  newTeamForm.addEventListener(
+    'submit',
+    async event => {
+
+      event.preventDefault()
 
 
-        await joinNewTeam(
-          input.value.trim()
+      const input =
+        document.getElementById(
+          'new-team-name'
         )
-      }
-    )
+
+
+      const button =
+        newTeamForm.querySelector(
+          'button[type="submit"]'
+        )
+
+
+      await joinNewTeam(
+        input.value.trim(),
+        button
+      )
+    }
+  )
 }
 
 
 /* =========================================================
-   RICHIESTE
+   ISCRIZIONE A SQUADRA ESISTENTE
    ========================================================= */
 
 async function joinExistingTeam(
-  teamId
+  teamId,
+  button
 ) {
 
-  showMessage('')
-
-
-  const data =
-    await callApi({
-
-      action:
-        'joinExistingTeam',
-
-      code:
-        currentPreview.league.code,
-
-      teamId
-    })
-
-
-  if (!data?.ok) {
+  if (!currentPreview?.league?.code) {
 
     showMessage(
-      data?.error ||
-      'Errore durante la richiesta.',
+      'Lega non valida.',
       'error'
     )
 
@@ -635,32 +736,114 @@ async function joinExistingTeam(
   }
 
 
-  const role =
-    roleLabel(
-      data.request
-        ?.requested_role
-    )
+  showMessage('')
 
 
-  leaguePreview.hidden =
+  button.disabled =
     true
 
 
-  showMessage(
-    `Richiesta inviata. Candidatura come ${role}.`,
-    'success'
-  )
+  const originalText =
+    button.textContent
 
 
-  await loadHome()
+  button.textContent =
+    'Invio...'
+
+
+  try {
+
+    const data =
+      await callApi({
+
+        action:
+          'joinExistingTeam',
+
+        code:
+          currentPreview.league.code,
+
+        teamId
+      })
+
+
+    if (!data?.ok) {
+
+      showMessage(
+        data?.error ||
+        'Errore durante la richiesta.',
+        'error'
+      )
+
+      return
+    }
+
+
+    const role =
+      roleLabel(
+        data.request
+          ?.requested_role
+      )
+
+
+    leaguePreview.hidden =
+      true
+
+    currentPreview =
+      null
+
+    codeInput.value =
+      ''
+
+
+    showMessage(
+      `Richiesta inviata. Candidatura come ${role}.`,
+      'success'
+    )
+
+
+    await loadHome()
+
+
+  } catch (error) {
+
+    console.error(error)
+
+
+    showMessage(
+      error.message ||
+      'Errore durante la richiesta.',
+      'error'
+    )
+
+  } finally {
+
+    button.disabled =
+      false
+
+    button.textContent =
+      originalText
+  }
 }
 
 
+/* =========================================================
+   CREAZIONE SQUADRA + ISCRIZIONE
+   ========================================================= */
+
 async function joinNewTeam(
-  teamName
+  teamName,
+  button
 ) {
 
-  showMessage('')
+  if (!currentPreview?.league?.code) {
+
+    showMessage(
+      'Lega non valida.',
+      'error'
+    )
+
+    return
+  }
 
 
   if (
@@ -676,47 +859,91 @@ async function joinNewTeam(
   }
 
 
-  const data =
-    await callApi({
-
-      action:
-        'joinNewTeam',
-
-      code:
-        currentPreview.league.code,
-
-      teamName
-    })
+  showMessage('')
 
 
-  if (!data?.ok) {
+  button.disabled =
+    true
+
+
+  const originalText =
+    button.textContent
+
+
+  button.textContent =
+    'Invio...'
+
+
+  try {
+
+    const data =
+      await callApi({
+
+        action:
+          'joinNewTeam',
+
+        code:
+          currentPreview.league.code,
+
+        teamName
+      })
+
+
+    if (!data?.ok) {
+
+      showMessage(
+        data?.error ||
+        'Errore durante la richiesta.',
+        'error'
+      )
+
+      return
+    }
+
+
+    leaguePreview.hidden =
+      true
+
+    currentPreview =
+      null
+
+    codeInput.value =
+      ''
+
 
     showMessage(
-      data?.error ||
+      'Squadra creata. Richiesta inviata come Presidente.',
+      'success'
+    )
+
+
+    await loadHome()
+
+
+  } catch (error) {
+
+    console.error(error)
+
+
+    showMessage(
+      error.message ||
       'Errore durante la richiesta.',
       'error'
     )
 
-    return
+  } finally {
+
+    button.disabled =
+      false
+
+    button.textContent =
+      originalText
   }
-
-
-  leaguePreview.hidden =
-    true
-
-
-  showMessage(
-    'Squadra creata. Richiesta di iscrizione inviata come Presidente.',
-    'success'
-  )
-
-
-  await loadHome()
 }
 
 
 /* =========================================================
-   CERCA CODICE
+   CERCA LEGA TRAMITE CODICE
    ========================================================= */
 
 codeForm.addEventListener(
@@ -725,7 +952,15 @@ codeForm.addEventListener(
 
     event.preventDefault()
 
+
     showMessage('')
+
+
+    leaguePreview.hidden =
+      true
+
+    currentPreview =
+      null
 
 
     const code =
@@ -735,25 +970,10 @@ codeForm.addEventListener(
         .toUpperCase()
 
 
-    const data =
-      await callApi({
-
-        action:
-          'previewLeagueCode',
-
-        code
-      })
-
-
-    if (!data?.ok) {
-
-      leaguePreview.hidden =
-        true
-
+    if (!code) {
 
       showMessage(
-        data?.error ||
-        'Lega non trovata.',
+        'Inserisci un codice lega.',
         'error'
       )
 
@@ -761,15 +981,78 @@ codeForm.addEventListener(
     }
 
 
-    renderLeaguePreview(
-      data
-    )
+    const button =
+      codeForm.querySelector(
+        'button[type="submit"]'
+      )
+
+
+    button.disabled =
+      true
+
+
+    const originalText =
+      button.textContent
+
+
+    button.textContent =
+      'Cerco...'
+
+
+    try {
+
+      const data =
+        await callApi({
+
+          action:
+            'previewLeagueCode',
+
+          code
+        })
+
+
+      if (!data?.ok) {
+
+        showMessage(
+          data?.error ||
+          'Lega non trovata.',
+          'error'
+        )
+
+        return
+      }
+
+
+      renderLeaguePreview(
+        data
+      )
+
+
+    } catch (error) {
+
+      console.error(error)
+
+
+      showMessage(
+        error.message ||
+        'Errore durante la ricerca.',
+        'error'
+      )
+
+    } finally {
+
+      button.disabled =
+        false
+
+      button.textContent =
+        originalText
+    }
   }
 )
 
 
 /* =========================================================
-   CREA LEGA
+   CREA NUOVA LEGA
    ========================================================= */
 
 createForm.addEventListener(
@@ -777,6 +1060,7 @@ createForm.addEventListener(
   async event => {
 
     event.preventDefault()
+
 
     showMessage('')
 
@@ -787,21 +1071,12 @@ createForm.addEventListener(
         .trim()
 
 
-    const data =
-      await callApi({
-
-        action:
-          'createLeague',
-
-        name
-      })
-
-
-    if (!data?.ok) {
+    if (
+      name.length < 2
+    ) {
 
       showMessage(
-        data?.error ||
-        'Errore durante la creazione.',
+        'Inserisci un nome lega valido.',
         'error'
       )
 
@@ -809,97 +1084,182 @@ createForm.addEventListener(
     }
 
 
-    newLeagueName.value =
-      ''
+    const button =
+      createForm.querySelector(
+        'button[type="submit"]'
+      )
 
 
-    if (
-      data.league
-        ?.league_status
+    button.disabled =
+      true
+
+
+    const originalText =
+      button.textContent
+
+
+    button.textContent =
+      'Creazione...'
+
+
+    try {
+
+      const data =
+        await callApi({
+
+          action:
+            'createLeague',
+
+          name
+        })
+
+
+      if (!data?.ok) {
+
+        showMessage(
+          data?.error ||
+          'Errore durante la creazione.',
+          'error'
+        )
+
+        return
+      }
+
+
+      newLeagueName.value =
+        ''
+
+
+      if (
+        data.league
+          ?.league_status
         === 'active'
-    ) {
+      ) {
+
+        showMessage(
+          'Lega creata e attivata.',
+          'success'
+        )
+
+      } else {
+
+        showMessage(
+          'Richiesta di creazione inviata al Super Admin.',
+          'success'
+        )
+      }
+
+
+      await loadHome()
+
+
+    } catch (error) {
+
+      console.error(error)
+
 
       showMessage(
-        'Lega creata e attivata.',
-        'success'
+        error.message ||
+        'Errore durante la creazione.',
+        'error'
       )
 
-    } else {
+    } finally {
 
-      showMessage(
-        'Richiesta di creazione inviata al Super Admin.',
-        'success'
-      )
+      button.disabled =
+        false
+
+      button.textContent =
+        originalText
     }
-
-
-    await loadHome()
   }
 )
 
 
 /* =========================================================
-   HOME
+   CARICAMENTO HOME
    ========================================================= */
 
 async function loadHome() {
 
-  const data =
-    await callApi({
-      action:
-        'getLeagueHome'
-    })
+  try {
+
+    const data =
+      await callApi({
+        action:
+          'getLeagueHome'
+      })
 
 
-  if (!data?.ok) {
+    if (!data?.ok) {
 
-    showMessage(
-      data?.error ||
-      'Impossibile caricare le leghe.',
-      'error'
+      showMessage(
+        data?.error ||
+        'Impossibile caricare le leghe.',
+        'error'
+      )
+
+      return
+    }
+
+
+    renderMemberships(
+      data.memberships || []
     )
 
-    return
-  }
+
+    /*
+     * Mostra "Unisciti"
+     * solo se l'utente può utilizzare
+     * un'altra lega.
+     */
+
+    joinSection.hidden =
+      !data.permissions
+        .canUseAnotherLeague
 
 
-  renderMemberships(
-    data.memberships || []
-  )
+    /*
+     * Mostra "Crea"
+     * solo quando la creazione
+     * è consentita.
+     */
+
+    createSection.hidden =
+      !data.permissions
+        .canCreateLeague
 
 
-  /*
-   * Può entrare in un'ulteriore
-   * lega?
-   */
+    if (
+      data.user.isSuperAdmin
+    ) {
 
-  joinSection.hidden =
-    !data.permissions
-      .canUseAnotherLeague
+      createDescription.textContent =
+        'Come Super Admin, la nuova lega sarà attiva immediatamente.'
 
+    } else {
 
-  /*
-   * Può crearne una?
-   */
-
-  createSection.hidden =
-    !data.permissions
-      .canCreateLeague
+      createDescription.textContent =
+        'La nuova lega dovrà essere approvata dal Super Admin.'
+    }
 
 
-  if (
-    data.user.isSuperAdmin
-  ) {
+  } catch (error) {
 
-    createDescription.textContent =
-      'Come Super Admin, la nuova lega sarà attiva immediatamente.'
+    console.error(error)
 
-  } else {
 
-    createDescription.textContent =
-      'La nuova lega dovrà essere approvata dal Super Admin.'
+    showMessage(
+      error.message ||
+      'Errore durante il caricamento.',
+      'error'
+    )
   }
 }
 
+
+/* =========================================================
+   START
+   ========================================================= */
 
 loadHome()
