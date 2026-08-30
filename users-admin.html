@@ -13,44 +13,71 @@
 
   <link
     rel="stylesheet"
-    href="style.css?v=7"
+    href="style.css?v=9"
   >
 </head>
 
-
 <body>
 
-  <main class="admin-page">
+  <main class="page-shell">
 
-    <header class="admin-header">
+    <header class="page-header">
 
       <div>
-        <h1>Gestione Utenti</h1>
+        <h1>Utenti</h1>
         <p>Account registrati nell'app</p>
       </div>
 
-      <a href="index.html">
+      <a
+        class="back-home"
+        href="index.html"
+      >
         ← Home
       </a>
 
     </header>
 
 
-    <nav class="admin-nav">
+    <nav class="tabs">
 
-      <a href="setup-global.html">
-        Setup Globale
+      <a
+        href="setup-global.html"
+        class="tab"
+      >
+        <span class="tab-title">
+          Configurazione
+        </span>
+
+        <span class="tab-description">
+          Impostazioni generali
+        </span>
       </a>
+
 
       <a
         href="users-admin.html"
-        class="active"
+        class="tab active"
       >
-        Utenti
+        <span class="tab-title">
+          Utenti
+        </span>
+
+        <span class="tab-description">
+          Account e privilegi
+        </span>
       </a>
 
-      <span class="admin-nav-disabled">
-        Leghe
+
+      <span class="tab disabled">
+
+        <span class="tab-title">
+          Leghe
+        </span>
+
+        <span class="tab-description">
+          Prossimamente
+        </span>
+
       </span>
 
     </nav>
@@ -58,25 +85,45 @@
 
     <p
       id="admin-message"
+      class="message"
       aria-live="polite"
     ></p>
 
 
-    <section>
+    <section class="card">
 
-      <div class="users-toolbar">
+      <div class="section-heading">
+
+        <span class="section-label">
+          USER
+        </span>
+
+        <div>
+          <h2>Account registrati</h2>
+
+          <p>
+            Seleziona un utente per visualizzare
+            e modificare le impostazioni
+          </p>
+        </div>
+
+      </div>
+
+
+      <div class="toolbar">
 
         <input
           id="user-search"
           type="search"
           placeholder="Cerca username..."
+          autocomplete="off"
         >
 
 
         <select id="user-filter">
 
           <option value="all">
-            Tutti gli utenti
+            Tutti
           </option>
 
           <option value="active">
@@ -92,7 +139,7 @@
           </option>
 
           <option value="multileague">
-            Multi-lega effettivo
+            Multi-lega
           </option>
 
         </select>
@@ -116,7 +163,7 @@
   </main>
 
 
-  <script src="users-admin.js?v=1"></script>
+  <script src="users-admin.js?v=3"></script>
 
 </body>
 
