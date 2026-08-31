@@ -1,3 +1,116 @@
+come vedi le tendine si sovrappongono alle parti fisse, nascondendone una parte: questo non deve accadere.
+
+annulla ultima operazione riporta allo step dell'asta precedente, ma la chiamerei annulla ultima offerta.. prevederei anche un annulla ultima operazione che annulla l'ultima assegnazione ufficiale.
+
+nella gestione rose aggiungerei un'icona swap (frecce convergenti) per permettere un cambio squadra se sbagliata l'assegnazione (o con drag and drop)
+
+Corretto in tre punti.
+
+Ora nessuna tendina copre più le aree fisse: “Ultimi acquisti” entra realmente nel layout a sinistra, quindi aprendola restringe lo spazio disponibile senza sovrapporsi alla dashboard; “Rose” occupa invece una vera riga inferiore e, quando si apre, riduce verticalmente il cockpit senza coprire asta o console Banditore.
+
+Ho anche separato i due rollback:
+
+↶ ANNULLA ULTIMA OFFERTA: annulla esclusivamente l’ultimo rilancio/correzione e ripristina offerta e leader precedenti. Non può più annullare la chiamata e quindi non torna allo step precedente dell’asta.
+↶ ANNULLA ULTIMA ASSEGNAZIONE: annulla l’ultimo acquisto ufficiale ancora valido, restituisce i crediti alla squadra e rende nuovamente svincolato il giocatore. Non riapre il lotto precedente.
+
+Nella tendina Rose ho aggiunto anche ⇄: cliccandolo scegli la nuova squadra, viene mostrata una conferma e il prezzo resta invariato. Prima dello spostamento vengono comunque verificati crediti e vincoli rosa della squadra di destinazione.
+
+Aggiorna in questo ordine:
+
+Esegui questa nuova migration:
+
+auction-admin-tools-v2-migration.sql
+Ridistribuisci la Edge Function esistente auction-api usando:
+
+auction-api-v11.ts
+Sostituisci il tuo home.html con questo file, rinominandolo home.html:
+
+home-v4.html
+
+Ho verificato la sintassi del JavaScript inline e del TypeScript.
+
+auction-admin-tools-v2-migration.sql
+Codice
+auction-api-v11.ts
+Codice
+home-v4.html
+HTML
+oggi 22:02
+l'aggiornamento continuo sta interferendo con l'utilizzo della ricerca giocatori nel listone e sotto nel pannello di supporto, qui direi di disattivarlo e limitarlo nella parte di rilancio (o valuta come far si che si aggiorni automaticamente ad ogni rilancio per tutti gli user contemporaneamente)
+poi va riorganizzato il layout per ottimizzarne gli spazi (c'è un buco)
+la parte di chiamata in corso la terrei sopra tutto in orizzontale.
+implementa i colori dei ruoli:
+Por - Giallo
+B Dd Dc Ds - Verde
+E M C - Blu
+W T - Viola
+A Pc - Rosso
+
+Ho modificato soltanto il monolite frontend:
+
+Scarica home-v5.html
+
+Rinominalo in home.html. Non servono nuove migration né una nuova versione dell’API per questo passaggio.
+
+Le modifiche principali sono quattro.
+
+Refresh intelligente dell’asta: il browser continua a controllare il server circa ogni 0,65 s, quindi un rilancio effettuato da un altro utente viene visto quasi subito da tutti. Però la pagina viene ridisegnata solo se cambia davvero lo stato dell’asta: offerta, leader, giocatore, turno, assegnazione, ecc. Se non cambia nulla, il DOM non viene toccato. Questo dovrebbe eliminare il problema della ricerca che perde focus o si resetta continuamente.
+Ho eliminato anche l’auto-refresh periodico della pagina Listone: ricerca, filtri e posizione di scroll restano stabili.
+Se durante un vero aggiornamento server stai scrivendo in un campo dell’asta, provo anche a ripristinare focus e posizione del cursore dopo il refresh.
+
+Ho inoltre riorganizzato la schermata come richiesto. La parte di chiamata/giocatore corrente ora è una fascia orizzontale sopra tutto:
+
+┌─────────────────────────────────────────────────────────────────┐
+│ ← LEGA     LIVE · TURNO                              CHIAMATA   │
+├───────────────────────────────┬─────────────────────────────────┤
+│ GIOCATORE / TURNO DI CHIAMATA │ CHIAMA / +1 +2 +3 +5 +10      │
+│ nome, ruolo, squadra, Q       │ base / conferma                │
+├───────────────┬───────────────┬─────────────────────────────────┤
+│ MIA SQUADRA   │ ATTIVITÀ ASTA │ SVINCOLATI                      │
+│ crediti       │ ultimi rilanci│ ricerca + filtri               │
+│ max bid       │ Vice          │ lista con scroll               │
+│ rosa          │               │                                 │
+├───────────────┴───────────────┴─────────────────────────────────┤
+│ BANDITORE / ADMIN                                               │
+└─────────────────────────────────────────────────────────────────┘
+│                         ROSE ▲                                  │
+
+In questo modo il grosso spazio vuoto centrale dovrebbe sparire: sotto la fascia dell’asta, la viewport restante viene consumata da dashboard squadra + attività + Svincolati.
+
+Ho implementato anche i colori ruolo, sia nei badge dei giocatori sia nei pulsanti filtro:
+
+P / Por → giallo
+D / B / Dd / Dc / Ds → verde
+E / M / C → blu
+W / T → viola
+A / Pc → rosso
+
+ALL rimane nel blu principale dell’app. Ho incluso anche P e D per mantenere coerente la modalità Classic oltre alla Mantra.
+
+La sintassi del JavaScript inline è stata verificata. 
+
+home-v5.html
+HTML
+occhio che P e D devono vedersi solo se è attiva la modalità classic (rimuovendo i ruoli esclusivi del mantra in quel caso)
+
+Corretto.
+
+Scarica home-v6.html
+
+Ora la logica è netta:
+
+Classic: P · D · C · A
+Mantra: Por · B · Dc · Dd · Ds · E · M · C · W · T · A · Pc
+
+Quindi:
+
+P e D non compaiono più in Mantra;
+i ruoli esclusivi Mantra non compaiono in Classic;
+C e A restano in entrambe perché condivisi;
+se in Mantra un portiere dovesse eccezionalmente avere solo classic_role = P, viene mostrato come Por, non come P.
+
+Nessuna modifica ad API o DB. 
+
 <!doctype html>
 <html lang="it">
 <head>
@@ -2229,6 +2342,330 @@
       }
     }
 
+
+    /* =====================================================
+       ASTA COCKPIT V5
+       Layout:
+       1) lotto/chiamata orizzontale sopra tutto
+       2) dashboard + attività + svincolati sotto
+       3) console Banditore
+       4) rose
+       ===================================================== */
+
+    .auction-cockpit-stage{
+      display:grid!important;
+      grid-template-rows:auto minmax(0,1fr)!important;
+      gap:5px;
+      min-height:0;
+      overflow:hidden;
+    }
+
+    .auction-lot-horizontal{
+      min-width:0;
+      display:grid;
+      grid-template-columns:minmax(0,1.15fr) minmax(430px,.85fr);
+      gap:5px;
+      align-items:stretch;
+    }
+
+    .auction-lot-horizontal .auction-player-hero{
+      min-height:104px;
+      height:100%;
+      padding:8px 11px;
+    }
+
+    .auction-lot-horizontal .auction-player-name-live{
+      font-size:clamp(27px,3.1vw,44px);
+    }
+
+    .auction-lot-horizontal .auction-current-offer{
+      min-width:132px;
+    }
+
+    .auction-lot-horizontal .auction-current-offer strong{
+      font-size:clamp(36px,4.2vw,54px);
+    }
+
+    .auction-lot-horizontal .auction-action-card{
+      height:100%;
+      min-height:104px;
+      display:grid;
+      align-content:center;
+    }
+
+    .auction-lot-horizontal .auction-action-head{
+      margin-bottom:4px;
+    }
+
+    .auction-lot-horizontal .quick-btn{
+      min-height:38px;
+    }
+
+    .auction-lot-horizontal .auction-call-preview{
+      min-height:42px;
+    }
+
+    .auction-lower-stage{
+      height:100%;
+      min-height:0;
+      display:grid;
+      grid-template-columns:auto minmax(0,1fr);
+      gap:5px;
+      overflow:hidden;
+    }
+
+    .auction-lower-main{
+      min-width:0;
+      min-height:0;
+      height:100%;
+      display:grid;
+      grid-template-columns:
+        minmax(235px,26%)
+        minmax(185px,1fr)
+        minmax(470px,43%);
+      gap:5px;
+      overflow:hidden;
+    }
+
+    .auction-lower-main .auction-team-column{
+      min-height:0;
+      height:100%;
+    }
+
+    .auction-middle-column{
+      min-width:0;
+      min-height:0;
+      height:100%;
+      display:grid;
+      grid-template-rows:auto minmax(0,1fr);
+      gap:5px;
+      overflow:hidden;
+    }
+
+    .auction-middle-column .auction-bid-history{
+      height:100%;
+      min-height:0;
+      display:grid;
+      grid-template-rows:auto minmax(0,1fr);
+      align-content:start;
+    }
+
+    .auction-middle-column .auction-bid-chips{
+      min-height:0;
+      overflow:auto;
+      align-content:flex-start;
+    }
+
+    .auction-middle-column .auction-bid-chip{
+      width:100%;
+      justify-content:space-between;
+    }
+
+    .auction-middle-column .auction-vice-strip:empty{
+      display:none;
+    }
+
+    .auction-free-fixed{
+      height:100%;
+      min-height:0;
+    }
+
+    /* console più densa: niente fascia vuota enorme */
+    .auctioneer-console{
+      max-height:190px!important;
+      padding:5px 7px;
+    }
+
+    .auctioneer-console-head{
+      margin-bottom:3px;
+    }
+
+    .auctioneer-idle{
+      min-height:23px;
+    }
+
+    .auctioneer-manual-award{
+      margin-top:3px;
+      padding-top:4px;
+    }
+
+
+    /* =====================================================
+       COLORI RUOLI
+       P/D vengono renderizzati solo in Classic.
+       I ruoli esclusivi Mantra vengono renderizzati solo in Mantra.
+       ===================================================== */
+
+    .rolebadge[data-role="P"],
+    .rolebadge[data-role="Por"],
+    .rolebadge[data-role="POR"],
+    .rolebtn[data-role="P"],
+    .rolebtn[data-role="Por"],
+    .rolebtn[data-role="POR"],
+    .auction-role-summary[data-role="P"],
+    .auction-role-summary[data-role="Por"],
+    .auction-role-summary[data-role="POR"]{
+      background:#f0c541!important;
+      border-color:#f6d86b!important;
+      color:#241d00!important;
+    }
+
+    .rolebadge[data-role="D"],
+    .rolebadge[data-role="B"],
+    .rolebadge[data-role="Dd"],
+    .rolebadge[data-role="Dc"],
+    .rolebadge[data-role="Ds"],
+    .rolebtn[data-role="D"],
+    .rolebtn[data-role="B"],
+    .rolebtn[data-role="Dd"],
+    .rolebtn[data-role="Dc"],
+    .rolebtn[data-role="Ds"],
+    .auction-role-summary[data-role="D"],
+    .auction-role-summary[data-role="B"],
+    .auction-role-summary[data-role="Dd"],
+    .auction-role-summary[data-role="Dc"],
+    .auction-role-summary[data-role="Ds"]{
+      background:#2f9b5f!important;
+      border-color:#49ba79!important;
+      color:#f4fff8!important;
+    }
+
+    .rolebadge[data-role="E"],
+    .rolebadge[data-role="M"],
+    .rolebadge[data-role="C"],
+    .rolebtn[data-role="E"],
+    .rolebtn[data-role="M"],
+    .rolebtn[data-role="C"],
+    .auction-role-summary[data-role="E"],
+    .auction-role-summary[data-role="M"],
+    .auction-role-summary[data-role="C"],
+    .auction-role-summary[data-role="MOV"]{
+      background:#3176d5!important;
+      border-color:#5795e7!important;
+      color:#f7fbff!important;
+    }
+
+    .rolebadge[data-role="W"],
+    .rolebadge[data-role="T"],
+    .rolebtn[data-role="W"],
+    .rolebtn[data-role="T"],
+    .auction-role-summary[data-role="W"],
+    .auction-role-summary[data-role="T"]{
+      background:#7555c7!important;
+      border-color:#9779e0!important;
+      color:#fff!important;
+    }
+
+    .rolebadge[data-role="A"],
+    .rolebadge[data-role="Pc"],
+    .rolebtn[data-role="A"],
+    .rolebtn[data-role="Pc"],
+    .auction-role-summary[data-role="A"],
+    .auction-role-summary[data-role="Pc"]{
+      background:#cf4658!important;
+      border-color:#e76778!important;
+      color:#fff!important;
+    }
+
+    .rolebtn[data-role]:not([data-role="all"]){
+      opacity:.76;
+    }
+
+    .rolebtn[data-role].active{
+      opacity:1;
+      box-shadow:
+        0 0 0 2px rgba(255,255,255,.20),
+        0 3px 10px rgba(0,0,0,.22);
+      transform:translateY(-1px);
+    }
+
+    .rolebtn[data-role="all"]{
+      background:var(--primary)!important;
+      border-color:#67a1ff!important;
+      color:#fff!important;
+    }
+
+
+    /* =====================================================
+       RESPONSIVE V5
+       ===================================================== */
+
+    @media(max-width:1250px){
+      .auction-lot-horizontal{
+        grid-template-columns:minmax(0,1fr) minmax(380px,.9fr);
+      }
+
+      .auction-lower-main{
+        grid-template-columns:
+          minmax(215px,25%)
+          minmax(165px,.75fr)
+          minmax(390px,45%);
+      }
+
+      .auction-free-fixed .drawer-filters{
+        grid-template-columns:1fr 1fr;
+      }
+    }
+
+    @media(max-width:900px){
+      .auction-cockpit-stage{
+        overflow:auto!important;
+        overscroll-behavior:contain;
+      }
+
+      .auction-lot-horizontal{
+        grid-template-columns:1fr;
+      }
+
+      .auction-lower-stage{
+        min-height:520px;
+      }
+
+      .auction-lower-main{
+        grid-template-columns:minmax(0,1fr) minmax(210px,43vw);
+        grid-template-rows:auto minmax(280px,1fr);
+        overflow:visible;
+      }
+
+      .auction-lower-main .auction-team-column{
+        grid-column:1;
+        grid-row:1;
+      }
+
+      .auction-middle-column{
+        grid-column:1;
+        grid-row:2;
+        min-height:260px;
+      }
+
+      .auction-free-fixed{
+        grid-column:2;
+        grid-row:1 / 3;
+      }
+
+      .auction-team-roster{
+        display:none;
+      }
+    }
+
+    @media(max-width:560px){
+      .auction-lower-main{
+        grid-template-columns:minmax(0,1fr) minmax(145px,46vw);
+      }
+
+      .auction-lot-horizontal .auction-player-name-live{
+        font-size:25px;
+      }
+
+      .auction-lot-horizontal .auction-current-offer{
+        min-width:100px;
+      }
+
+      .auction-lot-horizontal .auction-current-offer strong{
+        font-size:36px;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -2582,6 +3019,10 @@
       auctionSelectedPlayerId: null,
       auctionBidSelection: null,
       auctionBidSelectionKey: '',
+
+      auctionRenderSignature: '',
+      auctionRosterSignature: '',
+
       lastAuctionFetchAt: 0,
       serverOffsetMs: 0
     };
@@ -3248,13 +3689,35 @@
     }
 
     function playerRoles(player, mode = fantasyMode()) {
-      if (mode === 'classic') return player.classic_role ? [player.classic_role] : [];
-      const roles = Array.isArray(player.mantra_roles) ? player.mantra_roles.filter(Boolean) : [];
-      return roles.length ? roles : (player.classic_role ? [player.classic_role] : []);
+      if (mode === 'classic') {
+        return player.classic_role
+          ? [player.classic_role]
+          : [];
+      }
+
+      const roles = Array.isArray(player.mantra_roles)
+        ? player.mantra_roles.filter(Boolean)
+        : [];
+
+      /*
+       * In modalità Mantra mostriamo esclusivamente ruoli Mantra.
+       * P e D sono sigle Classic e non devono comparire.
+       * Se per un portiere manca eccezionalmente mantra_roles,
+       * normalizziamo il solo P Classic in Por.
+       */
+      if (roles.length) {
+        return roles.filter(role => !['P', 'D'].includes(role));
+      }
+
+      return player.classic_role === 'P'
+        ? ['Por']
+        : [];
     }
 
     function roleOrder(mode = fantasyMode()) {
-      return mode === 'classic' ? ['P','D','C','A'] : ['P','Por','B','Dc','Dd','Ds','E','M','C','W','T','A','Pc'];
+      return mode === 'classic'
+        ? ['P', 'D', 'C', 'A']
+        : ['Por', 'B', 'Dc', 'Dd', 'Ds', 'E', 'M', 'C', 'W', 'T', 'A', 'Pc'];
     }
 
     function flagEmoji(iso2) {
@@ -3367,7 +3830,7 @@
       const delta = Number(player.pfc_pma_delta);
       return `
         <tr class="${extraClass}" data-player-id="${esc(player.id)}">
-          <td><div class="player-main">${roles.map(role=>`<span class="rolebadge">${esc(role)}</span>`).join('')}<span class="player-name">${esc(player.name)}</span>${flagEmoji(player.nationality_iso2) ? `<span>${flagEmoji(player.nationality_iso2)}</span>` : ''}</div></td>
+          <td><div class="player-main">${roles.map(role=>`<span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>`).join('')}<span class="player-name">${esc(player.name)}</span>${flagEmoji(player.nationality_iso2) ? `<span>${flagEmoji(player.nationality_iso2)}</span>` : ''}</div></td>
           <td>${esc(player.serie_a_team || '—')}</td>
           <td class="num">${esc(player.slot ?? '—')}</td>
           <td class="num">${formatNumber(player.pma)}</td>
@@ -3839,7 +4302,10 @@
       const rolesHtml =
         info.roleBadges
           .map(role => `
-            <span class="badge">
+            <span
+              class="badge auction-role-summary"
+              data-role="${esc(role.label)}"
+            >
               ${esc(role.label)}
               ${role.count}${role.limit ? `/${role.limit}` : ''}
             </span>
@@ -4647,23 +5113,288 @@
     }
 
 
-    async function loadAuction({ quiet = false } = {}) {
-      const data = await api(ENDPOINTS.auction, { action:'getLobby' }, { quiet });
-      if (!data?.ok) return;
-      state.auction = data;
+    function auctionDataSignature(data) {
+      const session =
+        data?.auctionSession
+        ||
+        null;
+
+      const awards =
+        (data?.recentAwards || [])
+          .slice(0, 25)
+          .map(item => [
+            item.id,
+            item.assignmentId,
+            item.team_id,
+            item.player_id,
+            item.price
+          ]);
+
+      const vice =
+        data?.viceSignal
+          ? [
+              data.viceSignal.id,
+              data.viceSignal.signal_type,
+              data.viceSignal.type,
+              data.viceSignal.amount,
+              data.viceSignal.updated_at,
+              data.viceSignal.created_at
+            ]
+          : null;
+
+      return JSON.stringify({
+        sessionId:
+          session?.id
+          ||
+          null,
+
+        status:
+          session?.status
+          ||
+          null,
+
+        version:
+          session?.version
+          ??
+          null,
+
+        player:
+          session?.current_player_id
+          ||
+          null,
+
+        nominationTeam:
+          session?.current_nomination_team_id
+          ||
+          null,
+
+        bid:
+          session?.current_bid
+          ??
+          null,
+
+        bidder:
+          session?.current_bidder_team_id
+          ||
+          null,
+
+        turn:
+          session?.current_turn_team_id
+          ||
+          null,
+
+        hold:
+          session?.hold_active
+          === true,
+
+        expired:
+          session?.timer_expired_at
+          ||
+          null,
+
+        awards,
+        vice
+      });
+    }
+
+
+    function auctionRosterDataSignature(data) {
+      return JSON.stringify(
+        (data?.recentAwards || [])
+          .slice(0, 25)
+          .map(item => [
+            item.assignmentId || item.id,
+            item.team_id,
+            item.player_id,
+            item.price
+          ])
+      );
+    }
+
+
+    function captureAuctionFocus() {
+      const active =
+        document.activeElement;
+
+      if (
+        !active
+        ||
+        !active.id
+        ||
+        !$('auction-root')
+          ?.contains(active)
+      ) {
+        return null;
+      }
+
+      const snapshot = {
+        id:
+          active.id,
+
+        start:
+          null,
+
+        end:
+          null
+      };
+
+      if (
+        typeof active.selectionStart
+        === 'number'
+      ) {
+        snapshot.start =
+          active.selectionStart;
+
+        snapshot.end =
+          active.selectionEnd;
+      }
+
+      return snapshot;
+    }
+
+
+    function restoreAuctionFocus(snapshot) {
+      if (!snapshot?.id) {
+        return;
+      }
+
+      const element =
+        $(snapshot.id);
+
+      if (!element) {
+        return;
+      }
+
+      try {
+        element.focus({
+          preventScroll:
+            true
+        });
+
+        if (
+          snapshot.start !== null
+          &&
+          typeof element.setSelectionRange
+          === 'function'
+        ) {
+          element.setSelectionRange(
+            snapshot.start,
+            snapshot.end
+          );
+        }
+      } catch {
+        // Ripristino focus non essenziale.
+      }
+    }
+
+
+    async function loadAuction({
+      quiet = false,
+      onlyIfChanged = false
+    } = {}) {
+
+      const data =
+        await api(
+          ENDPOINTS.auction,
+          {
+            action:
+              'getLobby'
+          },
+          {
+            quiet
+          }
+        );
+
+      if (!data?.ok) {
+        return;
+      }
+
+
+      const nextSignature =
+        auctionDataSignature(
+          data
+        );
+
+      const nextRosterSignature =
+        auctionRosterDataSignature(
+          data
+        );
+
+      const firstLoad =
+        !state.auctionRenderSignature;
+
+      const changed =
+        firstLoad
+        ||
+        nextSignature
+          !== state.auctionRenderSignature;
+
+      const rosterChanged =
+        firstLoad
+        ||
+        nextRosterSignature
+          !== state.auctionRosterSignature;
+
+
+      state.auction =
+        data;
+
 
       if (data.serverNow) {
         state.serverOffsetMs =
-          Date.parse(data.serverNow)
+          Date.parse(
+            data.serverNow
+          )
           -
           Date.now();
       }
 
-      await loadAuctionPersonalRoster(false);
+
+      /*
+       * Polling live:
+       * se sul server non è cambiata alcuna operazione
+       * NON tocchiamo il DOM. Ricerca, cursore, select e scroll
+       * restano quindi completamente stabili.
+       */
+      if (
+        onlyIfChanged
+        &&
+        !changed
+      ) {
+        return;
+      }
+
+
+      const focusSnapshot =
+        captureAuctionFocus();
+
+
+      if (rosterChanged) {
+        await loadAuctionPersonalRoster(
+          true
+        );
+      } else {
+        await loadAuctionPersonalRoster(
+          false
+        );
+      }
+
+
+      state.auctionRenderSignature =
+        nextSignature;
+
+      state.auctionRosterSignature =
+        nextRosterSignature;
+
 
       renderAuction();
       renderTv();
       updateHeader();
+
+
+      restoreAuctionFocus(
+        focusSnapshot
+      );
     }
 
     function auctionSession() { return state.auction?.auctionSession || null; }
@@ -5601,20 +6332,27 @@
 
           <div class="auction-cockpit-stage">
 
-            <div class="auction-cockpit-stage-grid">
+            <div class="auction-lot-horizontal">
+              ${playerHeroHtml}
+              ${actionHtml}
+            </div>
+
+
+            <div class="auction-lower-stage">
 
               ${renderAuctionAwardsDrawer()}
 
-              <div class="auction-president-grid">
+
+              <div class="auction-lower-main">
 
                 ${renderAuctionCockpitTeamPanel()}
 
-                <div class="auction-table-column">
-                  ${playerHeroHtml}
-                  ${actionHtml}
+
+                <div class="auction-middle-column">
                   ${viceHtml}
                   ${recentBidsHtml}
                 </div>
+
 
                 ${renderAuctionFixedFreeAgents(hasPlayer)}
 
@@ -6775,28 +7513,100 @@
     }
 
     setInterval(async()=>{
-      renderAuctionTimer();renderTvTimer();
-      if(document.hidden||refreshBusy)return;
+      renderAuctionTimer();
+      renderTvTimer();
+
+      if(
+        document.hidden
+        ||
+        refreshBusy
+      ){
+        return;
+      }
+
       try{
-        if((state.view==='auction'||state.view==='tv')&&auctionSession()?.status==='live'){
-          if(Date.now()-state.lastAuctionFetchAt>900){state.lastAuctionFetchAt=Date.now();await loadCurrentView(false)}
-          const s=auctionSession();
-          if(s?.timer_deadline && !s.hold_active && Date.parse(s.timer_deadline) <= Date.now()+state.serverOffsetMs){
-            try{await api(ENDPOINTS.auction,{action:'syncTimer',sessionId:s.id},{quiet:true})}catch{}
+        if(
+          (
+            state.view==='auction'
+            ||
+            state.view==='tv'
+          )
+          &&
+          auctionSession()?.status==='live'
+        ){
+          /*
+           * Controlliamo spesso il server per vedere rilanci/chiamate,
+           * ma loadAuction ridisegna la schermata SOLO se cambia
+           * session.version / offerta / lotto / assegnazioni.
+           *
+           * Risultato:
+           * - tutti vedono il rilancio entro ~0,7 s
+           * - nessun refresh DOM continuo mentre si cerca un giocatore
+           */
+          if(
+            Date.now()
+            -
+            state.lastAuctionFetchAt
+            >
+            650
+          ){
+            state.lastAuctionFetchAt=
+              Date.now();
+
+            refreshBusy=true;
+
+            try{
+              await loadAuction({
+                quiet:true,
+                onlyIfChanged:true
+              });
+            }finally{
+              refreshBusy=false;
+            }
+          }
+
+          const s=
+            auctionSession();
+
+          if(
+            s?.timer_deadline
+            &&
+            !s.hold_active
+            &&
+            Date.parse(s.timer_deadline)
+              <=
+              Date.now()
+              +
+              state.serverOffsetMs
+          ){
+            try{
+              await api(
+                ENDPOINTS.auction,
+                {
+                  action:'syncTimer',
+                  sessionId:s.id
+                },
+                {
+                  quiet:true
+                }
+              );
+            }catch{}
           }
         }
-      }catch(error){console.error(error)}
-    },250);
+      }catch(error){
+        console.error(error);
+        refreshBusy=false;
+      }
+    },200);
 
     setInterval(()=>{
       if(document.hidden||refreshBusy)return;
       if(['home','manage','rosters'].includes(state.view))loadCurrentView(false);
     },5000);
 
-    setInterval(()=>{
-      if(document.hidden||refreshBusy)return;
-      if(state.view==='list')loadCurrentView(false);
-    },15000);
+    /* Il Listone non viene più ricaricato automaticamente:
+       filtri, ricerca e posizione di scroll restano stabili.
+       Resta disponibile il pulsante Aggiorna globale. */
 
     document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadCurrentView(true)});
     window.addEventListener('focus',()=>loadCurrentView(true));
@@ -6832,3 +7642,5 @@
   </script>
 </body>
 </html>
+home-v6.html
+HTML
