@@ -1,0 +1,1850 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Fantacalcio Live</title>
+
+  <style>
+    :root{
+      --bg:#061426;
+      --panel:#0c2442;
+      --panel2:#12345d;
+      --panel3:#173f70;
+      --line:#28598e;
+      --line2:#3977b5;
+      --text:#f5f8ff;
+      --soft:#9bb7da;
+      --muted:#6f91ba;
+      --primary:#3478f6;
+      --primary2:#2462d4;
+      --good:#1f6c58;
+      --warn:#81513a;
+      --danger:#84384d;
+      --shadow:0 14px 34px rgba(0,0,0,.24);
+      --r:10px;
+      --header-h:46px;
+      --nav-h:39px;
+      --gap:6px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;color-scheme:dark}
+    body{
+      overflow:hidden;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.25;
+    }
+
+    button,input,select,textarea{font:inherit}
+    button,a,input,select,summary{-webkit-tap-highlight-color:transparent}
+    [hidden]{display:none!important}
+
+    button,.btn{
+      min-height:32px;
+      border:1px solid transparent;
+      border-radius:7px;
+      padding:5px 9px;
+      background:var(--primary);
+      color:#fff;
+      font-weight:800;
+      font-size:11px;
+      cursor:pointer;
+    }
+    button:hover,.btn:hover{filter:brightness(1.08)}
+    button:disabled{opacity:.38;cursor:not-allowed;filter:none}
+    button.secondary,.btn.secondary{background:var(--panel3);border-color:var(--line);color:var(--text)}
+    button.danger{background:var(--danger)}
+    button.good{background:var(--good)}
+    button.warn{background:var(--warn)}
+
+    input,select,textarea{
+      width:100%;
+      min-height:32px;
+      border:1px solid var(--line);
+      border-radius:7px;
+      padding:5px 7px;
+      background:#0b2a4d;
+      color:var(--text);
+      outline:none;
+      font-size:11px;
+    }
+    input:focus,select:focus,textarea:focus{border-color:#6aa9ff}
+    input[type=checkbox]{width:18px;min-width:18px;height:18px;min-height:18px;padding:0}
+
+    .app{
+      height:100dvh;
+      display:grid;
+      grid-template-rows:var(--header-h) var(--nav-h) minmax(0,1fr);
+      gap:var(--gap);
+      padding:4px;
+    }
+
+    .app-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      min-width:0;
+      padding:5px 8px;
+      border:1px solid var(--line);
+      border-radius:var(--r);
+      background:var(--panel);
+    }
+    .brand-line{display:flex;align-items:center;gap:8px;min-width:0}
+    .brand{font-weight:900;font-size:16px;white-space:nowrap}
+    .league-pill{
+      display:flex;align-items:center;gap:6px;min-width:0;
+      padding:4px 7px;border:1px solid var(--line);border-radius:7px;background:var(--panel2);
+    }
+    .league-pill strong{max-width:40vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
+    .league-pill small{color:var(--soft);font-size:9px}
+    .head-actions{display:flex;align-items:center;gap:5px;flex:0 0 auto}
+    .user-label{color:var(--soft);font-size:9px}
+
+    .main-nav{
+      display:flex;
+      gap:4px;
+      min-width:0;
+      overflow-x:auto;
+      scrollbar-width:none;
+    }
+    .main-nav::-webkit-scrollbar{display:none}
+    .nav-btn{
+      flex:1 0 auto;
+      min-width:64px;
+      min-height:35px;
+      padding:5px 7px;
+      background:var(--panel);
+      border:1px solid var(--line);
+      color:var(--text);
+    }
+    .nav-btn.active{background:var(--primary);border-color:var(--primary)}
+
+    .workspace{
+      min-height:0;
+      overflow:hidden;
+      position:relative;
+    }
+
+    .view{
+      height:100%;
+      min-height:0;
+      display:none;
+      overflow:auto;
+      overscroll-behavior:contain;
+      padding:0;
+    }
+    .view.active{display:block}
+    .view.no-page-scroll{overflow:hidden}
+
+    .message{
+      position:fixed;
+      z-index:1000;
+      top:5px;
+      left:50%;
+      transform:translateX(-50%);
+      width:min(720px,calc(100% - 14px));
+      min-height:0;
+      padding:6px 9px;
+      border:1px solid var(--line2);
+      border-radius:7px;
+      background:rgba(6,20,38,.96);
+      box-shadow:var(--shadow);
+      font-size:11px;
+      text-align:center;
+    }
+    .message:empty{display:none}
+    .message.error{border-color:#c4526d;color:#ffc0cf}
+    .message.success{border-color:#3c9e7f;color:#c7ffe9}
+    .message.warning{border-color:#bb7b4a;color:#ffe0b7}
+
+    .panel{
+      border:1px solid var(--line);
+      border-radius:var(--r);
+      background:var(--panel);
+      padding:8px;
+      min-width:0;
+    }
+    .panel-title{
+      display:flex;align-items:center;justify-content:space-between;gap:8px;
+      margin-bottom:6px;
+    }
+    .panel-title h2,.panel-title h3{margin:0;font-size:14px;line-height:1.1}
+    .panel-title p{margin:1px 0 0;color:var(--soft);font-size:9px}
+
+    .grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+    .grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+    .grid-auto{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:6px}
+    .stack{display:grid;gap:5px}
+    .row{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+    .between{display:flex;align-items:center;justify-content:space-between;gap:7px}
+    .muted{color:var(--muted)}
+    .soft{color:var(--soft)}
+    .small{font-size:9px}
+
+    .badge{
+      display:inline-flex;align-items:center;justify-content:center;gap:3px;
+      min-height:18px;padding:2px 5px;border-radius:5px;background:var(--panel3);
+      color:#dceaff;font-size:8px;font-weight:900;white-space:nowrap;
+    }
+    .badge.good{background:var(--good);color:#d2fff0}
+    .badge.warn{background:var(--warn);color:#ffe0bc}
+    .badge.danger{background:var(--danger);color:#ffd2dc}
+    .badge.primary{background:var(--primary)}
+
+    .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:4px}
+    .kpi{
+      min-height:34px;padding:5px 7px;border:1px solid var(--line);border-radius:7px;background:var(--panel2);
+      display:flex;align-items:center;justify-content:space-between;gap:6px;
+    }
+    .kpi span{color:var(--muted);font-size:7px;text-transform:uppercase;letter-spacing:.04em}
+    .kpi strong{font-size:14px}
+
+    .compact-list{display:grid;gap:4px}
+    .compact-row{
+      min-height:35px;padding:5px 7px;border:1px solid var(--line);border-radius:7px;background:var(--panel2);
+      display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;align-items:center;
+    }
+    .compact-row strong{display:block;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .compact-row small{display:block;color:var(--soft);font-size:8px;margin-top:1px}
+
+    .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:5px}
+    label{display:grid;gap:3px;color:var(--soft);font-size:9px}
+    .check-line{display:flex;align-items:center;gap:5px;color:var(--text);font-size:10px}
+
+    /* LEGHE */
+    #view-leagues .league-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:6px}
+
+    /* HOME */
+    .home-layout{display:grid;grid-template-columns:1.2fr .8fr;gap:6px;height:100%;min-height:0}
+    .home-col{display:grid;grid-template-rows:auto minmax(0,1fr);gap:6px;min-height:0}
+    .inner-scroll{min-height:0;overflow:auto;overscroll-behavior:contain}
+
+    /* GESTIONE */
+    .manage-layout{display:grid;grid-template-columns:1fr 1fr;gap:6px;height:100%;min-height:0}
+    .manage-layout .panel{display:flex;flex-direction:column;min-height:0}
+
+    /* SETUP */
+    .setup-layout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+    .setup-layout .full{grid-column:1/-1}
+    .field-band{padding:6px;border:1px solid var(--line);border-radius:7px;background:var(--panel2)}
+
+    /* LISTONE */
+    .list-view-layout{height:100%;display:grid;grid-template-rows:auto auto minmax(0,1fr);gap:5px;min-height:0}
+    .filters{display:grid;grid-template-columns:minmax(180px,1fr) 150px 110px 150px auto;gap:4px;align-items:end}
+    .rolebar{display:flex;gap:3px;flex-wrap:wrap}
+    .rolebtn{min-width:31px;min-height:27px;padding:3px 5px;background:var(--panel2);border-color:var(--line);font-size:9px}
+    .rolebtn.active{background:var(--primary);border-color:var(--primary)}
+    .table-wrap{min-height:0;overflow:auto;border:1px solid var(--line);border-radius:7px;background:var(--panel)}
+    table{width:100%;border-collapse:separate;border-spacing:0;font-size:9px}
+    th{position:sticky;top:0;z-index:2;background:#0b2b50;border-bottom:1px solid var(--line2);text-align:left;white-space:nowrap}
+    th button{width:100%;min-height:27px;border:0;border-radius:0;background:transparent;color:var(--soft);padding:4px 6px;text-align:left;font-size:8px}
+    td{height:31px;padding:3px 6px;border-bottom:1px solid rgba(40,89,142,.55);white-space:nowrap}
+    tbody tr{cursor:pointer}
+    tbody tr:hover{background:#103663}
+    .player-main{display:flex;align-items:center;gap:4px;min-width:230px}
+    .player-name{font-size:10px;font-weight:850}
+    .rolebadge{display:inline-flex;min-width:22px;height:18px;align-items:center;justify-content:center;padding:1px 4px;border-radius:4px;background:#17487e;font-size:7px;font-weight:900}
+    .num{text-align:right;font-variant-numeric:tabular-nums}
+    .positive{color:#83e7bb}.negative{color:#ff9aac}
+
+    /* ROSE */
+    .rosters-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+    details.team-card{border:1px solid var(--line);border-radius:8px;background:var(--panel);overflow:hidden}
+    details.team-card summary{list-style:none;cursor:pointer;padding:6px 8px;background:var(--panel2);display:flex;align-items:center;justify-content:space-between;gap:6px}
+    details.team-card summary::-webkit-details-marker{display:none}
+    .roster-body{padding:5px;display:grid;gap:3px}
+    .roster-player{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px;align-items:center;padding:4px 6px;border:1px solid rgba(40,89,142,.55);border-radius:6px}
+
+    /* ASTA */
+    #view-auction{overflow:hidden}
+    .auction-lobby{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);gap:6px;min-height:0}
+    .auction-lobby-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;min-height:0}
+    .auction-lobby-grid .panel{min-height:0;display:flex;flex-direction:column}
+    .team-order{display:grid;gap:3px}
+    .order-row{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:4px;align-items:center;padding:4px 6px;background:var(--panel2);border:1px solid var(--line);border-radius:6px}
+
+    .auction-live-shell{height:100%;min-height:0;overflow:hidden;position:relative}
+    .live-top{
+      display:grid;grid-template-columns:minmax(0,1.25fr) minmax(260px,.75fr);gap:6px;height:100%;min-height:0
+    }
+    .live-left,.live-right{min-height:0;display:grid;gap:6px;align-content:start;overflow:auto;overscroll-behavior:contain}
+    .current-player{padding:8px;border:1px solid var(--line2);border-radius:10px;background:linear-gradient(135deg,#12345d,#0c2442)}
+    .current-player h2{margin:0;font-size:23px;line-height:1}
+    .current-player .meta{margin-top:4px;color:var(--soft);font-size:9px}
+    .bid-hero{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:7px}
+    .bid-amount{font-size:27px;font-weight:950}
+    .quick-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+    .quick-btn{min-height:45px;display:grid;place-items:center;gap:0;background:var(--panel2);border-color:var(--line)}
+    .quick-btn span{font-size:8px;color:var(--soft)}
+    .quick-btn strong{font-size:15px}.quick-btn.selected{background:var(--primary);border-color:var(--primary)}
+    .auction-team-buttons{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:4px}
+
+    .call-stage{height:100%;min-height:0;position:relative;overflow:hidden}
+    .call-main{height:100%;min-height:0;padding-right:min(50vw,760px);transition:padding-right .12s ease}
+    .call-stage:has(.free-drawer:not([open])) .call-main{padding-right:42px}
+    .call-card{width:min(470px,100%);display:grid;gap:6px}
+
+    details.free-drawer{
+      position:absolute;right:0;top:0;bottom:0;width:min(50vw,760px);min-width:360px;
+      border:1px solid var(--line2);border-radius:9px;background:var(--panel);box-shadow:var(--shadow);overflow:hidden;
+    }
+    details.free-drawer:not([open]){width:36px;min-width:36px;box-shadow:none}
+    details.free-drawer>summary{
+      position:absolute;left:0;top:0;bottom:0;width:36px;list-style:none;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;background:#1d4779;border-right:1px solid var(--line2);
+      writing-mode:vertical-rl;text-orientation:mixed;font-size:8px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;z-index:4;
+    }
+    details.free-drawer>summary::-webkit-details-marker{display:none}
+    details.free-drawer:not([open])>*:not(summary){display:none!important}
+    .drawer-content{height:100%;min-height:0;margin-left:36px;padding:5px;display:grid;grid-template-rows:auto auto minmax(0,1fr);gap:4px}
+    .drawer-filters{display:grid;grid-template-columns:minmax(130px,1fr) 120px 90px;gap:4px}
+    .drawer-table{min-height:0;overflow:auto;border:1px solid var(--line);border-radius:6px}
+    .selected-call{padding:6px;border:1px solid var(--line);border-radius:7px;background:var(--panel2)}
+
+    /* TV */
+    .tv-shell{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);gap:6px;min-height:0}
+    .tv-stage{display:grid;grid-template-columns:1.2fr .8fr;gap:6px;min-height:0}
+    .tv-player{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;background:linear-gradient(150deg,#12345d,#071a31);border:1px solid var(--line2);border-radius:12px;min-height:0}
+    .tv-player h1{margin:0;font-size:clamp(34px,7vw,88px);line-height:.95}
+    .tv-player .tv-bid{font-size:clamp(50px,9vw,120px);font-weight:950;line-height:.9;margin-top:18px}
+    .tv-side{min-height:0;overflow:auto}
+
+    body.auction-live .app{grid-template-rows:minmax(0,1fr);padding:3px}
+    body.auction-live .app-head,body.auction-live .main-nav{display:none}
+    body.auction-live .workspace{height:100%}
+    body.auction-live #view-auction{display:block!important;height:100%}
+
+    @media(max-width:850px){
+      :root{--header-h:42px;--nav-h:35px}
+      .app{padding:3px;gap:3px}
+      .brand{font-size:13px}.league-pill small,.user-label{display:none}.league-pill strong{max-width:45vw}
+      .nav-btn{min-width:57px;min-height:32px;padding:4px 6px;font-size:10px}
+      .grid-2,.grid-3,.home-layout,.manage-layout,.setup-layout,.auction-lobby-grid,.rosters-grid,.tv-stage{grid-template-columns:1fr}
+      .home-layout,.manage-layout{height:auto}
+      .view{overflow:auto}
+      .filters{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .filters label:first-child{grid-column:1/-1}
+      .table-wrap{min-height:50dvh}
+      .live-top{grid-template-columns:1fr;height:auto}.live-left,.live-right{overflow:visible}
+      #view-auction{overflow:auto}
+      body.auction-live #view-auction{overflow:hidden}
+      body.auction-live .live-top{height:100%;overflow:auto}
+      .call-main{padding-right:40px}
+      .call-stage:has(.free-drawer[open]) .call-main{padding-right:40px}
+      details.free-drawer{width:min(94vw,560px);min-width:0;z-index:20}
+      details.free-drawer:not([open]){width:36px}
+      .drawer-filters{grid-template-columns:1fr 1fr}
+      .drawer-filters label:first-child{grid-column:1/-1}
+      .auction-team-buttons{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .quick-btn{min-height:41px;padding:3px}
+    }
+
+    @media(max-width:430px){
+      .head-actions .secondary:not(#league-switch-btn){display:none}
+      .panel{padding:6px}.panel-title{margin-bottom:4px}
+      .panel-title h2,.panel-title h3{font-size:13px}
+      .filters{grid-template-columns:1fr 1fr}
+      .rosters-grid{grid-template-columns:1fr}
+      .quick-grid{gap:3px}.quick-btn strong{font-size:13px}
+    }
+  </style>
+</head>
+<body>
+  <div id="global-message" class="message" aria-live="polite"></div>
+
+  <div class="app">
+    <header class="app-head">
+      <div class="brand-line">
+        <div class="brand">Fantacalcio Live</div>
+        <div id="league-pill" class="league-pill" hidden>
+          <strong id="league-pill-name">—</strong>
+          <small id="league-pill-code">—</small>
+        </div>
+      </div>
+
+      <div class="head-actions">
+        <span id="user-label" class="user-label"></span>
+        <button id="league-switch-btn" class="secondary" type="button">Leghe</button>
+        <button id="reload-btn" class="secondary" type="button">↻</button>
+        <button id="exit-btn" class="secondary" type="button">Login</button>
+      </div>
+    </header>
+
+    <nav id="main-nav" class="main-nav" hidden>
+      <button class="nav-btn active" data-view="home" type="button">Home</button>
+      <button class="nav-btn" data-view="manage" type="button">Membri</button>
+      <button id="nav-setup" class="nav-btn" data-view="setup" type="button">Setup</button>
+      <button class="nav-btn" data-view="list" type="button">Listone</button>
+      <button class="nav-btn" data-view="rosters" type="button">Rose</button>
+      <button class="nav-btn" data-view="auction" type="button">Asta</button>
+      <button id="nav-tv" class="nav-btn" data-view="tv" type="button">TV</button>
+    </nav>
+
+    <main class="workspace">
+
+      <!-- LEAGHE -->
+      <section id="view-leagues" class="view active">
+        <div class="grid-2">
+          <section class="panel">
+            <div class="panel-title">
+              <div><h2>Le mie leghe</h2><p>Seleziona la lega da gestire.</p></div>
+              <button id="leagues-refresh" class="secondary" type="button">Aggiorna</button>
+            </div>
+            <div id="my-leagues" class="league-grid"></div>
+          </section>
+
+          <div class="stack">
+            <section id="create-league-panel" class="panel">
+              <div class="panel-title"><div><h2>Crea lega</h2><p>Usa le regole globali già configurate.</p></div></div>
+              <form id="create-league-form" class="form-grid">
+                <label>Nome lega<input id="new-league-name" maxlength="60" required></label>
+                <div style="align-self:end"><button type="submit">Crea</button></div>
+              </form>
+            </section>
+
+            <section id="join-league-panel" class="panel">
+              <div class="panel-title"><div><h2>Entra in una lega</h2><p>Codice, ruoli e squadra nella stessa maschera.</p></div></div>
+
+              <div class="form-grid">
+                <label>Codice lega<input id="join-code" maxlength="20" autocomplete="off"></label>
+                <div style="align-self:end"><button id="join-preview-btn" type="button">Cerca</button></div>
+              </div>
+
+              <div id="join-preview" class="stack" hidden style="margin-top:6px">
+                <div class="between"><strong id="join-league-name">—</strong><span id="join-league-code" class="badge"></span></div>
+
+                <div class="row">
+                  <label class="check-line"><input id="join-president" type="checkbox" value="president"> Presidente</label>
+                  <label class="check-line"><input id="join-vice" type="checkbox" value="vice"> Vice</label>
+                  <label class="check-line"><input id="join-auctioneer" type="checkbox" value="auctioneer"> Banditore</label>
+                  <label class="check-line"><input id="join-presenter" type="checkbox" value="presenter"> Presentatore</label>
+                </div>
+
+                <div id="join-team-fields" class="form-grid" hidden>
+                  <label>Modalità squadra
+                    <select id="join-team-mode">
+                      <option value="existing">Squadra esistente</option>
+                      <option value="create">Crea nuova squadra</option>
+                    </select>
+                  </label>
+                  <label id="join-existing-wrap">Squadra<select id="join-team-id"></select></label>
+                  <label id="join-new-wrap" hidden>Nuova squadra<input id="join-new-team-name" maxlength="60"></label>
+                </div>
+
+                <button id="join-submit-btn" type="button">Invia richiesta</button>
+              </div>
+
+              <div id="my-join-requests" class="compact-list" style="margin-top:6px"></div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <!-- HOME -->
+      <section id="view-home" class="view">
+        <div class="home-layout">
+          <div class="home-col">
+            <div id="home-kpis" class="kpis"></div>
+            <section class="panel">
+              <div class="panel-title"><div><h2>Squadre</h2><p>Presenze e Presidenti.</p></div></div>
+              <div id="home-teams" class="compact-list inner-scroll"></div>
+            </section>
+          </div>
+
+          <div class="home-col">
+            <section class="panel">
+              <div class="panel-title"><div><h2>Il mio accesso</h2><p>Ruoli e squadra attivi.</p></div></div>
+              <div id="home-me" class="stack"></div>
+            </section>
+
+            <section id="pending-panel" class="panel">
+              <div class="panel-title"><div><h2>Richieste</h2><p>Aggiornamento automatico.</p></div><span id="pending-count" class="badge">0</span></div>
+              <div id="pending-list" class="compact-list inner-scroll"></div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <!-- MEMBRI / SQUADRE -->
+      <section id="view-manage" class="view">
+        <div class="manage-layout">
+          <section class="panel">
+            <div class="panel-title"><div><h2>Squadre</h2><p>Creazione e assegnazione Presidente.</p></div></div>
+            <form id="create-team-form" class="form-grid" style="margin-bottom:6px">
+              <label>Nuova squadra<input id="manage-new-team" maxlength="60"></label>
+              <div style="align-self:end"><button type="submit">Crea squadra</button></div>
+            </form>
+            <div id="manage-teams" class="compact-list inner-scroll"></div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-title"><div><h2>Membri</h2><p>Ruoli lega e appartenenza squadra.</p></div></div>
+            <div id="manage-members" class="compact-list inner-scroll"></div>
+          </section>
+        </div>
+
+        <section id="vice-requests-panel" class="panel" style="margin-top:6px">
+          <div class="panel-title"><div><h2>Richieste Vice</h2><p>Approvazione del Presidente.</p></div></div>
+          <div id="vice-requests" class="compact-list"></div>
+        </section>
+      </section>
+
+      <!-- SETUP -->
+      <section id="view-setup" class="view">
+        <form id="setup-form" class="setup-layout">
+          <section class="panel">
+            <div class="panel-title"><div><h2>Formato</h2><p>Modalità, crediti e numero squadre.</p></div></div>
+            <div class="form-grid">
+              <label>Modalità<select id="setup-fantasy-mode"><option value="classic">Classic</option><option value="mantra">Mantra</option></select></label>
+              <label>Crediti<input id="setup-credits" type="number" min="1"></label>
+              <label>Squadre<input id="setup-team-count" type="number" min="2"></label>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-title"><div><h2>Chiamata e rilanci</h2><p>Ordine, base e modalità bid.</p></div></div>
+            <div class="form-grid">
+              <label>Chiamata<select id="setup-nomination"><option value="call">Chiamata</option><option value="list">Lista</option><option value="random">Casuale</option></select></label>
+              <label>Base asta<select id="setup-base"><option value="free">Libera</option><option value="quotation">Quotazione</option></select></label>
+              <label>Rilanci<select id="setup-bid-mode"><option value="wild">Liberi</option><option value="turn">Turni</option></select></label>
+              <label>Direzione<select id="setup-turn-direction"><option value="clockwise">Orario</option><option value="counterclockwise">Antiorario</option></select></label>
+              <label>Ordina lista per<select id="setup-list-sort"><option value="alphabetical">Alfabetico</option><option value="quotation">Quotazione</option></select></label>
+              <label>Direzione lista<select id="setup-list-dir"><option value="asc">Crescente</option><option value="desc">Decrescente</option></select></label>
+            </div>
+          </section>
+
+          <section id="classic-setup" class="panel">
+            <div class="panel-title"><div><h2>Rosa Classic</h2></div></div>
+            <div class="form-grid">
+              <label>P<input id="setup-P" type="number" min="0"></label>
+              <label>D<input id="setup-D" type="number" min="0"></label>
+              <label>C<input id="setup-C" type="number" min="0"></label>
+              <label>A<input id="setup-A" type="number" min="0"></label>
+            </div>
+          </section>
+
+          <section id="mantra-setup" class="panel" hidden>
+            <div class="panel-title"><div><h2>Rosa Mantra</h2></div></div>
+            <div class="form-grid">
+              <label>Portieri min<input id="setup-gk-min" type="number" min="0"></label>
+              <label>Portieri max<input id="setup-gk-max" type="number" min="0"></label>
+              <label>Movimento min<input id="setup-out-min" type="number" min="0"></label>
+              <label>Movimento max<input id="setup-out-max" type="number" min="0"></label>
+              <label>Totale min<input id="setup-total-min" type="number" min="0"></label>
+              <label>Totale max<input id="setup-total-max" type="number" min="0"></label>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-title"><div><h2>UNDER</h2><p>Soglia anagrafica non ancora definita.</p></div></div>
+            <div class="form-grid">
+              <label class="check-line"><input id="setup-under" type="checkbox"> Regola UNDER attiva</label>
+              <label>Numero minimo<input id="setup-under-min" type="number" min="1"></label>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-title"><div><h2>Timer</h2></div></div>
+            <div class="form-grid">
+              <label>Modalità<select id="setup-timer-mode"><option value="dynamic">Dinamico</option><option value="fixed">Fisso</option></select></label>
+              <label>Secondi fissi<input id="setup-fixed-timer" type="number" min="1"></label>
+            </div>
+          </section>
+
+          <section class="panel full">
+            <div class="between">
+              <span class="small soft">Salvataggio server-side con le validazioni già presenti nell'API.</span>
+              <button id="setup-save-btn" type="submit">Salva Setup</button>
+            </div>
+          </section>
+        </form>
+      </section>
+
+      <!-- LISTONE -->
+      <section id="view-list" class="view no-page-scroll">
+        <div class="list-view-layout">
+          <section class="panel">
+            <div class="between">
+              <div><strong id="list-title">Listone</strong> <span id="list-total" class="badge">0</span></div>
+              <span id="list-import-info" class="small soft"></span>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div id="list-rolebar" class="rolebar"></div>
+            <div class="filters" style="margin-top:4px">
+              <label>Cerca<input id="list-search" type="search" placeholder="Nome o squadra..."></label>
+              <label>Squadra<select id="list-team"><option value="all">Tutte</option></select></label>
+              <label>Slot<select id="list-slot"><option value="all">Tutti</option></select></label>
+              <label>Segnalazioni<select id="list-flag"><option value="all">Tutte</option><option value="market">Mercato</option><option value="injury">Indisponibili</option><option value="new">Nuovi arrivi</option><option value="penalties">Rigoristi</option></select></label>
+              <button id="list-reset" class="secondary" type="button">Azzera</button>
+            </div>
+          </section>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th><button data-list-sort="name">Calciatore <span>↑</span></button></th>
+                <th><button data-list-sort="team">Squadra <span>↕</span></button></th>
+                <th><button data-list-sort="slot">Slot <span>↕</span></button></th>
+                <th><button data-list-sort="pma">PMA <span>↕</span></button></th>
+                <th><button data-list-sort="pfc">PFC <span>↕</span></button></th>
+                <th><button data-list-sort="delta">Δ <span>↕</span></button></th>
+                <th><button data-list-sort="fm">Exp.FM <span>↕</span></button></th>
+                <th><button data-list-sort="tit">Exp.Tit. <span>↕</span></button></th>
+              </tr></thead>
+              <tbody id="list-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ROSE -->
+      <section id="view-rosters" class="view">
+        <div id="roster-kpis" class="kpis" style="margin-bottom:6px"></div>
+        <div id="rosters-grid" class="rosters-grid"></div>
+      </section>
+
+      <!-- ASTA -->
+      <section id="view-auction" class="view no-page-scroll">
+        <div id="auction-root" class="auction-lobby"></div>
+      </section>
+
+      <!-- TV -->
+      <section id="view-tv" class="view no-page-scroll">
+        <div class="tv-shell">
+          <div class="between panel">
+            <div><strong>Presentazione</strong> <span id="tv-status-badge" class="badge"></span></div>
+            <button id="tv-fullscreen" class="secondary" type="button">Schermo intero</button>
+          </div>
+          <div class="tv-stage">
+            <div class="tv-player">
+              <h1 id="tv-player-name">In attesa</h1>
+              <div id="tv-player-meta" class="soft"></div>
+              <div id="tv-bid" class="tv-bid">—</div>
+              <div id="tv-leader" class="soft"></div>
+              <div id="tv-timer" style="font-size:30px;font-weight:900;margin-top:10px">—</div>
+            </div>
+            <section class="panel tv-side">
+              <div class="panel-title"><div><h2>Squadre</h2></div></div>
+              <div id="tv-teams" class="compact-list"></div>
+              <div class="panel-title" style="margin-top:8px"><div><h2>Ultimi rilanci</h2></div></div>
+              <div id="tv-bids" class="compact-list"></div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    'use strict';
+
+    /* =====================================================
+       CONFIG
+       ===================================================== */
+
+    const SUPABASE_URL = 'https://yyklmhzjxzkvycmxkegx.supabase.co';
+
+    const ENDPOINTS = {
+      leagues: `${SUPABASE_URL}/functions/v1/leagues-api`,
+      onboarding: `${SUPABASE_URL}/functions/v1/onboarding-api`,
+      league: `${SUPABASE_URL}/functions/v1/league-api`,
+      list: `${SUPABASE_URL}/functions/v1/list-api`,
+      rosters: `${SUPABASE_URL}/functions/v1/rosters-api`,
+      auction: `${SUPABASE_URL}/functions/v1/auction-api`
+    };
+
+    const state = {
+      session: null,
+      selectedLeague: null,
+      view: 'leagues',
+      dashboard: null,
+      management: null,
+      setup: null,
+      list: null,
+      rosters: null,
+      auction: null,
+      joinPreview: null,
+      loading: new Set(),
+      listRoles: new Set(['all']),
+      listSort: { key: 'name', direction: 'asc' },
+      auctionRoles: new Set(['all']),
+      auctionSelectedPlayerId: null,
+      auctionBidSelection: null,
+      auctionBidSelectionKey: '',
+      lastAuctionFetchAt: 0,
+      serverOffsetMs: 0
+    };
+
+    const $ = id => document.getElementById(id);
+
+    function getLocalJson(key) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function setLocalJson(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    function esc(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function msg(text = '', type = '') {
+      const box = $('global-message');
+      box.textContent = text;
+      box.className = `message ${type}`;
+
+      if (text) {
+        clearTimeout(msg.timer);
+        msg.timer = setTimeout(() => {
+          if (box.textContent === text) box.textContent = '';
+        }, type === 'error' ? 6500 : 3500);
+      }
+    }
+
+    function roleLabel(role) {
+      return ({
+        league_admin: 'Admin Lega',
+        auctioneer: 'Banditore',
+        presenter: 'Presentatore',
+        president: 'Presidente',
+        vice: 'Vice'
+      })[role] || role || '—';
+    }
+
+    async function api(endpoint, payload = {}, { league = true, quiet = false } = {}) {
+      if (!state.session?.token) {
+        window.location.href = 'index.html';
+        return null;
+      }
+
+      const body = {
+        ...payload,
+        sessionToken: state.session.token
+      };
+
+      if (league) {
+        if (!state.selectedLeague?.id) {
+          throw new Error('Nessuna lega selezionata.');
+        }
+        body.leagueId = state.selectedLeague.id;
+      }
+
+      let response;
+      try {
+        response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+      } catch {
+        throw new Error('Impossibile contattare il server.');
+      }
+
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        throw new Error('Risposta non valida dal server.');
+      }
+
+      if (response.status === 401) {
+        localStorage.removeItem('fantacalcio_session');
+        window.location.href = 'index.html';
+        return null;
+      }
+
+      if (!data?.ok && !quiet) {
+        const dbMessage = data?.dbError?.message ? ` · ${data.dbError.message}` : '';
+        throw new Error((data?.error || 'Operazione non riuscita.') + dbMessage);
+      }
+
+      return data;
+    }
+
+    /* =====================================================
+       NAVIGAZIONE / LEGA
+       ===================================================== */
+
+    function updateHeader() {
+      const league = state.selectedLeague;
+      $('league-pill').hidden = !league;
+      $('main-nav').hidden = !league;
+
+      if (league) {
+        $('league-pill-name').textContent = league.name || 'Lega';
+        $('league-pill-code').textContent = league.code || '';
+      }
+
+      const username = state.dashboard?.currentUser?.username;
+      $('user-label').textContent = username || '';
+
+      const permissions = state.dashboard?.permissions || state.auction?.permissions || {};
+      $('nav-setup').hidden = !(permissions.isLeagueAdmin || permissions.isSuperAdmin);
+      $('nav-tv').hidden = !(permissions.isPresenter || permissions.isLeagueAdmin || permissions.isAuctioneer || permissions.isSuperAdmin);
+    }
+
+    function switchView(view, { load = true } = {}) {
+      state.view = view;
+
+      document.querySelectorAll('.view').forEach(section => {
+        section.classList.toggle('active', section.id === `view-${view}`);
+      });
+
+      document.querySelectorAll('.nav-btn').forEach(button => {
+        button.classList.toggle('active', button.dataset.view === view);
+      });
+
+      document.body.classList.remove('auction-live');
+
+      if (load) loadCurrentView(true);
+    }
+
+    function selectLeague(league) {
+      state.selectedLeague = {
+        id: league.id,
+        name: league.name,
+        code: league.code
+      };
+
+      setLocalJson('fantacalcio_selected_league', state.selectedLeague);
+      state.dashboard = null;
+      state.management = null;
+      state.setup = null;
+      state.list = null;
+      state.rosters = null;
+      state.auction = null;
+      updateHeader();
+      switchView('home');
+    }
+
+    $('league-switch-btn').addEventListener('click', () => switchView('leagues'));
+    $('reload-btn').addEventListener('click', () => loadCurrentView(true));
+    $('exit-btn').addEventListener('click', () => { window.location.href = 'index.html'; });
+
+    document.querySelectorAll('.nav-btn').forEach(button => {
+      button.addEventListener('click', () => switchView(button.dataset.view));
+    });
+
+    /* =====================================================
+       LEGHE / ONBOARDING
+       ===================================================== */
+
+    async function loadLeagues() {
+      const data = await api(ENDPOINTS.leagues, { action: 'getLeagueHome' }, { league: false });
+      if (!data) return;
+
+      renderLeagues(data);
+      await loadJoinRequests();
+    }
+
+    function renderLeagues(data) {
+      const memberships = (data.memberships || []).filter(item =>
+        item.league &&
+        ['pending', 'active'].includes(item.league.status) &&
+        ['pending', 'active'].includes(item.status)
+      );
+
+      $('create-league-panel').hidden = !data.permissions?.canCreateLeague;
+      $('join-league-panel').hidden = !data.permissions?.canUseAnotherLeague;
+
+      $('my-leagues').innerHTML = memberships.length
+        ? memberships.map(item => {
+            const league = item.league;
+            const active = item.status === 'active' && league.status === 'active';
+            return `
+              <article class="panel">
+                <div class="between">
+                  <div>
+                    <strong>${esc(league.name)}</strong>
+                    <div class="small soft">${active ? esc(league.code || '') : 'In attesa di approvazione'}</div>
+                  </div>
+                  <span class="badge ${active ? 'good' : 'warn'}">${active ? 'ATTIVA' : 'PENDING'}</span>
+                </div>
+                ${item.team ? `<div class="small soft" style="margin-top:5px">${esc(roleLabel(item.team.role))} · ${esc(item.team.name)}</div>` : ''}
+                ${active ? `<button class="enter-league" data-league-id="${esc(league.id)}" type="button" style="margin-top:6px">Entra</button>` : ''}
+              </article>
+            `;
+          }).join('')
+        : '<div class="panel small soft">Nessuna lega disponibile.</div>';
+
+      $('my-leagues').querySelectorAll('.enter-league').forEach(button => {
+        button.addEventListener('click', () => {
+          const item = memberships.find(m => m.league.id === button.dataset.leagueId);
+          if (item) selectLeague(item.league);
+        });
+      });
+    }
+
+    $('leagues-refresh').addEventListener('click', loadLeagues);
+
+    $('create-league-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      const name = $('new-league-name').value.trim();
+      if (name.length < 2) return msg('Inserisci un nome lega valido.', 'error');
+
+      try {
+        const data = await api(ENDPOINTS.leagues, { action: 'createLeague', name }, { league: false });
+        $('new-league-name').value = '';
+        msg(data.league?.league_status === 'active' ? 'Lega creata.' : 'Richiesta di creazione inviata.', 'success');
+        await loadLeagues();
+      } catch (error) {
+        msg(error.message, 'error');
+      }
+    });
+
+    async function loadJoinRequests() {
+      try {
+        const data = await api(ENDPOINTS.onboarding, { action: 'getMyRequests' }, { league: false, quiet: true });
+        if (!data?.ok) return;
+
+        const rows = (data.requests || []).filter(item => ['pending','active'].includes(item.status));
+        $('my-join-requests').innerHTML = rows.map(item => `
+          <div class="compact-row">
+            <div><strong>${esc(item.league?.name || 'Lega')}</strong><small>${(item.roles || []).map(r => esc(r.label || roleLabel(r.role))).join(' · ') || 'Richiesta ingresso'}</small></div>
+            <span class="badge ${item.status === 'active' ? 'good' : 'warn'}">${item.status === 'active' ? 'ATTIVA' : 'PENDING'}</span>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    $('join-preview-btn').addEventListener('click', async () => {
+      const code = $('join-code').value.trim().toUpperCase();
+      if (!code) return msg('Inserisci il codice lega.', 'error');
+
+      try {
+        const data = await api(ENDPOINTS.onboarding, { action: 'previewLeague', code }, { league: false });
+        state.joinPreview = data;
+        $('join-preview').hidden = false;
+        $('join-league-name').textContent = data.league.name;
+        $('join-league-code').textContent = data.league.code;
+        renderJoinTeamOptions();
+      } catch (error) {
+        msg(error.message, 'error');
+      }
+    });
+
+    function selectedJoinRoles() {
+      return [
+        $('join-president'),
+        $('join-vice'),
+        $('join-auctioneer'),
+        $('join-presenter')
+      ].filter(input => input.checked).map(input => input.value);
+    }
+
+    function updateJoinFields() {
+      if ($('join-president').checked && $('join-vice').checked) $('join-vice').checked = false;
+      const roles = selectedJoinRoles();
+      const teamNeeded = roles.includes('president') || roles.includes('vice');
+      $('join-team-fields').hidden = !teamNeeded;
+
+      if (roles.includes('vice')) {
+        $('join-team-mode').value = 'existing';
+        [...$('join-team-mode').options].forEach(option => option.disabled = option.value === 'create');
+      } else {
+        [...$('join-team-mode').options].forEach(option => option.disabled = false);
+      }
+
+      renderJoinTeamOptions();
+      updateJoinTeamMode();
+    }
+
+    function renderJoinTeamOptions() {
+      if (!state.joinPreview) return;
+      const roles = selectedJoinRoles();
+      const wantsPresident = roles.includes('president');
+      const wantsVice = roles.includes('vice');
+
+      const eligible = (state.joinPreview.teams || []).filter(team => {
+        if (wantsPresident) return !team.hasPresident;
+        if (wantsVice) return team.hasPresident && team.presidentStatus === 'active';
+        return true;
+      });
+
+      $('join-team-id').innerHTML = '<option value="">Seleziona...</option>' + eligible.map(team => `
+        <option value="${esc(team.id)}">${esc(team.name)}</option>
+      `).join('');
+    }
+
+    function updateJoinTeamMode() {
+      const create = $('join-team-mode').value === 'create';
+      $('join-existing-wrap').hidden = create;
+      $('join-new-wrap').hidden = !create;
+    }
+
+    ['join-president','join-vice','join-auctioneer','join-presenter'].forEach(id => $(id).addEventListener('change', updateJoinFields));
+    $('join-team-mode').addEventListener('change', updateJoinTeamMode);
+
+    $('join-submit-btn').addEventListener('click', async () => {
+      if (!state.joinPreview) return;
+      const roles = selectedJoinRoles();
+      if (!roles.length) return msg('Seleziona almeno un ruolo.', 'error');
+
+      const needsTeam = roles.includes('president') || roles.includes('vice');
+      const teamMode = needsTeam ? $('join-team-mode').value : 'none';
+      const teamId = needsTeam && teamMode === 'existing' ? $('join-team-id').value || null : null;
+      const newTeamName = needsTeam && teamMode === 'create' ? $('join-new-team-name').value.trim() || null : null;
+
+      try {
+        await api(ENDPOINTS.onboarding, {
+          action: 'submitJoinRequest',
+          code: state.joinPreview.league.code,
+          roles,
+          teamMode,
+          teamId,
+          newTeamName
+        }, { league: false });
+
+        msg('Richiesta inviata.', 'success');
+        $('join-preview').hidden = true;
+        state.joinPreview = null;
+        await loadLeagues();
+      } catch (error) {
+        msg(error.message, 'error');
+      }
+    });
+
+    /* =====================================================
+       DASHBOARD
+       ===================================================== */
+
+    async function loadDashboard() {
+      const data = await api(ENDPOINTS.league, { action: 'getDashboard' });
+      if (!data) return;
+      state.dashboard = data;
+      updateHeader();
+      renderDashboard();
+    }
+
+    function renderDashboard() {
+      const data = state.dashboard;
+      if (!data) return;
+
+      const teams = data.teams || [];
+      const pending = data.pendingRequests || [];
+
+      $('home-kpis').innerHTML = `
+        <div class="kpi"><span>Squadre</span><strong>${teams.length}</strong></div>
+        <div class="kpi"><span>Richieste</span><strong>${pending.length}</strong></div>
+        <div class="kpi"><span>Ruoli</span><strong>${(data.leagueRoles || []).length + (data.myTeam ? 1 : 0)}</strong></div>
+      `;
+
+      $('home-teams').innerHTML = teams.map(team => `
+        <div class="compact-row">
+          <div><strong>${esc(team.name)}</strong><small>Presidente: ${esc(team.presidentUsername || '—')}</small></div>
+          <span class="badge ${team.presidentUsername ? 'good' : 'warn'}">${team.presidentUsername ? 'OK' : 'NO PRES.'}</span>
+        </div>
+      `).join('') || '<div class="small soft">Nessuna squadra.</div>';
+
+      const roleBadges = (data.leagueRoles || []).map(role => `<span class="badge primary">${esc(roleLabel(role))}</span>`).join('');
+      const teamBadge = data.myTeam ? `<span class="badge good">${esc(roleLabel(data.myTeam.role))} · ${esc(data.myTeam.team?.name || data.myTeam.name || '')}</span>` : '';
+      $('home-me').innerHTML = `<div class="row">${roleBadges}${teamBadge || '<span class="small soft">Nessuna squadra associata.</span>'}</div>`;
+
+      $('pending-panel').hidden = !data.permissions?.canManageMembers;
+      $('pending-count').textContent = pending.length;
+      $('pending-list').innerHTML = pending.map(item => `
+        <div class="compact-row">
+          <div><strong>${esc(item.username || 'Utente')}</strong><small>${item.team?.teamName ? `Squadra: ${esc(item.team.teamName)}` : 'Nessuna squadra richiesta'}</small></div>
+          <div class="row">
+            <button class="approve-member good" data-user="${esc(item.userId)}" type="button">Approva</button>
+            <button class="reject-member danger" data-user="${esc(item.userId)}" type="button">Rifiuta</button>
+          </div>
+        </div>
+      `).join('') || '<div class="small soft">Nessuna richiesta.</div>';
+
+      $('pending-list').querySelectorAll('.approve-member').forEach(button => button.addEventListener('click', () => membershipAction('approveMember', button.dataset.user)));
+      $('pending-list').querySelectorAll('.reject-member').forEach(button => button.addEventListener('click', () => membershipAction('rejectMember', button.dataset.user)));
+    }
+
+    async function membershipAction(action, targetUserId) {
+      try {
+        await api(ENDPOINTS.league, { action, targetUserId });
+        msg(action === 'approveMember' ? 'Richiesta approvata.' : 'Richiesta rifiutata.', 'success');
+        await Promise.all([loadDashboard(), state.view === 'manage' ? loadManagement() : Promise.resolve()]);
+      } catch (error) {
+        msg(error.message, 'error');
+      }
+    }
+
+    /* =====================================================
+       GESTIONE MEMBRI / SQUADRE
+       ===================================================== */
+
+    async function loadManagement() {
+      const data = await api(ENDPOINTS.league, { action: 'getManagementData' });
+      if (!data) return;
+      state.management = data;
+      renderManagement();
+    }
+
+    function renderManagement() {
+      const data = state.management;
+      if (!data) return;
+
+      $('create-team-form').hidden = !data.permissions?.canCreateTeam;
+
+      const membersWithoutTeam = (data.members || []).filter(member => !member.team);
+
+      $('manage-teams').innerHTML = (data.teams || []).map(team => {
+        const president = (data.members || []).find(member => member.team?.teamId === team.id && member.team?.role === 'president' && member.team?.status === 'active');
+        return `
+          <div class="compact-row">
+            <div><strong>${esc(team.name)}</strong><small>${president ? `Presidente: ${esc(president.username)}` : 'Presidente non assegnato'}</small></div>
+            ${data.permissions?.canAssignPresident && !president ? `
+              <div class="row">
+                <select class="president-select" data-team="${esc(team.id)}" style="width:145px">
+                  <option value="">Presidente...</option>
+                  ${membersWithoutTeam.map(member => `<option value="${esc(member.userId)}">${esc(member.username)}</option>`).join('')}
+                </select>
+                <button class="assign-president" data-team="${esc(team.id)}" type="button">Assegna</button>
+              </div>
+            ` : '<span class="badge good">OK</span>'}
+          </div>
+        `;
+      }).join('') || '<div class="small soft">Nessuna squadra.</div>';
+
+      $('manage-teams').querySelectorAll('.assign-president').forEach(button => {
+        button.addEventListener('click', async () => {
+          const select = $('manage-teams').querySelector(`.president-select[data-team="${CSS.escape(button.dataset.team)}"]`);
+          if (!select?.value) return msg('Seleziona un membro.', 'error');
+          try {
+            await api(ENDPOINTS.league, { action: 'assignPresident', teamId: button.dataset.team, targetUserId: select.value });
+            msg('Presidente assegnato.', 'success');
+            await Promise.all([loadManagement(), loadDashboard()]);
+          } catch (error) { msg(error.message, 'error'); }
+        });
+      });
+
+      $('manage-members').innerHTML = (data.members || []).map(member => {
+        const roles = new Set(member.leagueRoles || []);
+        return `
+          <div class="compact-row">
+            <div>
+              <strong>${esc(member.username)}</strong>
+              <small>${member.team ? `${esc(roleLabel(member.team.role))} · ${esc(member.team.teamName)} · ${esc(member.team.status)}` : 'Nessuna squadra'}</small>
+            </div>
+            ${data.permissions?.canManageRoles ? `
+              <div class="row member-role-controls" data-user="${esc(member.userId)}">
+                ${['league_admin','auctioneer','presenter'].map(role => `
+                  <label class="check-line"><input type="checkbox" data-role="${role}" ${roles.has(role) ? 'checked' : ''}>${esc(roleLabel(role))}</label>
+                `).join('')}
+              </div>
+            ` : `<div class="row">${[...roles].map(role => `<span class="badge">${esc(roleLabel(role))}</span>`).join('')}</div>`}
+          </div>
+        `;
+      }).join('') || '<div class="small soft">Nessun membro.</div>';
+
+      $('manage-members').querySelectorAll('.member-role-controls input').forEach(input => {
+        input.addEventListener('change', async () => {
+          const parent = input.closest('.member-role-controls');
+          try {
+            await api(ENDPOINTS.league, {
+              action: 'setMemberRole',
+              targetUserId: parent.dataset.user,
+              role: input.dataset.role,
+              enabled: input.checked
+            });
+            msg('Ruolo aggiornato.', 'success');
+          } catch (error) {
+            input.checked = !input.checked;
+            msg(error.message, 'error');
+          }
+        });
+      });
+
+      $('vice-requests-panel').hidden = !(data.permissions?.canApproveVice && (data.viceRequests || []).length);
+      $('vice-requests').innerHTML = (data.viceRequests || []).map(item => `
+        <div class="compact-row">
+          <div><strong>${esc(item.username)}</strong><small>${item.leagueApproved ? 'Admin approvato' : 'Attesa Admin'} · ${item.presidentApproved ? 'Presidente approvato' : 'Attesa Presidente'}</small></div>
+          <div class="row"><button class="approve-vice good" data-user="${esc(item.userId)}">Approva</button><button class="reject-vice danger" data-user="${esc(item.userId)}">Rifiuta</button></div>
+        </div>
+      `).join('');
+
+      $('vice-requests').querySelectorAll('.approve-vice').forEach(button => button.addEventListener('click', () => viceAction('approveVice', button.dataset.user)));
+      $('vice-requests').querySelectorAll('.reject-vice').forEach(button => button.addEventListener('click', () => viceAction('rejectVice', button.dataset.user)));
+    }
+
+    $('create-team-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      const teamName = $('manage-new-team').value.trim();
+      if (teamName.length < 2) return msg('Nome squadra non valido.', 'error');
+      try {
+        await api(ENDPOINTS.league, { action: 'createTeam', teamName });
+        $('manage-new-team').value = '';
+        msg('Squadra creata.', 'success');
+        await loadManagement();
+      } catch (error) { msg(error.message, 'error'); }
+    });
+
+    async function viceAction(action, targetUserId) {
+      try {
+        await api(ENDPOINTS.league, { action, targetUserId });
+        msg(action === 'approveVice' ? 'Vice approvato.' : 'Richiesta Vice rifiutata.', 'success');
+        await loadManagement();
+      } catch (error) { msg(error.message, 'error'); }
+    }
+
+    /* =====================================================
+       SETUP
+       ===================================================== */
+
+    async function loadSetup() {
+      const data = await api(ENDPOINTS.league, { action: 'getSetup' });
+      if (!data) return;
+      state.setup = data.settings;
+      populateSetup(data.settings);
+    }
+
+    function populateSetup(s) {
+      $('setup-fantasy-mode').value = s.fantasy_mode || 'classic';
+      $('setup-credits').value = s.initial_credits ?? 500;
+      $('setup-team-count').value = s.team_count ?? 10;
+      $('setup-P').value = s.roster_config?.classic?.P ?? 3;
+      $('setup-D').value = s.roster_config?.classic?.D ?? 8;
+      $('setup-C').value = s.roster_config?.classic?.C ?? 8;
+      $('setup-A').value = s.roster_config?.classic?.A ?? 6;
+      $('setup-gk-min').value = s.roster_config?.mantra?.goalkeepers?.min ?? 2;
+      $('setup-gk-max').value = s.roster_config?.mantra?.goalkeepers?.max ?? 3;
+      $('setup-out-min').value = s.roster_config?.mantra?.outfield?.min ?? 22;
+      $('setup-out-max').value = s.roster_config?.mantra?.outfield?.max ?? 23;
+      $('setup-total-min').value = s.roster_config?.mantra?.total?.min ?? 25;
+      $('setup-total-max').value = s.roster_config?.mantra?.total?.max ?? 25;
+      $('setup-under').checked = s.under_enabled === true;
+      $('setup-under-min').value = s.under_min_count || 1;
+      $('setup-nomination').value = s.nomination_mode || 'call';
+      $('setup-list-sort').value = s.list_sort_by || 'alphabetical';
+      $('setup-list-dir').value = s.list_sort_direction || 'asc';
+      $('setup-base').value = s.auction_base_mode || 'free';
+      $('setup-bid-mode').value = s.bid_mode || 'wild';
+      $('setup-turn-direction').value = s.turn_direction || 'clockwise';
+      $('setup-timer-mode').value = s.timer_mode || 'dynamic';
+      $('setup-fixed-timer').value = s.fixed_timer_seconds || 10;
+      updateSetupVisibility();
+    }
+
+    function updateSetupVisibility() {
+      const mantra = $('setup-fantasy-mode').value === 'mantra';
+      $('classic-setup').hidden = mantra;
+      $('mantra-setup').hidden = !mantra;
+      $('setup-under-min').disabled = !$('setup-under').checked;
+      $('setup-turn-direction').disabled = $('setup-bid-mode').value !== 'turn';
+      $('setup-list-sort').disabled = $('setup-nomination').value !== 'list';
+      $('setup-list-dir').disabled = $('setup-nomination').value !== 'list';
+      $('setup-fixed-timer').disabled = $('setup-timer-mode').value !== 'fixed';
+    }
+
+    ['setup-fantasy-mode','setup-under','setup-bid-mode','setup-nomination','setup-timer-mode'].forEach(id => $(id).addEventListener('change', updateSetupVisibility));
+
+    $('setup-form').addEventListener('submit', async event => {
+      event.preventDefault();
+
+      const setup = {
+        fantasyMode: $('setup-fantasy-mode').value,
+        initialCredits: Number($('setup-credits').value),
+        teamCount: Number($('setup-team-count').value),
+        rosterConfig: {
+          classic: { P:Number($('setup-P').value), D:Number($('setup-D').value), C:Number($('setup-C').value), A:Number($('setup-A').value) },
+          mantra: {
+            goalkeepers: { min:Number($('setup-gk-min').value), max:Number($('setup-gk-max').value) },
+            outfield: { min:Number($('setup-out-min').value), max:Number($('setup-out-max').value) },
+            total: { min:Number($('setup-total-min').value), max:Number($('setup-total-max').value) }
+          }
+        },
+        underEnabled: $('setup-under').checked,
+        underMinCount: $('setup-under').checked ? Number($('setup-under-min').value) : 0,
+        nominationMode: $('setup-nomination').value,
+        listSortBy: $('setup-list-sort').value,
+        listSortDirection: $('setup-list-dir').value,
+        auctionBaseMode: $('setup-base').value,
+        bidMode: $('setup-bid-mode').value,
+        turnDirection: $('setup-turn-direction').value,
+        timerMode: $('setup-timer-mode').value,
+        fixedTimerSeconds: Number($('setup-fixed-timer').value)
+      };
+
+      try {
+        const data = await api(ENDPOINTS.league, { action:'updateSetup', setup });
+        if (data.settings) populateSetup(data.settings);
+        msg('Setup salvato.', 'success');
+      } catch (error) { msg(error.message, 'error'); }
+    });
+
+    /* =====================================================
+       LISTONE
+       ===================================================== */
+
+    function fantasyMode() {
+      return state.list?.settings?.fantasyMode || state.setup?.fantasy_mode || state.auction?.settings?.fantasy_mode || 'classic';
+    }
+
+    function playerRoles(player, mode = fantasyMode()) {
+      if (mode === 'classic') return player.classic_role ? [player.classic_role] : [];
+      const roles = Array.isArray(player.mantra_roles) ? player.mantra_roles.filter(Boolean) : [];
+      return roles.length ? roles : (player.classic_role ? [player.classic_role] : []);
+    }
+
+    function roleOrder(mode = fantasyMode()) {
+      return mode === 'classic' ? ['P','D','C','A'] : ['P','Por','B','Dc','Dd','Ds','E','M','C','W','T','A','Pc'];
+    }
+
+    function flagEmoji(iso2) {
+      const code = String(iso2 || '').trim().toUpperCase();
+      if (!/^[A-Z]{2}$/.test(code)) return '';
+      return [...code].map(char => String.fromCodePoint(127397 + char.charCodeAt(0))).join('');
+    }
+
+    function formatNumber(value) {
+      if (value === null || value === undefined || value === '') return '—';
+      const n = Number(value);
+      if (!Number.isFinite(n)) return esc(value);
+      return Number.isInteger(n) ? String(n) : n.toFixed(2).replace(/\.?0+$/, '');
+    }
+
+    async function loadList() {
+      const data = await api(ENDPOINTS.list, { action:'getList' });
+      if (!data) return;
+      state.list = data;
+      renderListControls();
+      renderListTable();
+    }
+
+    function setOptions(select, values, allLabel) {
+      const previous = select.value;
+      select.innerHTML = `<option value="all">${esc(allLabel)}</option>` + values.map(value => `<option value="${esc(value)}">${esc(value)}</option>`).join('');
+      if ([...select.options].some(option => option.value === previous)) select.value = previous;
+    }
+
+    function renderRoleBar(container, selected, mode, callback) {
+      container.innerHTML = `
+        <button class="rolebtn ${selected.has('all') ? 'active' : ''}" data-role="all" type="button">ALL</button>
+        ${roleOrder(mode).map(role => `<button class="rolebtn ${selected.has(role) ? 'active' : ''}" data-role="${esc(role)}" type="button">${esc(role)}</button>`).join('')}
+      `;
+      container.querySelectorAll('[data-role]').forEach(button => button.addEventListener('click', () => {
+        const role = button.dataset.role;
+        if (role === 'all') selected = new Set(['all']);
+        else {
+          selected.delete('all');
+          if (selected.has(role)) selected.delete(role); else selected.add(role);
+          if (!selected.size) selected.add('all');
+        }
+        callback(selected);
+      }));
+    }
+
+    function renderListControls() {
+      const players = state.list?.players || [];
+      $('list-total').textContent = players.length;
+      $('list-import-info').textContent = state.list?.importBatch ? `Import ${state.list.importBatch.reference_date || ''} · ${state.list.importBatch.row_count || players.length} righe` : 'Listone caricato';
+
+      const teams = [...new Set(players.map(p => p.serie_a_team).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'it'));
+      const slots = [...new Set(players.map(p => p.slot).filter(v => v !== null && v !== undefined && String(v).trim() !== '').map(String))].sort((a,b)=>a.localeCompare(b,'it',{numeric:true}));
+      setOptions($('list-team'), teams, 'Tutte');
+      setOptions($('list-slot'), slots, 'Tutti');
+      renderRoleBar($('list-rolebar'), state.listRoles, fantasyMode(), next => { state.listRoles = next; renderListControls(); renderListTable(); });
+    }
+
+    function matchesFlag(player, flag) {
+      if (flag === 'all') return true;
+      if (flag === 'market') return player.market_flag === true;
+      if (flag === 'new') return player.new_arrival === true;
+      if (flag === 'penalties') return Number(player.penalty_probability || 0) > 0;
+      if (flag === 'injury') return player.uncertain_return === true || (player.unavailable_until_round !== null && player.unavailable_until_round !== undefined && String(player.unavailable_until_round).trim() !== '');
+      return true;
+    }
+
+    function filterPlayers(players, controls, selectedRoles, mode) {
+      const q = String(controls.search?.value || '').trim().toLowerCase();
+      const team = controls.team?.value || 'all';
+      const slot = controls.slot?.value || 'all';
+      const flag = controls.flag?.value || 'all';
+
+      return players.filter(player => {
+        const roles = playerRoles(player, mode);
+        if (!selectedRoles.has('all') && !roles.some(role => selectedRoles.has(role))) return false;
+        if (team !== 'all' && String(player.serie_a_team || '') !== team) return false;
+        if (slot !== 'all' && String(player.slot ?? '') !== slot) return false;
+        if (!matchesFlag(player, flag)) return false;
+        if (!q) return true;
+        return [player.name,player.serie_a_team,player.classic_role,...roles,player.slot].filter(Boolean).join(' ').toLowerCase().includes(q);
+      });
+    }
+
+    function sortValue(player, key) {
+      return ({name:player.name||'',team:player.serie_a_team||'',slot:player.slot,pma:player.pma,pfc:player.pfc,delta:player.pfc_pma_delta,fm:player.expected_fantasy_avg,tit:player.expected_titolarity})[key];
+    }
+
+    function compareValues(a,b) {
+      const ea = a === null || a === undefined || a === '';
+      const eb = b === null || b === undefined || b === '';
+      if (ea && eb) return 0;
+      if (ea) return 1;
+      if (eb) return -1;
+      const na = Number(a), nb = Number(b);
+      if (Number.isFinite(na) && Number.isFinite(nb)) return na-nb;
+      return String(a).localeCompare(String(b),'it',{numeric:true,sensitivity:'base'});
+    }
+
+    function sortedPlayers(players, sort) {
+      const factor = sort.direction === 'asc' ? 1 : -1;
+      return [...players].sort((a,b) => {
+        const result = compareValues(sortValue(a,sort.key), sortValue(b,sort.key));
+        return result !== 0 ? result*factor : String(a.name||'').localeCompare(String(b.name||''),'it');
+      });
+    }
+
+    function playerRow(player, mode, extraClass = '') {
+      const roles = playerRoles(player, mode);
+      const delta = Number(player.pfc_pma_delta);
+      return `
+        <tr class="${extraClass}" data-player-id="${esc(player.id)}">
+          <td><div class="player-main">${roles.map(role=>`<span class="rolebadge">${esc(role)}</span>`).join('')}<span class="player-name">${esc(player.name)}</span>${flagEmoji(player.nationality_iso2) ? `<span>${flagEmoji(player.nationality_iso2)}</span>` : ''}</div></td>
+          <td>${esc(player.serie_a_team || '—')}</td>
+          <td class="num">${esc(player.slot ?? '—')}</td>
+          <td class="num">${formatNumber(player.pma)}</td>
+          <td class="num"><strong>${formatNumber(player.pfc)}</strong></td>
+          <td class="num ${Number.isFinite(delta) ? (delta>0?'positive':delta<0?'negative':'') : ''}">${formatNumber(player.pfc_pma_delta)}</td>
+          <td class="num">${formatNumber(player.expected_fantasy_avg)}</td>
+          <td class="num">${formatNumber(player.expected_titolarity)}</td>
+        </tr>
+      `;
+    }
+
+    function renderListTable() {
+      if (!state.list) return;
+      const controls = { search:$('list-search'), team:$('list-team'), slot:$('list-slot'), flag:$('list-flag') };
+      const filtered = filterPlayers(state.list.players || [], controls, state.listRoles, fantasyMode());
+      const sorted = sortedPlayers(filtered, state.listSort);
+      $('list-body').innerHTML = sorted.map(player => playerRow(player, fantasyMode())).join('') || '<tr><td colspan="8" class="soft" style="text-align:center;height:70px">Nessun giocatore.</td></tr>';
+    }
+
+    ['list-search','list-team','list-slot','list-flag'].forEach(id => $(id).addEventListener(id === 'list-search' ? 'input' : 'change', renderListTable));
+    $('list-reset').addEventListener('click', () => {
+      $('list-search').value=''; $('list-team').value='all'; $('list-slot').value='all'; $('list-flag').value='all';
+      state.listRoles = new Set(['all']); state.listSort={key:'name',direction:'asc'}; renderListControls(); renderListTable();
+    });
+    document.querySelector('#view-list thead').addEventListener('click', event => {
+      const button = event.target.closest('[data-list-sort]'); if (!button) return;
+      const key = button.dataset.listSort;
+      state.listSort = state.listSort.key === key ? {key,direction:state.listSort.direction==='asc'?'desc':'asc'} : {key,direction:'asc'};
+      document.querySelectorAll('[data-list-sort] span').forEach(span=>span.textContent='↕');
+      button.querySelector('span').textContent = state.listSort.direction==='asc'?'↑':'↓';
+      renderListTable();
+    });
+
+    /* =====================================================
+       ROSE
+       ===================================================== */
+
+    async function loadRosters() {
+      const data = await api(ENDPOINTS.rosters, { action:'getRosters' });
+      if (!data) return;
+      state.rosters = data;
+      renderRosters();
+    }
+
+    function renderRosters() {
+      const data = state.rosters;
+      if (!data) return;
+      const initial = Number(data.settings?.initial_credits || 0);
+      const assignments = data.assignments || [];
+      const spent = assignments.reduce((sum,item)=>sum+Number(item.purchase_price||0),0);
+
+      $('roster-kpis').innerHTML = `
+        <div class="kpi"><span>Squadre</span><strong>${(data.teams||[]).length}</strong></div>
+        <div class="kpi"><span>Giocatori</span><strong>${assignments.length}</strong></div>
+        <div class="kpi"><span>Spesa</span><strong>${spent}</strong></div>
+      `;
+
+      $('rosters-grid').innerHTML = (data.teams || []).map(team => {
+        const rows = assignments.filter(item => item.team_id === team.id);
+        const teamSpent = rows.reduce((sum,item)=>sum+Number(item.purchase_price||0),0);
+        return `
+          <details class="team-card" open>
+            <summary><div><strong>${esc(team.name)}</strong><span class="small soft"> · ${esc(team.presidentUsername || 'senza Presidente')}</span></div><span class="badge">${rows.length} · ${teamSpent}/${initial}</span></summary>
+            <div class="roster-body">
+              ${rows.map(item => `<div class="roster-player"><div><strong>${esc(item.player?.name || '—')}</strong><span class="small soft"> · ${esc((item.player?.mantra_roles || [item.player?.classic_role]).filter(Boolean).join('/'))} · ${esc(item.player?.serie_a_team || '')}</span></div><span class="badge primary">${Number(item.purchase_price||0)}</span></div>`).join('') || '<div class="small soft">Rosa vuota.</div>'}
+            </div>
+          </details>
+        `;
+      }).join('');
+    }
+
+    /* =====================================================
+       ASTA
+       ===================================================== */
+
+    async function loadAuction({ quiet = false } = {}) {
+      const data = await api(ENDPOINTS.auction, { action:'getLobby' }, { quiet });
+      if (!data?.ok) return;
+      state.auction = data;
+
+      if (data.serverNow) state.serverOffsetMs = Date.parse(data.serverNow) - Date.now();
+      renderAuction();
+      renderTv();
+      updateHeader();
+    }
+
+    function auctionSession() { return state.auction?.auctionSession || null; }
+    function auctionCanControl() { return state.auction?.permissions?.canControlAuction === true; }
+    function auctionMyTeamId() { return state.auction?.myTeam?.teamId || null; }
+
+    function renderAuction() {
+      const root = $('auction-root');
+      const data = state.auction;
+      if (!data) { root.innerHTML='<div class="panel">Caricamento...</div>'; return; }
+
+      const session = data.auctionSession;
+      document.body.classList.toggle('auction-live', session?.status === 'live' && state.view === 'auction');
+
+      if (!session) return renderAuctionLobby();
+      if (session.status === 'prepared') return renderAuctionPrepared();
+      if (session.status === 'live') return renderAuctionLive();
+      if (session.status === 'review') return renderAuctionReview();
+
+      root.innerHTML = `<section class="panel"><strong>Sessione ${esc(session.status)}</strong></section>`;
+    }
+
+    function renderAuctionLobby() {
+      const data = state.auction;
+      const readiness = data.readiness || {};
+      $('auction-root').innerHTML = `
+        <div class="auction-lobby">
+          <section class="panel">
+            <div class="between">
+              <div><strong>Preparazione asta</strong><div class="small soft">${readiness.ready ? 'Tutto pronto per l’avvio.' : 'Completa i requisiti indicati.'}</div></div>
+              <div class="row"><span class="badge ${readiness.ready?'good':'warn'}">${readiness.ready?'PRONTA':'DA COMPLETARE'}</span><span class="badge">${readiness.teamCount||0} squadre</span><span class="badge">${readiness.playerCount||0} giocatori</span></div>
+            </div>
+            ${(readiness.blockers||[]).map(item=>`<div class="small soft">• ${esc(item)}</div>`).join('')}
+            ${auctionCanControl() ? `<div class="row" style="margin-top:6px"><button id="prepare-auction">Prepara asta</button><button id="prepare-test-auction" class="secondary">Test</button></div>` : ''}
+          </section>
+          <div class="auction-lobby-grid">
+            <section class="panel"><div class="panel-title"><div><h2>Squadre</h2></div></div><div class="compact-list inner-scroll">${(data.teams||[]).map(team=>`<div class="compact-row"><div><strong>${esc(team.name)}</strong><small>Presidente: ${esc(team.president?.username||'—')}</small></div><span class="badge ${team.president?'good':'warn'}">${team.president?'OK':'—'}</span></div>`).join('')}</div></section>
+            <section class="panel"><div class="panel-title"><div><h2>Regole</h2></div></div><div class="compact-list inner-scroll">${auctionSettingsRows(data.settings)}</div></section>
+          </div>
+        </div>
+      `;
+
+      $('prepare-auction')?.addEventListener('click', () => auctionAction({action:'prepareAuction'}, 'Asta preparata.'));
+      $('prepare-test-auction')?.addEventListener('click', () => auctionAction({action:'prepareTestAuction'}, 'Asta test preparata.'));
+    }
+
+    function auctionSettingsRows(settings={}) {
+      const rows = [
+        ['Modalità',settings.fantasy_mode],['Crediti',settings.initial_credits],['Chiamata',settings.nomination_mode],['Base',settings.auction_base_mode],['Rilanci',settings.bid_mode],['Timer',settings.timer_mode]
+      ];
+      return rows.map(([a,b])=>`<div class="compact-row"><strong>${esc(a)}</strong><span class="badge">${esc(b ?? '—')}</span></div>`).join('');
+    }
+
+    function renderAuctionPrepared() {
+      const data=state.auction, session=data.auctionSession;
+      $('auction-root').innerHTML = `
+        <div class="auction-lobby">
+          <section class="panel"><div class="between"><div><strong>Asta preparata</strong><div class="small soft">Controlla l'ordine e avvia.</div></div><span class="badge good">PREPARED</span></div></section>
+          <section class="panel inner-scroll"><div id="auction-order" class="team-order">${(data.teamOrder||[]).map((item,index)=>`<div class="order-row" data-team="${esc(item.team_id)}"><span class="badge">${index+1}</span><strong>${esc(item.team?.name||'Squadra')}</strong>${auctionCanControl()?`<div class="row"><button class="secondary order-up" data-i="${index}">↑</button><button class="secondary order-down" data-i="${index}">↓</button></div>`:''}</div>`).join('')}</div>${auctionCanControl()?`<div class="row" style="margin-top:6px"><button id="save-order" class="secondary">Salva ordine</button><button id="start-auction">Avvia asta</button></div>`:''}</section>
+        </div>`;
+
+      const order = [...(data.teamOrder||[])];
+      document.querySelectorAll('.order-up,.order-down').forEach(button=>button.addEventListener('click',()=>{
+        const i=Number(button.dataset.i), delta=button.classList.contains('order-up')?-1:1, j=i+delta;
+        if(j<0||j>=order.length)return;
+        [order[i],order[j]]=[order[j],order[i]];
+        state.auction.teamOrder=order;
+        renderAuctionPrepared();
+      }));
+      $('save-order')?.addEventListener('click',()=>auctionAction({action:'saveTeamOrder',sessionId:session.id,teamIds:order.map(x=>x.team_id)},'Ordine salvato.'));
+      $('start-auction')?.addEventListener('click',()=>auctionAction({action:'startAuction',sessionId:session.id},'Asta avviata.'));
+    }
+
+    function renderAuctionLive() {
+      const session=auctionSession();
+      if(!session.current_player_id) return renderAuctionCall();
+      return renderAuctionBid();
+    }
+
+    function renderAuctionCall() {
+      const data=state.auction, session=data.auctionSession;
+      const selected=(data.callCandidates||[]).find(p=>p.id===state.auctionSelectedPlayerId)||null;
+
+      $('auction-root').innerHTML = `
+        <div class="auction-live-shell">
+          <div class="call-stage">
+            <div class="call-main">
+              <section class="panel call-card">
+                <div class="panel-title"><div><h2>Chiamata · ${esc(data.currentNominationTeam?.name||'Squadra')}</h2><p>${data.permissions?.canCallCurrentPlayer?'Seleziona il giocatore e conferma.':'In attesa della chiamata.'}</p></div></div>
+                ${data.settings?.auction_base_mode === 'quotation'
+                  ? '<div class="selected-call"><span class="small soft">Base d’asta: quotazione Fantacalcio del giocatore.</span></div>'
+                  : "<label>Base d'asta<input id='auction-opening-bid' type='number' min='1' value='1'></label>"}
+                <div id="auction-selected-call" class="selected-call">${selected?`<strong>${esc(selected.name)}</strong><div class="small soft">${esc(playerRoles(selected,data.settings?.fantasy_mode).join('/'))} · ${esc(selected.serie_a_team||'')} · Q ${formatNumber(selected.quotation)}</div>`:'<span class="small soft">Nessun giocatore selezionato.</span>'}</div>
+                <button id="auction-call-confirm" ${!selected||!data.permissions?.canCallCurrentPlayer?'disabled':''}>Chiama giocatore</button>
+              </section>
+            </div>
+
+            <details id="free-drawer" class="free-drawer" open>
+              <summary>Svincolati</summary>
+              <div class="drawer-content">
+                <div id="auction-rolebar" class="rolebar"></div>
+                <div class="drawer-filters">
+                  <label>Cerca<input id="auction-search" type="search" placeholder="Nome o squadra..."></label>
+                  <label>Squadra<select id="auction-team-filter"><option value="all">Tutte</option></select></label>
+                  <label>Slot<select id="auction-slot-filter"><option value="all">Tutti</option></select></label>
+                </div>
+                <div class="drawer-table">
+                  <table><thead><tr><th>Calciatore</th><th>Squadra</th><th>Slot</th><th>PMA</th><th>PFC</th><th>Δ</th><th>FM</th><th>Tit.</th></tr></thead><tbody id="auction-player-body"></tbody></table>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>`;
+
+      renderAuctionDrawerControls();
+      renderAuctionPlayers();
+
+      $('auction-call-confirm')?.addEventListener('click', async()=>{
+        if(!state.auctionSelectedPlayerId)return;
+        try{
+          const openingBid = data.settings?.auction_base_mode === 'quotation'
+            ? null
+            : Number($('auction-opening-bid')?.value || 1);
+          await api(ENDPOINTS.auction,{action:'callPlayer',sessionId:session.id,playerId:state.auctionSelectedPlayerId,openingBid});
+          state.auctionSelectedPlayerId=null;
+          await loadAuction();
+        }catch(error){msg(error.message,'error')}
+      });
+    }
+
+    function renderAuctionDrawerControls() {
+      const players=state.auction?.callCandidates||[];
+      const mode=state.auction?.settings?.fantasy_mode||'classic';
+      const teams=[...new Set(players.map(p=>p.serie_a_team).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'it'));
+      const slots=[...new Set(players.map(p=>p.slot).filter(v=>v!==null&&v!==undefined&&String(v).trim()!=='').map(String))].sort((a,b)=>a.localeCompare(b,'it',{numeric:true}));
+      setOptions($('auction-team-filter'),teams,'Tutte'); setOptions($('auction-slot-filter'),slots,'Tutti');
+      renderRoleBar($('auction-rolebar'),state.auctionRoles,mode,next=>{state.auctionRoles=next;renderAuctionDrawerControls();renderAuctionPlayers()});
+      $('auction-search').addEventListener('input',renderAuctionPlayers);
+      $('auction-team-filter').addEventListener('change',renderAuctionPlayers);
+      $('auction-slot-filter').addEventListener('change',renderAuctionPlayers);
+    }
+
+    function renderAuctionPlayers() {
+      const body=$('auction-player-body'); if(!body)return;
+      const data=state.auction, mode=data.settings?.fantasy_mode||'classic';
+      const controls={search:$('auction-search'),team:$('auction-team-filter'),slot:$('auction-slot-filter'),flag:null};
+      const players=filterPlayers(data.callCandidates||[],controls,state.auctionRoles,mode).sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'it'));
+      body.innerHTML=players.map(p=>playerRow(p,mode,p.id===state.auctionSelectedPlayerId?'selected-player':'')).join('');
+      body.querySelectorAll('[data-player-id]').forEach(row=>row.addEventListener('click',()=>{
+        state.auctionSelectedPlayerId=row.dataset.playerId;
+        renderAuctionCall();
+      }));
+    }
+
+    function auctionBidDefault() {
+      const s=auctionSession();
+      if(!s)return 1;
+      return s.current_bidder_team_id ? Number(s.current_bid||0)+1 : Math.max(1,Number(s.current_bid||1));
+    }
+
+    function ensureBidSelection() {
+      const s=auctionSession(); if(!s)return;
+      const key=`${s.current_player_id}|${s.current_bid}|${s.current_bidder_team_id||''}`;
+      if(state.auctionBidSelectionKey!==key){state.auctionBidSelectionKey=key;state.auctionBidSelection=auctionBidDefault()}
+    }
+
+    function renderAuctionBid() {
+      ensureBidSelection();
+      const d=state.auction,s=d.auctionSession,p=d.currentPlayer;
+      const current=Number(s.current_bid||0), selected=Number(state.auctionBidSelection||auctionBidDefault());
+      const quick=[1,2,3,5,10];
+      $('auction-root').innerHTML=`
+        <div class="auction-live-shell"><div class="live-top">
+          <div class="live-left">
+            <section class="current-player">
+              <div class="between"><div><h2>${esc(p?.name||'Giocatore')}</h2><div class="meta">${esc(playerRoles(p,d.settings?.fantasy_mode).join('/'))} · ${esc(p?.serie_a_team||'')} · Slot ${esc(p?.slot??'—')}</div></div><div class="bid-amount">${current||'—'}</div></div>
+              <div class="bid-hero"><div><span class="small soft">Leader</span><br><strong>${esc(d.currentBidderTeam?.name||'Nessuno')}</strong></div><div><span id="auction-timer-label" class="badge primary">—</span></div></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-title"><div><h2>Rilancio</h2><p>Seleziona, poi conferma.</p></div><span class="badge good">${selected}</span></div>
+              <div class="quick-grid">${quick.map(off=>`<button class="quick-btn ${selected===current+off?'selected':''}" data-amount="${current+off}" type="button"><span>+${off}</span><strong>${current+off}</strong></button>`).join('')}</div>
+              ${d.permissions?.isPresident ? `<button id="president-bid" style="width:100%;margin-top:5px">Conferma ${selected}</button>`:''}
+              ${d.settings?.bid_mode==='turn' && d.permissions?.isPresident ? `<div class="row" style="margin-top:5px"><button id="auction-pass" class="secondary">PASSA</button><button id="auction-abandon" class="danger">ABBANDONA</button></div>`:''}
+            </section>
+
+            ${d.permissions?.isVice?`<section class="panel"><div class="panel-title"><div><h2>Segnale al Presidente</h2></div></div><div class="row"><button class="vice-signal" data-type="push">RILANCIA</button><button class="vice-signal warn" data-type="stop">STOP</button><input id="vice-limit" type="number" min="1" value="${selected}" style="width:90px"><button class="vice-signal secondary" data-type="limit">FINO A</button><button class="vice-signal secondary" data-type="clear">Pulisci</button></div></section>`:''}
+            ${d.viceSignal?`<section class="panel"><strong>${esc(d.viceSignal.viceUsername||'Vice')}</strong> · <span class="badge ${d.viceSignal.type==='stop'?'danger':'good'}">${esc(d.viceSignal.type==='limit'?`FINO A ${d.viceSignal.amount}`:d.viceSignal.type==='push'?'RILANCIA':'STOP')}</span></section>`:''}
+          </div>
+
+          <div class="live-right">
+            ${auctionCanControl()?`<section class="panel"><div class="panel-title"><div><h2>Banditore</h2><p>Importo selezionato ${selected}</p></div><button id="auction-hold" class="secondary">${s.hold_active?'RIPRENDI':'HOLD'}</button></div><div class="auction-team-buttons">${(d.teams||[]).map(team=>`<button class="auctioneer-team secondary" data-team="${esc(team.id)}" ${s.current_bidder_team_id===team.id?'disabled':''}>${esc(team.name)}</button>`).join('')}</div><div class="row" style="margin-top:5px"><input id="auction-correct-amount" type="number" min="1" value="${selected}" style="width:95px"><select id="auction-correct-team" style="width:150px">${(d.teams||[]).map(team=>`<option value="${esc(team.id)}" ${s.current_bidder_team_id===team.id?'selected':''}>${esc(team.name)}</option>`).join('')}</select><button id="auction-correct" class="secondary">Correggi</button><button id="auction-award" class="good">Aggiudica</button></div></section>`:''}
+            <section class="panel"><div class="panel-title"><div><h2>Ultimi rilanci</h2></div></div><div class="compact-list">${(d.recentBids||[]).map(b=>`<div class="compact-row"><strong>${esc(b.team?.name||'Squadra')}</strong><span class="badge primary">${b.amount}</span></div>`).join('')||'<div class="small soft">Nessun rilancio.</div>'}</div></section>
+          </div>
+        </div></div>`;
+
+      document.querySelectorAll('.quick-btn').forEach(btn=>btn.addEventListener('click',()=>{state.auctionBidSelection=Number(btn.dataset.amount);renderAuctionBid()}));
+      $('president-bid')?.addEventListener('click',()=>placeBid(auctionMyTeamId(),selected,'APP'));
+      document.querySelectorAll('.auctioneer-team').forEach(btn=>btn.addEventListener('click',()=>placeBid(btn.dataset.team,selected,'VOCALE')));
+      $('auction-hold')?.addEventListener('click',()=>auctionAction({action:'setHold',sessionId:s.id,hold:!s.hold_active}));
+      $('auction-award')?.addEventListener('click',()=>auctionAction({action:'awardPlayer',sessionId:s.id},'Giocatore aggiudicato.'));
+      $('auction-correct')?.addEventListener('click',()=>auctionAction({action:'correctBid',sessionId:s.id,teamId:$('auction-correct-team').value,amount:Number($('auction-correct-amount').value)},'Offerta corretta.'));
+      $('auction-pass')?.addEventListener('click',()=>auctionAction({action:'passTurn',sessionId:s.id,teamId:auctionMyTeamId()}));
+      $('auction-abandon')?.addEventListener('click',()=>auctionAction({action:'abandonTurn',sessionId:s.id,teamId:auctionMyTeamId()}));
+      document.querySelectorAll('.vice-signal').forEach(btn=>btn.addEventListener('click',()=>sendViceSignal(btn.dataset.type)));
+      renderAuctionTimer();
+    }
+
+    async function placeBid(teamId,amount,source){
+      if(!teamId)return msg('Squadra non disponibile.','error');
+      try{await api(ENDPOINTS.auction,{action:'placeBid',sessionId:auctionSession().id,teamId,amount:Number(amount),source});await loadAuction()}catch(error){msg(error.message,'error')}
+    }
+
+    async function sendViceSignal(type){
+      try{await api(ENDPOINTS.auction,{action:'sendViceSignal',signalType:type,amount:type==='limit'?Number($('vice-limit').value):null});await loadAuction()}catch(error){msg(error.message,'error')}
+    }
+
+    async function auctionAction(payload,successText=''){
+      try{await api(ENDPOINTS.auction,payload);if(successText)msg(successText,'success');await loadAuction()}catch(error){msg(error.message,'error')}
+    }
+
+    function renderAuctionReview(){
+      const review=state.auction?.rosterReview;
+      $('auction-root').innerHTML=`<section class="panel"><div class="panel-title"><div><h2>Revisione test</h2></div></div>${review?`<div class="kpis"><div class="kpi"><span>Assegnazioni</span><strong>${review.totalAssignments||0}</strong></div></div><div class="grid-auto" style="margin-top:6px">${(review.teams||[]).map(team=>`<div class="panel"><strong>${esc(team.name)}</strong><div class="small soft">Spesi ${team.spent} · Restanti ${team.remaining}</div></div>`).join('')}</div>`:'<div class="small soft">Nessun riepilogo.</div>'}</section>`;
+    }
+
+    function renderAuctionTimer(){
+      const label=$('auction-timer-label');if(!label)return;
+      const s=auctionSession();if(!s?.timer_deadline){label.textContent=s?.hold_active?'HOLD':'—';return}
+      if(s.hold_active){label.textContent='HOLD';return}
+      const remain=Math.max(0,Date.parse(s.timer_deadline)-(Date.now()+state.serverOffsetMs));
+      const configured=Number(s.current_timer_seconds||0)*1000;
+      const visible=configured>0?Math.min(remain,configured):remain;
+      label.textContent=`${Math.ceil(visible/1000)}s`;
+    }
+
+    /* =====================================================
+       TV
+       ===================================================== */
+
+    function renderTv(){
+      const d=state.auction;if(!d)return;
+      const s=d.auctionSession,p=d.currentPlayer;
+      $('tv-status-badge').textContent=s?.status||'NESSUNA ASTA';
+      $('tv-player-name').textContent=p?.name||'In attesa';
+      $('tv-player-meta').textContent=p?`${playerRoles(p,d.settings?.fantasy_mode).join('/')} · ${p.serie_a_team||''}`:'';
+      $('tv-bid').textContent=s?.current_bid||'—';
+      $('tv-leader').textContent=d.currentBidderTeam?.name?`Leader: ${d.currentBidderTeam.name}`:'Nessun leader';
+      $('tv-teams').innerHTML=(d.teamOrder||[]).map(item=>`<div class="compact-row"><div><strong>${esc(item.team?.name||'Squadra')}</strong><small>Spesi ${item.credits_spent||0} · Pass ${item.passes_used||0}/5</small></div><span class="badge">${item.position}</span></div>`).join('');
+      $('tv-bids').innerHTML=(d.recentBids||[]).map(b=>`<div class="compact-row"><strong>${esc(b.team?.name||'Squadra')}</strong><span class="badge primary">${b.amount}</span></div>`).join('');
+      renderTvTimer();
+    }
+
+    function renderTvTimer(){
+      const d=state.auction,s=d?.auctionSession;if(!s){$('tv-timer').textContent='—';return}
+      if(s.hold_active){$('tv-timer').textContent='HOLD';return}
+      if(!s.timer_deadline){$('tv-timer').textContent='—';return}
+      const remain=Math.max(0,Date.parse(s.timer_deadline)-(Date.now()+state.serverOffsetMs));
+      const configured=Number(s.current_timer_seconds||0)*1000;
+      const visible=configured>0?Math.min(remain,configured):remain;
+      $('tv-timer').textContent=`${Math.ceil(visible/1000)}s`;
+    }
+
+    $('tv-fullscreen').addEventListener('click',async()=>{
+      try{if(!document.fullscreenElement)await $('view-tv').requestFullscreen();else await document.exitFullscreen()}catch(error){msg('Fullscreen non disponibile.','error')}
+    });
+
+    /* =====================================================
+       REFRESH AUTOMATICO
+       ===================================================== */
+
+    let refreshBusy=false;
+
+    async function loadCurrentView(force=false){
+      if(refreshBusy || document.hidden)return;
+      refreshBusy=true;
+      try{
+        if(state.view==='leagues')await loadLeagues();
+        else if(state.view==='home')await loadDashboard();
+        else if(state.view==='manage')await loadManagement();
+        else if(state.view==='setup')await loadSetup();
+        else if(state.view==='list')await loadList();
+        else if(state.view==='rosters')await loadRosters();
+        else if(state.view==='auction'||state.view==='tv')await loadAuction({quiet:!force});
+      }catch(error){if(force)msg(error.message,'error');else console.error(error)}
+      finally{refreshBusy=false}
+    }
+
+    setInterval(async()=>{
+      renderAuctionTimer();renderTvTimer();
+      if(document.hidden||refreshBusy)return;
+      try{
+        if((state.view==='auction'||state.view==='tv')&&auctionSession()?.status==='live'){
+          if(Date.now()-state.lastAuctionFetchAt>900){state.lastAuctionFetchAt=Date.now();await loadCurrentView(false)}
+          const s=auctionSession();
+          if(s?.timer_deadline && !s.hold_active && Date.parse(s.timer_deadline) <= Date.now()+state.serverOffsetMs){
+            try{await api(ENDPOINTS.auction,{action:'syncTimer',sessionId:s.id},{quiet:true})}catch{}
+          }
+        }
+      }catch(error){console.error(error)}
+    },250);
+
+    setInterval(()=>{
+      if(document.hidden||refreshBusy)return;
+      if(['home','manage','rosters'].includes(state.view))loadCurrentView(false);
+    },5000);
+
+    setInterval(()=>{
+      if(document.hidden||refreshBusy)return;
+      if(state.view==='list')loadCurrentView(false);
+    },15000);
+
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadCurrentView(true)});
+    window.addEventListener('focus',()=>loadCurrentView(true));
+
+    /* =====================================================
+       START
+       ===================================================== */
+
+    async function start(){
+      state.session=getLocalJson('fantacalcio_session');
+      if(!state.session?.token){window.location.href='index.html';return}
+
+      state.selectedLeague=getLocalJson('fantacalcio_selected_league');
+      updateHeader();
+
+      if(state.selectedLeague?.id){
+        switchView('home',{load:false});
+        try{await loadDashboard()}catch(error){
+          console.error(error);
+          state.selectedLeague=null;
+          localStorage.removeItem('fantacalcio_selected_league');
+          updateHeader();
+          switchView('leagues',{load:false});
+          await loadLeagues();
+        }
+      }else{
+        switchView('leagues',{load:false});
+        await loadLeagues();
+      }
+    }
+
+    start();
+  </script>
+</body>
+</html>
