@@ -379,6 +379,197 @@
       .rosters-grid{grid-template-columns:1fr}
       .quick-grid{gap:3px}.quick-btn strong{font-size:13px}
     }
+
+    /* =====================================================
+       ASTA LIVE FISSA
+       Presidente sempre nella parte principale.
+       Banditore/Admin sempre come supporto in basso.
+       La struttura non cambia tra chiamata e rilanci.
+       ===================================================== */
+
+    .fixed-live-layout{
+      height:100%;
+      min-height:0;
+      display:grid;
+      grid-template-rows:minmax(0,1fr) auto;
+      gap:6px;
+      overflow:hidden;
+    }
+
+    .president-stage{
+      position:relative;
+      min-height:0;
+      height:100%;
+      overflow:hidden;
+    }
+
+    .president-main{
+      height:100%;
+      min-height:0;
+      overflow:auto;
+      overscroll-behavior:contain;
+      padding-right:min(58vw,900px);
+      transition:padding-right .12s ease;
+    }
+
+    .president-stage:has(.free-drawer:not([open])) .president-main{
+      padding-right:42px;
+    }
+
+    .president-panels{
+      min-height:100%;
+      display:grid;
+      grid-template-columns:minmax(0,1.15fr) minmax(290px,.85fr);
+      gap:6px;
+      align-content:start;
+    }
+
+    .president-primary,
+    .president-actions{
+      min-width:0;
+    }
+
+    .president-primary{
+      display:grid;
+      align-content:start;
+      gap:6px;
+    }
+
+    .president-player-card{
+      min-height:132px;
+      display:grid;
+      align-content:center;
+    }
+
+    .president-player-card.is-waiting{
+      align-content:start;
+    }
+
+    .president-player-card .call-team{
+      font-size:18px;
+      font-weight:900;
+    }
+
+    .president-player-card .player-title{
+      font-size:clamp(24px,3.2vw,40px);
+      font-weight:950;
+      line-height:.95;
+      margin:2px 0;
+    }
+
+    .president-player-card .player-bid{
+      font-size:34px;
+      font-weight:950;
+      line-height:1;
+    }
+
+    .president-actions{
+      display:grid;
+      align-content:start;
+      gap:6px;
+    }
+
+    .president-action-slot{
+      min-height:132px;
+    }
+
+    .live-recent-bids{
+      max-height:150px;
+      overflow:auto;
+      overscroll-behavior:contain;
+    }
+
+    .banditore-support{
+      min-height:0;
+      max-height:30dvh;
+      overflow:auto;
+      overscroll-behavior:contain;
+      padding:7px;
+    }
+
+    .banditore-grid{
+      display:grid;
+      grid-template-columns:minmax(0,1.25fr) minmax(250px,.75fr);
+      gap:6px;
+      align-items:start;
+    }
+
+    .banditore-actions{
+      min-width:0;
+    }
+
+    .banditore-recent{
+      min-width:0;
+      max-height:21dvh;
+      overflow:auto;
+      overscroll-behavior:contain;
+    }
+
+    .live-phase-badge{
+      min-width:72px;
+    }
+
+    .live-placeholder{
+      min-height:76px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      color:var(--soft);
+      font-size:10px;
+      border:1px dashed var(--line);
+      border-radius:7px;
+      padding:8px;
+    }
+
+    .auction-drawer-readonly{
+      font-size:8px;
+      color:var(--soft);
+      text-align:right;
+      white-space:nowrap;
+    }
+
+    @media(max-width:900px){
+      .president-panels{
+        grid-template-columns:1fr;
+      }
+
+      .banditore-support{
+        max-height:35dvh;
+      }
+
+      .banditore-grid{
+        grid-template-columns:1fr;
+      }
+
+      .banditore-recent{
+        max-height:120px;
+      }
+    }
+
+    @media(max-width:850px){
+      .president-main{
+        padding-right:40px;
+      }
+
+      .president-stage:has(.free-drawer[open]) .president-main{
+        padding-right:40px;
+      }
+
+      .president-panels{
+        min-height:0;
+      }
+
+      .president-player-card,
+      .president-action-slot{
+        min-height:112px;
+      }
+
+      .banditore-support{
+        max-height:38dvh;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -711,6 +902,10 @@
       listSort: { key: 'name', direction: 'asc' },
       auctionRoles: new Set(['all']),
       auctionDrawerOpen: true,
+      auctionFilterSearch: '',
+      auctionFilterTeam: 'all',
+      auctionFilterSlot: 'all',
+      auctionFilterFlag: 'all',
       auctionSelectedPlayerId: null,
       auctionBidSelection: null,
       auctionBidSelectionKey: '',
@@ -1659,53 +1854,542 @@
     }
 
     function renderAuctionLive() {
-      const session=auctionSession();
-      if(!session.current_player_id) return renderAuctionCall();
-      return renderAuctionBid();
-    }
+      ensureBidSelection();
 
-    function renderAuctionCall() {
-      const data=state.auction, session=data.auctionSession;
-      const selected=(data.callCandidates||[]).find(p=>p.id===state.auctionSelectedPlayerId)||null;
+      const d = state.auction;
+      const s = d.auctionSession;
+      const hasPlayer = Boolean(s.current_player_id);
+      const p = d.currentPlayer || null;
+
+      const selectedCall =
+        (d.callCandidates || [])
+          .find(player => player.id === state.auctionSelectedPlayerId)
+        || null;
+
+      const currentBid =
+        hasPlayer
+          ? Number(s.current_bid || 0)
+          : 0;
+
+      const selectedBid =
+        hasPlayer
+          ? Number(state.auctionBidSelection || auctionBidDefault())
+          : null;
+
+      const quickOffsets = [1, 2, 3, 5, 10];
+
+      const canCall =
+        !hasPlayer
+        &&
+        d.permissions?.canCallCurrentPlayer === true;
+
+      const canPresidentBid =
+        hasPlayer
+        &&
+        d.permissions?.isPresident === true;
+
+      const callBaseHtml =
+        d.settings?.auction_base_mode === 'quotation'
+          ? `
+              <div class="selected-call">
+                <span class="small soft">
+                  Base d’asta: quotazione Fantacalcio del giocatore.
+                </span>
+              </div>
+            `
+          : `
+              <label>
+                Base d'asta
+                <input
+                  id="auction-opening-bid"
+                  type="number"
+                  min="1"
+                  value="1"
+                >
+              </label>
+            `;
+
+      const playerPrimaryHtml =
+        hasPlayer
+          ? `
+              <section class="current-player president-player-card">
+                <div class="between">
+                  <div>
+                    <div class="small soft">Giocatore in asta</div>
+                    <div class="player-title">${esc(p?.name || 'Giocatore')}</div>
+                    <div class="meta">
+                      ${esc(playerRoles(p, d.settings?.fantasy_mode).join('/'))}
+                      · ${esc(p?.serie_a_team || '')}
+                      · Slot ${esc(p?.slot ?? '—')}
+                    </div>
+                  </div>
+
+                  <div style="text-align:right">
+                    <div class="small soft">Offerta</div>
+                    <div class="player-bid">${currentBid || '—'}</div>
+                  </div>
+                </div>
+
+                <div class="bid-hero">
+                  <div>
+                    <span class="small soft">Leader</span><br>
+                    <strong>${esc(d.currentBidderTeam?.name || 'Nessuno')}</strong>
+                  </div>
+
+                  <div>
+                    <span id="auction-timer-label" class="badge primary">—</span>
+                  </div>
+                </div>
+              </section>
+            `
+          : `
+              <section class="panel president-player-card is-waiting">
+                <div class="between">
+                  <div>
+                    <div class="small soft">Turno di chiamata</div>
+                    <div class="call-team">
+                      ${esc(d.currentNominationTeam?.name || 'Squadra')}
+                    </div>
+                  </div>
+
+                  <span class="badge warn live-phase-badge">CHIAMATA</span>
+                </div>
+
+                <div class="small soft" style="margin-top:6px">
+                  ${
+                    canCall
+                      ? 'Seleziona un calciatore dal drawer Svincolati e conferma.'
+                      : 'In attesa della chiamata della squadra di turno.'
+                  }
+                </div>
+              </section>
+            `;
+
+      const presidentActionHtml =
+        hasPlayer
+          ? `
+              <section class="panel president-action-slot">
+                <div class="panel-title">
+                  <div>
+                    <h2>Rilancio Presidente</h2>
+                    <p>Seleziona un importo e poi conferma.</p>
+                  </div>
+                  <span class="badge good">${selectedBid}</span>
+                </div>
+
+                <div class="quick-grid">
+                  ${
+                    quickOffsets.map(offset => {
+                      const amount = currentBid + offset;
+
+                      return `
+                        <button
+                          class="quick-btn ${selectedBid === amount ? 'selected' : ''}"
+                          data-amount="${amount}"
+                          type="button"
+                          ${canPresidentBid ? '' : 'disabled'}
+                        >
+                          <span>+${offset}</span>
+                          <strong>${amount}</strong>
+                        </button>
+                      `;
+                    }).join('')
+                  }
+                </div>
+
+                ${
+                  canPresidentBid
+                    ? `
+                        <button
+                          id="president-bid"
+                          style="width:100%;margin-top:5px"
+                        >
+                          Conferma ${selectedBid}
+                        </button>
+                      `
+                    : `
+                        <div class="live-placeholder" style="margin-top:5px">
+                          Visualizzazione Presidente: attendi il tuo turno o il prossimo rilancio.
+                        </div>
+                      `
+                }
+
+                ${
+                  d.settings?.bid_mode === 'turn' && canPresidentBid
+                    ? `
+                        <div class="row" style="margin-top:5px">
+                          <button id="auction-pass" class="secondary">PASSA</button>
+                          <button id="auction-abandon" class="danger">ABBANDONA</button>
+                        </div>
+                      `
+                    : ''
+                }
+              </section>
+            `
+          : `
+              <section class="panel president-action-slot">
+                <div class="panel-title">
+                  <div>
+                    <h2>Chiamata Presidente</h2>
+                    <p>La posizione della schermata resta invariata.</p>
+                  </div>
+                  <span class="badge primary">PRESIDENTE</span>
+                </div>
+
+                ${callBaseHtml}
+
+                <div
+                  id="auction-selected-call"
+                  class="selected-call"
+                  style="margin-top:5px"
+                >
+                  ${
+                    selectedCall
+                      ? `
+                          <strong>${esc(selectedCall.name)}</strong>
+                          <div class="small soft">
+                            ${esc(playerRoles(selectedCall, d.settings?.fantasy_mode).join('/'))}
+                            · ${esc(selectedCall.serie_a_team || '')}
+                            · Q ${formatNumber(selectedCall.quotation)}
+                          </div>
+                        `
+                      : `
+                          <span class="small soft">
+                            Nessun giocatore selezionato.
+                          </span>
+                        `
+                  }
+                </div>
+
+                <button
+                  id="auction-call-confirm"
+                  style="width:100%;margin-top:5px"
+                  ${
+                    !selectedCall || !canCall
+                      ? 'disabled'
+                      : ''
+                  }
+                >
+                  Chiama giocatore
+                </button>
+              </section>
+            `;
+
+      const viceHtml =
+        hasPlayer && d.permissions?.isVice
+          ? `
+              <section class="panel">
+                <div class="panel-title">
+                  <div><h2>Segnale al Presidente</h2></div>
+                </div>
+
+                <div class="row">
+                  <button class="vice-signal" data-type="push">RILANCIA</button>
+                  <button class="vice-signal warn" data-type="stop">STOP</button>
+
+                  <input
+                    id="vice-limit"
+                    type="number"
+                    min="1"
+                    value="${selectedBid}"
+                    style="width:90px"
+                  >
+
+                  <button class="vice-signal secondary" data-type="limit">
+                    FINO A
+                  </button>
+
+                  <button class="vice-signal secondary" data-type="clear">
+                    Pulisci
+                  </button>
+                </div>
+              </section>
+            `
+          : '';
+
+      const viceSignalHtml =
+        hasPlayer && d.viceSignal
+          ? `
+              <section class="panel">
+                <strong>${esc(d.viceSignal.viceUsername || 'Vice')}</strong>
+                ·
+                <span class="badge ${d.viceSignal.type === 'stop' ? 'danger' : 'good'}">
+                  ${
+                    esc(
+                      d.viceSignal.type === 'limit'
+                        ? `FINO A ${d.viceSignal.amount}`
+                        : d.viceSignal.type === 'push'
+                          ? 'RILANCIA'
+                          : 'STOP'
+                    )
+                  }
+                </span>
+              </section>
+            `
+          : '';
+
+      const adminHtml =
+        auctionCanControl()
+          ? `
+              <section class="panel banditore-support">
+                <div class="panel-title">
+                  <div>
+                    <h2>Supporto Admin · Banditore</h2>
+                    <p>
+                      ${
+                        hasPlayer
+                          ? `Gestione dell’offerta corrente · selezionato ${selectedBid}`
+                          : 'In attesa della chiamata del prossimo giocatore.'
+                      }
+                    </p>
+                  </div>
+
+                  <div class="row">
+                    <span class="badge primary">BANDITORE</span>
+
+                    <button
+                      id="auction-hold"
+                      class="secondary"
+                      ${hasPlayer ? '' : 'disabled'}
+                    >
+                      ${s.hold_active ? 'RIPRENDI' : 'HOLD'}
+                    </button>
+                  </div>
+                </div>
+
+                <div class="banditore-grid">
+                  <div class="banditore-actions">
+                    ${
+                      hasPlayer
+                        ? `
+                            <div class="auction-team-buttons">
+                              ${
+                                (d.teams || []).map(team => `
+                                  <button
+                                    class="auctioneer-team secondary"
+                                    data-team="${esc(team.id)}"
+                                    ${
+                                      s.current_bidder_team_id === team.id
+                                        ? 'disabled'
+                                        : ''
+                                    }
+                                  >
+                                    ${esc(team.name)}
+                                  </button>
+                                `).join('')
+                              }
+                            </div>
+
+                            <div class="row" style="margin-top:5px">
+                              <input
+                                id="auction-correct-amount"
+                                type="number"
+                                min="1"
+                                value="${selectedBid}"
+                                style="width:95px"
+                              >
+
+                              <select
+                                id="auction-correct-team"
+                                style="width:150px"
+                              >
+                                ${
+                                  (d.teams || []).map(team => `
+                                    <option
+                                      value="${esc(team.id)}"
+                                      ${
+                                        s.current_bidder_team_id === team.id
+                                          ? 'selected'
+                                          : ''
+                                      }
+                                    >
+                                      ${esc(team.name)}
+                                    </option>
+                                  `).join('')
+                                }
+                              </select>
+
+                              <button id="auction-correct" class="secondary">
+                                Correggi
+                              </button>
+
+                              <button id="auction-award" class="good">
+                                Aggiudica
+                              </button>
+                            </div>
+                          `
+                        : `
+                            <div class="live-placeholder">
+                              La sezione Banditore resta fissa qui sotto.
+                              I controlli si attivano appena viene chiamato il giocatore.
+                            </div>
+                          `
+                    }
+                  </div>
+
+                  <div class="banditore-recent">
+                    <div class="small soft" style="margin-bottom:4px">
+                      Ultimi rilanci
+                    </div>
+
+                    <div class="compact-list">
+                      ${
+                        (d.recentBids || []).map(bid => `
+                          <div class="compact-row">
+                            <strong>${esc(bid.team?.name || 'Squadra')}</strong>
+                            <span class="badge primary">${bid.amount}</span>
+                          </div>
+                        `).join('')
+                        ||
+                        '<div class="small soft">Nessun rilancio.</div>'
+                      }
+                    </div>
+                  </div>
+                </div>
+              </section>
+            `
+          : '';
 
       $('auction-root').innerHTML = `
-        <div class="auction-live-shell">
-          <div class="call-stage">
-            <div class="call-main">
-              <section class="panel call-card">
-                <div class="panel-title"><div><h2>Chiamata · ${esc(data.currentNominationTeam?.name||'Squadra')}</h2><p>${data.permissions?.canCallCurrentPlayer?'Seleziona il giocatore e conferma.':'In attesa della chiamata.'}</p></div></div>
-                ${data.settings?.auction_base_mode === 'quotation'
-                  ? '<div class="selected-call"><span class="small soft">Base d’asta: quotazione Fantacalcio del giocatore.</span></div>'
-                  : "<label>Base d'asta<input id='auction-opening-bid' type='number' min='1' value='1'></label>"}
-                <div id="auction-selected-call" class="selected-call">${selected?`<strong>${esc(selected.name)}</strong><div class="small soft">${esc(playerRoles(selected,data.settings?.fantasy_mode).join('/'))} · ${esc(selected.serie_a_team||'')} · Q ${formatNumber(selected.quotation)}</div>`:'<span class="small soft">Nessun giocatore selezionato.</span>'}</div>
-                <button id="auction-call-confirm" ${!selected||!data.permissions?.canCallCurrentPlayer?'disabled':''}>Chiama giocatore</button>
-              </section>
+        <div class="fixed-live-layout">
+
+          <div class="president-stage">
+
+            <div class="president-main">
+              <div class="president-panels">
+
+                <div class="president-primary">
+                  ${playerPrimaryHtml}
+
+                  <section class="panel live-recent-bids">
+                    <div class="panel-title">
+                      <div><h2>Situazione asta</h2></div>
+                      <span class="badge ${hasPlayer ? 'good' : 'warn'}">
+                        ${hasPlayer ? 'RILANCI' : 'CHIAMATA'}
+                      </span>
+                    </div>
+
+                    <div class="compact-list">
+                      ${
+                        (d.recentBids || []).slice(0, 5).map(bid => `
+                          <div class="compact-row">
+                            <strong>${esc(bid.team?.name || 'Squadra')}</strong>
+                            <span class="badge primary">${bid.amount}</span>
+                          </div>
+                        `).join('')
+                        ||
+                        '<div class="small soft">Nessun rilancio registrato.</div>'
+                      }
+                    </div>
+                  </section>
+                </div>
+
+                <div class="president-actions">
+                  ${presidentActionHtml}
+                  ${viceHtml}
+                  ${viceSignalHtml}
+                </div>
+
+              </div>
             </div>
 
-            <details id="free-drawer" class="free-drawer" ${state.auctionDrawerOpen ? 'open' : ''}>
+            <details
+              id="free-drawer"
+              class="free-drawer"
+              ${state.auctionDrawerOpen ? 'open' : ''}
+            >
               <summary>Svincolati</summary>
+
               <div class="drawer-content">
-                <div id="auction-rolebar" class="rolebar"></div>
-                <div class="drawer-filters">
-                  <label>Cerca<input id="auction-search" type="search" placeholder="Nome o squadra..."></label>
-                  <label>Squadra<select id="auction-team-filter"><option value="all">Tutte</option></select></label>
-                  <label>Slot<select id="auction-slot-filter"><option value="all">Tutti</option></select></label>
-                  <label>Segnalazioni<select id="auction-flag-filter"><option value="all">Tutte</option><option value="market">Mercato</option><option value="injury">Indisponibili</option><option value="new">Nuovi arrivi</option><option value="penalties">Rigoristi</option></select></label>
+
+                <div class="between">
+                  <div id="auction-rolebar" class="rolebar"></div>
+
+                  <span class="auction-drawer-readonly">
+                    ${
+                      hasPlayer
+                        ? 'Consultazione durante i rilanci'
+                        : 'Clic sulla riga per selezionare'
+                    }
+                  </span>
                 </div>
+
+                <div class="drawer-filters">
+                  <label>
+                    Cerca
+                    <input
+                      id="auction-search"
+                      type="search"
+                      placeholder="Nome o squadra..."
+                      value="${esc(state.auctionFilterSearch)}"
+                    >
+                  </label>
+
+                  <label>
+                    Squadra
+                    <select id="auction-team-filter">
+                      <option value="all">Tutte</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    Slot
+                    <select id="auction-slot-filter">
+                      <option value="all">Tutti</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    Segnalazioni
+                    <select id="auction-flag-filter">
+                      <option value="all">Tutte</option>
+                      <option value="market">Mercato</option>
+                      <option value="injury">Indisponibili</option>
+                      <option value="new">Nuovi arrivi</option>
+                      <option value="penalties">Rigoristi</option>
+                    </select>
+                  </label>
+                </div>
+
                 <div class="drawer-table">
                   <table class="player-table">
                     <colgroup>
-                      <col class="col-player"><col class="col-team"><col class="col-slot">
-                      <col class="col-stat"><col class="col-stat"><col class="col-stat"><col class="col-stat"><col class="col-stat">
+                      <col class="col-player">
+                      <col class="col-team">
+                      <col class="col-slot">
+                      <col class="col-stat">
+                      <col class="col-stat">
+                      <col class="col-stat">
+                      <col class="col-stat">
+                      <col class="col-stat">
                     </colgroup>
-                    <thead><tr><th>Calciatore</th><th>Squadra</th><th class="num-head">Slot</th><th class="num-head">PMA</th><th class="num-head">PFC</th><th class="num-head">Δ</th><th class="num-head">FM</th><th class="num-head">Tit.</th></tr></thead>
+
+                    <thead>
+                      <tr>
+                        <th>Calciatore</th>
+                        <th>Squadra</th>
+                        <th class="num-head">Slot</th>
+                        <th class="num-head">PMA</th>
+                        <th class="num-head">PFC</th>
+                        <th class="num-head">Δ</th>
+                        <th class="num-head">FM</th>
+                        <th class="num-head">Tit.</th>
+                      </tr>
+                    </thead>
+
                     <tbody id="auction-player-body"></tbody>
                   </table>
                 </div>
+
               </div>
             </details>
+
           </div>
-        </div>`;
+
+          ${adminHtml}
+
+        </div>
+      `;
 
       renderAuctionDrawerControls();
       renderAuctionPlayers();
@@ -1714,96 +2398,332 @@
         state.auctionDrawerOpen = event.currentTarget.open;
       });
 
-      $('auction-call-confirm')?.addEventListener('click', async()=>{
-        if(!state.auctionSelectedPlayerId)return;
-        try{
-          const openingBid = data.settings?.auction_base_mode === 'quotation'
-            ? null
-            : Number($('auction-opening-bid')?.value || 1);
-          await api(ENDPOINTS.auction,{action:'callPlayer',sessionId:session.id,playerId:state.auctionSelectedPlayerId,openingBid});
-          state.auctionSelectedPlayerId=null;
+      $('auction-call-confirm')?.addEventListener('click', async () => {
+        if (!state.auctionSelectedPlayerId || hasPlayer) return;
+
+        try {
+          const openingBid =
+            d.settings?.auction_base_mode === 'quotation'
+              ? null
+              : Number($('auction-opening-bid')?.value || 1);
+
+          await api(ENDPOINTS.auction, {
+            action: 'callPlayer',
+            sessionId: s.id,
+            playerId: state.auctionSelectedPlayerId,
+            openingBid
+          });
+
+          state.auctionSelectedPlayerId = null;
           await loadAuction();
-        }catch(error){msg(error.message,'error')}
+
+        } catch (error) {
+          msg(error.message, 'error');
+        }
       });
+
+      document.querySelectorAll('.quick-btn').forEach(button => {
+        button.addEventListener('click', () => {
+          if (!hasPlayer) return;
+
+          state.auctionBidSelection =
+            Number(button.dataset.amount);
+
+          /*
+           * Re-render locale della STESSA schermata:
+           * non cambia struttura né posizione dei pannelli.
+           */
+          renderAuctionLive();
+        });
+      });
+
+      $('president-bid')?.addEventListener(
+        'click',
+        () => placeBid(
+          auctionMyTeamId(),
+          selectedBid,
+          'APP'
+        )
+      );
+
+      document.querySelectorAll('.auctioneer-team').forEach(button => {
+        button.addEventListener(
+          'click',
+          () => placeBid(
+            button.dataset.team,
+            selectedBid,
+            'VOCALE'
+          )
+        );
+      });
+
+      $('auction-hold')?.addEventListener(
+        'click',
+        () => auctionAction({
+          action: 'setHold',
+          sessionId: s.id,
+          hold: !s.hold_active
+        })
+      );
+
+      $('auction-award')?.addEventListener(
+        'click',
+        () => auctionAction({
+          action: 'awardPlayer',
+          sessionId: s.id
+        }, 'Giocatore aggiudicato.')
+      );
+
+      $('auction-correct')?.addEventListener(
+        'click',
+        () => auctionAction({
+          action: 'correctBid',
+          sessionId: s.id,
+          teamId: $('auction-correct-team').value,
+          amount: Number($('auction-correct-amount').value)
+        }, 'Offerta corretta.')
+      );
+
+      $('auction-pass')?.addEventListener(
+        'click',
+        () => auctionAction({
+          action: 'passTurn',
+          sessionId: s.id,
+          teamId: auctionMyTeamId()
+        })
+      );
+
+      $('auction-abandon')?.addEventListener(
+        'click',
+        () => auctionAction({
+          action: 'abandonTurn',
+          sessionId: s.id,
+          teamId: auctionMyTeamId()
+        })
+      );
+
+      document.querySelectorAll('.vice-signal').forEach(button => {
+        button.addEventListener(
+          'click',
+          () => sendViceSignal(
+            button.dataset.type
+          )
+        );
+      });
+
+      renderAuctionTimer();
     }
 
     function renderAuctionDrawerControls() {
-      const players=state.auction?.callCandidates||[];
-      const mode=state.auction?.settings?.fantasy_mode||'classic';
-      const teams=[...new Set(players.map(p=>p.serie_a_team).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'it'));
-      const slots=[...new Set(players.map(p=>p.slot).filter(v=>v!==null&&v!==undefined&&String(v).trim()!=='').map(String))].sort((a,b)=>a.localeCompare(b,'it',{numeric:true}));
-      setOptions($('auction-team-filter'),teams,'Tutte'); setOptions($('auction-slot-filter'),slots,'Tutti');
-      renderRoleBar($('auction-rolebar'),state.auctionRoles,mode,next=>{state.auctionRoles=next;renderAuctionDrawerControls();renderAuctionPlayers()});
-      $('auction-search').addEventListener('input',renderAuctionPlayers);
-      $('auction-team-filter').addEventListener('change',renderAuctionPlayers);
-      $('auction-slot-filter').addEventListener('change',renderAuctionPlayers);
-      $('auction-flag-filter').addEventListener('change',renderAuctionPlayers);
+      const players = state.auction?.callCandidates || [];
+      const mode = state.auction?.settings?.fantasy_mode || 'classic';
+
+      const teams = [
+        ...new Set(
+          players
+            .map(player => player.serie_a_team)
+            .filter(Boolean)
+        )
+      ].sort((a, b) => a.localeCompare(b, 'it'));
+
+      const slots = [
+        ...new Set(
+          players
+            .map(player => player.slot)
+            .filter(value =>
+              value !== null &&
+              value !== undefined &&
+              String(value).trim() !== ''
+            )
+            .map(String)
+        )
+      ].sort((a, b) =>
+        a.localeCompare(
+          b,
+          'it',
+          { numeric: true }
+        )
+      );
+
+      setOptions(
+        $('auction-team-filter'),
+        teams,
+        'Tutte'
+      );
+
+      setOptions(
+        $('auction-slot-filter'),
+        slots,
+        'Tutti'
+      );
+
+      $('auction-team-filter').value =
+        [...$('auction-team-filter').options]
+          .some(option => option.value === state.auctionFilterTeam)
+            ? state.auctionFilterTeam
+            : 'all';
+
+      $('auction-slot-filter').value =
+        [...$('auction-slot-filter').options]
+          .some(option => option.value === state.auctionFilterSlot)
+            ? state.auctionFilterSlot
+            : 'all';
+
+      $('auction-flag-filter').value =
+        state.auctionFilterFlag || 'all';
+
+      renderRoleBar(
+        $('auction-rolebar'),
+        state.auctionRoles,
+        mode,
+        next => {
+          state.auctionRoles = next;
+          renderAuctionLive();
+        }
+      );
+
+      $('auction-search').addEventListener('input', event => {
+        state.auctionFilterSearch = event.target.value;
+        renderAuctionPlayers();
+      });
+
+      $('auction-team-filter').addEventListener('change', event => {
+        state.auctionFilterTeam = event.target.value;
+        renderAuctionPlayers();
+      });
+
+      $('auction-slot-filter').addEventListener('change', event => {
+        state.auctionFilterSlot = event.target.value;
+        renderAuctionPlayers();
+      });
+
+      $('auction-flag-filter').addEventListener('change', event => {
+        state.auctionFilterFlag = event.target.value;
+        renderAuctionPlayers();
+      });
     }
 
     function renderAuctionPlayers() {
-      const body=$('auction-player-body'); if(!body)return;
-      const data=state.auction, mode=data.settings?.fantasy_mode||'classic';
-      const controls={search:$('auction-search'),team:$('auction-team-filter'),slot:$('auction-slot-filter'),flag:$('auction-flag-filter')};
-      const players=filterPlayers(data.callCandidates||[],controls,state.auctionRoles,mode).sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'it'));
-      body.innerHTML=players.map(p=>playerRow(p,mode,p.id===state.auctionSelectedPlayerId?'selected-player':'')).join('');
-      body.querySelectorAll('[data-player-id]').forEach(row=>row.addEventListener('click',()=>{
-        state.auctionSelectedPlayerId=row.dataset.playerId;
-        renderAuctionCall();
-      }));
+      const body = $('auction-player-body');
+      if (!body) return;
+
+      const data = state.auction;
+      const mode = data.settings?.fantasy_mode || 'classic';
+
+      const controls = {
+        search: $('auction-search'),
+        team: $('auction-team-filter'),
+        slot: $('auction-slot-filter'),
+        flag: $('auction-flag-filter')
+      };
+
+      const players =
+        filterPlayers(
+          data.callCandidates || [],
+          controls,
+          state.auctionRoles,
+          mode
+        )
+          .sort(
+            (a, b) =>
+              String(a.name || '')
+                .localeCompare(
+                  String(b.name || ''),
+                  'it'
+                )
+          );
+
+      body.innerHTML =
+        players
+          .map(player =>
+            playerRow(
+              player,
+              mode,
+              player.id === state.auctionSelectedPlayerId
+                ? 'selected-player'
+                : ''
+            )
+          )
+          .join('')
+        ||
+        `
+          <tr>
+            <td
+              colspan="8"
+              class="soft"
+              style="text-align:center;height:70px"
+            >
+              Nessun giocatore.
+            </td>
+          </tr>
+        `;
+
+      /*
+       * Durante i rilanci il Listone resta consultabile,
+       * ma non può cambiare il giocatore in asta.
+       */
+      if (auctionSession()?.current_player_id) {
+        return;
+      }
+
+      body
+        .querySelectorAll(
+          '[data-player-id]'
+        )
+        .forEach(row => {
+          row.addEventListener(
+            'click',
+            () => {
+              state.auctionSelectedPlayerId =
+                row.dataset.playerId;
+
+              renderAuctionLive();
+            }
+          );
+        });
     }
 
     function auctionBidDefault() {
-      const s=auctionSession();
-      if(!s)return 1;
-      return s.current_bidder_team_id ? Number(s.current_bid||0)+1 : Math.max(1,Number(s.current_bid||1));
+      const s = auctionSession();
+
+      if (!s) {
+        return 1;
+      }
+
+      return s.current_bidder_team_id
+        ? Number(s.current_bid || 0) + 1
+        : Math.max(
+            1,
+            Number(s.current_bid || 1)
+          );
     }
 
     function ensureBidSelection() {
-      const s=auctionSession(); if(!s)return;
-      const key=`${s.current_player_id}|${s.current_bid}|${s.current_bidder_team_id||''}`;
-      if(state.auctionBidSelectionKey!==key){state.auctionBidSelectionKey=key;state.auctionBidSelection=auctionBidDefault()}
-    }
+      const s = auctionSession();
 
-    function renderAuctionBid() {
-      ensureBidSelection();
-      const d=state.auction,s=d.auctionSession,p=d.currentPlayer;
-      const current=Number(s.current_bid||0), selected=Number(state.auctionBidSelection||auctionBidDefault());
-      const quick=[1,2,3,5,10];
-      $('auction-root').innerHTML=`
-        <div class="auction-live-shell"><div class="live-top">
-          <div class="live-left">
-            <section class="current-player">
-              <div class="between"><div><h2>${esc(p?.name||'Giocatore')}</h2><div class="meta">${esc(playerRoles(p,d.settings?.fantasy_mode).join('/'))} · ${esc(p?.serie_a_team||'')} · Slot ${esc(p?.slot??'—')}</div></div><div class="bid-amount">${current||'—'}</div></div>
-              <div class="bid-hero"><div><span class="small soft">Leader</span><br><strong>${esc(d.currentBidderTeam?.name||'Nessuno')}</strong></div><div><span id="auction-timer-label" class="badge primary">—</span></div></div>
-            </section>
+      if (!s) {
+        return;
+      }
 
-            <section class="panel">
-              <div class="panel-title"><div><h2>Rilancio</h2><p>Seleziona, poi conferma.</p></div><span class="badge good">${selected}</span></div>
-              <div class="quick-grid">${quick.map(off=>`<button class="quick-btn ${selected===current+off?'selected':''}" data-amount="${current+off}" type="button"><span>+${off}</span><strong>${current+off}</strong></button>`).join('')}</div>
-              ${d.permissions?.isPresident ? `<button id="president-bid" style="width:100%;margin-top:5px">Conferma ${selected}</button>`:''}
-              ${d.settings?.bid_mode==='turn' && d.permissions?.isPresident ? `<div class="row" style="margin-top:5px"><button id="auction-pass" class="secondary">PASSA</button><button id="auction-abandon" class="danger">ABBANDONA</button></div>`:''}
-            </section>
+      if (!s.current_player_id) {
+        state.auctionBidSelection = null;
+        state.auctionBidSelectionKey = '';
+        return;
+      }
 
-            ${d.permissions?.isVice?`<section class="panel"><div class="panel-title"><div><h2>Segnale al Presidente</h2></div></div><div class="row"><button class="vice-signal" data-type="push">RILANCIA</button><button class="vice-signal warn" data-type="stop">STOP</button><input id="vice-limit" type="number" min="1" value="${selected}" style="width:90px"><button class="vice-signal secondary" data-type="limit">FINO A</button><button class="vice-signal secondary" data-type="clear">Pulisci</button></div></section>`:''}
-            ${d.viceSignal?`<section class="panel"><strong>${esc(d.viceSignal.viceUsername||'Vice')}</strong> · <span class="badge ${d.viceSignal.type==='stop'?'danger':'good'}">${esc(d.viceSignal.type==='limit'?`FINO A ${d.viceSignal.amount}`:d.viceSignal.type==='push'?'RILANCIA':'STOP')}</span></section>`:''}
-          </div>
+      const key =
+        `${s.current_player_id}|${s.current_bid}|${s.current_bidder_team_id || ''}`;
 
-          <div class="live-right">
-            ${auctionCanControl()?`<section class="panel"><div class="panel-title"><div><h2>Banditore</h2><p>Importo selezionato ${selected}</p></div><button id="auction-hold" class="secondary">${s.hold_active?'RIPRENDI':'HOLD'}</button></div><div class="auction-team-buttons">${(d.teams||[]).map(team=>`<button class="auctioneer-team secondary" data-team="${esc(team.id)}" ${s.current_bidder_team_id===team.id?'disabled':''}>${esc(team.name)}</button>`).join('')}</div><div class="row" style="margin-top:5px"><input id="auction-correct-amount" type="number" min="1" value="${selected}" style="width:95px"><select id="auction-correct-team" style="width:150px">${(d.teams||[]).map(team=>`<option value="${esc(team.id)}" ${s.current_bidder_team_id===team.id?'selected':''}>${esc(team.name)}</option>`).join('')}</select><button id="auction-correct" class="secondary">Correggi</button><button id="auction-award" class="good">Aggiudica</button></div></section>`:''}
-            <section class="panel"><div class="panel-title"><div><h2>Ultimi rilanci</h2></div></div><div class="compact-list">${(d.recentBids||[]).map(b=>`<div class="compact-row"><strong>${esc(b.team?.name||'Squadra')}</strong><span class="badge primary">${b.amount}</span></div>`).join('')||'<div class="small soft">Nessun rilancio.</div>'}</div></section>
-          </div>
-        </div></div>`;
+      if (
+        state.auctionBidSelectionKey
+        !== key
+      ) {
+        state.auctionBidSelectionKey =
+          key;
 
-      document.querySelectorAll('.quick-btn').forEach(btn=>btn.addEventListener('click',()=>{state.auctionBidSelection=Number(btn.dataset.amount);renderAuctionBid()}));
-      $('president-bid')?.addEventListener('click',()=>placeBid(auctionMyTeamId(),selected,'APP'));
-      document.querySelectorAll('.auctioneer-team').forEach(btn=>btn.addEventListener('click',()=>placeBid(btn.dataset.team,selected,'VOCALE')));
-      $('auction-hold')?.addEventListener('click',()=>auctionAction({action:'setHold',sessionId:s.id,hold:!s.hold_active}));
-      $('auction-award')?.addEventListener('click',()=>auctionAction({action:'awardPlayer',sessionId:s.id},'Giocatore aggiudicato.'));
-      $('auction-correct')?.addEventListener('click',()=>auctionAction({action:'correctBid',sessionId:s.id,teamId:$('auction-correct-team').value,amount:Number($('auction-correct-amount').value)},'Offerta corretta.'));
-      $('auction-pass')?.addEventListener('click',()=>auctionAction({action:'passTurn',sessionId:s.id,teamId:auctionMyTeamId()}));
-      $('auction-abandon')?.addEventListener('click',()=>auctionAction({action:'abandonTurn',sessionId:s.id,teamId:auctionMyTeamId()}));
-      document.querySelectorAll('.vice-signal').forEach(btn=>btn.addEventListener('click',()=>sendViceSignal(btn.dataset.type)));
-      renderAuctionTimer();
+        state.auctionBidSelection =
+          auctionBidDefault();
+      }
     }
 
     async function placeBid(teamId,amount,source){
