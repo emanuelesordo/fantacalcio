@@ -710,6 +710,869 @@
       }
     }
 
+
+    /* =====================================================
+       ASTA COCKPIT V2
+       Ricostruzione completa della schermata live:
+       - barra stato unica
+       - dashboard squadra a sinistra
+       - tavolo d'asta centrale
+       - drawer svincolati in overlay a destra
+       - console Banditore fissa in basso
+       ===================================================== */
+
+    body.auction-live .auction-back-live{
+      display:none!important;
+    }
+
+    body.auction-live .auction-root{
+      padding-top:0!important;
+    }
+
+    .auction-cockpit{
+      height:100%;
+      min-height:0;
+      display:grid;
+      grid-template-rows:42px minmax(0,1fr) auto;
+      gap:5px;
+      overflow:hidden;
+    }
+
+    .auction-statusbar{
+      min-width:0;
+      display:grid;
+      grid-template-columns:auto minmax(0,1fr) auto auto;
+      align-items:center;
+      gap:7px;
+      padding:4px 6px;
+      border:1px solid var(--line2);
+      border-radius:8px;
+      background:#0a203b;
+      box-shadow:0 7px 20px rgba(0,0,0,.18);
+    }
+
+    .auction-statusbar .back-live{
+      min-height:30px;
+      padding:4px 8px;
+      background:var(--panel3);
+      border-color:var(--line);
+      white-space:nowrap;
+    }
+
+    .auction-status-main{
+      min-width:0;
+      display:flex;
+      align-items:center;
+      gap:7px;
+    }
+
+    .auction-live-mark{
+      flex:0 0 auto;
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      color:#a8c8ef;
+      font-size:8px;
+      font-weight:950;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .auction-live-dot{
+      width:7px;
+      height:7px;
+      border-radius:50%;
+      background:#4bdd9b;
+      box-shadow:0 0 0 4px rgba(75,221,155,.10);
+    }
+
+    .auction-status-title{
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-size:12px;
+      font-weight:900;
+    }
+
+    .auction-status-sub{
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      color:var(--soft);
+      font-size:8px;
+    }
+
+    .auction-status-phase{
+      display:flex;
+      align-items:center;
+      gap:4px;
+      white-space:nowrap;
+    }
+
+    .auction-status-timer{
+      min-width:62px;
+      height:32px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid #4c8bd1;
+      border-radius:7px;
+      background:#123a68;
+      font-size:18px;
+      font-weight:950;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .auction-cockpit-stage{
+      position:relative;
+      min-height:0;
+      overflow:hidden;
+    }
+
+    .auction-president-grid{
+      height:100%;
+      min-height:0;
+      display:grid;
+      grid-template-columns:minmax(255px,31%) minmax(0,1fr);
+      gap:5px;
+      padding-right:38px;
+      overflow:hidden;
+    }
+
+    .auction-team-column,
+    .auction-table-column{
+      min-height:0;
+      overflow:hidden;
+    }
+
+    .auction-team-column{
+      display:grid;
+      grid-template-rows:auto minmax(0,1fr);
+      gap:5px;
+    }
+
+    .auction-team-card{
+      min-width:0;
+      padding:8px;
+      border:1px solid var(--line);
+      border-radius:9px;
+      background:linear-gradient(145deg,#102f54,#0a213e);
+      overflow:hidden;
+    }
+
+    .auction-team-card-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:6px;
+      min-width:0;
+      margin-bottom:6px;
+    }
+
+    .auction-team-card-head strong{
+      display:block;
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-size:14px;
+    }
+
+    .auction-team-card-head small{
+      display:block;
+      color:var(--soft);
+      font-size:8px;
+      margin-top:1px;
+    }
+
+    .auction-team-primary-kpis{
+      display:grid;
+      grid-template-columns:1.25fr 1fr;
+      gap:4px;
+      margin-bottom:4px;
+    }
+
+    .auction-team-big-kpi{
+      min-width:0;
+      min-height:59px;
+      padding:6px 7px;
+      border:1px solid var(--line);
+      border-radius:7px;
+      background:#0b2a4d;
+      display:grid;
+      align-content:center;
+    }
+
+    .auction-team-big-kpi span{
+      color:var(--muted);
+      font-size:7px;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+    }
+
+    .auction-team-big-kpi strong{
+      margin-top:2px;
+      font-size:25px;
+      line-height:.9;
+      font-weight:950;
+    }
+
+    .auction-team-mini-kpis{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:4px;
+    }
+
+    .auction-team-mini-kpi{
+      min-width:0;
+      min-height:34px;
+      padding:4px 5px;
+      border:1px solid rgba(40,89,142,.8);
+      border-radius:6px;
+      background:#0b2949;
+      display:grid;
+      gap:1px;
+    }
+
+    .auction-team-mini-kpi span{
+      color:var(--muted);
+      font-size:6px;
+      text-transform:uppercase;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .auction-team-mini-kpi strong{
+      font-size:11px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .auction-role-strip{
+      display:flex;
+      gap:3px;
+      flex-wrap:wrap;
+      margin-top:5px;
+    }
+
+    .auction-team-roster{
+      min-height:0;
+      display:grid;
+      grid-template-rows:auto minmax(0,1fr);
+      border:1px solid var(--line);
+      border-radius:9px;
+      background:var(--panel);
+      overflow:hidden;
+    }
+
+    .auction-team-roster-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:6px;
+      padding:5px 7px;
+      border-bottom:1px solid var(--line);
+      background:var(--panel2);
+    }
+
+    .auction-team-roster-head strong{
+      font-size:10px;
+    }
+
+    .auction-team-roster-list{
+      min-height:0;
+      overflow:auto;
+      overscroll-behavior:contain;
+      padding:4px;
+      display:grid;
+      align-content:start;
+      gap:3px;
+    }
+
+    .auction-roster-line{
+      min-width:0;
+      min-height:29px;
+      padding:4px 5px;
+      border:1px solid rgba(40,89,142,.55);
+      border-radius:5px;
+      background:#0a2748;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:5px;
+      align-items:center;
+    }
+
+    .auction-roster-line strong{
+      display:block;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-size:9px;
+    }
+
+    .auction-roster-line small{
+      display:block;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      color:var(--soft);
+      font-size:7px;
+    }
+
+    .auction-all-teams-list{
+      min-height:0;
+      overflow:auto;
+      overscroll-behavior:contain;
+      padding:4px;
+      display:grid;
+      align-content:start;
+      gap:3px;
+    }
+
+    .auction-table-column{
+      display:grid;
+      grid-template-rows:minmax(145px,.9fr) auto auto minmax(0,.55fr);
+      gap:5px;
+    }
+
+    .auction-player-hero{
+      min-height:0;
+      padding:10px;
+      border:1px solid #3977b5;
+      border-radius:10px;
+      background:
+        radial-gradient(circle at 82% 20%,rgba(52,120,246,.20),transparent 31%),
+        linear-gradient(140deg,#10335c,#081b33);
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:10px;
+      align-items:center;
+      overflow:hidden;
+    }
+
+    .auction-player-hero.waiting{
+      align-items:start;
+    }
+
+    .auction-player-identity{
+      min-width:0;
+    }
+
+    .auction-player-kicker{
+      color:#7da7d5;
+      font-size:8px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.07em;
+    }
+
+    .auction-player-name-live{
+      margin:3px 0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-size:clamp(28px,4vw,50px);
+      line-height:.92;
+      font-weight:950;
+      letter-spacing:-.035em;
+    }
+
+    .auction-player-meta-live{
+      color:#aac3e2;
+      font-size:10px;
+    }
+
+    .auction-current-offer{
+      min-width:148px;
+      text-align:right;
+      padding-left:9px;
+      border-left:1px solid rgba(91,148,209,.35);
+    }
+
+    .auction-current-offer span{
+      color:var(--muted);
+      font-size:7px;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+    }
+
+    .auction-current-offer strong{
+      display:block;
+      margin-top:2px;
+      font-size:clamp(39px,5vw,62px);
+      line-height:.8;
+      font-weight:950;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .auction-current-leader{
+      margin-top:7px;
+      font-size:10px;
+    }
+
+    .auction-current-leader b{
+      color:#fff;
+    }
+
+    .auction-action-card{
+      padding:7px;
+      border:1px solid var(--line);
+      border-radius:9px;
+      background:var(--panel);
+    }
+
+    .auction-action-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:6px;
+      margin-bottom:5px;
+    }
+
+    .auction-action-head strong{
+      font-size:11px;
+    }
+
+    .auction-call-row{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) minmax(110px,150px) auto;
+      gap:5px;
+      align-items:end;
+    }
+
+    .auction-call-preview{
+      min-width:0;
+      min-height:48px;
+      padding:5px 7px;
+      border:1px solid var(--line);
+      border-radius:6px;
+      background:#0b2a4d;
+      display:grid;
+      align-content:center;
+    }
+
+    .auction-call-preview strong{
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-size:12px;
+    }
+
+    .auction-call-preview small{
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      color:var(--soft);
+      font-size:8px;
+    }
+
+    .auction-bid-action-row{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) minmax(120px,170px);
+      gap:5px;
+      align-items:stretch;
+    }
+
+    .auction-bid-confirm{
+      min-height:48px;
+      font-size:12px;
+    }
+
+    .auction-turn-actions{
+      display:flex;
+      gap:4px;
+      margin-top:4px;
+    }
+
+    .auction-vice-strip{
+      min-height:0;
+      display:flex;
+      align-items:center;
+      gap:5px;
+      flex-wrap:wrap;
+      padding:5px 7px;
+      border:1px solid var(--line);
+      border-radius:7px;
+      background:#0a2543;
+    }
+
+    .auction-vice-strip strong{
+      font-size:9px;
+    }
+
+    .auction-bid-history{
+      min-height:0;
+      overflow:auto;
+      overscroll-behavior:contain;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:var(--panel);
+      padding:5px;
+    }
+
+    .auction-bid-history-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:5px;
+      margin-bottom:4px;
+    }
+
+    .auction-bid-history-title strong{
+      font-size:9px;
+    }
+
+    .auction-bid-chips{
+      display:flex;
+      align-items:center;
+      gap:4px;
+      flex-wrap:wrap;
+    }
+
+    .auction-bid-chip{
+      display:flex;
+      align-items:center;
+      gap:4px;
+      padding:4px 6px;
+      border:1px solid rgba(40,89,142,.65);
+      border-radius:6px;
+      background:#0b2a4d;
+      font-size:8px;
+    }
+
+    .auction-bid-chip strong{
+      font-size:10px;
+    }
+
+    /* Drawer: overlay, non ridimensiona il cockpit */
+    .auction-cockpit details.free-drawer{
+      position:absolute;
+      z-index:40;
+      top:0;
+      right:0;
+      bottom:0;
+      width:min(58vw,900px);
+      min-width:420px;
+      height:100%;
+      border:1px solid var(--line2);
+      border-radius:9px;
+      background:var(--panel);
+      box-shadow:-12px 0 30px rgba(0,0,0,.34);
+      overflow:hidden;
+    }
+
+    .auction-cockpit details.free-drawer:not([open]){
+      width:36px;
+      min-width:36px;
+      max-width:36px;
+      box-shadow:none;
+    }
+
+    .auction-cockpit details.free-drawer>summary{
+      position:absolute;
+      left:0;
+      top:0;
+      bottom:0;
+      width:36px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-right:1px solid var(--line2);
+      background:#1a477b;
+      writing-mode:vertical-rl;
+      text-orientation:mixed;
+      color:#fff;
+      font-size:8px;
+      font-weight:950;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+      cursor:pointer;
+      list-style:none;
+      z-index:3;
+    }
+
+    .auction-cockpit details.free-drawer>summary::-webkit-details-marker{
+      display:none;
+    }
+
+    .auction-cockpit details.free-drawer:not([open])>*:not(summary){
+      display:none!important;
+    }
+
+    .auction-cockpit .drawer-content{
+      height:100%;
+      min-height:0;
+      margin-left:36px;
+      padding:5px;
+      display:grid;
+      grid-template-rows:auto auto minmax(0,1fr);
+      gap:4px;
+    }
+
+    .auction-cockpit .drawer-table{
+      height:100%;
+      min-height:0;
+      overflow:auto;
+    }
+
+    /* Console Banditore */
+    .auctioneer-console{
+      min-height:0;
+      max-height:170px;
+      padding:6px;
+      border:1px solid #3f71a8;
+      border-radius:9px;
+      background:linear-gradient(180deg,#0b2747,#081c34);
+      overflow:auto;
+      overscroll-behavior:contain;
+    }
+
+    .auctioneer-console-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:6px;
+      margin-bottom:5px;
+    }
+
+    .auctioneer-console-title{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      min-width:0;
+    }
+
+    .auctioneer-console-title strong{
+      font-size:11px;
+    }
+
+    .auctioneer-console-body{
+      display:grid;
+      grid-template-columns:minmax(0,1.5fr) auto;
+      gap:5px;
+      align-items:start;
+    }
+
+    .auctioneer-team-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
+      gap:3px;
+    }
+
+    .auctioneer-team-grid button{
+      min-height:29px;
+      padding:4px 6px;
+      font-size:9px;
+    }
+
+    .auctioneer-side-actions{
+      display:grid;
+      grid-template-columns:92px 145px auto auto;
+      gap:4px;
+      align-items:end;
+    }
+
+    .auctioneer-side-actions label{
+      gap:2px;
+      font-size:7px;
+    }
+
+    .auctioneer-side-actions input,
+    .auctioneer-side-actions select{
+      min-height:29px;
+      padding:4px 5px;
+      font-size:9px;
+    }
+
+    .auctioneer-side-actions button{
+      min-height:29px;
+      padding:4px 7px;
+      font-size:9px;
+    }
+
+    .auctioneer-idle{
+      min-height:34px;
+      display:flex;
+      align-items:center;
+      color:var(--soft);
+      font-size:9px;
+    }
+
+    /* Overview quando non esiste una squadra personale */
+    .auction-overview-card{
+      min-height:0;
+      display:grid;
+      grid-template-rows:auto minmax(0,1fr);
+      border:1px solid var(--line);
+      border-radius:9px;
+      background:var(--panel);
+      overflow:hidden;
+    }
+
+    .auction-overview-head{
+      padding:6px 7px;
+      border-bottom:1px solid var(--line);
+      background:var(--panel2);
+      font-size:10px;
+      font-weight:900;
+    }
+
+    /* Mobile */
+    @media(max-width:900px){
+      .auction-cockpit{
+        grid-template-rows:38px minmax(0,1fr) auto;
+      }
+
+      .auction-statusbar{
+        grid-template-columns:auto minmax(0,1fr) auto;
+        gap:4px;
+      }
+
+      .auction-status-phase{
+        display:none;
+      }
+
+      .auction-status-timer{
+        min-width:52px;
+        height:29px;
+        font-size:15px;
+      }
+
+      .auction-president-grid{
+        display:block;
+        height:100%;
+        padding-right:38px;
+        overflow:auto;
+        overscroll-behavior:contain;
+      }
+
+      .auction-team-column,
+      .auction-table-column{
+        overflow:visible;
+      }
+
+      .auction-team-column{
+        display:block;
+      }
+
+      .auction-team-card{
+        position:sticky;
+        top:0;
+        z-index:4;
+        margin-bottom:5px;
+      }
+
+      .auction-team-roster{
+        display:none;
+      }
+
+      .auction-table-column{
+        display:grid;
+        grid-template-rows:auto auto auto auto;
+      }
+
+      .auction-team-primary-kpis{
+        grid-template-columns:1fr 1fr;
+      }
+
+      .auction-team-mini-kpis{
+        grid-template-columns:repeat(3,1fr);
+      }
+
+      .auction-player-hero{
+        min-height:125px;
+      }
+
+      .auction-player-name-live{
+        font-size:28px;
+      }
+
+      .auction-current-offer{
+        min-width:105px;
+      }
+
+      .auction-current-offer strong{
+        font-size:40px;
+      }
+
+      .auction-call-row,
+      .auction-bid-action-row{
+        grid-template-columns:1fr;
+      }
+
+      .auction-call-row button,
+      .auction-bid-confirm{
+        width:100%;
+      }
+
+      .auction-cockpit details.free-drawer{
+        width:min(94vw,620px);
+        min-width:0;
+      }
+
+      .auctioneer-console{
+        max-height:195px;
+      }
+
+      .auctioneer-console-body{
+        grid-template-columns:1fr;
+      }
+
+      .auctioneer-side-actions{
+        grid-template-columns:80px minmax(110px,1fr) auto auto;
+      }
+    }
+
+    @media(max-width:520px){
+      .auction-statusbar .back-live{
+        min-width:34px;
+        width:34px;
+        padding:0;
+        font-size:0;
+      }
+
+      .auction-statusbar .back-live::before{
+        content:'←';
+        font-size:16px;
+      }
+
+      .auction-live-mark{
+        display:none;
+      }
+
+      .auction-team-card{
+        padding:6px;
+      }
+
+      .auction-team-big-kpi{
+        min-height:48px;
+      }
+
+      .auction-team-big-kpi strong{
+        font-size:21px;
+      }
+
+      .auction-role-strip{
+        display:none;
+      }
+
+      .quick-grid{
+        gap:3px;
+      }
+
+      .auctioneer-side-actions{
+        grid-template-columns:1fr 1fr;
+      }
+
+      .auctioneer-side-actions button{
+        width:100%;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -1046,6 +1909,7 @@
       auctionFilterTeam: 'all',
       auctionFilterSlot: 'all',
       auctionFilterFlag: 'all',
+      auctionOpeningBid: 1,
       auctionPersonalRoster: null,
       auctionPersonalRosterFetchedAt: 0,
       auctionSelectedPlayerId: null,
@@ -1913,10 +2777,12 @@
        ===================================================== */
 
     async function loadAuctionPersonalRoster(force = false) {
-      const isPresident =
-        state.auction?.permissions?.isPresident === true;
+      const hasTeamDashboard =
+        state.auction?.permissions?.isPresident === true
+        ||
+        state.auction?.permissions?.isVice === true;
 
-      if (!isPresident) {
+      if (!hasTeamDashboard) {
         state.auctionPersonalRoster = null;
         state.auctionPersonalRosterFetchedAt = 0;
         return;
@@ -2192,6 +3058,354 @@
     }
 
 
+    function renderAuctionCockpitTeamPanel() {
+      const info =
+        auctionMyTeamDashboardData();
+
+      if (!info) {
+        const d = state.auction;
+        const initialCredits =
+          Number(
+            d?.settings?.initial_credits
+            ||
+            0
+          );
+
+        const rows =
+          (d?.teamOrder || [])
+            .map(item => {
+              const spent =
+                Number(
+                  item.credits_spent
+                  ||
+                  0
+                );
+
+              const remaining =
+                Math.max(
+                  0,
+                  initialCredits - spent
+                );
+
+              return `
+                <div class="compact-row">
+                  <div>
+                    <strong>${esc(item.team?.name || 'Squadra')}</strong>
+                    <small>
+                      ${remaining} crediti
+                      · ${spent} spesi
+                      · ${Number(item.passes_used || 0)}/5 pass
+                    </small>
+                  </div>
+
+                  <span class="badge">
+                    ${item.position || '—'}
+                  </span>
+                </div>
+              `;
+            })
+            .join('');
+
+        return `
+          <div class="auction-team-column">
+
+            <section class="auction-team-card">
+              <div class="auction-team-card-head">
+                <div>
+                  <small>Console asta</small>
+                  <strong>Panoramica squadre</strong>
+                </div>
+
+                <span class="badge primary">
+                  ${esc(roleLabel(
+                    state.auction?.permissions?.isAuctioneer
+                      ? 'auctioneer'
+                      : 'league_admin'
+                  ))}
+                </span>
+              </div>
+
+              <div class="auction-team-mini-kpis">
+                <div class="auction-team-mini-kpi">
+                  <span>Squadre</span>
+                  <strong>${(d?.teams || []).length}</strong>
+                </div>
+
+                <div class="auction-team-mini-kpi">
+                  <span>Crediti</span>
+                  <strong>${initialCredits}</strong>
+                </div>
+
+                <div class="auction-team-mini-kpi">
+                  <span>Modalità</span>
+                  <strong>${esc(d?.settings?.fantasy_mode || '—')}</strong>
+                </div>
+              </div>
+            </section>
+
+            <section class="auction-overview-card">
+              <div class="auction-overview-head">
+                Situazione squadre
+              </div>
+
+              <div class="auction-all-teams-list">
+                ${rows || '<div class="small soft">Nessuna squadra.</div>'}
+              </div>
+            </section>
+
+          </div>
+        `;
+      }
+
+      const roleName =
+        state.auction?.myTeam?.role === 'vice'
+          ? 'Vice'
+          : 'Presidente';
+
+      const maxBid =
+        info.maxBid === null
+        ||
+        info.maxBid === undefined
+          ? '—'
+          : info.maxBid;
+
+      const roster =
+        info.rosterLimit
+          ? `${info.rosterCount}/${info.rosterLimit}`
+          : `${info.rosterCount}`;
+
+      const rolesHtml =
+        info.roleBadges
+          .map(role => `
+            <span class="badge">
+              ${esc(role.label)}
+              ${role.count}${role.limit ? `/${role.limit}` : ''}
+            </span>
+          `)
+          .join('');
+
+      const rosterHtml =
+        info.assignments.length
+          ? info.assignments
+              .slice()
+              .sort((a, b) =>
+                String(a.player?.name || '')
+                  .localeCompare(
+                    String(b.player?.name || ''),
+                    'it'
+                  )
+              )
+              .map(item => {
+                const roles =
+                  playerRoles(
+                    item.player || {},
+                    state.auction?.settings?.fantasy_mode
+                  )
+                    .join('/');
+
+                return `
+                  <div class="auction-roster-line">
+                    <div>
+                      <strong>${esc(item.player?.name || '—')}</strong>
+                      <small>
+                        ${esc(roles)}
+                        · ${esc(item.player?.serie_a_team || '')}
+                      </small>
+                    </div>
+
+                    <span class="badge primary">
+                      ${Number(item.purchase_price || 0)}
+                    </span>
+                  </div>
+                `;
+              })
+              .join('')
+          : `
+              <div class="my-team-roster-empty">
+                Nessun acquisto ancora registrato.
+              </div>
+            `;
+
+      return `
+        <div class="auction-team-column">
+
+          <section class="auction-team-card">
+
+            <div class="auction-team-card-head">
+              <div>
+                <small>La mia squadra · ${esc(roleName)}</small>
+                <strong>${esc(info.teamName)}</strong>
+              </div>
+
+              <span class="badge good">
+                MIA ROSA
+              </span>
+            </div>
+
+
+            <div class="auction-team-primary-kpis">
+
+              <div class="auction-team-big-kpi">
+                <span>Crediti disponibili</span>
+                <strong>${info.remaining}</strong>
+              </div>
+
+              <div class="auction-team-big-kpi">
+                <span>Max offerta</span>
+                <strong>${maxBid}</strong>
+              </div>
+
+            </div>
+
+
+            <div class="auction-team-mini-kpis">
+
+              <div class="auction-team-mini-kpi">
+                <span>Spesi</span>
+                <strong>${info.spent}</strong>
+              </div>
+
+              <div class="auction-team-mini-kpi">
+                <span>Rosa</span>
+                <strong>${roster}</strong>
+              </div>
+
+              <div class="auction-team-mini-kpi">
+                <span>Pass</span>
+                <strong>${info.passesUsed}/5</strong>
+              </div>
+
+            </div>
+
+
+            <div class="auction-role-strip">
+              ${rolesHtml}
+            </div>
+
+          </section>
+
+
+          <section class="auction-team-roster">
+
+            <div class="auction-team-roster-head">
+              <strong>Giocatori acquistati</strong>
+              <span class="badge">${info.assignments.length}</span>
+            </div>
+
+            <div class="auction-team-roster-list">
+              ${rosterHtml}
+            </div>
+
+          </section>
+
+        </div>
+      `;
+    }
+
+
+    function renderAuctionCockpitDrawer(hasPlayer) {
+      return `
+        <details
+          id="free-drawer"
+          class="free-drawer"
+          ${state.auctionDrawerOpen ? 'open' : ''}
+        >
+          <summary>Svincolati</summary>
+
+          <div class="drawer-content">
+
+            <div class="between">
+              <div id="auction-rolebar" class="rolebar"></div>
+
+              <span class="auction-drawer-readonly">
+                ${
+                  hasPlayer
+                    ? 'Consultazione'
+                    : 'Seleziona per chiamare'
+                }
+              </span>
+            </div>
+
+            <div class="drawer-filters">
+
+              <label>
+                Cerca
+                <input
+                  id="auction-search"
+                  type="search"
+                  placeholder="Nome o squadra..."
+                  value="${esc(state.auctionFilterSearch)}"
+                >
+              </label>
+
+              <label>
+                Squadra
+                <select id="auction-team-filter">
+                  <option value="all">Tutte</option>
+                </select>
+              </label>
+
+              <label>
+                Slot
+                <select id="auction-slot-filter">
+                  <option value="all">Tutti</option>
+                </select>
+              </label>
+
+              <label>
+                Segnalazioni
+                <select id="auction-flag-filter">
+                  <option value="all">Tutte</option>
+                  <option value="market">Mercato</option>
+                  <option value="injury">Indisponibili</option>
+                  <option value="new">Nuovi arrivi</option>
+                  <option value="penalties">Rigoristi</option>
+                </select>
+              </label>
+
+            </div>
+
+            <div class="drawer-table">
+
+              <table class="player-table">
+
+                <colgroup>
+                  <col class="col-player">
+                  <col class="col-team">
+                  <col class="col-slot">
+                  <col class="col-stat">
+                  <col class="col-stat">
+                  <col class="col-stat">
+                  <col class="col-stat">
+                  <col class="col-stat">
+                </colgroup>
+
+                <thead>
+                  <tr>
+                    <th>Calciatore</th>
+                    <th>Squadra</th>
+                    <th class="num-head">Slot</th>
+                    <th class="num-head">PMA</th>
+                    <th class="num-head">PFC</th>
+                    <th class="num-head">Δ</th>
+                    <th class="num-head">FM</th>
+                    <th class="num-head">Tit.</th>
+                  </tr>
+                </thead>
+
+                <tbody id="auction-player-body"></tbody>
+
+              </table>
+
+            </div>
+
+          </div>
+
+        </details>
+      `;
+    }
+
+
     function renderAuctionPersonalDashboard() {
       const info =
         auctionMyTeamDashboardData();
@@ -2460,313 +3674,567 @@
 
       const d = state.auction;
       const s = d.auctionSession;
-      const hasPlayer = Boolean(s.current_player_id);
-      const p = d.currentPlayer || null;
+      const hasPlayer =
+        Boolean(
+          s.current_player_id
+        );
+
+      const p =
+        d.currentPlayer
+        ||
+        null;
 
       const selectedCall =
         (d.callCandidates || [])
-          .find(player => player.id === state.auctionSelectedPlayerId)
-        || null;
+          .find(
+            player =>
+              player.id
+              === state.auctionSelectedPlayerId
+          )
+        ||
+        null;
 
       const currentBid =
         hasPlayer
-          ? Number(s.current_bid || 0)
+          ? Number(
+              s.current_bid
+              ||
+              0
+            )
           : 0;
 
       const selectedBid =
         hasPlayer
-          ? Number(state.auctionBidSelection || auctionBidDefault())
+          ? Number(
+              state.auctionBidSelection
+              ||
+              auctionBidDefault()
+            )
           : null;
 
-      const quickOffsets = [1, 2, 3, 5, 10];
+      const quickOffsets =
+        [1, 2, 3, 5, 10];
 
       const canCall =
         !hasPlayer
         &&
-        d.permissions?.canCallCurrentPlayer === true;
+        d.permissions
+          ?.canCallCurrentPlayer
+        === true;
 
       const canPresidentBid =
         hasPlayer
         &&
-        d.permissions?.isPresident === true;
+        d.permissions
+          ?.isPresident
+        === true;
 
-      const callBaseHtml =
-        d.settings?.auction_base_mode === 'quotation'
-          ? `
-              <div class="selected-call">
-                <span class="small soft">
-                  Base d’asta: quotazione Fantacalcio del giocatore.
-                </span>
-              </div>
-            `
-          : `
-              <label>
-                Base d'asta
-                <input
-                  id="auction-opening-bid"
-                  type="number"
-                  min="1"
-                  value="1"
-                >
-              </label>
-            `;
+      const canSelectBid =
+        hasPlayer
+        &&
+        (
+          canPresidentBid
+          ||
+          auctionCanControl()
+        );
 
-      const playerPrimaryHtml =
+      const phaseLabel =
+        hasPlayer
+          ? 'RILANCI'
+          : 'CHIAMATA';
+
+      const turnLabel =
+        hasPlayer
+          ? (
+              d.settings?.bid_mode === 'turn'
+                ? `Turno: ${d.currentTurnTeam?.name || '—'}`
+                : 'Rilanci liberi'
+            )
+          : `Chiama: ${d.currentNominationTeam?.name || '—'}`;
+
+      const playerHeroHtml =
         hasPlayer
           ? `
-              <section class="current-player president-player-card">
-                <div class="between">
-                  <div>
-                    <div class="small soft">Giocatore in asta</div>
-                    <div class="player-title">${esc(p?.name || 'Giocatore')}</div>
-                    <div class="meta">
-                      ${esc(playerRoles(p, d.settings?.fantasy_mode).join('/'))}
-                      · ${esc(p?.serie_a_team || '')}
-                      · Slot ${esc(p?.slot ?? '—')}
-                    </div>
+              <section class="auction-player-hero">
+
+                <div class="auction-player-identity">
+
+                  <div class="auction-player-kicker">
+                    Giocatore in asta
                   </div>
 
-                  <div style="text-align:right">
-                    <div class="small soft">Offerta</div>
-                    <div class="player-bid">${currentBid || '—'}</div>
+                  <div class="auction-player-name-live">
+                    ${esc(p?.name || 'Giocatore')}
                   </div>
+
+                  <div class="auction-player-meta-live">
+                    ${esc(
+                      playerRoles(
+                        p,
+                        d.settings?.fantasy_mode
+                      )
+                        .join('/')
+                    )}
+                    ·
+                    ${esc(p?.serie_a_team || '')}
+                    · Slot ${esc(p?.slot ?? '—')}
+                    · Q ${formatNumber(p?.quotation)}
+                  </div>
+
                 </div>
 
-                <div class="bid-hero">
-                  <div>
-                    <span class="small soft">Leader</span><br>
-                    <strong>${esc(d.currentBidderTeam?.name || 'Nessuno')}</strong>
+
+                <div class="auction-current-offer">
+
+                  <span>Offerta corrente</span>
+
+                  <strong>
+                    ${currentBid || '—'}
+                  </strong>
+
+                  <div class="auction-current-leader">
+                    Leader:
+                    <b>
+                      ${esc(d.currentBidderTeam?.name || 'Nessuno')}
+                    </b>
                   </div>
 
-                  <div>
-                    <span id="auction-timer-label" class="badge primary">—</span>
-                  </div>
                 </div>
+
               </section>
             `
           : `
-              <section class="panel president-player-card is-waiting">
-                <div class="between">
-                  <div>
-                    <div class="small soft">Turno di chiamata</div>
-                    <div class="call-team">
-                      ${esc(d.currentNominationTeam?.name || 'Squadra')}
-                    </div>
+              <section class="auction-player-hero waiting">
+
+                <div class="auction-player-identity">
+
+                  <div class="auction-player-kicker">
+                    Turno di chiamata
                   </div>
 
-                  <span class="badge warn live-phase-badge">CHIAMATA</span>
+                  <div class="auction-player-name-live">
+                    ${esc(d.currentNominationTeam?.name || 'Squadra')}
+                  </div>
+
+                  <div class="auction-player-meta-live">
+                    ${
+                      canCall
+                        ? 'Apri Svincolati, scegli un calciatore e conferma la chiamata.'
+                        : 'In attesa della squadra di turno.'
+                    }
+                  </div>
+
                 </div>
 
-                <div class="small soft" style="margin-top:6px">
-                  ${
-                    canCall
-                      ? 'Seleziona un calciatore dal drawer Svincolati e conferma.'
-                      : 'In attesa della chiamata della squadra di turno.'
-                  }
+
+                <div class="auction-current-offer">
+
+                  <span>Fase</span>
+
+                  <strong style="font-size:25px">
+                    CHIAMA
+                  </strong>
+
+                  <div class="auction-current-leader">
+                    ${
+                      selectedCall
+                        ? `Selezionato: <b>${esc(selectedCall.name)}</b>`
+                        : 'Nessun giocatore selezionato'
+                    }
+                  </div>
+
                 </div>
+
               </section>
             `;
 
-      const presidentActionHtml =
+      const actionHtml =
         hasPlayer
           ? `
-              <section class="panel president-action-slot">
-                <div class="panel-title">
-                  <div>
-                    <h2>Rilancio Presidente</h2>
-                    <p>Seleziona un importo e poi conferma.</p>
+              <section class="auction-action-card">
+
+                <div class="auction-action-head">
+                  <strong>La tua offerta</strong>
+
+                  <span class="badge good">
+                    ${selectedBid}
+                  </span>
+                </div>
+
+
+                <div class="auction-bid-action-row">
+
+                  <div class="quick-grid">
+
+                    ${
+                      quickOffsets
+                        .map(offset => {
+                          const amount =
+                            currentBid
+                            +
+                            offset;
+
+                          return `
+                            <button
+                              class="quick-btn ${
+                                selectedBid === amount
+                                  ? 'selected'
+                                  : ''
+                              }"
+                              data-amount="${amount}"
+                              type="button"
+                              ${
+                                canSelectBid
+                                  ? ''
+                                  : 'disabled'
+                              }
+                            >
+                              <span>+${offset}</span>
+                              <strong>${amount}</strong>
+                            </button>
+                          `;
+                        })
+                        .join('')
+                    }
+
                   </div>
-                  <span class="badge good">${selectedBid}</span>
-                </div>
 
-                <div class="quick-grid">
+
                   ${
-                    quickOffsets.map(offset => {
-                      const amount = currentBid + offset;
-
-                      return `
-                        <button
-                          class="quick-btn ${selectedBid === amount ? 'selected' : ''}"
-                          data-amount="${amount}"
-                          type="button"
-                          ${canPresidentBid ? '' : 'disabled'}
-                        >
-                          <span>+${offset}</span>
-                          <strong>${amount}</strong>
-                        </button>
-                      `;
-                    }).join('')
+                    canPresidentBid
+                      ? `
+                          <button
+                            id="president-bid"
+                            class="auction-bid-confirm"
+                          >
+                            CONFERMA ${selectedBid}
+                          </button>
+                        `
+                      : `
+                          <div class="live-placeholder">
+                            ${
+                              auctionCanControl()
+                                ? 'Seleziona l’importo: il Banditore lo registra dalla console in basso.'
+                                : 'In attesa del tuo turno.'
+                            }
+                          </div>
+                        `
                   }
+
                 </div>
+
 
                 ${
+                  d.settings?.bid_mode === 'turn'
+                  &&
                   canPresidentBid
                     ? `
-                        <button
-                          id="president-bid"
-                          style="width:100%;margin-top:5px"
-                        >
-                          Conferma ${selectedBid}
-                        </button>
-                      `
-                    : `
-                        <div class="live-placeholder" style="margin-top:5px">
-                          Visualizzazione Presidente: attendi il tuo turno o il prossimo rilancio.
-                        </div>
-                      `
-                }
+                        <div class="auction-turn-actions">
+                          <button
+                            id="auction-pass"
+                            class="secondary"
+                          >
+                            PASSA
+                          </button>
 
-                ${
-                  d.settings?.bid_mode === 'turn' && canPresidentBid
-                    ? `
-                        <div class="row" style="margin-top:5px">
-                          <button id="auction-pass" class="secondary">PASSA</button>
-                          <button id="auction-abandon" class="danger">ABBANDONA</button>
+                          <button
+                            id="auction-abandon"
+                            class="danger"
+                          >
+                            ABBANDONA
+                          </button>
                         </div>
                       `
                     : ''
                 }
+
               </section>
             `
           : `
-              <section class="panel president-action-slot">
-                <div class="panel-title">
-                  <div>
-                    <h2>Chiamata Presidente</h2>
-                    <p>La posizione della schermata resta invariata.</p>
-                  </div>
-                  <span class="badge primary">PRESIDENTE</span>
+              <section class="auction-action-card">
+
+                <div class="auction-action-head">
+                  <strong>Chiamata</strong>
+
+                  <span class="badge primary">
+                    ${esc(d.currentNominationTeam?.name || '—')}
+                  </span>
                 </div>
 
-                ${callBaseHtml}
 
-                <div
-                  id="auction-selected-call"
-                  class="selected-call"
-                  style="margin-top:5px"
-                >
+                <div class="auction-call-row">
+
+                  <div class="auction-call-preview">
+
+                    ${
+                      selectedCall
+                        ? `
+                            <strong>
+                              ${esc(selectedCall.name)}
+                            </strong>
+
+                            <small>
+                              ${esc(
+                                playerRoles(
+                                  selectedCall,
+                                  d.settings?.fantasy_mode
+                                )
+                                  .join('/')
+                              )}
+                              ·
+                              ${esc(selectedCall.serie_a_team || '')}
+                              · Q ${formatNumber(selectedCall.quotation)}
+                            </small>
+                          `
+                        : `
+                            <span class="small soft">
+                              Nessun giocatore selezionato.
+                            </span>
+                          `
+                    }
+
+                  </div>
+
+
                   ${
-                    selectedCall
+                    d.settings?.auction_base_mode === 'quotation'
                       ? `
-                          <strong>${esc(selectedCall.name)}</strong>
-                          <div class="small soft">
-                            ${esc(playerRoles(selectedCall, d.settings?.fantasy_mode).join('/'))}
-                            · ${esc(selectedCall.serie_a_team || '')}
-                            · Q ${formatNumber(selectedCall.quotation)}
+                          <div class="auction-call-preview">
+                            <small>Base d’asta</small>
+                            <strong>
+                              ${
+                                selectedCall
+                                  ? formatNumber(selectedCall.quotation)
+                                  : 'Quotazione'
+                              }
+                            </strong>
                           </div>
                         `
                       : `
-                          <span class="small soft">
-                            Nessun giocatore selezionato.
-                          </span>
+                          <label>
+                            Base d’asta
+                            <input
+                              id="auction-opening-bid"
+                              type="number"
+                              min="1"
+                              value="${Number(state.auctionOpeningBid || 1)}"
+                            >
+                          </label>
                         `
                   }
+
+
+                  <button
+                    id="auction-call-confirm"
+                    ${
+                      !selectedCall
+                      ||
+                      !canCall
+                        ? 'disabled'
+                        : ''
+                    }
+                  >
+                    CHIAMA
+                  </button>
+
                 </div>
 
-                <button
-                  id="auction-call-confirm"
-                  style="width:100%;margin-top:5px"
-                  ${
-                    !selectedCall || !canCall
-                      ? 'disabled'
-                      : ''
-                  }
-                >
-                  Chiama giocatore
-                </button>
               </section>
             `;
 
       const viceHtml =
-        hasPlayer && d.permissions?.isVice
+        hasPlayer
+        &&
+        (
+          d.permissions?.isVice
+          ||
+          d.viceSignal
+        )
           ? `
-              <section class="panel">
-                <div class="panel-title">
-                  <div><h2>Segnale al Presidente</h2></div>
-                </div>
+              <section class="auction-vice-strip">
 
-                <div class="row">
-                  <button class="vice-signal" data-type="push">RILANCIA</button>
-                  <button class="vice-signal warn" data-type="stop">STOP</button>
+                ${
+                  d.permissions?.isVice
+                    ? `
+                        <strong>Vice:</strong>
 
-                  <input
-                    id="vice-limit"
-                    type="number"
-                    min="1"
-                    value="${selectedBid}"
-                    style="width:90px"
-                  >
+                        <button
+                          class="vice-signal"
+                          data-type="push"
+                        >
+                          RILANCIA
+                        </button>
 
-                  <button class="vice-signal secondary" data-type="limit">
-                    FINO A
-                  </button>
+                        <button
+                          class="vice-signal warn"
+                          data-type="stop"
+                        >
+                          STOP
+                        </button>
 
-                  <button class="vice-signal secondary" data-type="clear">
-                    Pulisci
-                  </button>
-                </div>
+                        <input
+                          id="vice-limit"
+                          type="number"
+                          min="1"
+                          value="${selectedBid}"
+                          style="width:80px"
+                        >
+
+                        <button
+                          class="vice-signal secondary"
+                          data-type="limit"
+                        >
+                          FINO A
+                        </button>
+
+                        <button
+                          class="vice-signal secondary"
+                          data-type="clear"
+                        >
+                          Pulisci
+                        </button>
+                      `
+                    : ''
+                }
+
+
+                ${
+                  d.viceSignal
+                    ? `
+                        <span class="badge ${
+                          d.viceSignal.type === 'stop'
+                            ? 'danger'
+                            : 'good'
+                        }">
+                          ${esc(d.viceSignal.viceUsername || 'Vice')}
+                          ·
+                          ${
+                            esc(
+                              d.viceSignal.type === 'limit'
+                                ? `FINO A ${d.viceSignal.amount}`
+                                : d.viceSignal.type === 'push'
+                                  ? 'RILANCIA'
+                                  : 'STOP'
+                            )
+                          }
+                        </span>
+                      `
+                    : ''
+                }
+
               </section>
             `
           : '';
 
-      const viceSignalHtml =
-        hasPlayer && d.viceSignal
-          ? `
-              <section class="panel">
-                <strong>${esc(d.viceSignal.viceUsername || 'Vice')}</strong>
-                ·
-                <span class="badge ${d.viceSignal.type === 'stop' ? 'danger' : 'good'}">
-                  ${
-                    esc(
-                      d.viceSignal.type === 'limit'
-                        ? `FINO A ${d.viceSignal.amount}`
-                        : d.viceSignal.type === 'push'
-                          ? 'RILANCIA'
-                          : 'STOP'
-                    )
-                  }
-                </span>
-              </section>
-            `
-          : '';
+      const recentBidsHtml = `
+        <section class="auction-bid-history">
+
+          <div class="auction-bid-history-title">
+            <strong>Ultimi rilanci</strong>
+
+            <span class="small soft">
+              ${
+                (d.recentBids || []).length
+              } registrati
+            </span>
+          </div>
+
+          <div class="auction-bid-chips">
+            ${
+              (d.recentBids || [])
+                .slice(0, 10)
+                .map(bid => `
+                  <div class="auction-bid-chip">
+                    <span>
+                      ${esc(bid.team?.name || 'Squadra')}
+                    </span>
+
+                    <strong>
+                      ${bid.amount}
+                    </strong>
+                  </div>
+                `)
+                .join('')
+              ||
+              '<span class="small soft">Nessun rilancio.</span>'
+            }
+          </div>
+
+        </section>
+      `;
 
       const adminHtml =
         auctionCanControl()
           ? `
-              <section class="panel banditore-support">
-                <div class="panel-title">
-                  <div>
-                    <h2>Supporto Admin · Banditore</h2>
-                    <p>
-                      ${
-                        hasPlayer
-                          ? `Gestione dell’offerta corrente · selezionato ${selectedBid}`
-                          : 'In attesa della chiamata del prossimo giocatore.'
-                      }
-                    </p>
+              <section class="auctioneer-console">
+
+                <div class="auctioneer-console-head">
+
+                  <div class="auctioneer-console-title">
+                    <span class="badge primary">
+                      BANDITORE
+                    </span>
+
+                    <strong>
+                      Console di supporto
+                    </strong>
+
+                    ${
+                      hasPlayer
+                        ? `
+                            <span class="small soft">
+                              Importo selezionato: ${selectedBid}
+                            </span>
+                          `
+                        : ''
+                    }
                   </div>
 
+
                   <div class="row">
-                    <span class="badge primary">BANDITORE</span>
 
                     <button
                       id="auction-hold"
                       class="secondary"
-                      ${hasPlayer ? '' : 'disabled'}
+                      ${
+                        hasPlayer
+                          ? ''
+                          : 'disabled'
+                      }
                     >
-                      ${s.hold_active ? 'RIPRENDI' : 'HOLD'}
+                      ${
+                        s.hold_active
+                          ? 'RIPRENDI'
+                          : 'HOLD'
+                      }
                     </button>
+
+                    <button
+                      id="auction-award"
+                      class="good"
+                      ${
+                        hasPlayer
+                          ? ''
+                          : 'disabled'
+                      }
+                    >
+                      AGGIUDICA
+                    </button>
+
                   </div>
+
                 </div>
 
-                <div class="banditore-grid">
-                  <div class="banditore-actions">
-                    ${
-                      hasPlayer
-                        ? `
-                            <div class="auction-team-buttons">
-                              ${
-                                (d.teams || []).map(team => `
+
+                ${
+                  hasPlayer
+                    ? `
+                        <div class="auctioneer-console-body">
+
+                          <div class="auctioneer-team-grid">
+                            ${
+                              (d.teams || [])
+                                .map(team => `
                                   <button
                                     class="auctioneer-team secondary"
                                     data-team="${esc(team.id)}"
@@ -2778,217 +4246,159 @@
                                   >
                                     ${esc(team.name)}
                                   </button>
-                                `).join('')
-                              }
-                            </div>
+                                `)
+                                .join('')
+                            }
+                          </div>
 
-                            <div class="row" style="margin-top:5px">
+
+                          <div class="auctioneer-side-actions">
+
+                            <label>
+                              Importo
                               <input
                                 id="auction-correct-amount"
                                 type="number"
                                 min="1"
                                 value="${selectedBid}"
-                                style="width:95px"
                               >
+                            </label>
 
-                              <select
-                                id="auction-correct-team"
-                                style="width:150px"
-                              >
+                            <label>
+                              Squadra
+                              <select id="auction-correct-team">
                                 ${
-                                  (d.teams || []).map(team => `
-                                    <option
-                                      value="${esc(team.id)}"
-                                      ${
-                                        s.current_bidder_team_id === team.id
-                                          ? 'selected'
-                                          : ''
-                                      }
-                                    >
-                                      ${esc(team.name)}
-                                    </option>
-                                  `).join('')
+                                  (d.teams || [])
+                                    .map(team => `
+                                      <option
+                                        value="${esc(team.id)}"
+                                        ${
+                                          s.current_bidder_team_id === team.id
+                                            ? 'selected'
+                                            : ''
+                                        }
+                                      >
+                                        ${esc(team.name)}
+                                      </option>
+                                    `)
+                                    .join('')
                                 }
                               </select>
+                            </label>
 
-                              <button id="auction-correct" class="secondary">
-                                Correggi
-                              </button>
+                            <button
+                              id="auction-correct"
+                              class="secondary"
+                            >
+                              Correggi
+                            </button>
 
-                              <button id="auction-award" class="good">
-                                Aggiudica
-                              </button>
-                            </div>
-                          `
-                        : `
-                            <div class="live-placeholder">
-                              La sezione Banditore resta fissa qui sotto.
-                              I controlli si attivano appena viene chiamato il giocatore.
-                            </div>
-                          `
-                    }
-                  </div>
+                            <span></span>
 
-                  <div class="banditore-recent">
-                    <div class="small soft" style="margin-bottom:4px">
-                      Ultimi rilanci
-                    </div>
-
-                    <div class="compact-list">
-                      ${
-                        (d.recentBids || []).map(bid => `
-                          <div class="compact-row">
-                            <strong>${esc(bid.team?.name || 'Squadra')}</strong>
-                            <span class="badge primary">${bid.amount}</span>
                           </div>
-                        `).join('')
-                        ||
-                        '<div class="small soft">Nessun rilancio.</div>'
-                      }
-                    </div>
-                  </div>
-                </div>
+
+                        </div>
+                      `
+                    : `
+                        <div class="auctioneer-idle">
+                          In attesa della chiamata. La console rimane nella stessa posizione per tutta l’asta.
+                        </div>
+                      `
+                }
+
               </section>
             `
           : '';
 
       $('auction-root').innerHTML = `
-        <div class="fixed-live-layout">
+        <div class="auction-cockpit">
 
-          <div class="president-stage">
+          <header class="auction-statusbar">
 
-            <div class="president-main">
-              <div class="president-panels">
+            <button
+              id="auction-cockpit-back"
+              class="back-live secondary"
+              type="button"
+            >
+              ← Lega
+            </button>
 
-                <div class="president-primary">
-                  ${playerPrimaryHtml}
 
-                  ${renderAuctionPersonalDashboard()}
+            <div class="auction-status-main">
 
-                  <section class="panel live-recent-bids">
-                    <div class="panel-title">
-                      <div><h2>Situazione asta</h2></div>
-                      <span class="badge ${hasPlayer ? 'good' : 'warn'}">
-                        ${hasPlayer ? 'RILANCI' : 'CHIAMATA'}
-                      </span>
-                    </div>
+              <span class="auction-live-mark">
+                <span class="auction-live-dot"></span>
+                LIVE
+              </span>
 
-                    <div class="compact-list">
-                      ${
-                        (d.recentBids || []).slice(0, 5).map(bid => `
-                          <div class="compact-row">
-                            <strong>${esc(bid.team?.name || 'Squadra')}</strong>
-                            <span class="badge primary">${bid.amount}</span>
-                          </div>
-                        `).join('')
-                        ||
-                        '<div class="small soft">Nessun rilancio registrato.</div>'
-                      }
-                    </div>
-                  </section>
+              <div style="min-width:0">
+
+                <div class="auction-status-title">
+                  ${esc(d.league?.name || state.selectedLeague?.name || 'Asta')}
                 </div>
 
-                <div class="president-actions">
-                  ${presidentActionHtml}
-                  ${viceHtml}
-                  ${viceSignalHtml}
+                <div class="auction-status-sub">
+                  ${esc(turnLabel)}
                 </div>
 
               </div>
+
             </div>
 
-            <details
-              id="free-drawer"
-              class="free-drawer"
-              ${state.auctionDrawerOpen ? 'open' : ''}
+
+            <div class="auction-status-phase">
+              <span class="badge ${
+                hasPlayer
+                  ? 'good'
+                  : 'warn'
+              }">
+                ${phaseLabel}
+              </span>
+
+              ${
+                s.hold_active
+                  ? '<span class="badge danger">HOLD</span>'
+                  : ''
+              }
+            </div>
+
+
+            <div
+              id="auction-timer-label"
+              class="auction-status-timer"
             >
-              <summary>Svincolati</summary>
+              —
+            </div>
 
-              <div class="drawer-content">
+          </header>
 
-                <div class="between">
-                  <div id="auction-rolebar" class="rolebar"></div>
 
-                  <span class="auction-drawer-readonly">
-                    ${
-                      hasPlayer
-                        ? 'Consultazione durante i rilanci'
-                        : 'Clic sulla riga per selezionare'
-                    }
-                  </span>
-                </div>
+          <div class="auction-cockpit-stage">
 
-                <div class="drawer-filters">
-                  <label>
-                    Cerca
-                    <input
-                      id="auction-search"
-                      type="search"
-                      placeholder="Nome o squadra..."
-                      value="${esc(state.auctionFilterSearch)}"
-                    >
-                  </label>
+            <div class="auction-president-grid">
 
-                  <label>
-                    Squadra
-                    <select id="auction-team-filter">
-                      <option value="all">Tutte</option>
-                    </select>
-                  </label>
+              ${renderAuctionCockpitTeamPanel()}
 
-                  <label>
-                    Slot
-                    <select id="auction-slot-filter">
-                      <option value="all">Tutti</option>
-                    </select>
-                  </label>
 
-                  <label>
-                    Segnalazioni
-                    <select id="auction-flag-filter">
-                      <option value="all">Tutte</option>
-                      <option value="market">Mercato</option>
-                      <option value="injury">Indisponibili</option>
-                      <option value="new">Nuovi arrivi</option>
-                      <option value="penalties">Rigoristi</option>
-                    </select>
-                  </label>
-                </div>
+              <div class="auction-table-column">
 
-                <div class="drawer-table">
-                  <table class="player-table">
-                    <colgroup>
-                      <col class="col-player">
-                      <col class="col-team">
-                      <col class="col-slot">
-                      <col class="col-stat">
-                      <col class="col-stat">
-                      <col class="col-stat">
-                      <col class="col-stat">
-                      <col class="col-stat">
-                    </colgroup>
+                ${playerHeroHtml}
 
-                    <thead>
-                      <tr>
-                        <th>Calciatore</th>
-                        <th>Squadra</th>
-                        <th class="num-head">Slot</th>
-                        <th class="num-head">PMA</th>
-                        <th class="num-head">PFC</th>
-                        <th class="num-head">Δ</th>
-                        <th class="num-head">FM</th>
-                        <th class="num-head">Tit.</th>
-                      </tr>
-                    </thead>
+                ${actionHtml}
 
-                    <tbody id="auction-player-body"></tbody>
-                  </table>
-                </div>
+                ${viceHtml}
+
+                ${recentBidsHtml}
 
               </div>
-            </details>
+
+            </div>
+
+
+            ${renderAuctionCockpitDrawer(hasPlayer)}
 
           </div>
+
 
           ${adminHtml}
 
@@ -2998,125 +4408,255 @@
       renderAuctionDrawerControls();
       renderAuctionPlayers();
 
-      $('free-drawer')?.addEventListener('toggle', event => {
-        state.auctionDrawerOpen = event.currentTarget.open;
-      });
+      $('auction-cockpit-back')
+        ?.addEventListener(
+          'click',
+          () =>
+            switchView(
+              'home'
+            )
+        );
 
-      $('auction-call-confirm')?.addEventListener('click', async () => {
-        if (!state.auctionSelectedPlayerId || hasPlayer) return;
+      $('free-drawer')
+        ?.addEventListener(
+          'toggle',
+          event => {
+            state.auctionDrawerOpen =
+              event.currentTarget.open;
+          }
+        );
 
-        try {
-          const openingBid =
-            d.settings?.auction_base_mode === 'quotation'
-              ? null
-              : Number($('auction-opening-bid')?.value || 1);
+      $('auction-opening-bid')
+        ?.addEventListener(
+          'input',
+          event => {
+            state.auctionOpeningBid =
+              Math.max(
+                1,
+                Number(
+                  event.target.value
+                  ||
+                  1
+                )
+              );
+          }
+        );
 
-          await api(ENDPOINTS.auction, {
-            action: 'callPlayer',
-            sessionId: s.id,
-            playerId: state.auctionSelectedPlayerId,
-            openingBid
-          });
+      $('auction-call-confirm')
+        ?.addEventListener(
+          'click',
+          async () => {
+            if (
+              !state.auctionSelectedPlayerId
+              ||
+              hasPlayer
+            ) {
+              return;
+            }
 
-          state.auctionSelectedPlayerId = null;
-          await loadAuction();
+            try {
+              const openingBid =
+                d.settings?.auction_base_mode
+                  === 'quotation'
+                  ? null
+                  : Number(
+                      state.auctionOpeningBid
+                      ||
+                      1
+                    );
 
-        } catch (error) {
-          msg(error.message, 'error');
-        }
-      });
+              await api(
+                ENDPOINTS.auction,
+                {
+                  action:
+                    'callPlayer',
 
-      document.querySelectorAll('.quick-btn').forEach(button => {
-        button.addEventListener('click', () => {
-          if (!hasPlayer) return;
+                  sessionId:
+                    s.id,
 
-          state.auctionBidSelection =
-            Number(button.dataset.amount);
+                  playerId:
+                    state.auctionSelectedPlayerId,
 
-          /*
-           * Re-render locale della STESSA schermata:
-           * non cambia struttura né posizione dei pannelli.
-           */
-          renderAuctionLive();
-        });
-      });
+                  openingBid
+                }
+              );
 
-      $('president-bid')?.addEventListener(
-        'click',
-        () => placeBid(
-          auctionMyTeamId(),
-          selectedBid,
-          'APP'
+              state.auctionSelectedPlayerId =
+                null;
+
+              state.auctionOpeningBid =
+                1;
+
+              await loadAuction();
+
+            } catch (error) {
+              msg(
+                error.message,
+                'error'
+              );
+            }
+          }
+        );
+
+      document
+        .querySelectorAll(
+          '.quick-btn'
         )
-      );
+        .forEach(
+          button => {
+            button
+              .addEventListener(
+                'click',
+                () => {
+                  if (!hasPlayer) {
+                    return;
+                  }
 
-      document.querySelectorAll('.auctioneer-team').forEach(button => {
-        button.addEventListener(
-          'click',
-          () => placeBid(
-            button.dataset.team,
-            selectedBid,
-            'VOCALE'
-          )
+                  state.auctionBidSelection =
+                    Number(
+                      button.dataset.amount
+                    );
+
+                  renderAuctionLive();
+                }
+              );
+          }
         );
-      });
 
-      $('auction-hold')?.addEventListener(
-        'click',
-        () => auctionAction({
-          action: 'setHold',
-          sessionId: s.id,
-          hold: !s.hold_active
-        })
-      );
-
-      $('auction-award')?.addEventListener(
-        'click',
-        () => auctionAction({
-          action: 'awardPlayer',
-          sessionId: s.id
-        }, 'Giocatore aggiudicato.')
-      );
-
-      $('auction-correct')?.addEventListener(
-        'click',
-        () => auctionAction({
-          action: 'correctBid',
-          sessionId: s.id,
-          teamId: $('auction-correct-team').value,
-          amount: Number($('auction-correct-amount').value)
-        }, 'Offerta corretta.')
-      );
-
-      $('auction-pass')?.addEventListener(
-        'click',
-        () => auctionAction({
-          action: 'passTurn',
-          sessionId: s.id,
-          teamId: auctionMyTeamId()
-        })
-      );
-
-      $('auction-abandon')?.addEventListener(
-        'click',
-        () => auctionAction({
-          action: 'abandonTurn',
-          sessionId: s.id,
-          teamId: auctionMyTeamId()
-        })
-      );
-
-      document.querySelectorAll('.vice-signal').forEach(button => {
-        button.addEventListener(
+      $('president-bid')
+        ?.addEventListener(
           'click',
-          () => sendViceSignal(
-            button.dataset.type
-          )
+          () =>
+            placeBid(
+              auctionMyTeamId(),
+              selectedBid,
+              'APP'
+            )
         );
-      });
+
+      document
+        .querySelectorAll(
+          '.auctioneer-team'
+        )
+        .forEach(
+          button => {
+            button
+              .addEventListener(
+                'click',
+                () =>
+                  placeBid(
+                    button.dataset.team,
+                    selectedBid,
+                    'VOCALE'
+                  )
+              );
+          }
+        );
+
+      $('auction-hold')
+        ?.addEventListener(
+          'click',
+          () =>
+            auctionAction({
+              action:
+                'setHold',
+
+              sessionId:
+                s.id,
+
+              hold:
+                !s.hold_active
+            })
+        );
+
+      $('auction-award')
+        ?.addEventListener(
+          'click',
+          () =>
+            auctionAction({
+              action:
+                'awardPlayer',
+
+              sessionId:
+                s.id
+            }, 'Giocatore aggiudicato.')
+        );
+
+      $('auction-correct')
+        ?.addEventListener(
+          'click',
+          () =>
+            auctionAction({
+              action:
+                'correctBid',
+
+              sessionId:
+                s.id,
+
+              teamId:
+                $('auction-correct-team')
+                  .value,
+
+              amount:
+                Number(
+                  $('auction-correct-amount')
+                    .value
+                )
+            }, 'Offerta corretta.')
+        );
+
+      $('auction-pass')
+        ?.addEventListener(
+          'click',
+          () =>
+            auctionAction({
+              action:
+                'passTurn',
+
+              sessionId:
+                s.id,
+
+              teamId:
+                auctionMyTeamId()
+            })
+        );
+
+      $('auction-abandon')
+        ?.addEventListener(
+          'click',
+          () =>
+            auctionAction({
+              action:
+                'abandonTurn',
+
+              sessionId:
+                s.id,
+
+              teamId:
+                auctionMyTeamId()
+            })
+        );
+
+      document
+        .querySelectorAll(
+          '.vice-signal'
+        )
+        .forEach(
+          button => {
+            button
+              .addEventListener(
+                'click',
+                () =>
+                  sendViceSignal(
+                    button.dataset.type
+                  )
+              );
+          }
+        );
 
       renderAuctionTimer();
     }
+
 
     function renderAuctionDrawerControls() {
       const players = state.auction?.callCandidates || [];
