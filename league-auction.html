@@ -283,6 +283,135 @@
 
 
     <div
+      id="live-control-panel"
+      hidden
+    >
+
+      <div class="divider"></div>
+
+
+      <div class="section-heading">
+
+        <span class="section-label">
+          TIMER
+        </span>
+
+        <div>
+          <h3 id="live-timer-value">—</h3>
+          <p id="live-timer-status">
+            In attesa
+          </p>
+        </div>
+
+      </div>
+
+
+      <div class="league-actions">
+
+        <span
+          id="live-turn-badge"
+          class="badge"
+          hidden
+        ></span>
+
+
+        <span
+          id="live-pass-badge"
+          class="badge"
+          hidden
+        ></span>
+
+
+        <button
+          id="live-hold-button"
+          type="button"
+          class="secondary"
+          hidden
+        >
+          HOLD
+        </button>
+
+      </div>
+
+
+      <div
+        id="live-president-controls"
+        hidden
+      >
+
+        <div class="divider"></div>
+
+
+        <div class="form-grid">
+
+          <label class="form-field">
+
+            Offerta
+
+            <input
+              id="live-bid-amount"
+              type="number"
+              min="1"
+              step="1"
+            >
+
+          </label>
+
+
+          <div
+            class="form-field"
+            style="align-self:end"
+          >
+
+            <button
+              id="live-bid-button"
+              type="button"
+            >
+              Rilancia
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div
+          id="live-turn-actions"
+          class="league-actions"
+          hidden
+        >
+
+          <button
+            id="live-pass-button"
+            type="button"
+            class="secondary"
+          >
+            Passa
+          </button>
+
+
+          <button
+            id="live-abandon-button"
+            type="button"
+            class="danger"
+          >
+            Abbandona
+          </button>
+
+        </div>
+
+
+        <p
+          id="live-action-help"
+          class="setting-help"
+        ></p>
+
+      </div>
+
+    </div>
+
+
+    <div
       id="test-auctioneer-panel"
       hidden
     >
@@ -521,6 +650,7 @@
 
 
 <script src="league-auction.js?v=2"></script>
+<script src="auction-live-controls.js?v=1"></script>
 <script src="auction-test-live.js?v=2"></script>
 
 </body>
