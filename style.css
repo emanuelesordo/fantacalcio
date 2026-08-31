@@ -4268,3 +4268,768 @@ small {
       6px 8px;
   }
 }
+
+
+/* =========================================================
+   ASTA UI V23
+   Quick bid + drawer svincolati + timer sincronizzato
+   ========================================================= */
+
+.auction-engine-only,
+.auction-engine-picker,
+.auction-engine-picker-status {
+  display:
+    none !important;
+}
+
+
+.auction-visually-hidden {
+  position:
+    absolute;
+
+  width:
+    1px;
+
+  height:
+    1px;
+
+  padding:
+    0;
+
+  margin:
+    -1px;
+
+  overflow:
+    hidden;
+
+  clip:
+    rect(
+      0,
+      0,
+      0,
+      0
+    );
+
+  white-space:
+    nowrap;
+
+  border:
+    0;
+}
+
+
+.auction-field-label {
+  color:
+    var(--text-soft);
+
+  font-size:
+    12px;
+
+  font-weight:
+    700;
+}
+
+
+.auction-quick-bid-grid {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      5,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap:
+    5px;
+}
+
+
+.auction-quick-bid-button {
+  display:
+    grid;
+
+  gap:
+    1px;
+
+  min-width:
+    0;
+
+  min-height:
+    48px;
+
+  padding:
+    5px 6px;
+
+  border:
+    1px solid
+    var(--border-strong);
+
+  background:
+    var(--surface-2);
+
+  color:
+    var(--text);
+}
+
+
+.auction-quick-bid-button
+span {
+  color:
+    var(--text-muted);
+
+  font-size:
+    10px;
+
+  font-weight:
+    800;
+}
+
+
+.auction-quick-bid-button
+strong {
+  font-size:
+    18px;
+
+  line-height:
+    1;
+}
+
+
+.auction-quick-bid-button.is-selected {
+  border-color:
+    var(--primary);
+
+  background:
+    var(--primary);
+
+  color:
+    var(--primary-text);
+}
+
+
+.auction-quick-bid-button.is-selected
+span {
+  color:
+    inherit;
+
+  opacity:
+    .65;
+}
+
+
+.auction-bid-selection-row {
+  display:
+    flex;
+
+  flex-wrap:
+    wrap;
+
+  gap:
+    5px;
+}
+
+
+.auction-manual-picker {
+  margin-top:
+    5px;
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius:
+    var(--radius-sm);
+
+  background:
+    var(--surface-2);
+}
+
+
+.auction-manual-picker
+summary {
+  padding:
+    7px 9px;
+
+  color:
+    var(--text-muted);
+
+  font-size:
+    11px;
+
+  cursor:
+    pointer;
+}
+
+
+.auction-manual-picker
+select {
+  margin:
+    0 7px 7px;
+
+  width:
+    calc(
+      100% - 14px
+    );
+}
+
+
+/* TIMER */
+
+#auction-timer-display {
+  margin:
+    0;
+
+  font-size:
+    28px;
+
+  line-height:
+    1;
+}
+
+
+#auction-timer-display-status {
+  margin:
+    3px 0 0;
+
+  color:
+    var(--text-muted);
+
+  font-size:
+    11px;
+}
+
+
+/* CALL MODE */
+
+body.auction-live-mode.auction-call-mode
+#live-section {
+  overflow:
+    hidden;
+}
+
+
+body.auction-live-mode.auction-call-mode
+#call-panel {
+  display:
+    grid !important;
+
+  grid-template-rows:
+    auto
+    auto
+    minmax(
+      0,
+      1fr
+    );
+
+  height:
+    100%;
+
+  min-height:
+    0;
+
+  overflow:
+    hidden;
+}
+
+
+body.auction-live-mode.auction-call-mode
+#call-form-area:not([hidden]) {
+  position:
+    relative;
+
+  display:
+    grid !important;
+
+  grid-template-columns:
+    minmax(
+      220px,
+      1fr
+    )
+    minmax(
+      360px,
+      42%
+    );
+
+  grid-template-rows:
+    minmax(
+      0,
+      1fr
+    );
+
+  gap:
+    8px;
+
+  height:
+    100%;
+
+  min-height:
+    0;
+
+  overflow:
+    hidden;
+}
+
+
+body.auction-live-mode.auction-call-mode
+#call-form-area.free-agents-collapsed {
+  grid-template-columns:
+    minmax(
+      0,
+      1fr
+    )
+    38px;
+}
+
+
+.call-main-controls {
+  min-width:
+    0;
+
+  align-self:
+    start;
+
+  padding:
+    8px;
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius:
+    var(--radius-md);
+
+  background:
+    var(--surface-2);
+}
+
+
+.call-main-controls
+#opening-bid-field {
+  max-width:
+    180px;
+}
+
+
+.call-main-help {
+  margin:
+    8px 0 0;
+}
+
+
+/* DRAWER SVINCOLATI */
+
+.free-agents-drawer {
+  display:
+    grid;
+
+  grid-template-columns:
+    38px
+    minmax(
+      0,
+      1fr
+    );
+
+  min-width:
+    0;
+
+  min-height:
+    0;
+
+  height:
+    100%;
+
+  overflow:
+    hidden;
+
+  border:
+    1px solid
+    var(--border-strong);
+
+  border-radius:
+    var(--radius-md);
+
+  background:
+    var(--surface);
+}
+
+
+.free-agents-drawer.is-collapsed {
+  grid-template-columns:
+    38px
+    0;
+}
+
+
+.free-agents-handle {
+  width:
+    38px;
+
+  min-width:
+    38px;
+
+  height:
+    100%;
+
+  min-height:
+    0;
+
+  padding:
+    7px 4px;
+
+  border:
+    0;
+
+  border-right:
+    1px solid
+    var(--border);
+
+  border-radius:
+    0;
+
+  writing-mode:
+    vertical-rl;
+
+  text-orientation:
+    mixed;
+
+  gap:
+    8px;
+}
+
+
+.free-agents-handle
+#free-agents-toggle-icon {
+  font-size:
+    20px;
+
+  line-height:
+    1;
+}
+
+
+.free-agents-handle-label {
+  font-size:
+    10px;
+
+  letter-spacing:
+    .08em;
+
+  text-transform:
+    uppercase;
+}
+
+
+.free-agents-content {
+  display:
+    grid;
+
+  grid-template-rows:
+    auto
+    minmax(
+      0,
+      1fr
+    );
+
+  min-width:
+    0;
+
+  min-height:
+    0;
+
+  overflow:
+    hidden;
+
+  padding:
+    7px;
+}
+
+
+.free-agents-drawer.is-collapsed
+.free-agents-content {
+  visibility:
+    hidden;
+
+  pointer-events:
+    none;
+}
+
+
+.free-agents-toolbar {
+  display:
+    grid;
+
+  grid-template-columns:
+    auto
+    minmax(
+      150px,
+      1fr
+    );
+
+  align-items:
+    center;
+
+  gap:
+    7px;
+
+  padding-bottom:
+    6px;
+}
+
+
+.free-agents-toolbar
+>
+div {
+  display:
+    grid;
+
+  gap:
+    1px;
+}
+
+
+.free-agents-toolbar
+strong {
+  font-size:
+    13px;
+}
+
+
+.free-agents-toolbar
+small {
+  color:
+    var(--text-muted);
+
+  font-size:
+    10px;
+}
+
+
+.free-agents-toolbar
+.form-field {
+  gap:
+    0;
+}
+
+
+.free-agents-toolbar
+input {
+  min-height:
+    34px;
+
+  padding:
+    6px 8px;
+}
+
+
+body.auction-live-mode
+#call-candidates.free-agents-list {
+  display:
+    grid;
+
+  align-content:
+    start;
+
+  min-height:
+    0;
+
+  height:
+    100%;
+
+  max-height:
+    none;
+
+  overflow-y:
+    auto;
+
+  overflow-x:
+    hidden;
+
+  overscroll-behavior:
+    contain;
+
+  scrollbar-gutter:
+    stable;
+
+  padding-right:
+    2px;
+}
+
+
+body.auction-live-mode
+#call-candidates.free-agents-list
+.list-row-main {
+  padding:
+    6px 8px;
+}
+
+
+/* QUICK BID LIVE */
+
+body.auction-live-mode
+#live-president-controls
+.form-grid,
+
+body.auction-live-mode
+#auctioneer-panel
+.form-grid {
+  grid-template-columns:
+    minmax(
+      300px,
+      1.25fr
+    )
+    minmax(
+      180px,
+      .75fr
+    );
+
+  align-items:
+    end;
+}
+
+
+body.auction-live-mode
+.auction-bid-confirm-field
+button {
+  width:
+    100%;
+}
+
+
+.auction-quick-bid-button:hover {
+  transform:
+    none;
+}
+
+
+/* MOBILE */
+
+@media
+(max-width: 700px) {
+
+  .auction-quick-bid-grid {
+    gap:
+      4px;
+  }
+
+
+  .auction-quick-bid-button {
+    min-height:
+      44px;
+
+    padding:
+      4px;
+  }
+
+
+  .auction-quick-bid-button
+  strong {
+    font-size:
+      16px;
+  }
+
+
+  body.auction-live-mode
+  #live-president-controls
+  .form-grid,
+
+  body.auction-live-mode
+  #auctioneer-panel
+  .form-grid {
+    grid-template-columns:
+      1fr;
+
+    gap:
+      6px;
+  }
+
+
+  body.auction-live-mode.auction-call-mode
+  #call-form-area:not([hidden]),
+
+  body.auction-live-mode.auction-call-mode
+  #call-form-area.free-agents-collapsed {
+    display:
+      block !important;
+
+    height:
+      100%;
+
+    overflow:
+      hidden;
+  }
+
+
+  .call-main-controls {
+    width:
+      calc(
+        100% - 42px
+      );
+  }
+
+
+  .free-agents-drawer {
+    position:
+      absolute;
+
+    z-index:
+      20;
+
+    top:
+      0;
+
+    right:
+      0;
+
+    bottom:
+      0;
+
+    width:
+      min(
+        86vw,
+        390px
+      );
+
+    height:
+      100%;
+
+    box-shadow:
+      -10px 0 28px
+      rgba(
+        0,
+        0,
+        0,
+        .34
+      );
+
+    transition:
+      width .16s ease;
+  }
+
+
+  .free-agents-drawer.is-collapsed {
+    width:
+      38px;
+
+    box-shadow:
+      none;
+  }
+
+
+  .free-agents-toolbar {
+    grid-template-columns:
+      1fr;
+
+    gap:
+      5px;
+  }
+
+
+  #auction-timer-display {
+    font-size:
+      24px;
+  }
+}
