@@ -1,6 +1,12 @@
 /* =========================================================
    league-join.js
-   Onboarding lega atomico
+   Onboarding lega atomico - v2
+
+   Flusso:
+   1. Codice lega
+   2. Scelta ruoli
+   3A. Squadra, solo se Presidente/Vice
+   3B. Conferma diretta, se solo Banditore/Presentatore
    ========================================================= */
 
 const SUPABASE_URL =
@@ -33,6 +39,11 @@ const pendingList =
     'pending-list'
   );
 
+const leagueCodeSection =
+  document.getElementById(
+    'league-code-section'
+  );
+
 const leagueCode =
   document.getElementById(
     'league-code'
@@ -43,9 +54,9 @@ const previewButton =
     'preview-league-button'
   );
 
-const requestSection =
+const rolesSection =
   document.getElementById(
-    'request-section'
+    'roles-section'
   );
 
 const previewLeagueName =
@@ -78,9 +89,24 @@ const rolePresenter =
     'role-presenter'
   );
 
-const teamPanel =
+const rolesContinueButton =
   document.getElementById(
-    'team-panel'
+    'roles-continue-button'
+  );
+
+const rolesHelp =
+  document.getElementById(
+    'roles-help'
+  );
+
+const teamSection =
+  document.getElementById(
+    'team-section'
+  );
+
+const teamStepDescription =
+  document.getElementById(
+    'team-step-description'
   );
 
 const teamCreateChoice =
@@ -118,9 +144,34 @@ const newTeamName =
     'new-team-name'
   );
 
-const submitButton =
+const teamBackButton =
   document.getElementById(
-    'submit-request-button'
+    'team-back-button'
+  );
+
+const submitTeamRequestButton =
+  document.getElementById(
+    'submit-team-request-button'
+  );
+
+const noTeamConfirmSection =
+  document.getElementById(
+    'no-team-confirm-section'
+  );
+
+const noTeamSummary =
+  document.getElementById(
+    'no-team-summary'
+  );
+
+const noTeamBackButton =
+  document.getElementById(
+    'no-team-back-button'
+  );
+
+const submitNoTeamRequestButton =
+  document.getElementById(
+    'submit-no-team-request-button'
   );
 
 
@@ -191,6 +242,25 @@ function showMessage(
 }
 
 
+function roleLabel(role) {
+
+  return ({
+    president:
+      'Presidente',
+
+    vice:
+      'Vice',
+
+    auctioneer:
+      'Banditore',
+
+    presenter:
+      'Presentatore'
+  })[role]
+  || role;
+}
+
+
 function selectedRoles() {
 
   return [
@@ -210,22 +280,43 @@ function selectedRoles() {
 }
 
 
-function roleLabel(role) {
+function requiresTeam(
+  roles = selectedRoles()
+) {
 
-  return ({
-    president:
-      'Presidente',
+  return roles.includes(
+    'president'
+  )
+  ||
+  roles.includes(
+    'vice'
+  );
+}
 
-    vice:
-      'Vice',
 
-    auctioneer:
-      'Banditore',
+function resetStep3() {
 
-    presenter:
-      'Presentatore'
-  })[role]
-  || role;
+  teamSection.hidden =
+    true;
+
+
+  noTeamConfirmSection.hidden =
+    true;
+}
+
+
+function scrollToSection(
+  element
+) {
+
+  element
+    ?.scrollIntoView({
+      behavior:
+        'smooth',
+
+      block:
+        'start'
+    });
 }
 
 
@@ -486,6 +577,47 @@ async function loadMyRequests() {
    PREVIEW LEGA
    ========================================================= */
 
+function resetRoleSelection() {
+
+  rolePresident.checked =
+    false;
+
+
+  roleVice.checked =
+    false;
+
+
+  roleAuctioneer.checked =
+    false;
+
+
+  rolePresenter.checked =
+    false;
+
+
+  teamModeExisting.checked =
+    true;
+
+
+  teamModeCreate.checked =
+    false;
+
+
+  existingTeamSelect.value =
+    '';
+
+
+  newTeamName.value =
+    '';
+
+
+  resetStep3();
+
+
+  updateRolesUi();
+}
+
+
 function renderLeaguePreview() {
 
   const league =
@@ -495,14 +627,17 @@ function renderLeaguePreview() {
 
   if (!league) {
 
-    requestSection.hidden =
+    rolesSection.hidden =
       true;
+
+
+    resetStep3();
 
     return;
   }
 
 
-  requestSection.hidden =
+  rolesSection.hidden =
     false;
 
 
@@ -512,6 +647,9 @@ function renderLeaguePreview() {
 
   previewLeagueCode.textContent =
     `Codice ${league.code}`;
+
+
+  resetRoleSelection();
 
 
   const membership =
@@ -529,7 +667,7 @@ function renderLeaguePreview() {
     );
 
 
-    submitButton.disabled =
+    rolesContinueButton.disabled =
       true;
 
 
@@ -543,24 +681,182 @@ function renderLeaguePreview() {
     );
 
 
-    submitButton.disabled =
+    rolesContinueButton.disabled =
       true;
 
 
   } else {
 
-    submitButton.disabled =
+    rolesContinueButton.disabled =
       false;
+
+
+    showMessage('');
   }
 
 
-  renderTeamOptions();
-
-  renderTeamPanel();
+  scrollToSection(
+    rolesSection
+  );
 }
 
 
-function renderTeamOptions() {
+/* =========================================================
+   RUOLI
+   ========================================================= */
+
+function updateRolesUi() {
+
+  const roles =
+    selectedRoles();
+
+
+  const teamRequired =
+    requiresTeam(
+      roles
+    );
+
+
+  rolesContinueButton.textContent =
+    teamRequired
+      ? 'Continua alla squadra'
+      : 'Continua';
+
+
+  if (!roles.length) {
+
+    rolesHelp.textContent =
+      'Seleziona almeno un ruolo. Presidente e Vice richiedono una squadra; Banditore e Presentatore no.';
+
+
+  } else if (teamRequired) {
+
+    rolesHelp.textContent =
+      'Hai selezionato Presidente o Vice: nel prossimo passaggio dovrai indicare la squadra.';
+
+
+  } else {
+
+    rolesHelp.textContent =
+      'Banditore e Presentatore non richiedono alcuna squadra.';
+  }
+
+
+  resetStep3();
+}
+
+
+rolePresident
+  ?.addEventListener(
+    'change',
+    () => {
+
+      if (
+        rolePresident.checked
+        &&
+        roleVice.checked
+      ) {
+
+        roleVice.checked =
+          false;
+      }
+
+
+      updateRolesUi();
+    }
+  );
+
+
+roleVice
+  ?.addEventListener(
+    'change',
+    () => {
+
+      if (
+        roleVice.checked
+        &&
+        rolePresident.checked
+      ) {
+
+        rolePresident.checked =
+          false;
+      }
+
+
+      updateRolesUi();
+    }
+  );
+
+
+roleAuctioneer
+  ?.addEventListener(
+    'change',
+    updateRolesUi
+  );
+
+
+rolePresenter
+  ?.addEventListener(
+    'change',
+    updateRolesUi
+  );
+
+
+/* =========================================================
+   CONTINUA DOPO I RUOLI
+   ========================================================= */
+
+rolesContinueButton
+  ?.addEventListener(
+    'click',
+    () => {
+
+      const roles =
+        selectedRoles();
+
+
+      if (!roles.length) {
+
+        showMessage(
+          'Seleziona almeno un ruolo.',
+          'error'
+        );
+
+        return;
+      }
+
+
+      showMessage('');
+
+
+      if (
+        requiresTeam(
+          roles
+        )
+      ) {
+
+        renderTeamStep(
+          roles
+        );
+
+
+      } else {
+
+        renderNoTeamConfirmation(
+          roles
+        );
+      }
+    }
+  );
+
+
+/* =========================================================
+   STEP SQUADRA
+   ========================================================= */
+
+function renderTeamOptions(
+  roles
+) {
 
   if (!previewData) {
     return;
@@ -568,11 +864,15 @@ function renderTeamOptions() {
 
 
   const presidentSelected =
-    rolePresident.checked;
+    roles.includes(
+      'president'
+    );
 
 
   const viceSelected =
-    roleVice.checked;
+    roles.includes(
+      'vice'
+    );
 
 
   const teams =
@@ -600,7 +900,7 @@ function renderTeamOptions() {
           }
 
 
-          return true;
+          return false;
         }
       );
 
@@ -637,57 +937,35 @@ function renderTeamOptions() {
 }
 
 
-/* =========================================================
-   RUOLI / SQUADRA
-   ========================================================= */
-
-function renderTeamPanel() {
+function renderTeamStep(
+  roles
+) {
 
   const presidentSelected =
-    rolePresident.checked;
+    roles.includes(
+      'president'
+    );
 
 
   const viceSelected =
-    roleVice.checked;
+    roles.includes(
+      'vice'
+    );
 
 
-  const needsTeam =
-    presidentSelected
-    ||
-    viceSelected;
+  noTeamConfirmSection.hidden =
+    true;
 
 
-  teamPanel.hidden =
-    !needsTeam;
-
-
-  if (!needsTeam) {
-
-    teamModeExisting.checked =
-      true;
-
-
-    teamModeCreate.checked =
-      false;
-
-
-    newTeamName.value =
-      '';
-
-
-    return;
-  }
+  teamSection.hidden =
+    false;
 
 
   teamCreateChoice.hidden =
     !presidentSelected;
 
 
-  if (
-    viceSelected
-    &&
-    teamModeCreate.checked
-  ) {
+  if (viceSelected) {
 
     teamModeExisting.checked =
       true;
@@ -695,12 +973,30 @@ function renderTeamPanel() {
 
     teamModeCreate.checked =
       false;
+
+
+    teamStepDescription.textContent =
+      'Scegli la squadra del Presidente che vuoi affiancare.';
+
+
+  } else {
+
+    teamStepDescription.textContent =
+      'Scegli una squadra senza Presidente oppure creane una nuova.';
   }
 
 
   renderTeamMode();
 
-  renderTeamOptions();
+
+  renderTeamOptions(
+    roles
+  );
+
+
+  scrollToSection(
+    teamSection
+  );
 }
 
 
@@ -719,48 +1015,6 @@ function renderTeamMode() {
 }
 
 
-rolePresident
-  ?.addEventListener(
-    'change',
-    () => {
-
-      if (
-        rolePresident.checked
-        &&
-        roleVice.checked
-      ) {
-
-        roleVice.checked =
-          false;
-      }
-
-
-      renderTeamPanel();
-    }
-  );
-
-
-roleVice
-  ?.addEventListener(
-    'change',
-    () => {
-
-      if (
-        roleVice.checked
-        &&
-        rolePresident.checked
-      ) {
-
-        rolePresident.checked =
-          false;
-      }
-
-
-      renderTeamPanel();
-    }
-  );
-
-
 teamModeExisting
   ?.addEventListener(
     'change',
@@ -775,8 +1029,114 @@ teamModeCreate
   );
 
 
+teamBackButton
+  ?.addEventListener(
+    'click',
+    () => {
+
+      teamSection.hidden =
+        true;
+
+
+      scrollToSection(
+        rolesSection
+      );
+    }
+  );
+
+
 /* =========================================================
-   CONTINUA CON CODICE
+   CONFERMA SENZA SQUADRA
+   ========================================================= */
+
+function renderNoTeamConfirmation(
+  roles
+) {
+
+  teamSection.hidden =
+    true;
+
+
+  noTeamConfirmSection.hidden =
+    false;
+
+
+  noTeamSummary.innerHTML =
+    `
+
+      <div class="list-row">
+
+        <div class="list-row-main">
+
+          <div class="list-row-title">
+
+            <strong>
+              ${escapeHtml(
+                previewData
+                  ?.league
+                  ?.name
+                || 'Lega'
+              )}
+            </strong>
+
+            <small>
+              Nessuna squadra richiesta
+            </small>
+
+          </div>
+
+
+          <div class="league-actions">
+
+            ${
+              roles
+                .map(
+                  role => `
+                    <span class="badge good">
+                      ${escapeHtml(
+                        roleLabel(
+                          role
+                        )
+                      )}
+                    </span>
+                  `
+                )
+                .join('')
+            }
+
+          </div>
+
+        </div>
+
+      </div>
+
+    `;
+
+
+  scrollToSection(
+    noTeamConfirmSection
+  );
+}
+
+
+noTeamBackButton
+  ?.addEventListener(
+    'click',
+    () => {
+
+      noTeamConfirmSection.hidden =
+        true;
+
+
+      scrollToSection(
+        rolesSection
+      );
+    }
+  );
+
+
+/* =========================================================
+   PREVIEW CODICE
    ========================================================= */
 
 async function previewLeague() {
@@ -857,8 +1217,11 @@ async function previewLeague() {
       null;
 
 
-    requestSection.hidden =
+    rolesSection.hidden =
       true;
+
+
+    resetStep3();
 
 
     showMessage(
@@ -913,239 +1276,377 @@ leagueCode
       leagueCode.value =
         leagueCode.value
           .toUpperCase();
-    }
-  );
-
-
-/* =========================================================
-   INVIA RICHIESTA
-   ========================================================= */
-
-submitButton
-  ?.addEventListener(
-    'click',
-    async () => {
-
-      if (!previewData?.league) {
-
-        showMessage(
-          'Prima verifica il codice della lega.',
-          'error'
-        );
-
-        return;
-      }
-
-
-      const roles =
-        selectedRoles();
-
-
-      if (!roles.length) {
-
-        showMessage(
-          'Seleziona almeno un ruolo.',
-          'error'
-        );
-
-        return;
-      }
-
-
-      const presidentSelected =
-        roles.includes(
-          'president'
-        );
-
-
-      const viceSelected =
-        roles.includes(
-          'vice'
-        );
-
-
-      let teamMode =
-        'none';
-
-
-      let teamId =
-        null;
-
-
-      let requestedTeamName =
-        null;
 
 
       if (
-        presidentSelected
-        ||
-        viceSelected
+        previewData
+        &&
+        leagueCode.value
+          .trim()
+          .toUpperCase()
+        !==
+        String(
+          previewData
+            .league
+            .code
+        )
+          .trim()
+          .toUpperCase()
       ) {
-
-        if (
-          teamModeCreate.checked
-        ) {
-
-          teamMode =
-            'create';
-
-
-          requestedTeamName =
-            newTeamName.value
-              .trim();
-
-
-          if (
-            requestedTeamName.length < 2
-          ) {
-
-            showMessage(
-              'Inserisci il nome della nuova squadra.',
-              'error'
-            );
-
-            return;
-          }
-
-
-        } else {
-
-          teamMode =
-            'existing';
-
-
-          teamId =
-            existingTeamSelect.value
-            || null;
-
-
-          if (!teamId) {
-
-            showMessage(
-              'Seleziona una squadra.',
-              'error'
-            );
-
-            return;
-          }
-        }
-      }
-
-
-      submitButton.disabled =
-        true;
-
-
-      const oldText =
-        submitButton.textContent;
-
-
-      submitButton.textContent =
-        'Invio...';
-
-
-      showMessage('');
-
-
-      try {
-
-        const result =
-          await onboardingApi({
-
-            action:
-              'submitJoinRequest',
-
-            code:
-              previewData
-                .league
-                .code,
-
-            roles,
-
-            teamMode,
-
-            teamId,
-
-            newTeamName:
-              requestedTeamName
-          });
-
-
-        if (!result?.ok) {
-
-          throw new Error(
-            result?.error
-            ||
-            'Impossibile inviare la richiesta.'
-          );
-        }
-
-
-        showMessage(
-          'Richiesta inviata. L’Admin della lega può ora approvarla.',
-          'success'
-        );
-
-
-        requestSection.hidden =
-          true;
-
 
         previewData =
           null;
 
 
-        rolePresident.checked =
-          false;
+        rolesSection.hidden =
+          true;
 
 
-        roleVice.checked =
-          false;
+        resetStep3();
+      }
+    }
+  );
 
 
-        roleAuctioneer.checked =
-          false;
+/* =========================================================
+   SUBMIT COMUNE
+   ========================================================= */
+
+async function submitJoinRequest({
+  teamMode = 'none',
+  teamId = null,
+  newTeamName = null,
+  button
+}) {
+
+  if (!previewData?.league) {
+
+    showMessage(
+      'Prima verifica il codice della lega.',
+      'error'
+    );
+
+    return;
+  }
 
 
-        rolePresenter.checked =
-          false;
+  const roles =
+    selectedRoles();
 
 
-        existingTeamSelect.value =
-          '';
+  if (!roles.length) {
+
+    showMessage(
+      'Seleziona almeno un ruolo.',
+      'error'
+    );
+
+    return;
+  }
 
 
-        newTeamName.value =
-          '';
+  /*
+   * Se non ci sono Presidente/Vice,
+   * la richiesta parte obbligatoriamente senza squadra.
+   */
+  if (
+    !requiresTeam(
+      roles
+    )
+  ) {
+
+    teamMode =
+      'none';
 
 
-        await loadMyRequests();
+    teamId =
+      null;
 
 
-      } catch (error) {
+    newTeamName =
+      null;
+  }
 
-        console.error(
-          error
-        );
 
+  button.disabled =
+    true;
+
+
+  const oldText =
+    button.textContent;
+
+
+  button.textContent =
+    'Invio...';
+
+
+  showMessage('');
+
+
+  try {
+
+    const result =
+      await onboardingApi({
+
+        action:
+          'submitJoinRequest',
+
+        code:
+          previewData
+            .league
+            .code,
+
+        roles,
+
+        teamMode,
+
+        teamId,
+
+        newTeamName
+      });
+
+
+    if (!result?.ok) {
+
+      throw new Error(
+        result?.error
+        ||
+        'Impossibile inviare la richiesta.'
+      );
+    }
+
+
+    showMessage(
+      'Richiesta inviata. L’Admin della lega può ora approvarla.',
+      'success'
+    );
+
+
+    previewData =
+      null;
+
+
+    rolesSection.hidden =
+      true;
+
+
+    resetStep3();
+
+
+    rolePresident.checked =
+      false;
+
+
+    roleVice.checked =
+      false;
+
+
+    roleAuctioneer.checked =
+      false;
+
+
+    rolePresenter.checked =
+      false;
+
+
+    teamModeExisting.checked =
+      true;
+
+
+    teamModeCreate.checked =
+      false;
+
+
+    existingTeamSelect.value =
+      '';
+
+
+    newTeamName.value =
+      '';
+
+
+    await loadMyRequests();
+
+
+    scrollToSection(
+      pendingSection.hidden
+        ? leagueCodeSection
+        : pendingSection
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
+
+    showMessage(
+      error.message
+      ||
+      'Errore durante l’invio della richiesta.',
+      'error'
+    );
+
+
+  } finally {
+
+    button.disabled =
+      false;
+
+
+    button.textContent =
+      oldText;
+  }
+}
+
+
+/* =========================================================
+   SUBMIT CON SQUADRA
+   ========================================================= */
+
+submitTeamRequestButton
+  ?.addEventListener(
+    'click',
+    async () => {
+
+      const roles =
+        selectedRoles();
+
+
+      if (
+        !requiresTeam(
+          roles
+        )
+      ) {
 
         showMessage(
-          error.message
-          ||
-          'Errore durante l’invio della richiesta.',
+          'La selezione dei ruoli è cambiata. Torna allo step Ruoli.',
           'error'
         );
 
-
-      } finally {
-
-        submitButton.disabled =
-          false;
-
-
-        submitButton.textContent =
-          oldText;
+        return;
       }
+
+
+      if (
+        teamModeCreate.checked
+      ) {
+
+        const requestedTeamName =
+          newTeamName.value
+            .trim();
+
+
+        if (
+          requestedTeamName.length < 2
+        ) {
+
+          showMessage(
+            'Inserisci il nome della nuova squadra.',
+            'error'
+          );
+
+          return;
+        }
+
+
+        await submitJoinRequest({
+
+          teamMode:
+            'create',
+
+          teamId:
+            null,
+
+          newTeamName:
+            requestedTeamName,
+
+          button:
+            submitTeamRequestButton
+        });
+
+
+        return;
+      }
+
+
+      const teamId =
+        existingTeamSelect.value
+        || null;
+
+
+      if (!teamId) {
+
+        showMessage(
+          'Seleziona una squadra.',
+          'error'
+        );
+
+        return;
+      }
+
+
+      await submitJoinRequest({
+
+        teamMode:
+          'existing',
+
+        teamId,
+
+        newTeamName:
+          null,
+
+        button:
+          submitTeamRequestButton
+      });
+    }
+  );
+
+
+/* =========================================================
+   SUBMIT SENZA SQUADRA
+   ========================================================= */
+
+submitNoTeamRequestButton
+  ?.addEventListener(
+    'click',
+    async () => {
+
+      const roles =
+        selectedRoles();
+
+
+      if (
+        requiresTeam(
+          roles
+        )
+      ) {
+
+        showMessage(
+          'Hai selezionato Presidente o Vice: devi indicare una squadra.',
+          'error'
+        );
+
+        return;
+      }
+
+
+      await submitJoinRequest({
+
+        teamMode:
+          'none',
+
+        teamId:
+          null,
+
+        newTeamName:
+          null,
+
+        button:
+          submitNoTeamRequestButton
+      });
     }
   );
 
@@ -1162,4 +1663,6 @@ if (!getSession()?.token) {
 } else {
 
   loadMyRequests();
+
+  updateRolesUi();
 }
