@@ -1,701 +1,1922 @@
-<!DOCTYPE html>
-<html lang="it">
+/* auction-live-controls.js
+   STEP 4
+   Timer server-side, HOLD, turni, picker AUTO/MANUAL,
+   pannello Banditore, correzioni e capacità massima d'offerta.
+*/
 
-<head>
+const liveUi = {
+  panel: document.getElementById('live-control-panel'),
+  timerValue: document.getElementById('live-timer-value'),
+  timerStatus: document.getElementById('live-timer-status'),
+  turnBadge: document.getElementById('live-turn-badge'),
+  passBadge: document.getElementById('live-pass-badge'),
+  hold: document.getElementById('live-hold-button'),
+  controls: document.getElementById('live-president-controls'),
+  bidAmount: document.getElementById('live-bid-amount'),
+  pickerMode: document.getElementById('live-picker-mode'),
+  pickerAuto: document.getElementById('live-picker-auto-button'),
+  maxBid: document.getElementById('live-max-bid'),
+  bid: document.getElementById('live-bid-button'),
+  turnActions: document.getElementById('live-turn-actions'),
+  pass: document.getElementById('live-pass-button'),
+  abandon: document.getElementById('live-abandon-button'),
+  help: document.getElementById('live-action-help')
+};
 
-  <meta charset="UTF-8">
+const auctioneerUi = {
+  panel: document.getElementById('auctioneer-panel'),
+  amount: document.getElementById('auctioneer-bid-amount'),
+  pickerMode: document.getElementById('auctioneer-picker-mode'),
+  actionMode: document.getElementById('auctioneer-action-mode'),
+  pickerAuto: document.getElementById('auctioneer-picker-auto-button'),
+  teamButtons: document.getElementById('auctioneer-team-buttons'),
+  award: document.getElementById('auctioneer-award-player'),
+  finishTest: document.getElementById('test-finish-review'),
+  help: document.getElementById('auctioneer-help'),
+  recent: document.getElementById('auction-recent-bids')
+};
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+let liveServerOffsetMs = 0;
+let liveTimerSyncing = false;
+let livePolling = false;
 
-  <title>Asta - Fantacalcio Live</title>
+let presidentPickerMode = 'auto';
+let auctioneerPickerMode = 'auto';
+let pickerPlayerId = null;
 
-  <link
-    rel="stylesheet"
-    href="style.css?v=20"
-  >
+function liveSession() {
+  return auctionData?.auctionSession || null;
+}
 
-</head>
+function liveSettings() {
+  return (
+    liveSession()?.setup_snapshot
+    ||
+    auctionData?.settings
+    ||
+    {}
+  );
+}
 
+function liveBidMode() {
+  return liveSettings()?.bid_mode || 'wild';
+}
 
-<body>
+function liveMyTeamId() {
+  return auctionData?.myTeam?.teamId || null;
+}
 
-<main class="page-shell">
+function liveCurrentTurnTeam() {
+  return auctionData?.currentTurnTeam || null;
+}
 
+function liveIsController() {
+  return (
+    auctionData?.permissions?.canControlAuction
+    === true
+  );
+}
 
-  <header class="page-header">
+function liveIsPresident() {
+  return (
+    auctionData?.permissions?.isPresident
+    === true
+  );
+}
 
-    <div>
-      <h1 id="league-title">Asta</h1>
-      <p id="league-subtitle">Caricamento...</p>
-    </div>
+function liveTeamState(teamId) {
+  return (
+    auctionData?.teamOrder
+    || []
+  )
+    .find(
+      item =>
+        item.team_id === teamId
+    )
+    || null;
+}
 
-    <a
-      class="back-home"
-      href="league.html"
+function capacityForTeam(teamId) {
+  return (
+    auctionData?.bidCapacities
+    || []
+  )
+    .find(
+      item =>
+        item.team_id === teamId
+    )
+    || null;
+}
+
+function maxCapacityAcrossTeams() {
+  return (
+    auctionData?.bidCapacities
+    || []
+  )
+    .reduce(
+      (max, item) =>
+        Math.max(
+          max,
+          Number(
+            item.max_bid || 0
+          )
+        ),
+      0
+    );
+}
+
+function nextValidBid() {
+  const session =
+    liveSession();
+
+  if (!session) {
+    return 1;
+  }
+
+  if (
+    !session.current_bidder_team_id
+  ) {
+    return Math.max(
+      1,
+      Number(
+        session.current_bid
+        || 1
+      )
+    );
+  }
+
+  return Math.max(
+    1,
+    Number(
+      session.current_bid
+      || 0
+    )
+    +
+    1
+  );
+}
+
+function capacityReasonLabel(reason) {
+  const labels = {
+    CLASSIC_ROLE_FULL:
+      'ruolo completo',
+
+    CLASSIC_ROSTER_FULL:
+      'rosa completa',
+
+    MANTRA_ROSTER_FULL:
+      'rosa completa',
+
+    MANTRA_GOALKEEPER_FULL:
+      'portieri completi',
+
+    MANTRA_OUTFIELD_FULL:
+      'movimento completo',
+
+    MANTRA_MINIMA_IMPOSSIBLE:
+      'vincoli Mantra',
+
+    NO_BUDGET_FOR_REQUIRED_SLOTS:
+      'crediti da riservare',
+
+    PLAYER_ROLE_MISSING:
+      'ruolo non disponibile'
+  };
+
+  return (
+    labels[reason]
+    ||
+    'non disponibile'
+  );
+}
+
+function rebuildPickerOptions(
+  select,
+  maxBid
+) {
+  if (!select) return;
+
+  const maximum =
+    Math.max(
+      0,
+      Number(
+        maxBid || 0
+      )
+    );
+
+  if (
+    Number(
+      select.dataset.maxBid
+      || -1
+    )
+    === maximum
+  ) {
+    return;
+  }
+
+  select.innerHTML =
+    '';
+
+  if (maximum < 1) {
+    select.dataset.maxBid =
+      '0';
+
+    return;
+  }
+
+  const fragment =
+    document.createDocumentFragment();
+
+  for (
+    let amount = 1;
+    amount <= maximum;
+    amount += 1
+  ) {
+    const option =
+      document.createElement(
+        'option'
+      );
+
+    option.value =
+      String(amount);
+
+    option.textContent =
+      String(amount);
+
+    fragment.appendChild(
+      option
+    );
+  }
+
+  select.appendChild(
+    fragment
+  );
+
+  select.dataset.maxBid =
+    String(maximum);
+}
+
+function setPickerValue(
+  select,
+  value
+) {
+  if (!select) return;
+
+  const maximum =
+    Number(
+      select.dataset.maxBid
+      || 0
+    );
+
+  if (maximum < 1) {
+    return;
+  }
+
+  select.value =
+    String(
+      Math.min(
+        maximum,
+        Math.max(
+          1,
+          Number(
+            value || 1
+          )
+        )
+      )
+    );
+}
+
+function resetPickersForNewPlayer() {
+  const playerId =
+    auctionData?.currentPlayer?.id
+    || null;
+
+  if (
+    playerId === pickerPlayerId
+  ) {
+    return;
+  }
+
+  pickerPlayerId =
+    playerId;
+
+  presidentPickerMode =
+    'auto';
+
+  auctioneerPickerMode =
+    'auto';
+}
+
+function renderPresidentPickerMode() {
+  if (
+    !liveUi.pickerMode
+    ||
+    !liveUi.pickerAuto
+  ) {
+    return;
+  }
+
+  const auto =
+    presidentPickerMode === 'auto';
+
+  liveUi.pickerMode.textContent =
+    auto
+      ? 'AUTO'
+      : 'MANUAL';
+
+  liveUi.pickerMode.classList.toggle(
+    'good',
+    auto
+  );
+
+  liveUi.pickerMode.classList.toggle(
+    'warning',
+    !auto
+  );
+
+  liveUi.pickerAuto.hidden =
+    auto;
+}
+
+function renderAuctioneerPickerMode() {
+  if (
+    !auctioneerUi.pickerMode
+    ||
+    !auctioneerUi.pickerAuto
+  ) {
+    return;
+  }
+
+  const auto =
+    auctioneerPickerMode === 'auto';
+
+  auctioneerUi.pickerMode.textContent =
+    auto
+      ? 'AUTO'
+      : 'MANUAL';
+
+  auctioneerUi.pickerMode.classList.toggle(
+    'good',
+    auto
+  );
+
+  auctioneerUi.pickerMode.classList.toggle(
+    'warning',
+    !auto
+  );
+
+  auctioneerUi.pickerAuto.hidden =
+    auto;
+}
+
+function makePresidentPickerManual() {
+  presidentPickerMode =
+    'manual';
+
+  renderPresidentPickerMode();
+}
+
+function makeAuctioneerPickerManual() {
+  auctioneerPickerMode =
+    'manual';
+
+  renderAuctioneerPickerMode();
+  renderAuctioneerActionMode();
+  renderAuctioneerTeamButtons();
+}
+
+[
+  'pointerdown',
+  'touchstart',
+  'wheel'
+]
+  .forEach(
+    eventName => {
+      liveUi.bidAmount
+        ?.addEventListener(
+          eventName,
+          makePresidentPickerManual,
+          {
+            passive: true
+          }
+        );
+
+      auctioneerUi.amount
+        ?.addEventListener(
+          eventName,
+          makeAuctioneerPickerManual,
+          {
+            passive: true
+          }
+        );
+    }
+  );
+
+liveUi.bidAmount
+  ?.addEventListener(
+    'change',
+    makePresidentPickerManual
+  );
+
+auctioneerUi.amount
+  ?.addEventListener(
+    'change',
+    () => {
+      makeAuctioneerPickerManual();
+      renderAuctioneerActionMode();
+      renderAuctioneerTeamButtons();
+    }
+  );
+
+liveUi.pickerAuto
+  ?.addEventListener(
+    'click',
+    () => {
+      presidentPickerMode =
+        'auto';
+
+      setPickerValue(
+        liveUi.bidAmount,
+        nextValidBid()
+      );
+
+      renderPresidentPickerMode();
+    }
+  );
+
+auctioneerUi.pickerAuto
+  ?.addEventListener(
+    'click',
+    () => {
+      auctioneerPickerMode =
+        'auto';
+
+      setPickerValue(
+        auctioneerUi.amount,
+        nextValidBid()
+      );
+
+      renderAuctioneerPickerMode();
+      renderAuctioneerActionMode();
+      renderAuctioneerTeamButtons();
+    }
+  );
+
+function updateLiveServerOffset() {
+  const serverNow =
+    Date.parse(
+      auctionData?.serverNow
+      || ''
+    );
+
+  if (
+    Number.isFinite(
+      serverNow
+    )
+  ) {
+    liveServerOffsetMs =
+      serverNow
+      -
+      Date.now();
+  }
+}
+
+function liveNowMs() {
+  return (
+    Date.now()
+    +
+    liveServerOffsetMs
+  );
+}
+
+function liveRemainingMs() {
+  const session =
+    liveSession();
+
+  if (!session) {
+    return null;
+  }
+
+  if (
+    session.hold_active === true
+  ) {
+    const seconds =
+      Number(
+        session.hold_remaining_seconds
+      );
+
+    return Number.isFinite(
+      seconds
+    )
+      ? Math.max(
+          0,
+          seconds * 1000
+        )
+      : null;
+  }
+
+  if (
+    !session.timer_deadline
+  ) {
+    return null;
+  }
+
+  const deadline =
+    Date.parse(
+      session.timer_deadline
+    );
+
+  return Number.isFinite(
+    deadline
+  )
+    ? Math.max(
+        0,
+        deadline
+        -
+        liveNowMs()
+      )
+    : null;
+}
+
+function formatLiveTimer(milliseconds) {
+  if (
+    milliseconds === null
+    ||
+    milliseconds === undefined
+  ) {
+    return '—';
+  }
+
+  return `${
+    Math.max(
+      0,
+      Math.ceil(
+        milliseconds / 1000
+      )
+    )
+  }s`;
+}
+
+async function syncExpiredLiveTimer() {
+  const session =
+    liveSession();
+
+  if (
+    !session
+    ||
+    liveTimerSyncing
+    ||
+    session.status !== 'live'
+    ||
+    session.hold_active === true
+    ||
+    session.timer_expired_at
+    ||
+    !session.timer_deadline
+  ) {
+    return;
+  }
+
+  const remaining =
+    liveRemainingMs();
+
+  if (
+    remaining === null
+    ||
+    remaining > 0
+  ) {
+    return;
+  }
+
+  liveTimerSyncing =
+    true;
+
+  try {
+    const result =
+      await callApi({
+        action:
+          'syncTimer',
+
+        sessionId:
+          session.id
+      });
+
+    if (result?.ok) {
+      await refreshLiveAuctionState();
+    }
+
+  } catch (error) {
+    console.error(error);
+
+  } finally {
+    liveTimerSyncing =
+      false;
+  }
+}
+
+function renderLiveTimer() {
+  if (
+    !liveUi.timerValue
+    ||
+    !liveUi.timerStatus
+  ) {
+    return;
+  }
+
+  const session =
+    liveSession();
+
+  if (
+    !session
+    ||
+    session.status !== 'live'
+  ) {
+    liveUi.timerValue.textContent =
+      '—';
+
+    liveUi.timerStatus.textContent =
+      'In attesa';
+
+    return;
+  }
+
+  if (
+    session.hold_active === true
+  ) {
+    liveUi.timerValue.textContent =
+      formatLiveTimer(
+        liveRemainingMs()
+      );
+
+    liveUi.timerStatus.textContent =
+      'HOLD — timer sospeso';
+
+    return;
+  }
+
+  if (
+    session.timer_expired_at
+  ) {
+    liveUi.timerValue.textContent =
+      '0s';
+
+    liveUi.timerStatus.textContent =
+      'TIMER SCADUTO — ATTESA BANDITORE';
+
+    return;
+  }
+
+  const remaining =
+    liveRemainingMs();
+
+  if (
+    remaining === null
+  ) {
+    liveUi.timerValue.textContent =
+      '—';
+
+    liveUi.timerStatus.textContent =
+      session.current_bidder_team_id
+        ? 'Timer non avviato'
+        : 'In attesa della prima offerta';
+
+    return;
+  }
+
+  liveUi.timerValue.textContent =
+    formatLiveTimer(
+      remaining
+    );
+
+  liveUi.timerStatus.textContent =
+    'Tempo residuo';
+
+  if (
+    remaining <= 0
+  ) {
+    syncExpiredLiveTimer();
+  }
+}
+
+function liveActorTeamId() {
+  const session =
+    liveSession();
+
+  if (!session) {
+    return null;
+  }
+
+  const myTeamId =
+    liveMyTeamId();
+
+  if (
+    liveBidMode() === 'turn'
+  ) {
+    const turnTeam =
+      liveCurrentTurnTeam();
+
+    if (!turnTeam) {
+      return null;
+    }
+
+    if (
+      liveIsPresident()
+      &&
+      myTeamId === turnTeam.id
+    ) {
+      return turnTeam.id;
+    }
+
+    if (
+      liveIsController()
+    ) {
+      return turnTeam.id;
+    }
+
+    return null;
+  }
+
+  return (
+    liveIsPresident()
+    &&
+    myTeamId
+      ? myTeamId
+      : null
+  );
+}
+
+function renderLiveControls() {
+  if (!liveUi.panel) {
+    return;
+  }
+
+  updateLiveServerOffset();
+  resetPickersForNewPlayer();
+
+  const session =
+    liveSession();
+
+  const player =
+    auctionData?.currentPlayer;
+
+  const show =
+    Boolean(
+      session
+      &&
+      session.status === 'live'
+      &&
+      player
+    );
+
+  liveUi.panel.hidden =
+    !show;
+
+  if (!show) {
+    presidentPickerMode =
+      'auto';
+
+    return;
+  }
+
+  const mode =
+    liveBidMode();
+
+  const turnTeam =
+    liveCurrentTurnTeam();
+
+  const leader =
+    auctionData?.currentBidderTeam;
+
+  const actorTeamId =
+    liveActorTeamId();
+
+  const actorState =
+    actorTeamId
+      ? liveTeamState(actorTeamId)
+      : null;
+
+  const capacity =
+    actorTeamId
+      ? capacityForTeam(actorTeamId)
+      : null;
+
+  liveUi.turnBadge.hidden =
+    mode !== 'turn';
+
+  if (
+    mode === 'turn'
+  ) {
+    liveUi.turnBadge.textContent =
+      turnTeam
+        ? `Turno: ${turnTeam.name}`
+        : 'Nessun turno attivo';
+  }
+
+  liveUi.passBadge.hidden =
+    mode !== 'turn'
+    ||
+    !actorTeamId;
+
+  if (
+    mode === 'turn'
+    &&
+    actorTeamId
+  ) {
+    liveUi.passBadge.textContent =
+      `PASS ${
+        Number(
+          actorState?.passes_used
+          || 0
+        )
+      }/5`;
+  }
+
+  liveUi.hold.hidden =
+    !liveIsController();
+
+  if (
+    liveIsController()
+  ) {
+    liveUi.hold.textContent =
+      session.hold_active === true
+        ? 'Riprendi'
+        : 'HOLD';
+  }
+
+  let canBid =
+    Boolean(
+      actorTeamId
+      &&
+      actorTeamId
+      !==
+      session.current_bidder_team_id
+      &&
+      capacity
+      &&
+      capacity.allowed === true
+      &&
+      Number(
+        capacity.max_bid || 0
+      )
+      >=
+      nextValidBid()
+    );
+
+  if (
+    mode === 'wild'
+    &&
+    !liveIsPresident()
+  ) {
+    canBid =
+      false;
+  }
+
+  liveUi.controls.hidden =
+    !canBid;
+
+  if (!canBid) {
+    liveUi.turnActions.hidden =
+      true;
+
+    if (
+      actorTeamId
+      &&
+      capacity
+      &&
+      capacity.allowed !== true
+    ) {
+      liveUi.help.textContent =
+        `Offerta non disponibile: ${
+          capacityReasonLabel(
+            capacity.reason
+          )
+        }.`;
+
+    } else if (
+      actorTeamId
+      &&
+      capacity
+      &&
+      Number(
+        capacity.max_bid || 0
+      )
+      <
+      nextValidBid()
+    ) {
+      liveUi.help.textContent =
+        `Massimo spendibile ${capacity.max_bid}: impossibile rilanciare.`;
+
+    } else if (
+      mode === 'turn'
+      &&
+      !turnTeam
+    ) {
+      liveUi.help.textContent =
+        'Nessuna squadra attiva: attesa Banditore.';
+
+    } else if (
+      mode === 'turn'
+      &&
+      turnTeam
+    ) {
+      liveUi.help.textContent =
+        `In attesa di ${turnTeam.name}.`;
+
+    } else {
+      liveUi.help.textContent =
+        '';
+    }
+
+    renderPresidentPickerMode();
+    renderLiveTimer();
+
+    return;
+  }
+
+  const maxBid =
+    Math.max(
+      0,
+      Number(
+        capacity.max_bid || 0
+      )
+    );
+
+  rebuildPickerOptions(
+    liveUi.bidAmount,
+    maxBid
+  );
+
+  if (
+    presidentPickerMode === 'auto'
+  ) {
+    setPickerValue(
+      liveUi.bidAmount,
+      nextValidBid()
+    );
+  }
+
+  liveUi.maxBid.textContent =
+    `Max ${maxBid}`;
+
+  renderPresidentPickerMode();
+
+  if (
+    mode === 'turn'
+  ) {
+    liveUi.turnActions.hidden =
+      false;
+
+    const passes =
+      Number(
+        actorState?.passes_used
+        || 0
+      );
+
+    liveUi.pass.disabled =
+      passes >= 5;
+
+    liveUi.help.textContent =
+      liveIsPresident()
+      &&
+      liveMyTeamId() === actorTeamId
+        ? (
+            leader
+              ? `È il tuo turno. ${leader.name} è in testa a ${session.current_bid}.`
+              : 'È il tuo turno: puoi rilanciare, passare o abbandonare.'
+          )
+        : `Proxy Banditore per ${turnTeam?.name || 'squadra attiva'}.`;
+
+  } else {
+    liveUi.turnActions.hidden =
+      true;
+
+    liveUi.help.textContent =
+      leader
+        ? `${leader.name} è in testa a ${session.current_bid}.`
+        : `Prima offerta valida: ${nextValidBid()}.`;
+  }
+
+  renderLiveTimer();
+}
+
+function auctioneerSelectedAmount() {
+  return Number(
+    auctioneerUi.amount?.value
+    || 0
+  );
+}
+
+function auctioneerIsCorrection() {
+  const session =
+    liveSession();
+
+  if (
+    !session
+    ||
+    !session.current_bidder_team_id
+    ||
+    session.current_bid === null
+    ||
+    session.current_bid === undefined
+  ) {
+    return false;
+  }
+
+  return (
+    auctioneerSelectedAmount()
+    <=
+    Number(
+      session.current_bid
+    )
+  );
+}
+
+function renderAuctioneerActionMode() {
+  if (!auctioneerUi.actionMode) {
+    return;
+  }
+
+  const correction =
+    auctioneerIsCorrection();
+
+  auctioneerUi.actionMode.textContent =
+    correction
+      ? 'CORREZIONE'
+      : 'VOCALE';
+
+  auctioneerUi.actionMode.classList.toggle(
+    'warning',
+    correction
+  );
+
+  auctioneerUi.actionMode.classList.toggle(
+    'good',
+    !correction
+  );
+}
+
+function auctioneerTeamCanSubmit(teamId) {
+  const session =
+    liveSession();
+
+  if (!session) {
+    return false;
+  }
+
+  const amount =
+    auctioneerSelectedAmount();
+
+  const capacity =
+    capacityForTeam(teamId);
+
+  if (
+    !capacity
+    ||
+    capacity.allowed !== true
+    ||
+    amount < 1
+    ||
+    amount
     >
-      ← Lega
-    </a>
-
-  </header>
-
-
-  <nav class="tabs league-tabs">
-
-    <a href="league.html" class="tab">
-      <span class="tab-title">Home</span>
-      <span class="tab-description">Dashboard</span>
-    </a>
-
-    <a
-      href="league-auction.html"
-      class="tab active"
-    >
-      <span class="tab-title">Asta</span>
-      <span class="tab-description">Live</span>
-    </a>
-
-    <a href="league-rosters.html" class="tab">
-      <span class="tab-title">Rose</span>
-      <span class="tab-description">Squadre</span>
-    </a>
-
-    <a href="league-list.html" class="tab">
-      <span class="tab-title">Listone</span>
-      <span class="tab-description">Giocatori</span>
-    </a>
-
-    <a
-      id="setup-tab"
-      href="league-setup.html"
-      class="tab"
-      hidden
-    >
-      <span class="tab-title">Setup</span>
-      <span class="tab-description">Configurazione</span>
-    </a>
-
-  </nav>
-
-
-  <p
-    id="page-message"
-    class="message"
-    aria-live="polite"
-  ></p>
-
-
-  <section class="card">
-
-    <div class="section-heading">
-
-      <span class="section-label">
-        ASTA
-      </span>
-
-      <div>
-        <h2 id="auction-phase-title">
-          Preparazione
-        </h2>
-
-        <p id="auction-phase-subtitle">
-          Controlli prima dell’avvio
-        </p>
-      </div>
-
-    </div>
-
-
-    <div
-      id="auction-status-line"
-      class="league-actions"
-    ></div>
-
-
-    <p
-      id="auction-blockers"
-      class="setting-help"
-    ></p>
-
-
-    <div
-      id="auction-control-area"
-      class="league-actions"
-      hidden
-    >
-
-      <button
-        id="prepare-auction-button"
-        type="button"
-      >
-        Prepara asta
-      </button>
-
-
-      <button
-        id="prepare-test-auction-button"
-        type="button"
-        class="secondary"
-      >
-        Test
-      </button>
-
-    </div>
-
-  </section>
-
-
-  <div
-    id="lobby-grid"
-    class="form-grid"
-  >
-
-
-    <section class="card">
-
-      <div class="section-heading">
-
-        <span class="section-label">
-          TEAM
-        </span>
-
-        <div>
-          <h2>Squadre</h2>
-          <p>Presenze e Presidenti</p>
-        </div>
-
-      </div>
-
-
-      <div
-        id="auction-teams"
-        class="list"
-      ></div>
-
-    </section>
-
-
-    <section class="card">
-
-      <div class="section-heading">
-
-        <span class="section-label">
-          SETUP
-        </span>
-
-        <div>
-          <h2>Regole</h2>
-          <p>Configurazione della sessione</p>
-        </div>
-
-      </div>
-
-
-      <div
-        id="auction-settings"
-        class="list"
-      ></div>
-
-    </section>
-
-
-  </div>
-
-
-  <section
-    id="prepared-session-section"
-    class="card"
-    hidden
-  >
-
-    <div class="section-heading">
-
-      <span class="section-label">
-        ORDER
-      </span>
-
-      <div>
-        <h2>Ordine squadre</h2>
-        <p>Definisce il primo turno di chiamata</p>
-      </div>
-
-    </div>
-
-
-    <div
-      id="auction-team-order"
-      class="list"
-    ></div>
-
-
-    <div
-      id="team-order-actions"
-      class="league-actions"
-      hidden
-    >
-
-      <button
-        id="save-team-order-button"
-        type="button"
-        class="secondary"
-      >
-        Salva ordine
-      </button>
-
-
-      <button
-        id="start-auction-button"
-        type="button"
-      >
-        Avvia asta
-      </button>
-
-    </div>
-
-  </section>
-
-
-  <section
-    id="live-section"
-    class="card"
-    hidden
-  >
-
-    <div class="section-heading">
-
-      <span class="section-label">
-        LIVE
-      </span>
-
-      <div>
-        <h2>Giocatore corrente</h2>
-        <p id="live-help">Asta in corso</p>
-      </div>
-
-    </div>
-
-
-    <div
-      id="current-player-box"
-    ></div>
-
-
-    <div
-      id="live-control-panel"
-      hidden
-    >
-
-      <div class="divider"></div>
-
-
-      <div class="section-heading">
-
-        <span class="section-label">
-          TIMER
-        </span>
-
-        <div>
-          <h3 id="live-timer-value">—</h3>
-          <p id="live-timer-status">
-            In attesa
-          </p>
-        </div>
-
-      </div>
-
-
-      <div class="league-actions">
-
-        <span
-          id="live-turn-badge"
-          class="badge"
-          hidden
-        ></span>
-
-
-        <span
-          id="live-pass-badge"
-          class="badge"
-          hidden
-        ></span>
-
-
-        <button
-          id="live-hold-button"
-          type="button"
-          class="secondary"
-          hidden
-        >
-          HOLD
-        </button>
-
-      </div>
-
-
-      <div
-        id="live-president-controls"
-        hidden
-      >
-
-        <div class="divider"></div>
-
-
-        <div class="form-grid">
-
-          <label class="form-field">
-
-            Picker offerta
-
-            <select
-              id="live-bid-amount"
-            ></select>
-
-          </label>
-
-
-          <div class="form-field">
-
-            <span
-              id="live-picker-mode"
-              class="badge good"
-            >
-              AUTO
-            </span>
-
-
-            <span
-              id="live-max-bid"
-              class="badge"
-            >
-              Max —
-            </span>
-
-
+    Number(
+      capacity.max_bid || 0
+    )
+  ) {
+    return false;
+  }
+
+  if (
+    auctioneerIsCorrection()
+  ) {
+    return true;
+  }
+
+  if (
+    teamId ===
+    session.current_bidder_team_id
+  ) {
+    return false;
+  }
+
+  if (
+    liveBidMode() === 'turn'
+    &&
+    teamId !==
+    session.current_turn_team_id
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+function renderAuctioneerTeamButtons() {
+  if (!auctioneerUi.teamButtons) {
+    return;
+  }
+
+  const orderedTeams =
+    (
+      auctionData?.teamOrder || []
+    )
+      .map(
+        item =>
+          item.team
+      )
+      .filter(Boolean);
+
+  const teams =
+    orderedTeams.length
+      ? orderedTeams
+      : (
+          auctionData?.teams || []
+        );
+
+  auctioneerUi.teamButtons.innerHTML =
+    teams
+      .map(
+        team => {
+          const capacity =
+            capacityForTeam(
+              team.id
+            );
+
+          const maxBid =
+            Number(
+              capacity?.max_bid
+              || 0
+            );
+
+          const enabled =
+            auctioneerTeamCanSubmit(
+              team.id
+            );
+
+          const subtitle =
+            capacity?.allowed === true
+              ? `max ${maxBid}`
+              : capacityReasonLabel(
+                  capacity?.reason
+                );
+
+          return `
             <button
-              id="live-picker-auto-button"
               type="button"
               class="secondary"
-              hidden
+              data-auctioneer-team="${escapeHtml(team.id)}"
+              ${enabled ? '' : 'disabled'}
             >
-              Rilascia · torna AUTO
+              ${escapeHtml(team.name)}
+              ·
+              ${escapeHtml(subtitle)}
             </button>
+          `;
+        }
+      )
+      .join('');
+}
 
+function renderRecentBids() {
+  if (!auctioneerUi.recent) {
+    return;
+  }
 
-            <button
-              id="live-bid-button"
-              type="button"
-            >
-              Rilancia
-            </button>
+  const bids =
+    auctionData?.recentBids || [];
+
+  if (!bids.length) {
+    auctioneerUi.recent.innerHTML = `
+      <div class="empty-state">
+        Nessuna offerta registrata.
+      </div>
+    `;
+
+    return;
+  }
+
+  auctioneerUi.recent.innerHTML =
+    bids
+      .map(
+        bid => `
+          <div class="setting-row">
+
+            <span>
+
+              <strong>
+                ${escapeHtml(
+                  bid.team?.name
+                  || 'Squadra'
+                )}
+              </strong>
+
+              <small>
+                ${escapeHtml(
+                  bid.source
+                  || 'APP'
+                )}
+              </small>
+
+            </span>
+
+            <strong>
+              ${escapeHtml(
+                bid.amount
+              )}
+            </strong>
 
           </div>
+        `
+      )
+      .join('');
+}
 
-        </div>
+function renderAuctioneerPanel() {
+  if (!auctioneerUi.panel) {
+    return;
+  }
 
+  resetPickersForNewPlayer();
 
-        <div
-          id="live-turn-actions"
-          class="league-actions"
-          hidden
-        >
+  const session =
+    liveSession();
 
-          <button
-            id="live-pass-button"
-            type="button"
-            class="secondary"
-          >
-            Passa
-          </button>
+  const player =
+    auctionData?.currentPlayer;
 
+  const show =
+    Boolean(
+      session
+      &&
+      session.status === 'live'
+      &&
+      player
+      &&
+      liveIsController()
+    );
 
-          <button
-            id="live-abandon-button"
-            type="button"
-            class="danger"
-          >
-            Abbandona
-          </button>
+  auctioneerUi.panel.hidden =
+    !show;
 
-        </div>
+  if (!show) {
+    auctioneerPickerMode =
+      'auto';
 
+    return;
+  }
 
-        <p
-          id="live-action-help"
-          class="setting-help"
-        ></p>
+  rebuildPickerOptions(
+    auctioneerUi.amount,
+    maxCapacityAcrossTeams()
+  );
 
-      </div>
+  if (
+    auctioneerPickerMode === 'auto'
+  ) {
+    setPickerValue(
+      auctioneerUi.amount,
+      nextValidBid()
+    );
+  }
 
-    </div>
+  renderAuctioneerPickerMode();
+  renderAuctioneerActionMode();
+  renderAuctioneerTeamButtons();
+  renderRecentBids();
 
+  const leader =
+    auctionData?.currentBidderTeam;
 
-    <div
-      id="auctioneer-panel"
-      hidden
-    >
+  const selected =
+    auctioneerSelectedAmount();
 
-      <div class="divider"></div>
+  if (
+    auctioneerIsCorrection()
+  ) {
+    auctioneerUi.help.textContent =
+      `Importo ${selected}: verrà registrato come CORREZIONE BANDITORE.`;
 
+  } else if (leader) {
+    auctioneerUi.help.textContent =
+      `${leader.name} guida a ${session.current_bid}. Tocca la squadra che ha rilanciato.`;
 
-      <div class="section-heading">
+  } else {
+    auctioneerUi.help.textContent =
+      `Prima offerta valida: ${nextValidBid()}. Tocca la squadra offerente.`;
+  }
 
-        <span class="section-label">
-          BANDITORE
-        </span>
+  auctioneerUi.award.disabled =
+    !leader
+    ||
+    !session.current_bid;
 
-        <div>
-          <h3>Pannello offerte</h3>
-          <p>
-            Tocca una squadra per registrare l’importo selezionato.
-          </p>
-        </div>
+  if (
+    auctioneerUi.finishTest
+  ) {
+    auctioneerUi.finishTest.hidden =
+      session.is_test !== true;
+  }
+}
 
-      </div>
+liveUi.hold?.addEventListener(
+  'click',
+  async () => {
+    const session =
+      liveSession();
 
+    if (!session) {
+      return;
+    }
 
-      <div class="form-grid">
+    liveUi.hold.disabled =
+      true;
 
-        <label class="form-field">
+    try {
+      const result =
+        await callApi({
+          action:
+            'setHold',
 
-          Picker Banditore
+          sessionId:
+            session.id,
 
-          <select
-            id="auctioneer-bid-amount"
-          ></select>
+          hold:
+            session.hold_active !== true
+        });
 
-        </label>
+      if (!result?.ok) {
+        throw new Error(
+          result?.error
+          ||
+          'Impossibile modificare HOLD.'
+        );
+      }
 
+      await loadLobby();
 
-        <div class="form-field">
+    } catch (error) {
+      console.error(error);
 
-          <span
-            id="auctioneer-picker-mode"
-            class="badge good"
-          >
-            AUTO
-          </span>
+      showMessage(
+        error.message
+        ||
+        'Errore durante HOLD.',
+        'error'
+      );
 
+    } finally {
+      liveUi.hold.disabled =
+        false;
+    }
+  }
+);
 
-          <span
-            id="auctioneer-action-mode"
-            class="badge"
-          >
-            VOCALE
-          </span>
+liveUi.bid?.addEventListener(
+  'click',
+  async () => {
+    const session =
+      liveSession();
 
+    const teamId =
+      liveActorTeamId();
 
-          <button
-            id="auctioneer-picker-auto-button"
-            type="button"
-            class="secondary"
-            hidden
-          >
-            Rilascia · torna AUTO
-          </button>
+    const amount =
+      Number(
+        liveUi.bidAmount.value
+      );
 
+    if (
+      !session
+      ||
+      !teamId
+    ) {
+      showMessage(
+        'Non puoi rilanciare in questo momento.',
+        'error'
+      );
 
-          <button
-            id="auctioneer-award-player"
-            type="button"
-            class="success"
-          >
-            Aggiudica
-          </button>
+      return;
+    }
 
+    const capacity =
+      capacityForTeam(teamId);
 
-          <button
-            id="test-finish-review"
-            type="button"
-            class="secondary"
-            hidden
-          >
-            Termina test e visualizza rose
-          </button>
+    if (
+      !capacity
+      ||
+      capacity.allowed !== true
+    ) {
+      showMessage(
+        'La squadra non può acquistare questo giocatore.',
+        'error'
+      );
 
-        </div>
+      return;
+    }
 
-      </div>
+    if (
+      amount < nextValidBid()
+    ) {
+      showMessage(
+        'Offerta superata.',
+        'error'
+      );
 
+      return;
+    }
 
-      <div
-        id="auctioneer-team-buttons"
-        class="league-actions"
-      ></div>
-
-
-      <p
-        id="auctioneer-help"
-        class="setting-help"
-      ></p>
-
-
-      <div class="divider"></div>
-
-
-      <h3>Ultime offerte</h3>
-
-
-      <div
-        id="auction-recent-bids"
-        class="list"
-      ></div>
-
-    </div>
-
-
-    <div
-      id="call-panel"
-      hidden
-    >
-
-      <div class="divider"></div>
-
-
-      <h3 id="call-team-title">
-        Chiamata
-      </h3>
-
-
-      <p
-        id="call-permission-help"
-        class="setting-help"
-      ></p>
-
-
-      <div
-        id="call-form-area"
-        hidden
+    if (
+      amount
       >
+      Number(
+        capacity.max_bid || 0
+      )
+    ) {
+      showMessage(
+        `Offerta massima consentita: ${capacity.max_bid}.`,
+        'error'
+      );
 
-        <div class="form-grid">
+      return;
+    }
 
-          <label class="form-field">
+    liveUi.bid.disabled =
+      true;
 
-            Cerca giocatore
+    try {
+      const result =
+        await callApi({
+          action:
+            'placeBid',
 
-            <input
-              id="call-player-search"
-              type="search"
-              autocomplete="off"
-              placeholder="Nome o squadra..."
-            >
+          sessionId:
+            session.id,
 
-          </label>
+          teamId,
 
+          amount,
 
-          <label
-            id="opening-bid-field"
-            class="form-field"
-          >
+          source:
+            liveIsController()
+            &&
+            !(
+              liveIsPresident()
+              &&
+              liveMyTeamId() === teamId
+            )
+              ? 'VOCALE'
+              : 'APP'
+        });
 
-            Base d’asta
+      if (!result?.ok) {
+        throw new Error(
+          result?.error
+          ||
+          'Impossibile registrare l’offerta.'
+        );
+      }
 
-            <input
-              id="opening-bid"
-              type="number"
-              min="1"
-              step="1"
-              value="1"
-            >
+      presidentPickerMode =
+        'auto';
 
-          </label>
+      await loadLobby();
 
-        </div>
+    } catch (error) {
+      console.error(error);
 
+      showMessage(
+        error.message
+        ||
+        'Errore durante il rilancio.',
+        'error'
+      );
 
-        <div
-          id="call-candidates"
-          class="list"
-        ></div>
+    } finally {
+      liveUi.bid.disabled =
+        false;
+    }
+  }
+);
 
-      </div>
+auctioneerUi.teamButtons?.addEventListener(
+  'click',
+  async event => {
+    const button =
+      event.target.closest(
+        '[data-auctioneer-team]'
+      );
 
-    </div>
+    if (
+      !button
+      ||
+      button.disabled
+    ) {
+      return;
+    }
 
-  </section>
+    const session =
+      liveSession();
 
+    const teamId =
+      button.dataset.auctioneerTeam;
 
-  <section
-    id="test-roster-review"
-    class="card"
-    hidden
-  >
+    const amount =
+      auctioneerSelectedAmount();
 
-    <div class="section-heading">
+    if (
+      !session
+      ||
+      !teamId
+      ||
+      !Number.isInteger(amount)
+      ||
+      amount < 1
+    ) {
+      return;
+    }
 
-      <span class="section-label">
-        REVIEW
-      </span>
+    button.disabled =
+      true;
 
-      <div>
-        <h2>Rose del test</h2>
-        <p>
-          Le assegnazioni sono ancora disponibili e non sono state eliminate.
-        </p>
-      </div>
+    try {
+      const correction =
+        auctioneerIsCorrection();
 
-    </div>
+      const result =
+        await callApi({
+          action:
+            correction
+              ? 'correctBid'
+              : 'placeBid',
 
+          sessionId:
+            session.id,
 
-    <div class="league-actions">
+          teamId,
 
-      <button
-        id="test-print-rosters"
-        type="button"
-        class="secondary"
-      >
-        Stampa / PDF
-      </button>
+          amount,
 
+          ...(
+            correction
+              ? {}
+              : {
+                  source:
+                    'VOCALE'
+                }
+          )
+        });
 
-      <button
-        id="test-download-csv"
-        type="button"
-        class="secondary"
-      >
-        CSV Fantacalcio (beta)
-      </button>
+      if (!result?.ok) {
+        throw new Error(
+          result?.error
+          ||
+          (
+            correction
+              ? 'Impossibile correggere l’offerta.'
+              : 'Impossibile registrare l’offerta.'
+          )
+        );
+      }
 
+      auctioneerPickerMode =
+        'auto';
 
-      <button
-        id="test-purge-data"
-        type="button"
-        class="danger"
-      >
-        Elimina dati test
-      </button>
+      await loadLobby();
 
-    </div>
+    } catch (error) {
+      console.error(error);
 
+      showMessage(
+        error.message
+        ||
+        'Errore nel pannello Banditore.',
+        'error'
+      );
 
-    <p
-      id="test-csv-note"
-      class="setting-help"
-    >
-      Il CSV contiene fantasquadra, ID sorgente, nome,
-      ruolo, squadra e prezzo. La compatibilità 1:1 con
-      l'import ufficiale va validata con un file campione
-      esportato da FantaAsta Live.
-    </p>
+    } finally {
+      button.disabled =
+        false;
+    }
+  }
+);
 
+auctioneerUi.award?.addEventListener(
+  'click',
+  async () => {
+    const session =
+      liveSession();
 
-    <div
-      id="test-roster-review-list"
-      class="list"
-    ></div>
+    const leader =
+      auctionData?.currentBidderTeam;
 
-  </section>
+    if (
+      !session
+      ||
+      !leader
+      ||
+      !session.current_bid
+    ) {
+      showMessage(
+        'Non c’è un leader da aggiudicare.',
+        'error'
+      );
 
+      return;
+    }
 
-</main>
+    auctioneerUi.award.disabled =
+      true;
 
+    const playerName =
+      auctionData?.currentPlayer?.name
+      ||
+      'Giocatore';
 
-<script src="league-auction.js?v=2"></script>
-<script src="auction-live-controls.js?v=2"></script>
-<script src="auction-test-live.js?v=2"></script>
+    const price =
+      session.current_bid;
 
-</body>
+    try {
+      const result =
+        await callApi({
+          action:
+            'awardPlayer',
 
-</html>
+          sessionId:
+            session.id
+        });
+
+      if (!result?.ok) {
+        throw new Error(
+          result?.error
+          ||
+          'Impossibile confermare l’aggiudicazione.'
+        );
+      }
+
+      presidentPickerMode =
+        'auto';
+
+      auctioneerPickerMode =
+        'auto';
+
+      showMessage(
+        `${playerName} aggiudicato a ${leader.name} per ${price}.`,
+        'success'
+      );
+
+      await loadLobby();
+
+    } catch (error) {
+      console.error(error);
+
+      showMessage(
+        error.message
+        ||
+        'Errore durante l’aggiudicazione.',
+        'error'
+      );
+
+    } finally {
+      auctioneerUi.award.disabled =
+        false;
+    }
+  }
+);
+
+liveUi.pass?.addEventListener(
+  'click',
+  async () => {
+    const session =
+      liveSession();
+
+    const teamId =
+      liveActorTeamId();
+
+    if (
+      !session
+      ||
+      !teamId
+    ) {
+      return;
+    }
+
+    liveUi.pass.disabled =
+      true;
+
+    try {
+      const result =
+        await callApi({
+          action:
+            'passTurn',
+
+          sessionId:
+            session.id,
+
+          teamId
+        });
+
+      if (!result?.ok) {
+        throw new Error(
+          result?.error
+          ||
+          'Impossibile passare.'
+        );
+      }
+
+      presidentPickerMode =
+        'auto';
+
+      await loadLobby();
+
+    } catch (error) {
+      console.error(error);
+
+      showMessage(
+        error.message
+        ||
+        'Errore durante PASSA.',
+        'error'
+      );
+
+    } finally {
+      liveUi.pass.disabled =
+        false;
+    }
+  }
+);
+
+liveUi.abandon?.addEventListener(
+  'click',
+  async () => {
+    const session =
+      liveSession();
+
+    const teamId =
+      liveActorTeamId();
+
+    if (
+      !session
+      ||
+      !teamId
+    ) {
+      return;
+    }
+
+    const confirmed =
+      window.confirm(
+        'Abbandonare definitivamente l’asta di questo giocatore per la squadra attiva?'
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+    liveUi.abandon.disabled =
+      true;
+
+    try {
+      const result =
+        await callApi({
+          action:
+            'abandonTurn',
+
+          sessionId:
+            session.id,
+
+          teamId
+        });
+
+      if (!result?.ok) {
+        throw new Error(
+          result?.error
+          ||
+          'Impossibile abbandonare.'
+        );
+      }
+
+      presidentPickerMode =
+        'auto';
+
+      await loadLobby();
+
+    } catch (error) {
+      console.error(error);
+
+      showMessage(
+        error.message
+        ||
+        'Errore durante ABBANDONA.',
+        'error'
+      );
+
+    } finally {
+      liveUi.abandon.disabled =
+        false;
+    }
+  }
+);
+
+function renderAuctionLiveControls() {
+  renderLiveControls();
+  renderAuctioneerPanel();
+}
+
+async function refreshLiveAuctionState() {
+  if (
+    livePolling
+    ||
+    document.hidden
+  ) {
+    return;
+  }
+
+  const session =
+    liveSession();
+
+  if (
+    !session
+    ||
+    session.status !== 'live'
+  ) {
+    return;
+  }
+
+  livePolling =
+    true;
+
+  try {
+    const data =
+      await callApi({
+        action:
+          'getLobby'
+      });
+
+    if (!data?.ok) {
+      return;
+    }
+
+    auctionData =
+      data;
+
+    leagueTitle.textContent =
+      `Asta · ${data.league.name}`;
+
+    leagueSubtitle.textContent =
+      `Sessione ${
+        sessionStatusLabel(
+          data.auctionSession?.status
+        )
+      }`;
+
+    renderAll();
+    renderAuctionLiveControls();
+
+    if (
+      typeof renderAuctionTestAddon
+      === 'function'
+    ) {
+      renderAuctionTestAddon();
+    }
+
+  } catch (error) {
+    console.error(error);
+
+  } finally {
+    livePolling =
+      false;
+  }
+}
+
+setInterval(
+  renderLiveTimer,
+  250
+);
+
+setInterval(
+  refreshLiveAuctionState,
+  1800
+);
+
+const baseLiveLoadLobby =
+  loadLobby;
+
+loadLobby =
+  async function () {
+    await baseLiveLoadLobby();
+    renderAuctionLiveControls();
+  };
+
+const initialLiveRender =
+  setInterval(
+    () => {
+      if (!auctionData) {
+        return;
+      }
+
+      clearInterval(
+        initialLiveRender
+      );
+
+      renderAuctionLiveControls();
+    },
+    100
+  );
