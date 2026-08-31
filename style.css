@@ -5033,3 +5033,2343 @@ button {
       24px;
   }
 }
+
+
+/* =========================================================
+   UI V24 - DENSITÀ GLOBALE
+   Obiettivo: massima informazione utile nella viewport,
+   minimo scroll pagina, scroll interni dove ha senso.
+   ========================================================= */
+
+:root {
+  --content-width:
+    1500px;
+}
+
+
+/* ---------------------------------------------------------
+   BASE DESKTOP + MOBILE
+   --------------------------------------------------------- */
+
+.page-shell,
+.admin-shell,
+.admin-page {
+  width:
+    min(
+      var(--content-width),
+      calc(
+        100% - 14px
+      )
+    );
+
+  margin:
+    8px auto
+    16px;
+}
+
+
+.page-header,
+.admin-topbar,
+.admin-header {
+  align-items:
+    center;
+
+  gap:
+    10px;
+
+  margin-bottom:
+    7px;
+}
+
+
+.page-header h1,
+.admin-topbar h1,
+.admin-header h1 {
+  margin:
+    0;
+
+  font-size:
+    clamp(
+      21px,
+      2.2vw,
+      28px
+    );
+
+  line-height:
+    1.05;
+}
+
+
+.page-header p,
+.admin-topbar p,
+.admin-header p {
+  margin:
+    2px 0 0;
+
+  font-size:
+    11px;
+
+  line-height:
+    1.2;
+}
+
+
+.back-home {
+  min-height:
+    32px;
+
+  padding:
+    5px 9px;
+
+  font-size:
+    11px;
+}
+
+
+.tabs,
+.admin-tabs,
+.admin-nav {
+  gap:
+    4px;
+
+  margin-bottom:
+    7px;
+}
+
+
+.tab,
+.admin-tab,
+.admin-nav a,
+.admin-nav-disabled {
+  min-height:
+    34px;
+
+  gap:
+    1px;
+
+  padding:
+    6px 9px;
+
+  border-radius:
+    8px;
+
+  text-align:
+    center;
+}
+
+
+.tab-title,
+.admin-tab-title {
+  font-size:
+    12px;
+}
+
+
+.tab-description,
+.admin-tab-description {
+  font-size:
+    9px;
+}
+
+
+#message,
+#admin-message,
+.message {
+  min-height:
+    0;
+
+  margin:
+    0 0 6px;
+
+  font-size:
+    11px;
+
+  line-height:
+    1.25;
+}
+
+
+.message:empty,
+#message:empty,
+#admin-message:empty {
+  display:
+    none;
+}
+
+
+.card,
+.admin-card,
+section {
+  padding:
+    10px;
+
+  border-radius:
+    10px;
+}
+
+
+.page-shell section,
+.admin-shell section,
+.admin-page section {
+  margin-bottom:
+    7px;
+}
+
+
+.section-heading {
+  gap:
+    7px;
+
+  margin-bottom:
+    8px;
+}
+
+
+.section-heading h2,
+.section-heading h3 {
+  margin:
+    0;
+
+  font-size:
+    16px;
+
+  line-height:
+    1.1;
+}
+
+
+.section-heading p {
+  margin:
+    1px 0 0;
+
+  font-size:
+    10px;
+
+  line-height:
+    1.15;
+}
+
+
+.section-label {
+  min-width:
+    32px;
+
+  padding:
+    3px 5px;
+
+  font-size:
+    8px;
+
+  border-radius:
+    5px;
+}
+
+
+form {
+  gap:
+    8px;
+}
+
+
+.form-grid {
+  gap:
+    7px;
+}
+
+
+.form-field {
+  gap:
+    4px;
+
+  font-size:
+    11px;
+}
+
+
+input,
+select,
+textarea {
+  min-height:
+    34px;
+
+  padding:
+    6px 8px;
+
+  border-radius:
+    7px;
+
+  font-size:
+    12px;
+}
+
+
+input[type="checkbox"] {
+  width:
+    19px;
+
+  min-width:
+    19px;
+
+  height:
+    19px;
+
+  min-height:
+    19px;
+}
+
+
+button,
+.button {
+  min-height:
+    34px;
+
+  padding:
+    6px 10px;
+
+  border-radius:
+    7px;
+
+  font-size:
+    11px;
+}
+
+
+.conditional-panel {
+  margin-top:
+    7px;
+
+  padding:
+    8px;
+
+  border-radius:
+    8px;
+}
+
+
+.conditional-panel h3 {
+  margin-bottom:
+    6px;
+
+  font-size:
+    13px;
+}
+
+
+.setting-help {
+  font-size:
+    10px;
+
+  line-height:
+    1.25;
+}
+
+
+.divider {
+  margin:
+    7px 0;
+}
+
+
+.list,
+.users-list,
+.league-list {
+  gap:
+    4px;
+}
+
+
+.list-row,
+.user-row,
+.league-card {
+  border-radius:
+    8px;
+}
+
+
+.list-row-main {
+  min-height:
+    0;
+
+  gap:
+    7px;
+
+  padding:
+    7px 8px;
+}
+
+
+.list-row-title strong,
+.league-card h3 {
+  font-size:
+    12px;
+}
+
+
+.list-row-title small,
+.league-card p {
+  font-size:
+    9px;
+
+  line-height:
+    1.15;
+}
+
+
+.setting-row {
+  min-height:
+    0;
+
+  gap:
+    8px;
+
+  padding:
+    6px 0;
+
+  font-size:
+    11px;
+}
+
+
+.setting-row strong {
+  font-size:
+    11px;
+}
+
+
+.setting-row small {
+  font-size:
+    9px;
+}
+
+
+.league-card {
+  padding:
+    8px;
+}
+
+
+.league-card-header {
+  gap:
+    7px;
+}
+
+
+.league-code {
+  margin-top:
+    4px;
+
+  padding:
+    4px 6px;
+
+  font-size:
+    12px;
+}
+
+
+.league-actions {
+  gap:
+    4px;
+
+  margin-top:
+    6px;
+}
+
+
+.badge,
+.user-badge {
+  padding:
+    3px 5px;
+
+  font-size:
+    8px;
+}
+
+
+.empty-state {
+  padding:
+    12px 9px;
+
+  font-size:
+    10px;
+}
+
+
+/* KPI come fascia compatta, non come grandi card */
+
+.stats-grid {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(
+        105px,
+        1fr
+      )
+    );
+
+  gap:
+    4px;
+}
+
+
+.stat-card {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    7px;
+
+  min-height:
+    36px;
+
+  padding:
+    6px 8px;
+
+  border-radius:
+    7px;
+}
+
+
+.stat-label {
+  font-size:
+    8px;
+}
+
+
+.stat-value {
+  font-size:
+    16px;
+
+  line-height:
+    1;
+}
+
+
+/* Utenti / membri compatti */
+
+.user-row summary {
+  grid-template-columns:
+    minmax(
+      120px,
+      1fr
+    )
+    auto
+    auto;
+
+  gap:
+    7px;
+
+  padding:
+    7px 8px;
+}
+
+
+.user-summary-name strong {
+  font-size:
+    12px;
+}
+
+
+.user-summary-name small {
+  font-size:
+    9px;
+}
+
+
+.user-summary-status {
+  gap:
+    3px;
+}
+
+
+.user-detail {
+  padding:
+    5px 8px 8px;
+}
+
+
+.user-metadata {
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap:
+    5px;
+
+  margin:
+    7px 0;
+}
+
+
+.user-metadata div {
+  gap:
+    1px;
+
+  padding:
+    6px;
+}
+
+
+.user-metadata span {
+  font-size:
+    8px;
+}
+
+
+.user-metadata strong {
+  font-size:
+    11px;
+}
+
+
+/* =========================================================
+   HOME LEGA
+   KPI vicini al menu + blocchi a scacchiera desktop
+   ========================================================= */
+
+@media
+(min-width: 851px) {
+
+  body:has(#pending-requests)
+  .page-shell {
+    display:
+      grid;
+
+    grid-template-columns:
+      repeat(
+        12,
+        minmax(
+          0,
+          1fr
+        )
+      );
+
+    gap:
+      7px;
+
+    align-items:
+      start;
+  }
+
+
+  body:has(#pending-requests)
+  .page-header,
+
+  body:has(#pending-requests)
+  .league-tabs,
+
+  body:has(#pending-requests)
+  #page-message {
+    grid-column:
+      1 / -1;
+  }
+
+
+  body:has(#pending-requests)
+  .page-shell
+  >
+  section {
+    margin-bottom:
+      0;
+  }
+
+
+  body:has(#pending-requests)
+  .page-shell
+  >
+  section:nth-of-type(1),
+
+  body:has(#pending-requests)
+  .page-shell
+  >
+  section:nth-of-type(2),
+
+  body:has(#pending-requests)
+  .page-shell
+  >
+  section:nth-of-type(3) {
+    grid-column:
+      span 4;
+  }
+
+
+  body:has(#pending-requests)
+  #admin-section {
+    grid-column:
+      1 / -1;
+  }
+
+
+  body:has(#pending-requests)
+  #teams-list {
+    max-height:
+      42dvh;
+
+    overflow-y:
+      auto;
+
+    overscroll-behavior:
+      contain;
+  }
+
+
+  body:has(#pending-requests)
+  #pending-requests {
+    display:
+      grid;
+
+    grid-template-columns:
+      repeat(
+        auto-fit,
+        minmax(
+          240px,
+          1fr
+        )
+      );
+
+    max-height:
+      35dvh;
+
+    overflow-y:
+      auto;
+
+    overscroll-behavior:
+      contain;
+  }
+}
+
+
+/* =========================================================
+   MEMBRI E SQUADRE
+   Due colonne desktop come richiesto.
+   ========================================================= */
+
+@media
+(min-width: 851px) {
+
+  body:has(#members-list):has(#teams-list)
+  .page-shell {
+    display:
+      grid;
+
+    grid-template-columns:
+      minmax(
+        0,
+        1fr
+      )
+      minmax(
+        0,
+        1fr
+      );
+
+    gap:
+      7px;
+
+    align-items:
+      start;
+  }
+
+
+  body:has(#members-list):has(#teams-list)
+  .page-header,
+
+  body:has(#members-list):has(#teams-list)
+  #page-message {
+    grid-column:
+      1 / -1;
+  }
+
+
+  body:has(#members-list):has(#teams-list)
+  .page-shell
+  >
+  section {
+    margin-bottom:
+      0;
+  }
+
+
+  body:has(#members-list):has(#teams-list)
+  #vice-section {
+    grid-column:
+      1 / -1;
+  }
+
+
+  body:has(#members-list):has(#teams-list)
+  #teams-list,
+
+  body:has(#members-list):has(#teams-list)
+  #members-list {
+    max-height:
+      calc(
+        100dvh - 155px
+      );
+
+    overflow-y:
+      auto;
+
+    overscroll-behavior:
+      contain;
+
+    padding-right:
+      2px;
+  }
+
+
+  body:has(#members-list):has(#teams-list)
+  #create-team-form {
+    grid-template-columns:
+      minmax(
+        0,
+        1fr
+      )
+      auto;
+
+    align-items:
+      end;
+  }
+}
+
+
+/* =========================================================
+   LE MIE LEGHE
+   ========================================================= */
+
+@media
+(min-width: 851px) {
+
+  body:has(#my-leagues):has(#create-section)
+  .page-shell {
+    display:
+      grid;
+
+    grid-template-columns:
+      minmax(
+        0,
+        1.6fr
+      )
+      minmax(
+        260px,
+        .75fr
+      );
+
+    gap:
+      7px;
+
+    align-items:
+      start;
+  }
+
+
+  body:has(#my-leagues):has(#create-section)
+  .page-header,
+
+  body:has(#my-leagues):has(#create-section)
+  #page-message {
+    grid-column:
+      1 / -1;
+  }
+
+
+  body:has(#my-leagues):has(#create-section)
+  .page-shell
+  >
+  section {
+    margin-bottom:
+      0;
+  }
+
+
+  body:has(#my-leagues):has(#create-section)
+  .page-shell
+  >
+  section:first-of-type {
+    grid-row:
+      span 2;
+  }
+
+
+  body:has(#my-leagues):has(#create-section)
+  #my-leagues {
+    display:
+      grid;
+
+    grid-template-columns:
+      repeat(
+        auto-fit,
+        minmax(
+          230px,
+          1fr
+        )
+      );
+  }
+}
+
+
+/* =========================================================
+   ONBOARDING
+   Step affiancati desktop, una colonna mobile.
+   ========================================================= */
+
+@media
+(min-width: 851px) {
+
+  body:has(#league-code-section)
+  .page-shell {
+    display:
+      grid;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+
+    gap:
+      7px;
+
+    align-items:
+      start;
+  }
+
+
+  body:has(#league-code-section)
+  .page-header,
+
+  body:has(#league-code-section)
+  #join-message,
+
+  body:has(#league-code-section)
+  #pending-section {
+    grid-column:
+      1 / -1;
+  }
+
+
+  body:has(#league-code-section)
+  .page-shell
+  >
+  section {
+    margin-bottom:
+      0;
+  }
+}
+
+
+/* =========================================================
+   SETUP LEGA
+   Griglia 2 colonne desktop.
+   ========================================================= */
+
+@media
+(min-width: 901px) {
+
+  body:has(#setup-form)
+  #setup-form {
+    display:
+      grid;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+
+    gap:
+      7px;
+  }
+
+
+  body:has(#setup-form)
+  #setup-form
+  >
+  section {
+    margin-bottom:
+      0;
+  }
+
+
+  body:has(#setup-form)
+  #setup-form
+  >
+  section:last-of-type {
+    grid-column:
+      1 / -1;
+
+    padding:
+      6px;
+  }
+
+
+  body:has(#setup-form)
+  #save-setup {
+    width:
+      100%;
+  }
+
+
+  body:has(#setup-form)
+  .roster-grid {
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+
+  body:has(#setup-form)
+  .conditional-panel {
+    margin-top:
+      6px;
+  }
+
+
+  body:has(#setup-form)
+  #dynamic-timer-settings
+  .list {
+    grid-template-columns:
+      repeat(
+        5,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+
+  body:has(#setup-form)
+  #dynamic-timer-settings
+  .list-row-main {
+    display:
+      grid;
+
+    justify-content:
+      stretch;
+
+    gap:
+      3px;
+
+    text-align:
+      center;
+  }
+}
+
+
+/* =========================================================
+   ROSE
+   KPI fascia + rose a scacchiera.
+   ========================================================= */
+
+body:has(#rosters-board)
+.rosters-board {
+  gap:
+    6px;
+}
+
+
+@media
+(min-width: 851px) {
+
+  body:has(#rosters-board)
+  .rosters-board {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+
+  body:has(#rosters-board)
+  .roster-team summary {
+    padding:
+      7px 8px;
+  }
+
+
+  body:has(#rosters-board)
+  .roster-body {
+    padding:
+      7px;
+  }
+
+
+  body:has(#rosters-board)
+  .roster-player-row {
+    padding:
+      5px 6px;
+  }
+}
+
+
+/* =========================================================
+   LISTONE
+   La pagina non scorre: scorre solo la tabella.
+   Header, menu e filtri restano nella viewport.
+   ========================================================= */
+
+body:has(#player-table-wrap) {
+  height:
+    100dvh;
+
+  overflow:
+    hidden;
+}
+
+
+body:has(#player-table-wrap)
+.page-shell {
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  height:
+    calc(
+      100dvh - 8px
+    );
+
+  margin-top:
+    4px;
+
+  margin-bottom:
+    4px;
+
+  overflow:
+    hidden;
+}
+
+
+body:has(#player-table-wrap)
+.page-header,
+
+body:has(#player-table-wrap)
+.league-tabs,
+
+body:has(#player-table-wrap)
+#page-message,
+
+body:has(#player-table-wrap)
+#list-import-section,
+
+body:has(#player-table-wrap)
+#import-info,
+
+body:has(#player-table-wrap)
+#superadmin-nationality-section {
+  flex:
+    0 0 auto;
+}
+
+
+body:has(#player-table-wrap)
+#list-import-section {
+  padding:
+    7px 9px;
+}
+
+
+body:has(#player-table-wrap)
+#list-import-section
+.section-heading {
+  margin-bottom:
+    5px;
+}
+
+
+@media
+(min-width: 851px) {
+
+  body:has(#player-table-wrap)
+  #list-import-form {
+    display:
+      grid;
+
+    grid-template-columns:
+      minmax(
+        0,
+        1fr
+      )
+      auto
+      minmax(
+        160px,
+        .45fr
+      );
+
+    gap:
+      6px;
+
+    align-items:
+      end;
+  }
+
+
+  body:has(#player-table-wrap)
+  #list-import-form
+  .form-grid {
+    grid-template-columns:
+      minmax(
+        220px,
+        1fr
+      )
+      150px;
+  }
+
+
+  body:has(#player-table-wrap)
+  #list-import-form
+  >
+  .setting-help {
+    display:
+      none;
+  }
+
+
+  body:has(#player-table-wrap)
+  #list-import-progress {
+    grid-column:
+      1 / -1;
+
+    margin:
+      0;
+  }
+}
+
+
+body:has(#player-table-wrap)
+#import-info {
+  display:
+    grid;
+
+  grid-template-columns:
+    auto
+    minmax(
+      180px,
+      .35fr
+    )
+    minmax(
+      0,
+      1fr
+    );
+
+  align-items:
+    center;
+
+  gap:
+    8px;
+
+  padding:
+    7px 9px;
+}
+
+
+body:has(#player-table-wrap)
+#import-info
+.section-heading {
+  margin:
+    0;
+}
+
+
+body:has(#player-table-wrap)
+#import-info
+.stats-grid {
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(
+        90px,
+        1fr
+      )
+    );
+}
+
+
+body:has(#player-table-wrap)
+#import-details {
+  margin:
+    0;
+}
+
+
+body:has(#player-table-wrap)
+section:has(#player-table-wrap) {
+  display:
+    flex;
+
+  flex:
+    1 1 auto;
+
+  flex-direction:
+    column;
+
+  min-height:
+    0;
+
+  margin-bottom:
+    0;
+
+  padding:
+    8px;
+}
+
+
+body:has(#player-table-wrap)
+section:has(#player-table-wrap)
+.section-heading {
+  margin-bottom:
+    5px;
+}
+
+
+body:has(#player-table-wrap)
+.role-filter-bar {
+  flex:
+    0 0 auto;
+
+  gap:
+    4px;
+
+  margin-bottom:
+    5px;
+
+  padding:
+    0 0 4px;
+}
+
+
+body:has(#player-table-wrap)
+.role-filter-button {
+  min-width:
+    34px;
+
+  min-height:
+    30px;
+
+  padding:
+    5px 7px;
+
+  font-size:
+    10px;
+}
+
+
+body:has(#player-table-wrap)
+.player-filter-grid {
+  flex:
+    0 0 auto;
+
+  grid-template-columns:
+    minmax(
+      180px,
+      1fr
+    )
+    minmax(
+      115px,
+      160px
+    )
+    minmax(
+      85px,
+      120px
+    )
+    minmax(
+      140px,
+      180px
+    )
+    auto;
+
+  gap:
+    5px;
+
+  margin-bottom:
+    4px;
+}
+
+
+body:has(#player-table-wrap)
+.player-filter-field {
+  gap:
+    2px;
+
+  font-size:
+    8px;
+}
+
+
+body:has(#player-table-wrap)
+.player-filter-field
+input,
+
+body:has(#player-table-wrap)
+.player-filter-field
+select,
+
+body:has(#player-table-wrap)
+.player-filter-reset {
+  min-height:
+    31px;
+
+  padding:
+    5px 7px;
+
+  font-size:
+    10px;
+}
+
+
+body:has(#player-table-wrap)
+.player-count-line {
+  flex:
+    0 0 auto;
+
+  margin:
+    2px 0 4px;
+
+  font-size:
+    9px;
+}
+
+
+body:has(#player-table-wrap)
+.player-table-wrap {
+  flex:
+    1 1 auto;
+
+  min-height:
+    0;
+
+  overflow:
+    auto;
+
+  border-radius:
+    7px;
+}
+
+
+body:has(#player-table-wrap)
+.player-table {
+  font-size:
+    10px;
+}
+
+
+body:has(#player-table-wrap)
+.player-sort-button {
+  min-height:
+    30px;
+
+  padding:
+    5px 7px;
+
+  font-size:
+    9px;
+}
+
+
+body:has(#player-table-wrap)
+.player-row
+td {
+  height:
+    34px;
+
+  padding:
+    4px 7px;
+}
+
+
+body:has(#player-table-wrap)
+.player-name {
+  font-size:
+    11px;
+}
+
+
+body:has(#player-table-wrap)
+.role-badge {
+  min-width:
+    24px;
+
+  min-height:
+    19px;
+
+  padding:
+    2px 5px;
+
+  font-size:
+    8px;
+}
+
+
+/* =========================================================
+   ASTA - DRAWER LISTONE IDENTICO
+   ========================================================= */
+
+.free-agents-content {
+  grid-template-rows:
+    auto
+    auto
+    auto
+    auto
+    minmax(
+      0,
+      1fr
+    );
+
+  gap:
+    4px;
+}
+
+
+.free-agents-title-row {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    7px;
+
+  min-width:
+    0;
+}
+
+
+.free-agents-title-row
+>
+div {
+  display:
+    flex;
+
+  align-items:
+    baseline;
+
+  gap:
+    6px;
+}
+
+
+.free-agents-title-row
+strong {
+  font-size:
+    13px;
+}
+
+
+.free-agents-title-row
+small {
+  color:
+    var(--text-muted);
+
+  font-size:
+    9px;
+}
+
+
+.free-agents-drawer
+.role-filter-bar {
+  gap:
+    3px;
+
+  margin:
+    0;
+
+  padding:
+    0 0 3px;
+}
+
+
+.free-agents-drawer
+.role-filter-button {
+  min-width:
+    31px;
+
+  min-height:
+    28px;
+
+  padding:
+    4px 6px;
+
+  font-size:
+    9px;
+}
+
+
+.free-agents-drawer
+.player-filter-grid {
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap:
+    4px;
+
+  margin:
+    0;
+}
+
+
+.free-agents-drawer
+.player-filter-field {
+  gap:
+    2px;
+
+  font-size:
+    8px;
+}
+
+
+.free-agents-drawer
+.player-filter-field
+input,
+
+.free-agents-drawer
+.player-filter-field
+select,
+
+.free-agents-drawer
+.player-filter-reset {
+  min-height:
+    30px;
+
+  padding:
+    4px 6px;
+
+  font-size:
+    10px;
+}
+
+
+.free-agents-drawer
+.player-filter-reset {
+  width:
+    100%;
+}
+
+
+.free-agents-drawer
+.player-count-line {
+  margin:
+    0;
+
+  font-size:
+    8px;
+}
+
+
+.auction-player-table-wrap {
+  min-height:
+    0;
+
+  height:
+    100%;
+
+  overflow:
+    auto;
+
+  border-radius:
+    6px;
+}
+
+
+.auction-player-table {
+  min-width:
+    900px;
+
+  font-size:
+    9px;
+}
+
+
+.auction-player-table
+.player-sort-button {
+  min-height:
+    29px;
+
+  padding:
+    4px 6px;
+
+  font-size:
+    8px;
+}
+
+
+.auction-player-table
+.player-row
+td {
+  height:
+    32px;
+
+  padding:
+    3px 6px;
+}
+
+
+.auction-player-table
+.player-name {
+  font-size:
+    10px;
+}
+
+
+.auction-player-table
+.role-badge {
+  min-width:
+    22px;
+
+  min-height:
+    18px;
+
+  padding:
+    2px 4px;
+
+  font-size:
+    7px;
+}
+
+
+.player-alert-flags {
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  gap:
+    2px;
+
+  flex:
+    0 0 auto;
+}
+
+
+.player-alert-flag {
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  min-width:
+    18px;
+
+  height:
+    16px;
+
+  padding:
+    1px 3px;
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius:
+    4px;
+
+  background:
+    var(--surface-3);
+
+  color:
+    var(--text-soft);
+
+  font-size:
+    6px;
+
+  font-weight:
+    900;
+}
+
+
+.player-alert-flag.warning {
+  background:
+    var(--danger-bg);
+
+  color:
+    var(--danger-text);
+}
+
+
+.player-table-empty {
+  height:
+    70px;
+
+  color:
+    var(--text-muted);
+
+  text-align:
+    center;
+}
+
+
+@media
+(min-width: 901px) {
+
+  body.auction-live-mode.auction-call-mode
+  #call-form-area:not([hidden]) {
+    grid-template-columns:
+      minmax(
+        220px,
+        1fr
+      )
+      minmax(
+        560px,
+        52%
+      );
+  }
+}
+
+
+/* =========================================================
+   MOBILE GLOBALE
+   ========================================================= */
+
+@media
+(max-width: 850px) {
+
+  .page-shell,
+  .admin-shell,
+  .admin-page {
+    width:
+      calc(
+        100% - 8px
+      );
+
+    margin:
+      4px auto
+      10px;
+  }
+
+
+  .page-header,
+  .admin-topbar,
+  .admin-header {
+    min-height:
+      32px;
+
+    margin-bottom:
+      4px;
+  }
+
+
+  .page-header h1,
+  .admin-topbar h1,
+  .admin-header h1 {
+    font-size:
+      19px;
+  }
+
+
+  .page-header p,
+  .admin-topbar p,
+  .admin-header p {
+    display:
+      none;
+  }
+
+
+  .back-home {
+    min-height:
+      30px;
+
+    padding:
+      4px 7px;
+
+    font-size:
+      10px;
+  }
+
+
+  .tabs,
+  .admin-tabs,
+  .admin-nav {
+    gap:
+      3px;
+
+    margin-bottom:
+      5px;
+  }
+
+
+  .league-tabs {
+    display:
+      flex;
+
+    overflow-x:
+      auto;
+
+    padding-bottom:
+      2px;
+  }
+
+
+  .league-tabs
+  .tab {
+    flex:
+      1 0 auto;
+
+    min-width:
+      61px;
+
+    min-height:
+      31px;
+
+    padding:
+      5px 6px;
+  }
+
+
+  .tab-title,
+  .admin-tab-title {
+    font-size:
+      10px;
+  }
+
+
+  .tab-description,
+  .admin-tab-description {
+    display:
+      none;
+  }
+
+
+  .card,
+  .admin-card,
+  section {
+    padding:
+      8px;
+  }
+
+
+  .page-shell section,
+  .admin-shell section,
+  .admin-page section {
+    margin-bottom:
+      5px;
+  }
+
+
+  .section-heading {
+    gap:
+      5px;
+
+    margin-bottom:
+      6px;
+  }
+
+
+  .section-heading h2,
+  .section-heading h3 {
+    font-size:
+      14px;
+  }
+
+
+  .section-heading p {
+    display:
+      none;
+  }
+
+
+  .section-label {
+    min-width:
+      28px;
+
+    padding:
+      3px 4px;
+
+    font-size:
+      7px;
+  }
+
+
+  .stats-grid {
+    grid-template-columns:
+      repeat(
+        auto-fit,
+        minmax(
+          92px,
+          1fr
+        )
+      );
+
+    gap:
+      3px;
+  }
+
+
+  .stat-card {
+    min-height:
+      32px;
+
+    padding:
+      5px 6px;
+  }
+
+
+  .stat-label {
+    font-size:
+      7px;
+  }
+
+
+  .stat-value {
+    font-size:
+      14px;
+  }
+
+
+  .list-row-main {
+    padding:
+      6px 7px;
+  }
+
+
+  .user-row summary {
+    grid-template-columns:
+      minmax(
+        0,
+        1fr
+      )
+      auto;
+
+    padding:
+      6px 7px;
+  }
+
+
+  .user-summary-status {
+    grid-column:
+      1;
+
+    justify-content:
+      flex-start;
+  }
+
+
+  .user-chevron {
+    grid-column:
+      2;
+
+    grid-row:
+      1 / span 2;
+  }
+
+
+  .user-metadata {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+
+  .form-grid,
+  .roster-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+
+    gap:
+      5px;
+  }
+
+
+  input,
+  select,
+  textarea {
+    min-height:
+      32px;
+  }
+
+
+  button,
+  .button {
+    min-height:
+      32px;
+  }
+
+
+  /* Listone mobile: toolbar in 2 colonne, tabella ancora interna */
+
+  body:has(#player-table-wrap)
+  #import-info {
+    grid-template-columns:
+      auto
+      minmax(
+        150px,
+        1fr
+      );
+
+    gap:
+      4px;
+  }
+
+
+  body:has(#player-table-wrap)
+  #import-details {
+    display:
+      none;
+  }
+
+
+  body:has(#player-table-wrap)
+  .player-filter-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+
+    gap:
+      4px;
+  }
+
+
+  body:has(#player-table-wrap)
+  .player-filter-reset {
+    width:
+      100%;
+  }
+
+
+  body:has(#player-table-wrap)
+  .player-table {
+    min-width:
+      780px;
+  }
+
+
+  /* Drawer asta mobile */
+
+  .free-agents-drawer {
+    width:
+      min(
+        94vw,
+        520px
+      );
+  }
+
+
+  .free-agents-drawer
+  .player-filter-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+
+  .auction-player-table {
+    min-width:
+      780px;
+  }
+}
+
+
+@media
+(max-width: 430px) {
+
+  .form-grid,
+  .roster-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  body:has(#player-table-wrap)
+  .player-filter-grid,
+
+  .free-agents-drawer
+  .player-filter-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+
+  .player-filter-field:first-child {
+    grid-column:
+      1 / -1;
+  }
+
+
+  .player-filter-reset {
+    grid-column:
+      1 / -1;
+  }
+
+
+  .free-agents-title-row
+  .setting-help {
+    display:
+      none;
+  }
+}
+
+
+/* =========================================================
+   ASTA LOBBY - correzioni densità specifiche
+   ========================================================= */
+
+#auction-teams,
+#auction-settings {
+  min-height:
+    0;
+}
+
+
+@media
+(min-width: 851px) {
+
+  .auction-lobby-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+
+  #auction-teams,
+  #auction-settings {
+    max-height:
+      44dvh;
+
+    overflow-y:
+      auto;
+
+    overscroll-behavior:
+      contain;
+
+    padding-right:
+      2px;
+  }
+}
+
+
+@media
+(max-width: 850px) {
+
+  /*
+   * Su telefono Squadre e Regole restano una sotto l'altra:
+   * nessuna colonna stretta.
+   */
+  .auction-lobby-grid {
+    grid-template-columns:
+      1fr !important;
+  }
+
+
+  #auction-teams {
+    max-height:
+      34dvh;
+
+    overflow-y:
+      auto;
+
+    overscroll-behavior:
+      contain;
+
+    padding-right:
+      2px;
+  }
+
+
+  #auction-settings {
+    display:
+      grid;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+
+    gap:
+      0 8px;
+  }
+
+
+  #auction-settings
+  .setting-row {
+    min-width:
+      0;
+  }
+}
+
+
+@media
+(max-width: 430px) {
+
+  #auction-settings {
+    grid-template-columns:
+      1fr;
+  }
+}
