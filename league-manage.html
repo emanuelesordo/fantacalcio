@@ -3,12 +3,13 @@
 
 <head>
   <meta charset="UTF-8">
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>Membri e squadre - Fantacalcio Live</title>
+  <title>Setup Lega - Fantacalcio Live</title>
 
   <link
     rel="stylesheet"
@@ -23,8 +24,8 @@
   <header class="page-header">
 
     <div>
-      <h1 id="league-title">Membri e squadre</h1>
-      <p>Gestione partecipanti, ruoli e squadre</p>
+      <h1 id="league-title">Setup Lega</h1>
+      <p>Configurazione della lega e dell'asta</p>
     </div>
 
     <a
@@ -37,6 +38,48 @@
   </header>
 
 
+  <nav class="tabs league-tabs">
+
+    <a
+      href="league.html"
+      class="tab"
+    >
+      <span class="tab-title">Home</span>
+      <span class="tab-description">Dashboard</span>
+    </a>
+
+    <a href="league-auction.html" class="tab">
+      <span class="tab-title">Asta</span>
+      <span class="tab-description">Live</span>
+    </a>
+
+    <a
+      href="league-rosters.html"
+      class="tab"
+    >
+      <span class="tab-title">Rose</span>
+      <span class="tab-description">Squadre</span>
+    </a>
+
+    <a
+      href="league-list.html"
+      class="tab"
+    >
+      <span class="tab-title">Listone</span>
+      <span class="tab-description">Giocatori</span>
+    </a>
+
+    <a
+      href="league-setup.html"
+      class="tab active"
+    >
+      <span class="tab-title">Setup</span>
+      <span class="tab-description">Configurazione</span>
+    </a>
+
+  </nav>
+
+
   <p
     id="page-message"
     class="message"
@@ -44,118 +87,687 @@
   ></p>
 
 
-  <section class="card">
+  <form id="setup-form">
 
-    <div class="section-heading">
 
-      <span class="section-label">
-        TEAM
-      </span>
+    <!-- ===================================================
+         FORMATO LEGA
+         =================================================== -->
 
-      <div>
-        <h2>Squadre</h2>
-        <p>Squadre attive nella lega</p>
+    <section class="card">
+
+      <div class="section-heading">
+
+        <span class="section-label">
+          MODE
+        </span>
+
+        <div>
+          <h2>Formato lega</h2>
+          <p>Modalità, crediti e numero di squadre</p>
+        </div>
+
       </div>
 
-    </div>
 
-
-    <div
-      id="create-team-area"
-      hidden
-    >
-
-      <form id="create-team-form">
+      <div class="form-grid">
 
         <label class="form-field">
 
-          Nuova squadra
+          Modalità
+
+          <select id="fantasy-mode">
+            <option value="classic">Classic</option>
+            <option value="mantra">Mantra</option>
+          </select>
+
+        </label>
+
+
+        <label class="form-field">
+
+          Crediti iniziali
 
           <input
-            id="new-team-name"
-            type="text"
-            minlength="2"
-            maxlength="60"
-            placeholder="Nome squadra"
+            id="initial-credits"
+            type="number"
+            min="1"
+            max="1000000"
+            step="1"
             required
           >
 
         </label>
 
-        <button type="submit">
-          Crea squadra
-        </button>
 
-      </form>
+        <label class="form-field">
 
-      <div class="divider"></div>
+          Numero squadre
 
-    </div>
+          <input
+            id="team-count"
+            type="number"
+            min="2"
+            max="30"
+            step="1"
+            required
+          >
 
+        </label>
 
-    <div
-      id="teams-list"
-      class="league-list"
-    ></div>
-
-  </section>
-
-
-  <section class="card">
-
-    <div class="section-heading">
-
-      <span class="section-label">
-        USER
-      </span>
-
-      <div>
-        <h2>Membri</h2>
-        <p>Utenti attivi e ruoli nella lega</p>
       </div>
 
-    </div>
+    </section>
 
 
-    <div
-      id="members-list"
-      class="users-list"
-    ></div>
+    <!-- ===================================================
+         ROSA CLASSIC
+         =================================================== -->
 
-  </section>
+    <section
+      id="classic-roster"
+      class="card"
+    >
 
+      <div class="section-heading">
 
-  <section
-    id="vice-section"
-    class="card"
-    hidden
-  >
+        <span class="section-label">
+          ROSA
+        </span>
 
-    <div class="section-heading">
+        <div>
+          <h2>Rosa Classic</h2>
+          <p>Numero esatto di giocatori per ruolo</p>
+        </div>
 
-      <span class="section-label">
-        VICE
-      </span>
-
-      <div>
-        <h2>Richieste Vice</h2>
-        <p>Candidature da approvare per la tua squadra</p>
       </div>
 
-    </div>
+
+      <div class="form-grid roster-grid">
+
+        <label class="form-field">
+
+          Portieri (P)
+
+          <input
+            id="slot-p"
+            type="number"
+            min="0"
+            max="50"
+            step="1"
+          >
+
+        </label>
 
 
-    <div
-      id="vice-requests"
-      class="league-list"
-    ></div>
+        <label class="form-field">
 
-  </section>
+          Difensori (D)
+
+          <input
+            id="slot-d"
+            type="number"
+            min="0"
+            max="50"
+            step="1"
+          >
+
+        </label>
+
+
+        <label class="form-field">
+
+          Centrocampisti (C)
+
+          <input
+            id="slot-c"
+            type="number"
+            min="0"
+            max="50"
+            step="1"
+          >
+
+        </label>
+
+
+        <label class="form-field">
+
+          Attaccanti (A)
+
+          <input
+            id="slot-a"
+            type="number"
+            min="0"
+            max="50"
+            step="1"
+          >
+
+        </label>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         ROSA MANTRA
+         =================================================== -->
+
+    <section
+      id="mantra-roster"
+      class="card"
+      hidden
+    >
+
+      <div class="section-heading">
+
+        <span class="section-label">
+          ROSA
+        </span>
+
+        <div>
+          <h2>Rosa Mantra</h2>
+          <p>Intervalli minimi e massimi consentiti</p>
+        </div>
+
+      </div>
+
+
+      <div class="conditional-panel">
+
+        <h3>Portieri (P)</h3>
+
+        <div class="form-grid">
+
+          <label class="form-field">
+
+            Minimo
+
+            <input
+              id="mantra-gk-min"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+            >
+
+          </label>
+
+          <label class="form-field">
+
+            Massimo
+
+            <input
+              id="mantra-gk-max"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+            >
+
+          </label>
+
+        </div>
+
+      </div>
+
+
+      <div class="conditional-panel">
+
+        <h3>Giocatori di movimento</h3>
+
+        <p class="setting-help">
+          Ruoli Mantra: B, Dc, Dd, Ds, E, W, M, C, T, A, Pc.
+        </p>
+
+        <div class="form-grid">
+
+          <label class="form-field">
+
+            Minimo
+
+            <input
+              id="mantra-outfield-min"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+            >
+
+          </label>
+
+          <label class="form-field">
+
+            Massimo
+
+            <input
+              id="mantra-outfield-max"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+            >
+
+          </label>
+
+        </div>
+
+      </div>
+
+
+      <div class="conditional-panel">
+
+        <h3>Totale giocatori</h3>
+
+        <p class="setting-help">
+          Il totale è la somma di Portieri e giocatori di movimento.
+        </p>
+
+        <div class="form-grid">
+
+          <label class="form-field">
+
+            Minimo totale
+
+            <input
+              id="mantra-total-min"
+              type="number"
+              min="1"
+              max="100"
+              step="1"
+            >
+
+          </label>
+
+          <label class="form-field">
+
+            Massimo totale
+
+            <input
+              id="mantra-total-max"
+              type="number"
+              min="1"
+              max="100"
+              step="1"
+            >
+
+          </label>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         UNDER
+         =================================================== -->
+
+    <section class="card">
+
+      <div class="section-heading">
+
+        <span class="section-label">
+          U
+        </span>
+
+        <div>
+          <h2>UNDER</h2>
+          <p>Vincolo minimo di giocatori UNDER in rosa</p>
+        </div>
+
+      </div>
+
+
+      <label class="setting-row">
+
+        <span>
+
+          <strong>
+            Abilita UNDER
+          </strong>
+
+          <small>
+            Impone un numero minimo di giocatori UNDER
+            nella rosa della squadra.
+          </small>
+
+        </span>
+
+        <input
+          id="under-enabled"
+          type="checkbox"
+        >
+
+      </label>
+
+
+      <div
+        id="under-settings"
+        class="conditional-panel"
+        hidden
+      >
+
+        <label class="form-field">
+
+          Numero minimo di UNDER in rosa
+
+          <input
+            id="under-min-count"
+            type="number"
+            min="1"
+            max="100"
+            step="1"
+          >
+
+        </label>
+
+        <p class="setting-help">
+          La definizione anagrafica di giocatore UNDER verrà
+          applicata ai dati del listone. Qui viene impostato
+          soltanto il numero minimo richiesto.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         CHIAMATA
+         =================================================== -->
+
+    <section class="card">
+
+      <div class="section-heading">
+
+        <span class="section-label">
+          CALL
+        </span>
+
+        <div>
+          <h2>Chiamata giocatori</h2>
+          <p>Come viene scelto il prossimo giocatore</p>
+        </div>
+
+      </div>
+
+
+      <label class="form-field">
+
+        Modalità di chiamata
+
+        <select id="nomination-mode">
+          <option value="call">A chiamata</option>
+          <option value="list">Da listone</option>
+          <option value="random">Casuale</option>
+        </select>
+
+      </label>
+
+
+      <div
+        id="list-settings"
+        class="conditional-panel"
+        hidden
+      >
+
+        <div class="form-grid">
+
+          <label class="form-field">
+
+            Ordina per
+
+            <select id="list-sort-by">
+              <option value="alphabetical">Ordine alfabetico</option>
+              <option value="quotation">Quotazione</option>
+            </select>
+
+          </label>
+
+
+          <label class="form-field">
+
+            Direzione
+
+            <select id="list-sort-direction">
+              <option value="asc">Crescente</option>
+              <option value="desc">Decrescente</option>
+            </select>
+
+          </label>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         ASTA
+         =================================================== -->
+
+    <section class="card">
+
+      <div class="section-heading">
+
+        <span class="section-label">
+          BID
+        </span>
+
+        <div>
+          <h2>Asta</h2>
+          <p>Base d'asta e modalità di rilancio</p>
+        </div>
+
+      </div>
+
+
+      <div class="form-grid">
+
+        <label class="form-field">
+
+          Base d'asta
+
+          <select id="auction-base-mode">
+            <option value="free">Libera</option>
+            <option value="quotation">Quotazione Fantacalcio.it</option>
+          </select>
+
+        </label>
+
+
+        <label class="form-field">
+
+          Modalità rilancio
+
+          <select id="bid-mode">
+            <option value="wild">Rilancio selvaggio</option>
+            <option value="turn">Rilancio a turno</option>
+          </select>
+
+        </label>
+
+      </div>
+
+
+      <div
+        id="turn-settings"
+        class="conditional-panel"
+        hidden
+      >
+
+        <label class="form-field">
+
+          Direzione dei turni
+
+          <select id="turn-direction">
+            <option value="clockwise">Senso orario</option>
+            <option value="counterclockwise">Senso antiorario</option>
+          </select>
+
+        </label>
+
+      </div>
+
+
+      <p class="setting-help">
+        L'incremento minimo è sempre di
+        <strong>1 credito</strong>.
+      </p>
+
+    </section>
+
+
+    <!-- ===================================================
+         TIMER
+         =================================================== -->
+
+    <section class="card">
+
+      <div class="section-heading">
+
+        <span class="section-label">
+          TIME
+        </span>
+
+        <div>
+          <h2>Timer</h2>
+          <p>Durata del conto alla rovescia</p>
+        </div>
+
+      </div>
+
+
+      <label class="form-field">
+
+        Modalità timer
+
+        <select id="timer-mode">
+          <option value="dynamic">Dinamico</option>
+          <option value="fixed">Fisso</option>
+        </select>
+
+      </label>
+
+
+      <div
+        id="fixed-timer-settings"
+        class="conditional-panel"
+        hidden
+      >
+
+        <label class="form-field">
+
+          Secondi
+
+          <input
+            id="fixed-timer-seconds"
+            type="number"
+            min="1"
+            max="120"
+            step="1"
+          >
+
+        </label>
+
+      </div>
+
+
+      <div
+        id="dynamic-timer-settings"
+        class="conditional-panel"
+      >
+
+        <h3>Timer dinamico</h3>
+
+        <p class="setting-help">
+          I valori sono fissi per ora e vengono calcolati
+          sul rapporto tra prezzo corrente e crediti iniziali.
+        </p>
+
+        <div class="list">
+
+          <div class="list-row">
+            <div class="list-row-main">
+              <div class="list-row-title">
+                <strong>Fino al 2%</strong>
+                <small>dei crediti iniziali</small>
+              </div>
+              <strong>5 sec</strong>
+            </div>
+          </div>
+
+          <div class="list-row">
+            <div class="list-row-main">
+              <div class="list-row-title">
+                <strong>Fino al 5%</strong>
+                <small>dei crediti iniziali</small>
+              </div>
+              <strong>7 sec</strong>
+            </div>
+          </div>
+
+          <div class="list-row">
+            <div class="list-row-main">
+              <div class="list-row-title">
+                <strong>Fino al 10%</strong>
+                <small>dei crediti iniziali</small>
+              </div>
+              <strong>9 sec</strong>
+            </div>
+          </div>
+
+          <div class="list-row">
+            <div class="list-row-main">
+              <div class="list-row-title">
+                <strong>Fino al 20%</strong>
+                <small>dei crediti iniziali</small>
+              </div>
+              <strong>12 sec</strong>
+            </div>
+          </div>
+
+          <div class="list-row">
+            <div class="list-row-main">
+              <div class="list-row-title">
+                <strong>Oltre il 20%</strong>
+                <small>dei crediti iniziali</small>
+              </div>
+              <strong>15 sec</strong>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         SALVA
+         =================================================== -->
+
+    <section class="card">
+
+      <button
+        id="save-setup"
+        type="submit"
+      >
+        Salva Setup
+      </button>
+
+    </section>
+
+  </form>
 
 </main>
 
 
-<script src="league-manage.js?v=3"></script>
+<script src="league-setup.js?v=2"></script>
 
 </body>
 
