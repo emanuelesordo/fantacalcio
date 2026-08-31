@@ -346,22 +346,42 @@
 
           <label class="form-field">
 
-            Offerta
+            Picker offerta
 
-            <input
+            <select
               id="live-bid-amount"
-              type="number"
-              min="1"
-              step="1"
-            >
+            ></select>
 
           </label>
 
 
-          <div
-            class="form-field"
-            style="align-self:end"
-          >
+          <div class="form-field">
+
+            <span
+              id="live-picker-mode"
+              class="badge good"
+            >
+              AUTO
+            </span>
+
+
+            <span
+              id="live-max-bid"
+              class="badge"
+            >
+              Max —
+            </span>
+
+
+            <button
+              id="live-picker-auto-button"
+              type="button"
+              class="secondary"
+              hidden
+            >
+              Rilascia · torna AUTO
+            </button>
+
 
             <button
               id="live-bid-button"
@@ -412,7 +432,7 @@
 
 
     <div
-      id="test-auctioneer-panel"
+      id="auctioneer-panel"
       hidden
     >
 
@@ -428,7 +448,7 @@
         <div>
           <h3>Pannello offerte</h3>
           <p>
-            Registra un rilancio per una delle squadre partecipanti.
+            Tocca una squadra per registrare l’importo selezionato.
           </p>
         </div>
 
@@ -439,65 +459,88 @@
 
         <label class="form-field">
 
-          Squadra
+          Picker Banditore
 
           <select
-            id="test-bid-team"
+            id="auctioneer-bid-amount"
           ></select>
 
         </label>
 
 
-        <label class="form-field">
+        <div class="form-field">
 
-          Offerta
-
-          <input
-            id="test-bid-amount"
-            type="number"
-            min="1"
-            step="1"
+          <span
+            id="auctioneer-picker-mode"
+            class="badge good"
           >
+            AUTO
+          </span>
 
-        </label>
+
+          <span
+            id="auctioneer-action-mode"
+            class="badge"
+          >
+            VOCALE
+          </span>
+
+
+          <button
+            id="auctioneer-picker-auto-button"
+            type="button"
+            class="secondary"
+            hidden
+          >
+            Rilascia · torna AUTO
+          </button>
+
+
+          <button
+            id="auctioneer-award-player"
+            type="button"
+            class="success"
+          >
+            Aggiudica
+          </button>
+
+
+          <button
+            id="test-finish-review"
+            type="button"
+            class="secondary"
+            hidden
+          >
+            Termina test e visualizza rose
+          </button>
+
+        </div>
 
       </div>
 
 
-      <div class="league-actions">
-
-        <button
-          id="test-place-bid"
-          type="button"
-        >
-          Registra offerta
-        </button>
-
-
-        <button
-          id="test-award-player"
-          type="button"
-          class="success"
-        >
-          Aggiudica al leader
-        </button>
-
-
-        <button
-          id="test-finish-review"
-          type="button"
-          class="secondary"
-        >
-          Termina test e visualizza rose
-        </button>
-
-      </div>
+      <div
+        id="auctioneer-team-buttons"
+        class="league-actions"
+      ></div>
 
 
       <p
-        id="test-bid-help"
+        id="auctioneer-help"
         class="setting-help"
       ></p>
+
+
+      <div class="divider"></div>
+
+
+      <h3>Ultime offerte</h3>
+
+
+      <div
+        id="auction-recent-bids"
+        class="list"
+      ></div>
 
     </div>
 
@@ -650,8 +693,8 @@
 
 
 <script src="league-auction.js?v=2"></script>
-<script src="auction-live-controls.js?v=1"></script>
-<script src="auction-test-live.js?v=2"></script>
+<script src="auction-live-controls.js?v=2"></script>
+<script src="auction-test-live.js?v=3"></script>
 
 </body>
 
