@@ -1,12 +1,6 @@
 /* =========================================================
    league-join.js
-   Onboarding lega atomico - v2
-
-   Flusso:
-   1. Codice lega
-   2. Scelta ruoli
-   3A. Squadra, solo se Presidente/Vice
-   3B. Conferma diretta, se solo Banditore/Presentatore
+   Onboarding lega atomico - v3
    ========================================================= */
 
 const SUPABASE_URL =
@@ -15,9 +9,7 @@ const SUPABASE_URL =
 const ONBOARDING_API_URL =
   `${SUPABASE_URL}/functions/v1/onboarding-api`;
 
-
-let previewData =
-  null;
+let previewData = null;
 
 
 /* =========================================================
@@ -25,158 +17,98 @@ let previewData =
    ========================================================= */
 
 const joinMessage =
-  document.getElementById(
-    'join-message'
-  );
+  document.getElementById('join-message');
 
 const pendingSection =
-  document.getElementById(
-    'pending-section'
-  );
+  document.getElementById('pending-section');
 
 const pendingList =
-  document.getElementById(
-    'pending-list'
-  );
+  document.getElementById('pending-list');
 
 const leagueCodeSection =
-  document.getElementById(
-    'league-code-section'
-  );
+  document.getElementById('league-code-section');
 
 const leagueCode =
-  document.getElementById(
-    'league-code'
-  );
+  document.getElementById('league-code');
 
 const previewButton =
-  document.getElementById(
-    'preview-league-button'
-  );
+  document.getElementById('preview-league-button');
 
 const rolesSection =
-  document.getElementById(
-    'roles-section'
-  );
+  document.getElementById('roles-section');
 
 const previewLeagueName =
-  document.getElementById(
-    'preview-league-name'
-  );
+  document.getElementById('preview-league-name');
 
 const previewLeagueCode =
-  document.getElementById(
-    'preview-league-code'
-  );
+  document.getElementById('preview-league-code');
 
 const rolePresident =
-  document.getElementById(
-    'role-president'
-  );
+  document.getElementById('role-president');
 
 const roleVice =
-  document.getElementById(
-    'role-vice'
-  );
+  document.getElementById('role-vice');
 
 const roleAuctioneer =
-  document.getElementById(
-    'role-auctioneer'
-  );
+  document.getElementById('role-auctioneer');
 
 const rolePresenter =
-  document.getElementById(
-    'role-presenter'
-  );
+  document.getElementById('role-presenter');
 
 const rolesContinueButton =
-  document.getElementById(
-    'roles-continue-button'
-  );
+  document.getElementById('roles-continue-button');
 
 const rolesHelp =
-  document.getElementById(
-    'roles-help'
-  );
+  document.getElementById('roles-help');
 
 const teamSection =
-  document.getElementById(
-    'team-section'
-  );
+  document.getElementById('team-section');
 
 const teamStepDescription =
-  document.getElementById(
-    'team-step-description'
-  );
+  document.getElementById('team-step-description');
 
 const teamCreateChoice =
-  document.getElementById(
-    'team-create-choice'
-  );
+  document.getElementById('team-create-choice');
 
 const teamModeExisting =
-  document.getElementById(
-    'team-mode-existing'
-  );
+  document.getElementById('team-mode-existing');
 
 const teamModeCreate =
-  document.getElementById(
-    'team-mode-create'
-  );
+  document.getElementById('team-mode-create');
 
 const existingTeamArea =
-  document.getElementById(
-    'existing-team-area'
-  );
+  document.getElementById('existing-team-area');
 
 const existingTeamSelect =
-  document.getElementById(
-    'existing-team-select'
-  );
+  document.getElementById('existing-team-select');
 
 const newTeamArea =
-  document.getElementById(
-    'new-team-area'
-  );
+  document.getElementById('new-team-area');
 
-const newTeamName =
-  document.getElementById(
-    'new-team-name'
-  );
+const newTeamNameInput =
+  document.getElementById('new-team-name');
 
 const teamBackButton =
-  document.getElementById(
-    'team-back-button'
-  );
+  document.getElementById('team-back-button');
 
 const submitTeamRequestButton =
-  document.getElementById(
-    'submit-team-request-button'
-  );
+  document.getElementById('submit-team-request-button');
 
 const noTeamConfirmSection =
-  document.getElementById(
-    'no-team-confirm-section'
-  );
+  document.getElementById('no-team-confirm-section');
 
 const noTeamSummary =
-  document.getElementById(
-    'no-team-summary'
-  );
+  document.getElementById('no-team-summary');
 
 const noTeamBackButton =
-  document.getElementById(
-    'no-team-back-button'
-  );
+  document.getElementById('no-team-back-button');
 
 const submitNoTeamRequestButton =
-  document.getElementById(
-    'submit-no-team-request-button'
-  );
+  document.getElementById('submit-no-team-request-button');
 
 
 /* =========================================================
-   STORAGE / UTILITY
+   UTILITY
    ========================================================= */
 
 function getSession() {
@@ -187,7 +119,6 @@ function getSession() {
       localStorage.getItem(
         'fantacalcio_session'
       );
-
 
     return raw
       ? JSON.parse(raw)
@@ -202,29 +133,12 @@ function getSession() {
 
 function escapeHtml(value) {
 
-  return String(
-    value ?? ''
-  )
-    .replaceAll(
-      '&',
-      '&amp;'
-    )
-    .replaceAll(
-      '<',
-      '&lt;'
-    )
-    .replaceAll(
-      '>',
-      '&gt;'
-    )
-    .replaceAll(
-      '"',
-      '&quot;'
-    )
-    .replaceAll(
-      "'",
-      '&#039;'
-    );
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
 }
 
 
@@ -235,7 +149,6 @@ function showMessage(
 
   joinMessage.textContent =
     text;
-
 
   joinMessage.className =
     `message ${type}`;
@@ -256,8 +169,7 @@ function roleLabel(role) {
 
     presenter:
       'Presentatore'
-  })[role]
-  || role;
+  })[role] || role;
 }
 
 
@@ -270,53 +182,43 @@ function selectedRoles() {
     rolePresenter
   ]
     .filter(
-      checkbox =>
-        checkbox.checked
+      input =>
+        input?.checked
     )
     .map(
-      checkbox =>
-        checkbox.value
+      input =>
+        input.value
     );
 }
 
 
-function requiresTeam(
-  roles = selectedRoles()
-) {
+function requiresTeam(roles) {
 
-  return roles.includes(
-    'president'
-  )
-  ||
-  roles.includes(
-    'vice'
-  );
+  return roles.includes('president')
+    ||
+    roles.includes('vice');
 }
 
 
-function resetStep3() {
+function hideStep3() {
 
   teamSection.hidden =
     true;
-
 
   noTeamConfirmSection.hidden =
     true;
 }
 
 
-function scrollToSection(
-  element
-) {
+function scrollToSection(element) {
 
-  element
-    ?.scrollIntoView({
-      behavior:
-        'smooth',
+  element?.scrollIntoView({
+    behavior:
+      'smooth',
 
-      block:
-        'start'
-    });
+    block:
+      'start'
+  });
 }
 
 
@@ -390,9 +292,7 @@ async function onboardingApi(body) {
   }
 
 
-  if (
-    response.status === 401
-  ) {
+  if (response.status === 401) {
 
     window.location.href =
       'index.html';
@@ -409,25 +309,22 @@ async function onboardingApi(body) {
    RICHIESTE ESISTENTI
    ========================================================= */
 
-function renderPendingRequests(
-  requests
-) {
+function renderMyRequests(requests) {
 
-  const useful =
+  const rows =
     (requests || [])
       .filter(
         item =>
-          item.status === 'pending'
-          ||
-          item.status === 'active'
+          ['pending', 'active']
+            .includes(item.status)
       );
 
 
   pendingSection.hidden =
-    useful.length === 0;
+    rows.length === 0;
 
 
-  if (!useful.length) {
+  if (!rows.length) {
 
     pendingList.innerHTML =
       '';
@@ -437,30 +334,26 @@ function renderPendingRequests(
 
 
   pendingList.innerHTML =
-    useful
+    rows
       .map(
         item => {
 
-          const roles =
+          const roleBadges =
             (item.roles || [])
               .map(
                 role => {
 
-                  const status =
+                  const state =
                     role.status === 'approved'
                       ? '✓'
                       : role.status === 'rejected'
                         ? '×'
                         : '…';
 
-
-                  const teamName =
+                  const team =
                     role.team?.name
-                      ? ` · ${escapeHtml(
-                          role.team.name
-                        )}`
+                      ? ` · ${escapeHtml(role.team.name)}`
                       : '';
-
 
                   return `
                     <span class="badge ${
@@ -470,15 +363,12 @@ function renderPendingRequests(
                           ? 'warning'
                           : ''
                     }">
-                      ${status}
+                      ${state}
                       ${escapeHtml(
                         role.label
-                        ||
-                        roleLabel(
-                          role.role
-                        )
+                        || roleLabel(role.role)
                       )}
-                      ${teamName}
+                      ${team}
                     </span>
                   `;
                 }
@@ -487,9 +377,7 @@ function renderPendingRequests(
 
 
           return `
-
             <div class="list-row">
-
               <div class="list-row-main">
 
                 <div class="list-row-title">
@@ -513,11 +401,10 @@ function renderPendingRequests(
                     class="league-actions"
                     style="margin-top:8px"
                   >
-                    ${roles}
+                    ${roleBadges}
                   </div>
 
                 </div>
-
 
                 <span class="badge ${
                   item.status === 'active'
@@ -532,9 +419,7 @@ function renderPendingRequests(
                 </span>
 
               </div>
-
             </div>
-
           `;
         }
       )
@@ -552,23 +437,16 @@ async function loadMyRequests() {
           'getMyRequests'
       });
 
+    if (data?.ok) {
 
-    if (!data?.ok) {
-      return;
+      renderMyRequests(
+        data.requests || []
+      );
     }
-
-
-    renderPendingRequests(
-      data.requests
-      || []
-    );
-
 
   } catch (error) {
 
-    console.error(
-      error
-    );
+    console.error(error);
   }
 }
 
@@ -577,42 +455,33 @@ async function loadMyRequests() {
    PREVIEW LEGA
    ========================================================= */
 
-function resetRoleSelection() {
+function resetRequestForm() {
 
   rolePresident.checked =
     false;
 
-
   roleVice.checked =
     false;
-
 
   roleAuctioneer.checked =
     false;
 
-
   rolePresenter.checked =
     false;
-
 
   teamModeExisting.checked =
     true;
 
-
   teamModeCreate.checked =
     false;
-
 
   existingTeamSelect.value =
     '';
 
-
-  newTeamName.value =
+  newTeamNameInput.value =
     '';
 
-
-  resetStep3();
-
+  hideStep3();
 
   updateRolesUi();
 }
@@ -621,8 +490,7 @@ function resetRoleSelection() {
 function renderLeaguePreview() {
 
   const league =
-    previewData
-      ?.league;
+    previewData?.league;
 
 
   if (!league) {
@@ -630,8 +498,7 @@ function renderLeaguePreview() {
     rolesSection.hidden =
       true;
 
-
-    resetStep3();
+    hideStep3();
 
     return;
   }
@@ -640,21 +507,18 @@ function renderLeaguePreview() {
   rolesSection.hidden =
     false;
 
-
   previewLeagueName.textContent =
     league.name;
-
 
   previewLeagueCode.textContent =
     `Codice ${league.code}`;
 
 
-  resetRoleSelection();
+  resetRequestForm();
 
 
   const membership =
-    previewData
-      ?.existingMembership;
+    previewData.existingMembership;
 
 
   if (
@@ -666,10 +530,8 @@ function renderLeaguePreview() {
       'warning'
     );
 
-
     rolesContinueButton.disabled =
       true;
-
 
   } else if (
     membership?.status === 'active'
@@ -680,16 +542,13 @@ function renderLeaguePreview() {
       'success'
     );
 
-
     rolesContinueButton.disabled =
       true;
-
 
   } else {
 
     rolesContinueButton.disabled =
       false;
-
 
     showMessage('');
   }
@@ -710,15 +569,12 @@ function updateRolesUi() {
   const roles =
     selectedRoles();
 
-
-  const teamRequired =
-    requiresTeam(
-      roles
-    );
+  const needsTeam =
+    requiresTeam(roles);
 
 
   rolesContinueButton.textContent =
-    teamRequired
+    needsTeam
       ? 'Continua alla squadra'
       : 'Continua';
 
@@ -728,12 +584,10 @@ function updateRolesUi() {
     rolesHelp.textContent =
       'Seleziona almeno un ruolo. Presidente e Vice richiedono una squadra; Banditore e Presentatore no.';
 
-
-  } else if (teamRequired) {
+  } else if (needsTeam) {
 
     rolesHelp.textContent =
       'Hai selezionato Presidente o Vice: nel prossimo passaggio dovrai indicare la squadra.';
-
 
   } else {
 
@@ -742,167 +596,132 @@ function updateRolesUi() {
   }
 
 
-  resetStep3();
+  hideStep3();
 }
 
 
-rolePresident
-  ?.addEventListener(
-    'change',
-    () => {
+rolePresident.addEventListener(
+  'change',
+  () => {
 
-      if (
-        rolePresident.checked
-        &&
-        roleVice.checked
-      ) {
+    if (
+      rolePresident.checked
+      &&
+      roleVice.checked
+    ) {
 
-        roleVice.checked =
-          false;
-      }
-
-
-      updateRolesUi();
+      roleVice.checked =
+        false;
     }
-  );
+
+    updateRolesUi();
+  }
+);
 
 
-roleVice
-  ?.addEventListener(
-    'change',
-    () => {
+roleVice.addEventListener(
+  'change',
+  () => {
 
-      if (
-        roleVice.checked
-        &&
-        rolePresident.checked
-      ) {
+    if (
+      roleVice.checked
+      &&
+      rolePresident.checked
+    ) {
 
-        rolePresident.checked =
-          false;
-      }
-
-
-      updateRolesUi();
+      rolePresident.checked =
+        false;
     }
-  );
+
+    updateRolesUi();
+  }
+);
 
 
-roleAuctioneer
-  ?.addEventListener(
-    'change',
-    updateRolesUi
-  );
+roleAuctioneer.addEventListener(
+  'change',
+  updateRolesUi
+);
 
 
-rolePresenter
-  ?.addEventListener(
-    'change',
-    updateRolesUi
-  );
+rolePresenter.addEventListener(
+  'change',
+  updateRolesUi
+);
 
 
-/* =========================================================
-   CONTINUA DOPO I RUOLI
-   ========================================================= */
+rolesContinueButton.addEventListener(
+  'click',
+  () => {
 
-rolesContinueButton
-  ?.addEventListener(
-    'click',
-    () => {
-
-      const roles =
-        selectedRoles();
+    const roles =
+      selectedRoles();
 
 
-      if (!roles.length) {
+    if (!roles.length) {
 
-        showMessage(
-          'Seleziona almeno un ruolo.',
-          'error'
-        );
+      showMessage(
+        'Seleziona almeno un ruolo.',
+        'error'
+      );
 
-        return;
-      }
-
-
-      showMessage('');
-
-
-      if (
-        requiresTeam(
-          roles
-        )
-      ) {
-
-        renderTeamStep(
-          roles
-        );
-
-
-      } else {
-
-        renderNoTeamConfirmation(
-          roles
-        );
-      }
+      return;
     }
-  );
+
+
+    showMessage('');
+
+
+    if (requiresTeam(roles)) {
+
+      renderTeamStep(roles);
+
+    } else {
+
+      renderNoTeamConfirmation(
+        roles
+      );
+    }
+  }
+);
 
 
 /* =========================================================
    STEP SQUADRA
    ========================================================= */
 
-function renderTeamOptions(
-  roles
-) {
-
-  if (!previewData) {
-    return;
-  }
-
-
-  const presidentSelected =
-    roles.includes(
-      'president'
-    );
-
-
-  const viceSelected =
-    roles.includes(
-      'vice'
-    );
-
+function renderTeamOptions(roles) {
 
   const teams =
-    previewData.teams
-    || [];
+    previewData?.teams || [];
+
+  const wantsPresident =
+    roles.includes('president');
+
+  const wantsVice =
+    roles.includes('vice');
 
 
   const eligible =
-    teams
-      .filter(
-        team => {
+    teams.filter(
+      team => {
 
-          if (presidentSelected) {
+        if (wantsPresident) {
 
-            return !team.hasPresident;
-          }
-
-
-          if (viceSelected) {
-
-            return team.hasPresident
-              &&
-              team.presidentStatus
-              === 'active';
-          }
-
-
-          return false;
+          return !team.hasPresident;
         }
-      );
+
+        if (wantsVice) {
+
+          return team.hasPresident
+            &&
+            team.presidentStatus
+            === 'active';
+        }
+
+        return false;
+      }
+    );
 
 
   existingTeamSelect.innerHTML =
@@ -915,69 +734,51 @@ function renderTeamOptions(
     eligible
       .map(
         team => `
-
           <option
-            value="${escapeHtml(
-              team.id
-            )}"
+            value="${escapeHtml(team.id)}"
           >
-            ${escapeHtml(
-              team.name
-            )}
+            ${escapeHtml(team.name)}
             ${
               team.hasPresident
                 ? ' · Presidente presente'
                 : ' · senza Presidente'
             }
           </option>
-
         `
       )
       .join('');
 }
 
 
-function renderTeamStep(
-  roles
-) {
+function renderTeamStep(roles) {
 
-  const presidentSelected =
-    roles.includes(
-      'president'
-    );
+  const wantsPresident =
+    roles.includes('president');
 
-
-  const viceSelected =
-    roles.includes(
-      'vice'
-    );
+  const wantsVice =
+    roles.includes('vice');
 
 
   noTeamConfirmSection.hidden =
     true;
 
-
   teamSection.hidden =
     false;
 
-
   teamCreateChoice.hidden =
-    !presidentSelected;
+    !wantsPresident;
 
 
-  if (viceSelected) {
+  if (wantsVice) {
 
     teamModeExisting.checked =
       true;
 
-
     teamModeCreate.checked =
       false;
 
-
     teamStepDescription.textContent =
       'Scegli la squadra del Presidente che vuoi affiancare.';
-
 
   } else {
 
@@ -988,11 +789,7 @@ function renderTeamStep(
 
   renderTeamMode();
 
-
-  renderTeamOptions(
-    roles
-  );
-
+  renderTeamOptions(roles);
 
   scrollToSection(
     teamSection
@@ -1005,112 +802,93 @@ function renderTeamMode() {
   const create =
     teamModeCreate.checked;
 
-
   existingTeamArea.hidden =
     create;
-
 
   newTeamArea.hidden =
     !create;
 }
 
 
-teamModeExisting
-  ?.addEventListener(
-    'change',
-    renderTeamMode
-  );
+teamModeExisting.addEventListener(
+  'change',
+  renderTeamMode
+);
 
 
-teamModeCreate
-  ?.addEventListener(
-    'change',
-    renderTeamMode
-  );
+teamModeCreate.addEventListener(
+  'change',
+  renderTeamMode
+);
 
 
-teamBackButton
-  ?.addEventListener(
-    'click',
-    () => {
+teamBackButton.addEventListener(
+  'click',
+  () => {
 
-      teamSection.hidden =
-        true;
+    teamSection.hidden =
+      true;
 
-
-      scrollToSection(
-        rolesSection
-      );
-    }
-  );
+    scrollToSection(
+      rolesSection
+    );
+  }
+);
 
 
 /* =========================================================
    CONFERMA SENZA SQUADRA
    ========================================================= */
 
-function renderNoTeamConfirmation(
-  roles
-) {
+function renderNoTeamConfirmation(roles) {
 
   teamSection.hidden =
     true;
-
 
   noTeamConfirmSection.hidden =
     false;
 
 
-  noTeamSummary.innerHTML =
-    `
+  noTeamSummary.innerHTML = `
+    <div class="list-row">
+      <div class="list-row-main">
 
-      <div class="list-row">
+        <div class="list-row-title">
 
-        <div class="list-row-main">
+          <strong>
+            ${escapeHtml(
+              previewData?.league?.name
+              || 'Lega'
+            )}
+          </strong>
 
-          <div class="list-row-title">
+          <small>
+            Nessuna squadra richiesta
+          </small>
 
-            <strong>
-              ${escapeHtml(
-                previewData
-                  ?.league
-                  ?.name
-                || 'Lega'
-              )}
-            </strong>
+        </div>
 
-            <small>
-              Nessuna squadra richiesta
-            </small>
+        <div class="league-actions">
 
-          </div>
-
-
-          <div class="league-actions">
-
-            ${
-              roles
-                .map(
-                  role => `
-                    <span class="badge good">
-                      ${escapeHtml(
-                        roleLabel(
-                          role
-                        )
-                      )}
-                    </span>
-                  `
-                )
-                .join('')
-            }
-
-          </div>
+          ${
+            roles
+              .map(
+                role => `
+                  <span class="badge good">
+                    ${escapeHtml(
+                      roleLabel(role)
+                    )}
+                  </span>
+                `
+              )
+              .join('')
+          }
 
         </div>
 
       </div>
-
-    `;
+    </div>
+  `;
 
 
   scrollToSection(
@@ -1119,24 +897,22 @@ function renderNoTeamConfirmation(
 }
 
 
-noTeamBackButton
-  ?.addEventListener(
-    'click',
-    () => {
+noTeamBackButton.addEventListener(
+  'click',
+  () => {
 
-      noTeamConfirmSection.hidden =
-        true;
+    noTeamConfirmSection.hidden =
+      true;
 
-
-      scrollToSection(
-        rolesSection
-      );
-    }
-  );
+    scrollToSection(
+      rolesSection
+    );
+  }
+);
 
 
 /* =========================================================
-   PREVIEW CODICE
+   CERCA LEGA
    ========================================================= */
 
 async function previewLeague() {
@@ -1161,14 +937,11 @@ async function previewLeague() {
   previewButton.disabled =
     true;
 
-
   const oldText =
     previewButton.textContent;
 
-
   previewButton.textContent =
     'Controllo...';
-
 
   showMessage('');
 
@@ -1177,7 +950,6 @@ async function previewLeague() {
 
     const data =
       await onboardingApi({
-
         action:
           'previewLeague',
 
@@ -1198,31 +970,23 @@ async function previewLeague() {
     previewData =
       data;
 
-
     leagueCode.value =
       data.league.code;
-
 
     renderLeaguePreview();
 
 
   } catch (error) {
 
-    console.error(
-      error
-    );
-
+    console.error(error);
 
     previewData =
       null;
 
-
     rolesSection.hidden =
       true;
 
-
-    resetStep3();
-
+    hideStep3();
 
     showMessage(
       error.message
@@ -1237,85 +1001,75 @@ async function previewLeague() {
     previewButton.disabled =
       false;
 
-
     previewButton.textContent =
       oldText;
   }
 }
 
 
-previewButton
-  ?.addEventListener(
-    'click',
-    previewLeague
-  );
+previewButton.addEventListener(
+  'click',
+  previewLeague
+);
 
 
-leagueCode
-  ?.addEventListener(
-    'keydown',
-    event => {
+leagueCode.addEventListener(
+  'keydown',
+  event => {
 
-      if (
-        event.key === 'Enter'
-      ) {
+    if (event.key === 'Enter') {
 
-        event.preventDefault();
+      event.preventDefault();
 
-        previewLeague();
-      }
+      previewLeague();
     }
-  );
+  }
+);
 
 
-leagueCode
-  ?.addEventListener(
-    'input',
-    () => {
+leagueCode.addEventListener(
+  'input',
+  () => {
 
-      leagueCode.value =
-        leagueCode.value
-          .toUpperCase();
-
-
-      if (
-        previewData
-        &&
-        leagueCode.value
-          .trim()
-          .toUpperCase()
-        !==
-        String(
-          previewData
-            .league
-            .code
-        )
-          .trim()
-          .toUpperCase()
-      ) {
-
-        previewData =
-          null;
+    leagueCode.value =
+      leagueCode.value
+        .toUpperCase();
 
 
-        rolesSection.hidden =
-          true;
+    if (
+      previewData
+      &&
+      leagueCode.value
+        .trim()
+        .toUpperCase()
+      !==
+      String(
+        previewData.league.code
+      )
+        .trim()
+        .toUpperCase()
+    ) {
 
+      previewData =
+        null;
 
-        resetStep3();
-      }
+      rolesSection.hidden =
+        true;
+
+      hideStep3();
     }
-  );
+  }
+);
 
 
 /* =========================================================
-   SUBMIT COMUNE
+   INVIA RICHIESTA
    ========================================================= */
 
 async function submitJoinRequest({
   teamMode = 'none',
   teamId = null,
-  newTeamName = null,
+  requestedTeamName = null,
   button
 }) {
 
@@ -1345,25 +1099,15 @@ async function submitJoinRequest({
   }
 
 
-  /*
-   * Se non ci sono Presidente/Vice,
-   * la richiesta parte obbligatoriamente senza squadra.
-   */
-  if (
-    !requiresTeam(
-      roles
-    )
-  ) {
+  if (!requiresTeam(roles)) {
 
     teamMode =
       'none';
 
-
     teamId =
       null;
 
-
-    newTeamName =
+    requestedTeamName =
       null;
   }
 
@@ -1371,14 +1115,11 @@ async function submitJoinRequest({
   button.disabled =
     true;
 
-
   const oldText =
     button.textContent;
 
-
   button.textContent =
     'Invio...';
-
 
   showMessage('');
 
@@ -1387,14 +1128,11 @@ async function submitJoinRequest({
 
     const result =
       await onboardingApi({
-
         action:
           'submitJoinRequest',
 
         code:
-          previewData
-            .league
-            .code,
+          previewData.league.code,
 
         roles,
 
@@ -1402,7 +1140,8 @@ async function submitJoinRequest({
 
         teamId,
 
-        newTeamName
+        newTeamName:
+          requestedTeamName
       });
 
 
@@ -1425,43 +1164,36 @@ async function submitJoinRequest({
     previewData =
       null;
 
-
     rolesSection.hidden =
       true;
 
-
-    resetStep3();
-
+    hideStep3();
 
     rolePresident.checked =
       false;
 
-
     roleVice.checked =
       false;
-
 
     roleAuctioneer.checked =
       false;
 
-
     rolePresenter.checked =
       false;
-
 
     teamModeExisting.checked =
       true;
 
-
     teamModeCreate.checked =
       false;
-
 
     existingTeamSelect.value =
       '';
 
+    newTeamNameInput.value =
+      '';
 
-    newTeamName.value =
+    leagueCode.value =
       '';
 
 
@@ -1477,10 +1209,7 @@ async function submitJoinRequest({
 
   } catch (error) {
 
-    console.error(
-      error
-    );
-
+    console.error(error);
 
     showMessage(
       error.message
@@ -1495,137 +1224,44 @@ async function submitJoinRequest({
     button.disabled =
       false;
 
-
     button.textContent =
       oldText;
   }
 }
 
 
-/* =========================================================
-   SUBMIT CON SQUADRA
-   ========================================================= */
+submitTeamRequestButton.addEventListener(
+  'click',
+  async () => {
 
-submitTeamRequestButton
-  ?.addEventListener(
-    'click',
-    async () => {
-
-      const roles =
-        selectedRoles();
+    const roles =
+      selectedRoles();
 
 
-      if (
-        !requiresTeam(
-          roles
-        )
-      ) {
+    if (!requiresTeam(roles)) {
 
-        showMessage(
-          'La selezione dei ruoli è cambiata. Torna allo step Ruoli.',
-          'error'
-        );
+      showMessage(
+        'La selezione dei ruoli è cambiata. Torna allo step Ruoli.',
+        'error'
+      );
 
-        return;
-      }
-
-
-      if (
-        teamModeCreate.checked
-      ) {
-
-        const requestedTeamName =
-          newTeamName.value
-            .trim();
-
-
-        if (
-          requestedTeamName.length < 2
-        ) {
-
-          showMessage(
-            'Inserisci il nome della nuova squadra.',
-            'error'
-          );
-
-          return;
-        }
-
-
-        await submitJoinRequest({
-
-          teamMode:
-            'create',
-
-          teamId:
-            null,
-
-          newTeamName:
-            requestedTeamName,
-
-          button:
-            submitTeamRequestButton
-        });
-
-
-        return;
-      }
-
-
-      const teamId =
-        existingTeamSelect.value
-        || null;
-
-
-      if (!teamId) {
-
-        showMessage(
-          'Seleziona una squadra.',
-          'error'
-        );
-
-        return;
-      }
-
-
-      await submitJoinRequest({
-
-        teamMode:
-          'existing',
-
-        teamId,
-
-        newTeamName:
-          null,
-
-        button:
-          submitTeamRequestButton
-      });
+      return;
     }
-  );
 
 
-/* =========================================================
-   SUBMIT SENZA SQUADRA
-   ========================================================= */
+    if (teamModeCreate.checked) {
 
-submitNoTeamRequestButton
-  ?.addEventListener(
-    'click',
-    async () => {
-
-      const roles =
-        selectedRoles();
+      const requestedTeamName =
+        newTeamNameInput.value
+          .trim();
 
 
       if (
-        requiresTeam(
-          roles
-        )
+        requestedTeamName.length < 2
       ) {
 
         showMessage(
-          'Hai selezionato Presidente o Vice: devi indicare una squadra.',
+          'Inserisci il nome della nuova squadra.',
           'error'
         );
 
@@ -1634,25 +1270,92 @@ submitNoTeamRequestButton
 
 
       await submitJoinRequest({
-
         teamMode:
-          'none',
+          'create',
 
         teamId:
           null,
 
-        newTeamName:
-          null,
+        requestedTeamName,
 
         button:
-          submitNoTeamRequestButton
+          submitTeamRequestButton
       });
+
+      return;
     }
-  );
+
+
+    const teamId =
+      existingTeamSelect.value
+      || null;
+
+
+    if (!teamId) {
+
+      showMessage(
+        'Seleziona una squadra.',
+        'error'
+      );
+
+      return;
+    }
+
+
+    await submitJoinRequest({
+      teamMode:
+        'existing',
+
+      teamId,
+
+      requestedTeamName:
+        null,
+
+      button:
+        submitTeamRequestButton
+    });
+  }
+);
+
+
+submitNoTeamRequestButton.addEventListener(
+  'click',
+  async () => {
+
+    const roles =
+      selectedRoles();
+
+
+    if (requiresTeam(roles)) {
+
+      showMessage(
+        'Hai selezionato Presidente o Vice: devi indicare una squadra.',
+        'error'
+      );
+
+      return;
+    }
+
+
+    await submitJoinRequest({
+      teamMode:
+        'none',
+
+      teamId:
+        null,
+
+      requestedTeamName:
+        null,
+
+      button:
+        submitNoTeamRequestButton
+    });
+  }
+);
 
 
 /* =========================================================
-   BOOT
+   START
    ========================================================= */
 
 if (!getSession()?.token) {
