@@ -2,33 +2,51 @@
 <html lang="it">
 
 <head>
+
   <meta charset="UTF-8">
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>Listone - Fantacalcio Live</title>
+  <title>Rose - Fantacalcio Live</title>
 
   <link
     rel="stylesheet"
     href="style.css?v=24"
   >
+
 </head>
+
 
 <body>
 
 <main class="page-shell">
 
+
   <header class="page-header">
+
     <div>
-      <h1 id="league-title">Listone</h1>
-      <p id="league-subtitle">Caricamento...</p>
+
+      <h1 id="league-title">
+        Rose
+      </h1>
+
+      <p id="league-subtitle">
+        Caricamento...
+      </p>
+
     </div>
 
-    <a class="back-home" href="league.html">
+
+    <a
+      class="back-home"
+      href="league.html"
+    >
       ← Lega
     </a>
+
   </header>
 
 
@@ -42,26 +60,30 @@
       <span class="tab-description">Dashboard</span>
     </a>
 
+
     <a href="league-auction.html" class="tab">
       <span class="tab-title">Asta</span>
       <span class="tab-description">Live</span>
     </a>
 
+
     <a
       href="league-rosters.html"
-      class="tab"
+      class="tab active"
     >
       <span class="tab-title">Rose</span>
       <span class="tab-description">Squadre</span>
     </a>
 
+
     <a
       href="league-list.html"
-      class="tab active"
+      class="tab"
     >
       <span class="tab-title">Listone</span>
       <span class="tab-description">Giocatori</span>
     </a>
+
 
     <a
       id="setup-tab"
@@ -83,496 +105,95 @@
   ></p>
 
 
-  <!-- =====================================================
-       IMPORT LISTONE - ADMIN LEGA
-       ===================================================== -->
-
-  <section
-    id="list-import-section"
-    class="card"
-    hidden
-  >
+  <section class="card">
 
     <div class="section-heading">
-      <span class="section-label">IMPORT</span>
+
+      <span class="section-label">
+        ROSTER
+      </span>
 
       <div>
-        <h2>Carica listone</h2>
-        <p>XLSX o CSV Fantaculo</p>
-      </div>
-    </div>
-
-
-    <form id="list-import-form">
-
-      <div class="form-grid">
-
-        <label class="form-field">
-          File
-
-          <input
-            id="list-file"
-            type="file"
-            accept=".xlsx,.xls,.csv,text/csv"
-            required
-          >
-        </label>
-
-
-        <label class="form-field">
-          Data di riferimento
-
-          <input
-            id="list-reference-date"
-            type="date"
-            required
-          >
-        </label>
-
+        <h2>Situazione lega</h2>
+        <p>Budget e giocatori assegnati</p>
       </div>
 
-
-      <p class="setting-help">
-        Un nuovo caricamento sostituisce il listone precedente
-        soltanto quando l'import è terminato correttamente.
-      </p>
-
-
-      <button
-        id="list-import-button"
-        type="submit"
-      >
-        Importa listone
-      </button>
-
-
-      <p
-        id="list-import-progress"
-        class="setting-help"
-      ></p>
-
-    </form>
-
-  </section>
-
-
-  <!-- =====================================================
-       INFO LISTONE
-       ===================================================== -->
-
-  <section
-    id="import-info"
-    class="card"
-    hidden
-  >
-
-    <div class="section-heading">
-      <span class="section-label">FILE</span>
-
-      <div>
-        <h2>Listone corrente</h2>
-        <p>Snapshot utilizzato dalla lega</p>
-      </div>
     </div>
 
 
     <div class="stats-grid">
 
       <div class="stat-card">
-        <span class="stat-label">Giocatori</span>
-        <span id="players-count" class="stat-value">0</span>
+
+        <span class="stat-label">
+          Squadre
+        </span>
+
+        <span
+          id="league-team-count"
+          class="stat-value"
+        >
+          —
+        </span>
+
       </div>
 
+
       <div class="stat-card">
-        <span class="stat-label">Formato</span>
-        <span id="fantasy-mode" class="stat-value">—</span>
+
+        <span class="stat-label">
+          Giocatori assegnati
+        </span>
+
+        <span
+          id="league-player-count"
+          class="stat-value"
+        >
+          —
+        </span>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <span class="stat-label">
+          Crediti spesi
+        </span>
+
+        <span
+          id="league-spent"
+          class="stat-value"
+        >
+          —
+        </span>
+
       </div>
 
     </div>
 
-
-    <p
-      id="import-details"
-      class="setting-help"
-    ></p>
-
   </section>
 
-
-  <!-- =====================================================
-       LISTONE COMPATTO
-       ===================================================== -->
 
   <section class="card">
 
     <div class="section-heading">
-      <span class="section-label">LIST</span>
+
+      <span class="section-label">
+        TEAM
+      </span>
 
       <div>
-        <h2>Giocatori</h2>
-        <p>Confronto rapido dei valori utili durante l'asta</p>
-      </div>
-    </div>
-
-
-    <div
-      id="role-filter-bar"
-      class="role-filter-bar"
-      hidden
-      aria-label="Filtro ruolo"
-    ></div>
-
-
-    <div
-      id="player-filter-grid"
-      class="player-filter-grid"
-      hidden
-    >
-
-      <label class="player-filter-field">
-        Cerca
-
-        <input
-          id="player-search"
-          type="search"
-          placeholder="Calciatore o squadra..."
-          autocomplete="off"
-        >
-      </label>
-
-
-      <label class="player-filter-field">
-        Squadra
-
-        <select id="player-team-filter">
-          <option value="all">Tutte</option>
-        </select>
-      </label>
-
-
-      <label class="player-filter-field">
-        Slot
-
-        <select id="player-slot-filter">
-          <option value="all">Tutti</option>
-        </select>
-      </label>
-
-
-      <label class="player-filter-field">
-        Segnalazioni
-
-        <select id="player-flag-filter">
-          <option value="all">Tutte</option>
-          <option value="market">Mercato</option>
-          <option value="injury">Indisponibili / rientro incerto</option>
-          <option value="new">Nuovi arrivi</option>
-          <option value="penalties">Possibili rigoristi</option>
-        </select>
-      </label>
-
-
-      <button
-        id="player-filter-reset"
-        class="secondary player-filter-reset"
-        type="button"
-      >
-        Azzera filtri
-      </button>
-
-    </div>
-
-
-    <div
-      id="player-count-line"
-      class="player-count-line"
-      hidden
-    >
-      <span id="filtered-count"></span>
-      <span>Click sulla riga per i dettagli</span>
-    </div>
-
-
-    <div
-      id="player-table-wrap"
-      class="player-table-wrap"
-      hidden
-    >
-
-      <table class="player-table">
-
-        <colgroup>
-          <col class="player-col-name">
-          <col class="player-col-team">
-          <col class="player-col-slot">
-          <col class="player-col-pma">
-          <col class="player-col-pfc">
-          <col class="player-col-delta">
-          <col class="player-col-fm">
-          <col class="player-col-tit">
-        </colgroup>
-
-        <thead>
-          <tr>
-
-            <th>
-              <button
-                class="player-sort-button active"
-                type="button"
-                data-sort="name"
-              >
-                Calciatore
-                <span class="player-sort-indicator">↑</span>
-              </button>
-            </th>
-
-            <th>
-              <button
-                class="player-sort-button"
-                type="button"
-                data-sort="team"
-              >
-                Squadra
-                <span class="player-sort-indicator">↕</span>
-              </button>
-            </th>
-
-            <th>
-              <button
-                class="player-sort-button"
-                type="button"
-                data-sort="slot"
-              >
-                Slot
-                <span class="player-sort-indicator">↕</span>
-              </button>
-            </th>
-
-            <th>
-              <button
-                class="player-sort-button"
-                type="button"
-                data-sort="pma"
-              >
-                PMA
-                <span class="player-sort-indicator">↕</span>
-              </button>
-            </th>
-
-            <th>
-              <button
-                class="player-sort-button"
-                type="button"
-                data-sort="pfc"
-              >
-                PFC
-                <span class="player-sort-indicator">↕</span>
-              </button>
-            </th>
-
-            <th>
-              <button
-                class="player-sort-button"
-                type="button"
-                data-sort="delta"
-              >
-                Δ PFC-PMA
-                <span class="player-sort-indicator">↕</span>
-              </button>
-            </th>
-
-            <th>
-              <button
-                class="player-sort-button"
-                type="button"
-                data-sort="fm"
-              >
-                Exp. FM
-                <span class="player-sort-indicator">↕</span>
-              </button>
-            </th>
-
-            <th>
-              <button
-                class="player-sort-button"
-                type="button"
-                data-sort="tit"
-              >
-                Exp. Tit.
-                <span class="player-sort-indicator">↕</span>
-              </button>
-            </th>
-
-          </tr>
-        </thead>
-
-        <tbody id="players-table-body"></tbody>
-
-      </table>
-
-    </div>
-
-
-    <div
-      id="players-empty"
-      class="empty-state"
-    >
-      Nessun listone importato.
-    </div>
-
-  </section>
-
-
-  <!-- =====================================================
-       SUPER ADMIN - NAZIONALITA'
-       ===================================================== -->
-
-  <section
-    id="superadmin-nationality-section"
-    class="card"
-    hidden
-  >
-
-    <div class="section-heading">
-      <span class="section-label">ISO</span>
-
-      <div>
-        <h2>Nazionalità giocatori</h2>
-        <p>Area riservata al Super Admin</p>
-      </div>
-    </div>
-
-
-    <p class="setting-help">
-      La ricerca usa una fonte strutturata pubblica e salva il codice ISO
-      nel database. Le corrispondenze dubbie vengono lasciate da verificare,
-      invece di mostrare automaticamente una bandiera potenzialmente errata.
-    </p>
-
-
-    <div class="player-nationality-tools">
-
-      <button
-        id="nationality-enrich-button"
-        type="button"
-      >
-        Cerca nazionalità mancanti
-      </button>
-
-      <span
-        id="nationality-progress"
-        class="setting-help"
-      ></span>
-
-    </div>
-
-  </section>
-
-
-  <!-- =====================================================
-       SUPER ADMIN - DATI SUGGERITORE
-       ===================================================== -->
-
-  <section
-    id="superadmin-stats-section"
-    class="card"
-    hidden
-  >
-
-    <div class="section-heading">
-      <span class="section-label">ENGINE</span>
-
-      <div>
-        <h2>Statistiche motore suggerimenti</h2>
-        <p>Area riservata al Super Admin</p>
-      </div>
-    </div>
-
-
-    <p class="setting-help">
-      Questi dataset non vengono mostrati direttamente ai partecipanti.
-      Verranno usati dal futuro motore di calcolo per valutazioni e
-      suggerimenti durante l'asta.
-    </p>
-
-
-    <form id="advisory-import-form">
-
-      <div class="form-grid">
-
-        <label class="form-field">
-          Nome dataset
-
-          <input
-            id="advisory-label"
-            type="text"
-            maxlength="100"
-            placeholder="Es. Medie aste 8 partecipanti"
-            required
-          >
-        </label>
-
-
-        <label class="form-field">
-          Stagione
-
-          <input
-            id="advisory-season"
-            type="text"
-            maxlength="20"
-            placeholder="2026/27"
-          >
-        </label>
-
-
-        <label class="form-field">
-          Data di riferimento
-
-          <input
-            id="advisory-reference-date"
-            type="date"
-          >
-        </label>
-
-
-        <label class="form-field">
-          XLSX o CSV
-
-          <input
-            id="advisory-file"
-            type="file"
-            accept=".xlsx,.xls,.csv,text/csv"
-            required
-          >
-        </label>
-
+        <h2>Rose</h2>
+        <p>Situazione aggiornata squadra per squadra</p>
       </div>
 
+    </div>
 
-      <button
-        id="advisory-import-button"
-        type="submit"
-      >
-        Importa statistiche
-      </button>
-
-
-      <p
-        id="advisory-progress"
-        class="setting-help"
-      ></p>
-
-    </form>
-
-
-    <div class="divider"></div>
-
-
-    <h3>Dataset importati</h3>
 
     <div
-      id="advisory-datasets"
-      class="list"
+      id="rosters-board"
+      class="rosters-board"
     ></div>
 
   </section>
@@ -581,12 +202,7 @@
 </main>
 
 
-<script
-  src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"
-></script>
-
-<script src="league-list.js?v=6"></script>
-<script src="league-list-permissions.js?v=1"></script>
+<script src="league-rosters.js?v=1"></script>
 
 </body>
 
