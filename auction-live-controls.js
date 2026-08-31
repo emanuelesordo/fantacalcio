@@ -1,604 +1,701 @@
-/* auction-live-controls.js
-   Timer server-side, HOLD e rilanci a turno.
-*/
+<!DOCTYPE html>
+<html lang="it">
 
-const liveUi = {
-  panel: document.getElementById('live-control-panel'),
-  timerValue: document.getElementById('live-timer-value'),
-  timerStatus: document.getElementById('live-timer-status'),
-  turnBadge: document.getElementById('live-turn-badge'),
-  passBadge: document.getElementById('live-pass-badge'),
-  hold: document.getElementById('live-hold-button'),
-  controls: document.getElementById('live-president-controls'),
-  bidAmount: document.getElementById('live-bid-amount'),
-  bid: document.getElementById('live-bid-button'),
-  turnActions: document.getElementById('live-turn-actions'),
-  pass: document.getElementById('live-pass-button'),
-  abandon: document.getElementById('live-abandon-button'),
-  help: document.getElementById('live-action-help')
-};
+<head>
 
-let liveServerOffsetMs = 0;
-let liveTimerSyncing = false;
-let livePolling = false;
-let liveLastBid = null;
+  <meta charset="UTF-8">
 
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-function liveSession() {
-  return auctionData?.auctionSession || null;
-}
+  <title>Asta - Fantacalcio Live</title>
 
+  <link
+    rel="stylesheet"
+    href="style.css?v=20"
+  >
 
-function liveSettings() {
-  return liveSession()?.setup_snapshot || auctionData?.settings || {};
-}
+</head>
 
 
-function liveBidMode() {
-  return liveSettings()?.bid_mode || 'wild';
-}
+<body>
 
+<main class="page-shell">
 
-function liveMyTeamId() {
-  return auctionData?.myTeam?.teamId || null;
-}
 
+  <header class="page-header">
 
-function liveCurrentTurnTeam() {
-  return auctionData?.currentTurnTeam || null;
-}
+    <div>
+      <h1 id="league-title">Asta</h1>
+      <p id="league-subtitle">Caricamento...</p>
+    </div>
 
+    <a
+      class="back-home"
+      href="league.html"
+    >
+      ← Lega
+    </a>
 
-function liveIsController() {
-  return auctionData?.permissions?.canControlAuction === true;
-}
+  </header>
 
 
-function liveIsPresident() {
-  return auctionData?.permissions?.isPresident === true;
-}
+  <nav class="tabs league-tabs">
 
+    <a href="league.html" class="tab">
+      <span class="tab-title">Home</span>
+      <span class="tab-description">Dashboard</span>
+    </a>
 
-function liveTeamState(teamId) {
-  return (auctionData?.teamOrder || [])
-    .find(item => item.team_id === teamId) || null;
-}
+    <a
+      href="league-auction.html"
+      class="tab active"
+    >
+      <span class="tab-title">Asta</span>
+      <span class="tab-description">Live</span>
+    </a>
 
+    <a href="league-rosters.html" class="tab">
+      <span class="tab-title">Rose</span>
+      <span class="tab-description">Squadre</span>
+    </a>
 
-function updateLiveServerOffset() {
-  const serverNow = Date.parse(auctionData?.serverNow || '');
+    <a href="league-list.html" class="tab">
+      <span class="tab-title">Listone</span>
+      <span class="tab-description">Giocatori</span>
+    </a>
 
-  if (Number.isFinite(serverNow)) {
-    liveServerOffsetMs = serverNow - Date.now();
-  }
-}
+    <a
+      id="setup-tab"
+      href="league-setup.html"
+      class="tab"
+      hidden
+    >
+      <span class="tab-title">Setup</span>
+      <span class="tab-description">Configurazione</span>
+    </a>
 
+  </nav>
 
-function liveNowMs() {
-  return Date.now() + liveServerOffsetMs;
-}
 
+  <p
+    id="page-message"
+    class="message"
+    aria-live="polite"
+  ></p>
 
-function liveRemainingMs() {
-  const session = liveSession();
 
-  if (!session) return null;
+  <section class="card">
 
-  if (session.hold_active === true) {
-    const seconds = Number(session.hold_remaining_seconds);
+    <div class="section-heading">
 
-    return Number.isFinite(seconds)
-      ? Math.max(0, seconds * 1000)
-      : null;
-  }
+      <span class="section-label">
+        ASTA
+      </span>
 
-  if (!session.timer_deadline) return null;
+      <div>
+        <h2 id="auction-phase-title">
+          Preparazione
+        </h2>
 
-  const deadline = Date.parse(session.timer_deadline);
+        <p id="auction-phase-subtitle">
+          Controlli prima dell’avvio
+        </p>
+      </div>
 
-  return Number.isFinite(deadline)
-    ? Math.max(0, deadline - liveNowMs())
-    : null;
-}
+    </div>
 
 
-function formatLiveTimer(milliseconds) {
-  if (milliseconds === null || milliseconds === undefined) {
-    return '—';
-  }
+    <div
+      id="auction-status-line"
+      class="league-actions"
+    ></div>
 
-  return `${Math.max(0, Math.ceil(milliseconds / 1000))}s`;
-}
 
+    <p
+      id="auction-blockers"
+      class="setting-help"
+    ></p>
 
-async function syncExpiredLiveTimer() {
-  const session = liveSession();
 
-  if (
-    !session
-    || liveTimerSyncing
-    || session.status !== 'live'
-    || session.hold_active === true
-    || session.timer_expired_at
-    || !session.timer_deadline
-  ) {
-    return;
-  }
+    <div
+      id="auction-control-area"
+      class="league-actions"
+      hidden
+    >
 
-  const remaining = liveRemainingMs();
+      <button
+        id="prepare-auction-button"
+        type="button"
+      >
+        Prepara asta
+      </button>
 
-  if (remaining === null || remaining > 0) return;
 
-  liveTimerSyncing = true;
+      <button
+        id="prepare-test-auction-button"
+        type="button"
+        class="secondary"
+      >
+        Test
+      </button>
 
-  try {
-    const result = await callApi({
-      action: 'syncTimer',
-      sessionId: session.id
-    });
+    </div>
 
-    if (result?.ok) {
-      await refreshLiveAuctionState();
-    }
-  } catch (error) {
-    console.error(error);
-  } finally {
-    liveTimerSyncing = false;
-  }
-}
+  </section>
 
 
-function renderLiveTimer() {
-  if (!liveUi.timerValue || !liveUi.timerStatus) return;
+  <div
+    id="lobby-grid"
+    class="form-grid"
+  >
 
-  const session = liveSession();
 
-  if (!session || session.status !== 'live') {
-    liveUi.timerValue.textContent = '—';
-    liveUi.timerStatus.textContent = 'In attesa';
-    return;
-  }
+    <section class="card">
 
-  if (session.hold_active === true) {
-    liveUi.timerValue.textContent = formatLiveTimer(liveRemainingMs());
-    liveUi.timerStatus.textContent = 'HOLD — timer sospeso';
-    return;
-  }
+      <div class="section-heading">
 
-  if (session.timer_expired_at) {
-    liveUi.timerValue.textContent = '0s';
-    liveUi.timerStatus.textContent =
-      'TIMER SCADUTO — ATTESA BANDITORE';
-    return;
-  }
+        <span class="section-label">
+          TEAM
+        </span>
 
-  const remaining = liveRemainingMs();
+        <div>
+          <h2>Squadre</h2>
+          <p>Presenze e Presidenti</p>
+        </div>
 
-  if (remaining === null) {
-    liveUi.timerValue.textContent = '—';
-    liveUi.timerStatus.textContent = session.current_bidder_team_id
-      ? 'Timer non avviato'
-      : 'In attesa della prima offerta';
-    return;
-  }
+      </div>
 
-  liveUi.timerValue.textContent = formatLiveTimer(remaining);
-  liveUi.timerStatus.textContent = 'Tempo residuo';
 
-  if (remaining <= 0) {
-    syncExpiredLiveTimer();
-  }
-}
+      <div
+        id="auction-teams"
+        class="list"
+      ></div>
 
+    </section>
 
-function liveActorTeamId() {
-  const session = liveSession();
 
-  if (!session) return null;
+    <section class="card">
 
-  const myTeamId = liveMyTeamId();
+      <div class="section-heading">
 
-  if (liveBidMode() === 'turn') {
-    const turnTeam = liveCurrentTurnTeam();
+        <span class="section-label">
+          SETUP
+        </span>
 
-    if (!turnTeam) return null;
+        <div>
+          <h2>Regole</h2>
+          <p>Configurazione della sessione</p>
+        </div>
 
-    if (liveIsPresident() && myTeamId === turnTeam.id) {
-      return turnTeam.id;
-    }
+      </div>
 
-    if (liveIsController()) {
-      return turnTeam.id;
-    }
 
-    return null;
-  }
+      <div
+        id="auction-settings"
+        class="list"
+      ></div>
 
-  if (liveIsPresident() && myTeamId) {
-    return myTeamId;
-  }
+    </section>
 
-  return null;
-}
 
+  </div>
 
-function renderLiveControls() {
-  if (!liveUi.panel) return;
 
-  updateLiveServerOffset();
+  <section
+    id="prepared-session-section"
+    class="card"
+    hidden
+  >
 
-  const session = liveSession();
-  const player = auctionData?.currentPlayer;
+    <div class="section-heading">
 
-  const show = Boolean(
-    session
-    && session.status === 'live'
-    && player
-  );
-
-  liveUi.panel.hidden = !show;
-
-  if (!show) return;
-
-  const mode = liveBidMode();
-  const turnTeam = liveCurrentTurnTeam();
-  const leader = auctionData?.currentBidderTeam;
-  const actorTeamId = liveActorTeamId();
-  const actorState = actorTeamId
-    ? liveTeamState(actorTeamId)
-    : null;
+      <span class="section-label">
+        ORDER
+      </span>
 
-  liveUi.turnBadge.hidden = mode !== 'turn';
+      <div>
+        <h2>Ordine squadre</h2>
+        <p>Definisce il primo turno di chiamata</p>
+      </div>
 
-  if (mode === 'turn') {
-    liveUi.turnBadge.textContent = turnTeam
-      ? `Turno: ${turnTeam.name}`
-      : 'Nessun turno attivo';
-  }
+    </div>
 
-  liveUi.passBadge.hidden =
-    mode !== 'turn' || !actorTeamId;
 
-  if (mode === 'turn' && actorTeamId) {
-    liveUi.passBadge.textContent =
-      `PASS ${Number(actorState?.passes_used || 0)}/5`;
-  }
+    <div
+      id="auction-team-order"
+      class="list"
+    ></div>
 
-  liveUi.hold.hidden = !liveIsController();
 
-  if (liveIsController()) {
-    liveUi.hold.textContent =
-      session.hold_active === true
-        ? 'Riprendi'
-        : 'HOLD';
-  }
+    <div
+      id="team-order-actions"
+      class="league-actions"
+      hidden
+    >
 
-  let canBid = Boolean(
-    actorTeamId
-    && actorTeamId !== session.current_bidder_team_id
-  );
+      <button
+        id="save-team-order-button"
+        type="button"
+        class="secondary"
+      >
+        Salva ordine
+      </button>
 
-  if (mode === 'wild' && !liveIsPresident()) {
-    canBid = false;
-  }
 
-  liveUi.controls.hidden = !canBid;
+      <button
+        id="start-auction-button"
+        type="button"
+      >
+        Avvia asta
+      </button>
 
-  if (!canBid) {
-    liveUi.turnActions.hidden = true;
+    </div>
 
-    if (mode === 'turn' && !turnTeam) {
-      liveUi.help.textContent =
-        'Nessuna squadra attiva: attesa Banditore.';
-    } else if (mode === 'turn' && turnTeam) {
-      liveUi.help.textContent =
-        `In attesa di ${turnTeam.name}.`;
-    } else {
-      liveUi.help.textContent = '';
-    }
+  </section>
 
-    renderLiveTimer();
-    return;
-  }
-
-  const minimum = Math.max(
-    1,
-    Number(session.current_bid || 0) + 1
-  );
-
-  liveUi.bidAmount.min = String(minimum);
-
-  if (
-    liveLastBid !== session.current_bid
-    || !liveUi.bidAmount.value
-    || Number(liveUi.bidAmount.value) < minimum
-  ) {
-    liveUi.bidAmount.value = String(minimum);
-    liveLastBid = session.current_bid;
-  }
-
-  if (mode === 'turn') {
-    liveUi.turnActions.hidden = false;
-
-    const passes = Number(actorState?.passes_used || 0);
-
-    liveUi.pass.disabled = passes >= 5;
-
-    if (
-      liveIsPresident()
-      && liveMyTeamId() === actorTeamId
-    ) {
-      liveUi.help.textContent = leader
-        ? `È il tuo turno. ${leader.name} è in testa a ${session.current_bid}.`
-        : 'È il tuo turno: puoi rilanciare, passare o abbandonare.';
-    } else {
-      liveUi.help.textContent =
-        `Pannello proxy Banditore per ${turnTeam?.name || 'squadra attiva'}.`;
-    }
-  } else {
-    liveUi.turnActions.hidden = true;
-
-    liveUi.help.textContent = leader
-      ? `${leader.name} è in testa a ${session.current_bid}.`
-      : 'Inserisci la prima offerta.';
-  }
-
-  renderLiveTimer();
-}
-
-
-liveUi.hold?.addEventListener('click', async () => {
-  const session = liveSession();
-
-  if (!session) return;
-
-  liveUi.hold.disabled = true;
-
-  try {
-    const result = await callApi({
-      action: 'setHold',
-      sessionId: session.id,
-      hold: session.hold_active !== true
-    });
-
-    if (!result?.ok) {
-      throw new Error(
-        result?.error || 'Impossibile modificare HOLD.'
-      );
-    }
-
-    await loadLobby();
-
-  } catch (error) {
-    console.error(error);
-
-    showMessage(
-      error.message || 'Errore durante HOLD.',
-      'error'
-    );
-
-  } finally {
-    liveUi.hold.disabled = false;
-  }
-});
-
-
-liveUi.bid?.addEventListener('click', async () => {
-  const session = liveSession();
-  const teamId = liveActorTeamId();
-  const amount = Number(liveUi.bidAmount.value);
-
-  if (!session || !teamId) {
-    showMessage(
-      'Non puoi rilanciare in questo momento.',
-      'error'
-    );
-    return;
-  }
-
-  const minimum = Math.max(
-    1,
-    Number(session.current_bid || 0) + 1
-  );
-
-  if (!Number.isInteger(amount) || amount < minimum) {
-    showMessage('Offerta superata.', 'error');
-    return;
-  }
-
-  liveUi.bid.disabled = true;
-
-  try {
-    const result = await callApi({
-      action: 'placeBid',
-      sessionId: session.id,
-      teamId,
-      amount,
-      source:
-        liveIsController()
-        && !(
-          liveIsPresident()
-          && liveMyTeamId() === teamId
-        )
-          ? 'VOCALE'
-          : 'APP'
-    });
-
-    if (!result?.ok) {
-      throw new Error(
-        result?.error || 'Impossibile registrare l’offerta.'
-      );
-    }
 
-    await loadLobby();
+  <section
+    id="live-section"
+    class="card"
+    hidden
+  >
 
-  } catch (error) {
-    console.error(error);
+    <div class="section-heading">
 
-    showMessage(
-      error.message || 'Errore durante il rilancio.',
-      'error'
-    );
+      <span class="section-label">
+        LIVE
+      </span>
 
-  } finally {
-    liveUi.bid.disabled = false;
-  }
-});
+      <div>
+        <h2>Giocatore corrente</h2>
+        <p id="live-help">Asta in corso</p>
+      </div>
 
+    </div>
 
-liveUi.pass?.addEventListener('click', async () => {
-  const session = liveSession();
-  const teamId = liveActorTeamId();
 
-  if (!session || !teamId) return;
+    <div
+      id="current-player-box"
+    ></div>
 
-  liveUi.pass.disabled = true;
 
-  try {
-    const result = await callApi({
-      action: 'passTurn',
-      sessionId: session.id,
-      teamId
-    });
+    <div
+      id="live-control-panel"
+      hidden
+    >
 
-    if (!result?.ok) {
-      throw new Error(
-        result?.error || 'Impossibile passare.'
-      );
-    }
+      <div class="divider"></div>
 
-    await loadLobby();
 
-  } catch (error) {
-    console.error(error);
+      <div class="section-heading">
 
-    showMessage(
-      error.message || 'Errore durante PASSA.',
-      'error'
-    );
+        <span class="section-label">
+          TIMER
+        </span>
 
-  } finally {
-    liveUi.pass.disabled = false;
-  }
-});
+        <div>
+          <h3 id="live-timer-value">—</h3>
+          <p id="live-timer-status">
+            In attesa
+          </p>
+        </div>
 
+      </div>
 
-liveUi.abandon?.addEventListener('click', async () => {
-  const session = liveSession();
-  const teamId = liveActorTeamId();
 
-  if (!session || !teamId) return;
+      <div class="league-actions">
 
-  const confirmed = window.confirm(
-    'Abbandonare definitivamente l’asta di questo giocatore per la squadra attiva?'
-  );
+        <span
+          id="live-turn-badge"
+          class="badge"
+          hidden
+        ></span>
 
-  if (!confirmed) return;
 
-  liveUi.abandon.disabled = true;
+        <span
+          id="live-pass-badge"
+          class="badge"
+          hidden
+        ></span>
 
-  try {
-    const result = await callApi({
-      action: 'abandonTurn',
-      sessionId: session.id,
-      teamId
-    });
 
-    if (!result?.ok) {
-      throw new Error(
-        result?.error || 'Impossibile abbandonare.'
-      );
-    }
+        <button
+          id="live-hold-button"
+          type="button"
+          class="secondary"
+          hidden
+        >
+          HOLD
+        </button>
 
-    await loadLobby();
+      </div>
 
-  } catch (error) {
-    console.error(error);
 
-    showMessage(
-      error.message || 'Errore durante ABBANDONA.',
-      'error'
-    );
+      <div
+        id="live-president-controls"
+        hidden
+      >
 
-  } finally {
-    liveUi.abandon.disabled = false;
-  }
-});
+        <div class="divider"></div>
 
 
-async function refreshLiveAuctionState() {
-  if (livePolling || document.hidden) return;
+        <div class="form-grid">
 
-  const session = liveSession();
+          <label class="form-field">
 
-  if (!session || session.status !== 'live') return;
+            Picker offerta
 
-  livePolling = true;
+            <select
+              id="live-bid-amount"
+            ></select>
 
-  try {
-    const data = await callApi({
-      action: 'getLobby'
-    });
+          </label>
 
-    if (!data?.ok) return;
 
-    auctionData = data;
+          <div class="form-field">
 
-    leagueTitle.textContent =
-      `Asta · ${data.league.name}`;
+            <span
+              id="live-picker-mode"
+              class="badge good"
+            >
+              AUTO
+            </span>
 
-    leagueSubtitle.textContent =
-      `Sessione ${sessionStatusLabel(
-        data.auctionSession?.status
-      )}`;
 
-    renderAll();
-    renderLiveControls();
+            <span
+              id="live-max-bid"
+              class="badge"
+            >
+              Max —
+            </span>
 
-    if (typeof renderAuctionTestAddon === 'function') {
-      renderAuctionTestAddon();
-    }
 
-  } catch (error) {
-    console.error(error);
+            <button
+              id="live-picker-auto-button"
+              type="button"
+              class="secondary"
+              hidden
+            >
+              Rilascia · torna AUTO
+            </button>
 
-  } finally {
-    livePolling = false;
-  }
-}
 
+            <button
+              id="live-bid-button"
+              type="button"
+            >
+              Rilancia
+            </button>
 
-setInterval(
-  renderLiveTimer,
-  250
-);
+          </div>
 
-setInterval(
-  refreshLiveAuctionState,
-  1800
-);
+        </div>
 
 
-const baseLiveLoadLobby =
-  loadLobby;
+        <div
+          id="live-turn-actions"
+          class="league-actions"
+          hidden
+        >
 
+          <button
+            id="live-pass-button"
+            type="button"
+            class="secondary"
+          >
+            Passa
+          </button>
 
-loadLobby = async function () {
-  await baseLiveLoadLobby();
-  renderLiveControls();
-};
 
+          <button
+            id="live-abandon-button"
+            type="button"
+            class="danger"
+          >
+            Abbandona
+          </button>
 
-const initialLiveRender =
-  setInterval(
-    () => {
-      if (!auctionData) return;
+        </div>
 
-      clearInterval(
-        initialLiveRender
-      );
 
-      renderLiveControls();
-    },
-    100
-  );
+        <p
+          id="live-action-help"
+          class="setting-help"
+        ></p>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="auctioneer-panel"
+      hidden
+    >
+
+      <div class="divider"></div>
+
+
+      <div class="section-heading">
+
+        <span class="section-label">
+          BANDITORE
+        </span>
+
+        <div>
+          <h3>Pannello offerte</h3>
+          <p>
+            Tocca una squadra per registrare l’importo selezionato.
+          </p>
+        </div>
+
+      </div>
+
+
+      <div class="form-grid">
+
+        <label class="form-field">
+
+          Picker Banditore
+
+          <select
+            id="auctioneer-bid-amount"
+          ></select>
+
+        </label>
+
+
+        <div class="form-field">
+
+          <span
+            id="auctioneer-picker-mode"
+            class="badge good"
+          >
+            AUTO
+          </span>
+
+
+          <span
+            id="auctioneer-action-mode"
+            class="badge"
+          >
+            VOCALE
+          </span>
+
+
+          <button
+            id="auctioneer-picker-auto-button"
+            type="button"
+            class="secondary"
+            hidden
+          >
+            Rilascia · torna AUTO
+          </button>
+
+
+          <button
+            id="auctioneer-award-player"
+            type="button"
+            class="success"
+          >
+            Aggiudica
+          </button>
+
+
+          <button
+            id="test-finish-review"
+            type="button"
+            class="secondary"
+            hidden
+          >
+            Termina test e visualizza rose
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="auctioneer-team-buttons"
+        class="league-actions"
+      ></div>
+
+
+      <p
+        id="auctioneer-help"
+        class="setting-help"
+      ></p>
+
+
+      <div class="divider"></div>
+
+
+      <h3>Ultime offerte</h3>
+
+
+      <div
+        id="auction-recent-bids"
+        class="list"
+      ></div>
+
+    </div>
+
+
+    <div
+      id="call-panel"
+      hidden
+    >
+
+      <div class="divider"></div>
+
+
+      <h3 id="call-team-title">
+        Chiamata
+      </h3>
+
+
+      <p
+        id="call-permission-help"
+        class="setting-help"
+      ></p>
+
+
+      <div
+        id="call-form-area"
+        hidden
+      >
+
+        <div class="form-grid">
+
+          <label class="form-field">
+
+            Cerca giocatore
+
+            <input
+              id="call-player-search"
+              type="search"
+              autocomplete="off"
+              placeholder="Nome o squadra..."
+            >
+
+          </label>
+
+
+          <label
+            id="opening-bid-field"
+            class="form-field"
+          >
+
+            Base d’asta
+
+            <input
+              id="opening-bid"
+              type="number"
+              min="1"
+              step="1"
+              value="1"
+            >
+
+          </label>
+
+        </div>
+
+
+        <div
+          id="call-candidates"
+          class="list"
+        ></div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section
+    id="test-roster-review"
+    class="card"
+    hidden
+  >
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        REVIEW
+      </span>
+
+      <div>
+        <h2>Rose del test</h2>
+        <p>
+          Le assegnazioni sono ancora disponibili e non sono state eliminate.
+        </p>
+      </div>
+
+    </div>
+
+
+    <div class="league-actions">
+
+      <button
+        id="test-print-rosters"
+        type="button"
+        class="secondary"
+      >
+        Stampa / PDF
+      </button>
+
+
+      <button
+        id="test-download-csv"
+        type="button"
+        class="secondary"
+      >
+        CSV Fantacalcio (beta)
+      </button>
+
+
+      <button
+        id="test-purge-data"
+        type="button"
+        class="danger"
+      >
+        Elimina dati test
+      </button>
+
+    </div>
+
+
+    <p
+      id="test-csv-note"
+      class="setting-help"
+    >
+      Il CSV contiene fantasquadra, ID sorgente, nome,
+      ruolo, squadra e prezzo. La compatibilità 1:1 con
+      l'import ufficiale va validata con un file campione
+      esportato da FantaAsta Live.
+    </p>
+
+
+    <div
+      id="test-roster-review-list"
+      class="list"
+    ></div>
+
+  </section>
+
+
+</main>
+
+
+<script src="league-auction.js?v=2"></script>
+<script src="auction-live-controls.js?v=2"></script>
+<script src="auction-test-live.js?v=2"></script>
+
+</body>
+
+</html>
