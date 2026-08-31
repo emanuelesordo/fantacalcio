@@ -14,7 +14,7 @@
 
   <link
     rel="stylesheet"
-    href="style.css?v=22"
+    href="style.css?v=23"
   >
 
 </head>
@@ -307,8 +307,21 @@
         </span>
 
         <div>
-          <h3 id="live-timer-value">—</h3>
-          <p id="live-timer-status">
+          <h3
+            id="live-timer-value"
+            class="auction-engine-only"
+          >—</h3>
+
+          <p
+            id="live-timer-status"
+            class="auction-engine-only"
+          >
+            In attesa
+          </p>
+
+          <h3 id="auction-timer-display">—</h3>
+
+          <p id="auction-timer-display-status">
             In attesa
           </p>
         </div>
@@ -354,50 +367,68 @@
 
         <div class="form-grid">
 
-          <label class="form-field">
+          <div class="form-field auction-quick-bid-field">
 
-            Picker offerta
+            <span class="auction-field-label">
+              Rilancio
+            </span>
+
+            <div
+              id="live-bid-quick"
+              class="auction-quick-bid-grid"
+            ></div>
 
             <select
               id="live-bid-amount"
+              class="auction-engine-picker"
+              tabindex="-1"
+              aria-hidden="true"
             ></select>
 
-          </label>
+          </div>
 
 
-          <div class="form-field">
+          <div class="form-field auction-bid-confirm-field">
 
             <span
               id="live-picker-mode"
-              class="badge good"
+              class="badge good auction-engine-picker-status"
             >
               AUTO
             </span>
 
+            <div class="auction-bid-selection-row">
 
-            <span
-              id="live-max-bid"
-              class="badge"
-            >
-              Max —
-            </span>
+              <span
+                id="live-selected-bid"
+                class="badge good"
+              >
+                Selezionato —
+              </span>
 
+              <span
+                id="live-max-bid"
+                class="badge"
+              >
+                Max —
+              </span>
+
+            </div>
 
             <button
               id="live-picker-auto-button"
               type="button"
-              class="secondary"
+              class="secondary auction-engine-picker-status"
               hidden
             >
               Rilascia · torna AUTO
             </button>
 
-
             <button
               id="live-bid-button"
               type="button"
             >
-              Rilancia
+              Conferma rilancio
             </button>
 
           </div>
@@ -555,44 +586,67 @@
 
       <div class="form-grid">
 
-        <label class="form-field">
+        <div class="form-field auction-quick-bid-field">
 
-          Picker Banditore
+          <span class="auction-field-label">
+            Importo
+          </span>
 
-          <select
-            id="auctioneer-bid-amount"
-          ></select>
+          <div
+            id="auctioneer-bid-quick"
+            class="auction-quick-bid-grid"
+          ></div>
 
-        </label>
+          <details class="auction-manual-picker">
+
+            <summary>
+              Manuale / correzione
+            </summary>
+
+            <select
+              id="auctioneer-bid-amount"
+            ></select>
+
+          </details>
+
+        </div>
 
 
         <div class="form-field">
 
           <span
             id="auctioneer-picker-mode"
-            class="badge good"
+            class="badge good auction-engine-picker-status"
           >
             AUTO
           </span>
 
+          <div class="auction-bid-selection-row">
 
-          <span
-            id="auctioneer-action-mode"
-            class="badge"
-          >
-            VOCALE
-          </span>
+            <span
+              id="auctioneer-selected-bid"
+              class="badge good"
+            >
+              Selezionato —
+            </span>
 
+            <span
+              id="auctioneer-action-mode"
+              class="badge"
+            >
+              VOCALE
+            </span>
+
+          </div>
 
           <button
             id="auctioneer-picker-auto-button"
             type="button"
-            class="secondary"
+            class="secondary auction-engine-picker-status"
             hidden
           >
             Rilascia · torna AUTO
           </button>
-
 
           <button
             id="auctioneer-award-player"
@@ -667,21 +721,7 @@
         hidden
       >
 
-        <div class="form-grid">
-
-          <label class="form-field">
-
-            Cerca giocatore
-
-            <input
-              id="call-player-search"
-              type="search"
-              autocomplete="off"
-              placeholder="Nome o squadra..."
-            >
-
-          </label>
-
+        <div class="call-main-controls">
 
           <label
             id="opening-bid-field"
@@ -700,13 +740,72 @@
 
           </label>
 
+          <p class="setting-help call-main-help">
+            Seleziona il calciatore dal pannello Svincolati.
+          </p>
+
         </div>
 
 
-        <div
-          id="call-candidates"
-          class="list"
-        ></div>
+        <aside
+          id="free-agents-drawer"
+          class="free-agents-drawer"
+          aria-label="Lista svincolati"
+        >
+
+          <button
+            id="free-agents-toggle"
+            type="button"
+            class="free-agents-handle secondary"
+            aria-expanded="true"
+            title="Nascondi lista svincolati"
+          >
+            <span
+              id="free-agents-toggle-icon"
+              aria-hidden="true"
+            >›</span>
+
+            <span class="free-agents-handle-label">
+              Svincolati
+            </span>
+          </button>
+
+
+          <div class="free-agents-content">
+
+            <div class="free-agents-toolbar">
+
+              <div>
+                <strong>Svincolati</strong>
+                <small id="free-agents-count">—</small>
+              </div>
+
+              <label class="form-field">
+
+                <span class="auction-visually-hidden">
+                  Cerca giocatore
+                </span>
+
+                <input
+                  id="call-player-search"
+                  type="search"
+                  autocomplete="off"
+                  placeholder="Cerca nome, ruolo, squadra..."
+                >
+
+              </label>
+
+            </div>
+
+
+            <div
+              id="call-candidates"
+              class="list free-agents-list"
+            ></div>
+
+          </div>
+
+        </aside>
 
       </div>
 
@@ -794,7 +893,7 @@
 <script src="auction-live-controls.js?v=3"></script>
 <script src="auction-test-live.js?v=3"></script>
 <script src="auction-vice.js?v=1"></script>
-<script src="auction-ui.js?v=1"></script>
+<script src="auction-ui.js?v=2"></script>
 
 </body>
 
