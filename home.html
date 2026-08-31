@@ -240,8 +240,17 @@
     .rolebtn.active{background:var(--primary);border-color:var(--primary)}
     .table-wrap{min-height:0;overflow:auto;border:1px solid var(--line);border-radius:7px;background:var(--panel)}
     table{width:100%;border-collapse:separate;border-spacing:0;font-size:9px}
+    .player-table{table-layout:fixed;min-width:840px}
+    .player-table col.col-player{width:34%}
+    .player-table col.col-team{width:16%}
+    .player-table col.col-slot{width:7%}
+    .player-table col.col-stat{width:8.6%}
     th{position:sticky;top:0;z-index:2;background:#0b2b50;border-bottom:1px solid var(--line2);text-align:left;white-space:nowrap}
     th button{width:100%;min-height:27px;border:0;border-radius:0;background:transparent;color:var(--soft);padding:4px 6px;text-align:left;font-size:8px}
+    .player-table th.num-head,
+    .player-table th.num-head button{text-align:right}
+    .player-table th,
+    .player-table td{box-sizing:border-box}
     td{height:31px;padding:3px 6px;border-bottom:1px solid rgba(40,89,142,.55);white-space:nowrap}
     tbody tr{cursor:pointer}
     tbody tr:hover{background:#103663}
@@ -260,8 +269,21 @@
     .roster-player{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px;align-items:center;padding:4px 6px;border:1px solid rgba(40,89,142,.55);border-radius:6px}
 
     /* ASTA */
-    #view-auction{overflow:hidden}
+    #view-auction{overflow:hidden;position:relative}
+    .auction-root{height:100%;min-height:0;overflow:hidden}
     .auction-lobby{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);gap:6px;min-height:0}
+    .auction-back-live{
+      display:none;
+      position:absolute;
+      z-index:60;
+      top:5px;
+      left:5px;
+      min-height:30px;
+      padding:4px 8px;
+      box-shadow:var(--shadow)
+    }
+    body.auction-live .auction-back-live{display:inline-flex}
+    body.auction-live .auction-root{padding-top:38px}
     .auction-lobby-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;min-height:0}
     .auction-lobby-grid .panel{min-height:0;display:flex;flex-direction:column}
     .team-order{display:grid;gap:3px}
@@ -284,12 +306,18 @@
     .auction-team-buttons{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:4px}
 
     .call-stage{height:100%;min-height:0;position:relative;overflow:hidden}
-    .call-main{height:100%;min-height:0;padding-right:min(50vw,760px);transition:padding-right .12s ease}
+    .call-main{
+      height:100%;min-height:0;
+      padding-right:min(58vw,900px);
+      transition:padding-right .12s ease;
+      display:flex;
+      align-items:flex-start
+    }
     .call-stage:has(.free-drawer:not([open])) .call-main{padding-right:42px}
-    .call-card{width:min(470px,100%);display:grid;gap:6px}
+    .call-card{width:100%;max-width:none;display:grid;gap:6px}
 
     details.free-drawer{
-      position:absolute;right:0;top:0;bottom:0;width:min(50vw,760px);min-width:360px;
+      position:absolute;right:0;top:0;bottom:0;width:min(58vw,900px);min-width:420px;
       border:1px solid var(--line2);border-radius:9px;background:var(--panel);box-shadow:var(--shadow);overflow:hidden;
     }
     details.free-drawer:not([open]){width:36px;min-width:36px;box-shadow:none}
@@ -301,8 +329,8 @@
     details.free-drawer>summary::-webkit-details-marker{display:none}
     details.free-drawer:not([open])>*:not(summary){display:none!important}
     .drawer-content{height:100%;min-height:0;margin-left:36px;padding:5px;display:grid;grid-template-rows:auto auto minmax(0,1fr);gap:4px}
-    .drawer-filters{display:grid;grid-template-columns:minmax(130px,1fr) 120px 90px;gap:4px}
-    .drawer-table{min-height:0;overflow:auto;border:1px solid var(--line);border-radius:6px}
+    .drawer-filters{display:grid;grid-template-columns:minmax(150px,1fr) 120px 90px 140px;gap:4px}
+    .drawer-table{min-height:0;height:100%;overflow:auto;border:1px solid var(--line);border-radius:6px}
     .selected-call{padding:6px;border:1px solid var(--line);border-radius:7px;background:var(--panel2)}
 
     /* TV */
@@ -586,16 +614,22 @@
           </section>
 
           <div class="table-wrap">
-            <table>
+            <table class="player-table">
+              <colgroup>
+                <col class="col-player">
+                <col class="col-team">
+                <col class="col-slot">
+                <col class="col-stat"><col class="col-stat"><col class="col-stat"><col class="col-stat"><col class="col-stat">
+              </colgroup>
               <thead><tr>
                 <th><button data-list-sort="name">Calciatore <span>↑</span></button></th>
                 <th><button data-list-sort="team">Squadra <span>↕</span></button></th>
-                <th><button data-list-sort="slot">Slot <span>↕</span></button></th>
-                <th><button data-list-sort="pma">PMA <span>↕</span></button></th>
-                <th><button data-list-sort="pfc">PFC <span>↕</span></button></th>
-                <th><button data-list-sort="delta">Δ <span>↕</span></button></th>
-                <th><button data-list-sort="fm">Exp.FM <span>↕</span></button></th>
-                <th><button data-list-sort="tit">Exp.Tit. <span>↕</span></button></th>
+                <th class="num-head"><button data-list-sort="slot">Slot <span>↕</span></button></th>
+                <th class="num-head"><button data-list-sort="pma">PMA <span>↕</span></button></th>
+                <th class="num-head"><button data-list-sort="pfc">PFC <span>↕</span></button></th>
+                <th class="num-head"><button data-list-sort="delta">Δ <span>↕</span></button></th>
+                <th class="num-head"><button data-list-sort="fm">Exp.FM <span>↕</span></button></th>
+                <th class="num-head"><button data-list-sort="tit">Exp.Tit. <span>↕</span></button></th>
               </tr></thead>
               <tbody id="list-body"></tbody>
             </table>
@@ -611,7 +645,8 @@
 
       <!-- ASTA -->
       <section id="view-auction" class="view no-page-scroll">
-        <div id="auction-root" class="auction-lobby"></div>
+        <button id="auction-back-live" class="auction-back-live secondary" type="button">← Torna alla lega</button>
+        <div id="auction-root" class="auction-root"></div>
       </section>
 
       <!-- TV -->
@@ -838,6 +873,7 @@
     $('league-switch-btn').addEventListener('click', () => switchView('leagues'));
     $('reload-btn').addEventListener('click', () => loadCurrentView(true));
     $('exit-btn').addEventListener('click', () => { window.location.href = 'index.html'; });
+    $('auction-back-live').addEventListener('click', () => switchView('home'));
 
     document.querySelectorAll('.nav-btn').forEach(button => {
       button.addEventListener('click', () => switchView(button.dataset.view));
@@ -1209,28 +1245,73 @@
        ===================================================== */
 
     async function loadSetup() {
-      const data = await api(ENDPOINTS.league, { action: 'getSetup' });
-      if (!data) return;
-      state.setup = data.settings;
-      populateSetup(data.settings);
+      let settings = null;
+
+      /* Fonte primaria: league_settings via league-api. */
+      const direct = await api(
+        ENDPOINTS.league,
+        { action: 'getSetup' },
+        { quiet: true }
+      );
+
+      if (direct?.ok && direct.settings) {
+        settings = direct.settings;
+      }
+
+      /*
+       * Fallback: auction-api legge la stessa league_settings
+       * per costruire la lobby. Utile se il browser sta ancora
+       * parlando con una vecchia revisione di league-api.
+       */
+      if (!settings) {
+        const lobby = await api(
+          ENDPOINTS.auction,
+          { action: 'getLobby' },
+          { quiet: true }
+        );
+
+        if (lobby?.ok && lobby.settings) {
+          settings = lobby.settings;
+        }
+      }
+
+      if (!settings) {
+        throw new Error('Impossibile leggere il Setup salvato nel database.');
+      }
+
+      state.setup = settings;
+      populateSetup(settings);
+    }
+
+    function parseRosterConfig(value) {
+      if (!value) return {};
+      if (typeof value === 'object') return value;
+
+      try {
+        return JSON.parse(value);
+      } catch {
+        return {};
+      }
     }
 
     function populateSetup(s) {
+      const roster = parseRosterConfig(s.roster_config);
+
       $('setup-fantasy-mode').value = s.fantasy_mode || 'classic';
       $('setup-credits').value = s.initial_credits ?? 500;
       $('setup-team-count').value = s.team_count ?? 10;
-      $('setup-P').value = s.roster_config?.classic?.P ?? 3;
-      $('setup-D').value = s.roster_config?.classic?.D ?? 8;
-      $('setup-C').value = s.roster_config?.classic?.C ?? 8;
-      $('setup-A').value = s.roster_config?.classic?.A ?? 6;
-      $('setup-gk-min').value = s.roster_config?.mantra?.goalkeepers?.min ?? 2;
-      $('setup-gk-max').value = s.roster_config?.mantra?.goalkeepers?.max ?? 3;
-      $('setup-out-min').value = s.roster_config?.mantra?.outfield?.min ?? 22;
-      $('setup-out-max').value = s.roster_config?.mantra?.outfield?.max ?? 23;
-      $('setup-total-min').value = s.roster_config?.mantra?.total?.min ?? 25;
-      $('setup-total-max').value = s.roster_config?.mantra?.total?.max ?? 25;
+      $('setup-P').value = roster?.classic?.P ?? 3;
+      $('setup-D').value = roster?.classic?.D ?? 8;
+      $('setup-C').value = roster?.classic?.C ?? 8;
+      $('setup-A').value = roster?.classic?.A ?? 6;
+      $('setup-gk-min').value = roster?.mantra?.goalkeepers?.min ?? 2;
+      $('setup-gk-max').value = roster?.mantra?.goalkeepers?.max ?? 3;
+      $('setup-out-min').value = roster?.mantra?.outfield?.min ?? 22;
+      $('setup-out-max').value = roster?.mantra?.outfield?.max ?? 23;
+      $('setup-total-min').value = roster?.mantra?.total?.min ?? 25;
+      $('setup-total-max').value = roster?.mantra?.total?.max ?? 25;
       $('setup-under').checked = s.under_enabled === true;
-      $('setup-under-min').value = s.under_min_count || 1;
+      $('setup-under-min').value = s.under_min_count ?? 1;
       $('setup-nomination').value = s.nomination_mode || 'call';
       $('setup-list-sort').value = s.list_sort_by || 'alphabetical';
       $('setup-list-dir').value = s.list_sort_direction || 'asc';
@@ -1238,7 +1319,7 @@
       $('setup-bid-mode').value = s.bid_mode || 'wild';
       $('setup-turn-direction').value = s.turn_direction || 'clockwise';
       $('setup-timer-mode').value = s.timer_mode || 'dynamic';
-      $('setup-fixed-timer').value = s.fixed_timer_seconds || 10;
+      $('setup-fixed-timer').value = s.fixed_timer_seconds ?? 10;
       updateSetupVisibility();
     }
 
@@ -1514,6 +1595,7 @@
       if (!data) { root.innerHTML='<div class="panel">Caricamento...</div>'; return; }
 
       const session = data.auctionSession;
+      root.className = 'auction-root';
       document.body.classList.toggle('auction-live', session?.status === 'live' && state.view === 'auction');
 
       if (!session) return renderAuctionLobby();
@@ -1607,9 +1689,17 @@
                   <label>Cerca<input id="auction-search" type="search" placeholder="Nome o squadra..."></label>
                   <label>Squadra<select id="auction-team-filter"><option value="all">Tutte</option></select></label>
                   <label>Slot<select id="auction-slot-filter"><option value="all">Tutti</option></select></label>
+                  <label>Segnalazioni<select id="auction-flag-filter"><option value="all">Tutte</option><option value="market">Mercato</option><option value="injury">Indisponibili</option><option value="new">Nuovi arrivi</option><option value="penalties">Rigoristi</option></select></label>
                 </div>
                 <div class="drawer-table">
-                  <table><thead><tr><th>Calciatore</th><th>Squadra</th><th>Slot</th><th>PMA</th><th>PFC</th><th>Δ</th><th>FM</th><th>Tit.</th></tr></thead><tbody id="auction-player-body"></tbody></table>
+                  <table class="player-table">
+                    <colgroup>
+                      <col class="col-player"><col class="col-team"><col class="col-slot">
+                      <col class="col-stat"><col class="col-stat"><col class="col-stat"><col class="col-stat"><col class="col-stat">
+                    </colgroup>
+                    <thead><tr><th>Calciatore</th><th>Squadra</th><th class="num-head">Slot</th><th class="num-head">PMA</th><th class="num-head">PFC</th><th class="num-head">Δ</th><th class="num-head">FM</th><th class="num-head">Tit.</th></tr></thead>
+                    <tbody id="auction-player-body"></tbody>
+                  </table>
                 </div>
               </div>
             </details>
@@ -1642,12 +1732,13 @@
       $('auction-search').addEventListener('input',renderAuctionPlayers);
       $('auction-team-filter').addEventListener('change',renderAuctionPlayers);
       $('auction-slot-filter').addEventListener('change',renderAuctionPlayers);
+      $('auction-flag-filter').addEventListener('change',renderAuctionPlayers);
     }
 
     function renderAuctionPlayers() {
       const body=$('auction-player-body'); if(!body)return;
       const data=state.auction, mode=data.settings?.fantasy_mode||'classic';
-      const controls={search:$('auction-search'),team:$('auction-team-filter'),slot:$('auction-slot-filter'),flag:null};
+      const controls={search:$('auction-search'),team:$('auction-team-filter'),slot:$('auction-slot-filter'),flag:$('auction-flag-filter')};
       const players=filterPlayers(data.callCandidates||[],controls,state.auctionRoles,mode).sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'it'));
       body.innerHTML=players.map(p=>playerRow(p,mode,p.id===state.auctionSelectedPlayerId?'selected-player':'')).join('');
       body.querySelectorAll('[data-player-id]').forEach(row=>row.addEventListener('click',()=>{
