@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>TV Asta - Fantacalcio Live</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css?v=20"
+  >
+
+</head>
+
+
+<body>
+
+<main class="page-shell">
+
+
+  <header class="page-header">
+
+    <div>
+
+      <h1 id="tv-league-title">
+        TV Asta
+      </h1>
+
+      <p id="tv-league-subtitle">
+        Caricamento...
+      </p>
+
+    </div>
+
+
+    <div class="league-actions">
+
+      <button
+        id="tv-fullscreen-button"
+        type="button"
+        class="secondary"
+      >
+        Schermo intero
+      </button>
+
+
+      <a
+        class="back-home"
+        href="league-auction.html"
+      >
+        ← Asta
+      </a>
+
+    </div>
+
+  </header>
+
+
+  <nav class="tabs league-tabs">
+
+    <a
+      href="league.html"
+      class="tab"
+    >
+      <span class="tab-title">
+        Home
+      </span>
+
+      <span class="tab-description">
+        Dashboard
+      </span>
+    </a>
+
+
+    <a
+      href="league-auction.html"
+      class="tab"
+    >
+      <span class="tab-title">
+        Asta
+      </span>
+
+      <span class="tab-description">
+        Live
+      </span>
+    </a>
+
+
+    <a
+      href="league-presenter.html"
+      class="tab active"
+    >
+      <span class="tab-title">
+        TV
+      </span>
+
+      <span class="tab-description">
+        Presentatore
+      </span>
+    </a>
+
+
+    <a
+      href="league-rosters.html"
+      class="tab"
+    >
+      <span class="tab-title">
+        Rose
+      </span>
+
+      <span class="tab-description">
+        Squadre
+      </span>
+    </a>
+
+
+    <a
+      href="league-list.html"
+      class="tab"
+    >
+      <span class="tab-title">
+        Listone
+      </span>
+
+      <span class="tab-description">
+        Giocatori
+      </span>
+    </a>
+
+  </nav>
+
+
+  <p
+    id="tv-message"
+    class="message"
+    aria-live="polite"
+  ></p>
+
+
+  <section
+    id="tv-layout-settings"
+    class="card"
+    hidden
+  >
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        TV
+      </span>
+
+      <div>
+
+        <h2>Layout</h2>
+
+        <p>
+          Le preferenze restano salvate per la lega
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="form-grid">
+
+      <label class="form-field">
+
+        Visualizzazione
+
+        <select id="tv-layout-mode">
+
+          <option value="standard">
+            Standard
+          </option>
+
+          <option value="focus">
+            Focus giocatore
+          </option>
+
+          <option value="compact">
+            Compatta
+          </option>
+
+        </select>
+
+      </label>
+
+
+      <label class="form-field">
+
+        <span>
+          <input
+            id="tv-show-teams"
+            type="checkbox"
+            checked
+          >
+
+          Mostra situazione squadre
+        </span>
+
+      </label>
+
+
+      <label class="form-field">
+
+        <span>
+          <input
+            id="tv-show-bids"
+            type="checkbox"
+            checked
+          >
+
+          Mostra ultime offerte
+        </span>
+
+      </label>
+
+    </div>
+
+
+    <div class="league-actions">
+
+      <button
+        id="tv-save-layout"
+        type="button"
+      >
+        Salva layout
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <section class="card">
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        LIVE
+      </span>
+
+      <div>
+
+        <h2 id="tv-status-title">
+          In attesa
+        </h2>
+
+        <p id="tv-status-subtitle">
+          Nessuna sessione attiva
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="league-actions">
+
+      <span
+        id="tv-session-badge"
+        class="badge"
+      >
+        —
+      </span>
+
+
+      <span
+        id="tv-turn-badge"
+        class="badge"
+        hidden
+      ></span>
+
+
+      <span
+        id="tv-test-badge"
+        class="badge warning"
+        hidden
+      >
+        TEST
+      </span>
+
+    </div>
+
+  </section>
+
+
+  <section
+    id="tv-player-section"
+    class="card"
+  >
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        GIOCATORE
+      </span>
+
+      <div>
+
+        <h1 id="tv-player-name">
+          —
+        </h1>
+
+        <p id="tv-player-meta">
+          In attesa
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="stats-grid">
+
+      <div class="stat-card">
+
+        <span class="stat-label">
+          OFFERTA
+        </span>
+
+        <strong
+          id="tv-current-bid"
+          class="stat-value"
+        >
+          —
+        </strong>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <span class="stat-label">
+          LEADER
+        </span>
+
+        <strong
+          id="tv-current-leader"
+          class="stat-value"
+        >
+          —
+        </strong>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <span class="stat-label">
+          TIMER
+        </span>
+
+        <strong
+          id="tv-timer"
+          class="stat-value"
+        >
+          —
+        </strong>
+
+        <small id="tv-timer-status">
+          In attesa
+        </small>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section
+    id="tv-teams-section"
+    class="card"
+  >
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        TEAM
+      </span>
+
+      <div>
+
+        <h2>Situazione squadre</h2>
+
+        <p>
+          Crediti e composizione rosa
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="tv-teams-list"
+      class="list"
+    ></div>
+
+  </section>
+
+
+  <section
+    id="tv-bids-section"
+    class="card"
+  >
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        OFFERTE
+      </span>
+
+      <div>
+
+        <h2>Ultimi rilanci</h2>
+
+        <p>
+          Giocatore corrente
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="tv-bids-list"
+      class="list"
+    ></div>
+
+  </section>
+
+
+</main>
+
+
+<script src="league-presenter.js?v=1"></script>
+
+</body>
+
+</html>
