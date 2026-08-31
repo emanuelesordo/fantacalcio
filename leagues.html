@@ -105,8 +105,8 @@
         <h2>Unisciti a una lega</h2>
 
         <p>
-          Inserisci il codice fornito
-          dall'Admin della lega
+          Scegli i ruoli che vuoi richiedere
+          e, solo se necessario, la squadra
         </p>
 
       </div>
@@ -114,23 +114,35 @@
     </div>
 
 
-    <form id="league-code-form">
+    <a
+      class="button"
+      href="league-join.html"
+    >
+      Entra in una lega
+    </a>
 
-      <label>
 
-        Codice lega
+    <p class="setting-help">
+      Potrai richiedere Presidente, Vice,
+      Banditore e/o Presentatore.
+      La squadra verrà richiesta solo
+      per Presidente o Vice.
+    </p>
 
-        <input
-          id="league-code"
-          type="text"
-          maxlength="12"
-          placeholder="Es. A73F28C1"
-          autocomplete="off"
-          required
-        >
 
-      </label>
+    <!-- Compatibilità temporanea con leagues.js?v=1 -->
 
+    <form
+      id="league-code-form"
+      hidden
+    >
+
+      <input
+        id="league-code"
+        type="text"
+        maxlength="12"
+        autocomplete="off"
+      >
 
       <button type="submit">
         Cerca lega
