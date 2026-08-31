@@ -570,6 +570,146 @@
       }
     }
 
+
+    /* =====================================================
+       DASHBOARD PERSONALE PRESIDENTE DURANTE L'ASTA
+       Sempre visibile anche se l'utente è anche Admin.
+       ===================================================== */
+
+    .my-team-auction-dashboard{
+      min-width:0;
+      display:grid;
+      gap:5px;
+    }
+
+    .my-team-auction-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:7px;
+      min-width:0;
+    }
+
+    .my-team-auction-head strong{
+      display:block;
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-size:13px;
+    }
+
+    .my-team-auction-kpis{
+      display:grid;
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      gap:4px;
+    }
+
+    .my-team-auction-kpi{
+      min-width:0;
+      min-height:39px;
+      padding:5px 6px;
+      border:1px solid var(--line);
+      border-radius:6px;
+      background:var(--panel2);
+      display:grid;
+      gap:1px;
+    }
+
+    .my-team-auction-kpi span{
+      color:var(--muted);
+      font-size:7px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .my-team-auction-kpi strong{
+      font-size:14px;
+      line-height:1;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .my-team-role-progress{
+      display:flex;
+      align-items:center;
+      gap:3px;
+      flex-wrap:wrap;
+    }
+
+    .my-team-roster-strip{
+      min-height:0;
+      max-height:92px;
+      overflow:auto;
+      overscroll-behavior:contain;
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:3px;
+      padding-right:2px;
+    }
+
+    .my-team-roster-player{
+      min-width:0;
+      min-height:31px;
+      padding:4px 5px;
+      border:1px solid rgba(40,89,142,.65);
+      border-radius:6px;
+      background:#0b2a4d;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:5px;
+      align-items:center;
+    }
+
+    .my-team-roster-player strong{
+      display:block;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-size:9px;
+    }
+
+    .my-team-roster-player small{
+      display:block;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      color:var(--soft);
+      font-size:7px;
+    }
+
+    .my-team-roster-empty{
+      min-height:38px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:var(--soft);
+      font-size:9px;
+      border:1px dashed var(--line);
+      border-radius:6px;
+    }
+
+    @media(max-width:1050px){
+      .my-team-auction-kpis{
+        grid-template-columns:repeat(3,minmax(0,1fr));
+      }
+
+      .my-team-roster-strip{
+        grid-template-columns:1fr;
+        max-height:105px;
+      }
+    }
+
+    @media(max-width:600px){
+      .my-team-auction-kpis{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -906,6 +1046,8 @@
       auctionFilterTeam: 'all',
       auctionFilterSlot: 'all',
       auctionFilterFlag: 'all',
+      auctionPersonalRoster: null,
+      auctionPersonalRosterFetchedAt: 0,
       auctionSelectedPlayerId: null,
       auctionBidSelection: null,
       auctionBidSelectionKey: '',
@@ -1770,12 +1912,472 @@
        ASTA
        ===================================================== */
 
+    async function loadAuctionPersonalRoster(force = false) {
+      const isPresident =
+        state.auction?.permissions?.isPresident === true;
+
+      if (!isPresident) {
+        state.auctionPersonalRoster = null;
+        state.auctionPersonalRosterFetchedAt = 0;
+        return;
+      }
+
+      const now = Date.now();
+
+      if (
+        !force &&
+        state.auctionPersonalRoster &&
+        now - state.auctionPersonalRosterFetchedAt < 5000
+      ) {
+        return;
+      }
+
+      try {
+        const data = await api(
+          ENDPOINTS.rosters,
+          { action: 'getRosters' },
+          { quiet: true }
+        );
+
+        if (data?.ok) {
+          state.auctionPersonalRoster = data;
+          state.auctionPersonalRosterFetchedAt = Date.now();
+        }
+
+      } catch (error) {
+        console.error(
+          'AUCTION PERSONAL ROSTER:',
+          error
+        );
+      }
+    }
+
+
+    function auctionMyTeamDashboardData() {
+      const d = state.auction;
+      const teamId = d?.myTeam?.teamId;
+
+      if (!d || !teamId) {
+        return null;
+      }
+
+      const team =
+        (d.teams || [])
+          .find(item => item.id === teamId)
+        ||
+        null;
+
+      const teamState =
+        (d.teamOrder || [])
+          .find(item => item.team_id === teamId)
+        ||
+        null;
+
+      const capacity =
+        (d.bidCapacities || [])
+          .find(item => item.team_id === teamId)
+        ||
+        null;
+
+      const initialCredits =
+        Number(
+          d.settings?.initial_credits
+          ||
+          0
+        );
+
+      const spent =
+        Number(
+          teamState?.credits_spent
+          ??
+          capacity?.spent
+          ??
+          0
+        );
+
+      const remaining =
+        Math.max(
+          0,
+          initialCredits - spent
+        );
+
+      const assignments =
+        (
+          state.auctionPersonalRoster
+            ?.assignments
+          ||
+          []
+        )
+          .filter(
+            item =>
+              item.team_id === teamId
+          );
+
+      const rosterConfig =
+        parseRosterConfig(
+          d.settings?.roster_config
+        );
+
+      let rosterLimit = null;
+      let roleBadges = [];
+
+      if (
+        d.settings?.fantasy_mode
+        === 'classic'
+      ) {
+        const limits =
+          rosterConfig?.classic
+          ||
+          {};
+
+        rosterLimit =
+          ['P', 'D', 'C', 'A']
+            .reduce(
+              (
+                sum,
+                role
+              ) =>
+                sum
+                +
+                Number(
+                  limits?.[role]
+                  ||
+                  0
+                ),
+              0
+            );
+
+        roleBadges =
+          ['P', 'D', 'C', 'A']
+            .map(
+              role => {
+                const count =
+                  assignments
+                    .filter(
+                      item =>
+                        item.player
+                          ?.classic_role
+                        === role
+                    )
+                    .length;
+
+                return {
+                  label: role,
+                  count,
+                  limit:
+                    Number(
+                      limits?.[role]
+                      ||
+                      0
+                    )
+                };
+              }
+            );
+
+      } else {
+        const mantra =
+          rosterConfig?.mantra
+          ||
+          {};
+
+        const goalkeeperRoles =
+          new Set([
+            'P',
+            'Por'
+          ]);
+
+        const goalkeepers =
+          assignments
+            .filter(
+              item =>
+                (
+                  item.player
+                    ?.mantra_roles
+                  ||
+                  []
+                )
+                  .some(
+                    role =>
+                      goalkeeperRoles
+                        .has(
+                          role
+                        )
+                  )
+                ||
+                goalkeeperRoles
+                  .has(
+                    item.player
+                      ?.classic_role
+                  )
+            )
+            .length;
+
+        const outfield =
+          Math.max(
+            0,
+            assignments.length
+            -
+            goalkeepers
+          );
+
+        rosterLimit =
+          Number(
+            mantra?.total?.max
+            ??
+            mantra?.total?.min
+            ??
+            0
+          )
+          ||
+          null;
+
+        roleBadges = [
+          {
+            label: 'POR',
+            count: goalkeepers,
+            limit:
+              Number(
+                mantra
+                  ?.goalkeepers
+                  ?.max
+                ??
+                0
+              )
+          },
+          {
+            label: 'MOV',
+            count: outfield,
+            limit:
+              Number(
+                mantra
+                  ?.outfield
+                  ?.max
+                ??
+                0
+              )
+          }
+        ];
+      }
+
+      return {
+        teamId,
+        teamName:
+          team?.name
+          ||
+          'La mia squadra',
+        initialCredits,
+        spent,
+        remaining,
+        passesUsed:
+          Number(
+            teamState?.passes_used
+            ||
+            0
+          ),
+        maxBid:
+          capacity?.max_bid
+          ??
+          null,
+        rosterCount:
+          capacity?.roster_count
+          ??
+          assignments.length,
+        rosterLimit:
+          capacity?.roster_limit
+          ??
+          rosterLimit,
+        roleBadges,
+        assignments
+      };
+    }
+
+
+    function renderAuctionPersonalDashboard() {
+      const info =
+        auctionMyTeamDashboardData();
+
+      if (!info) {
+        return '';
+      }
+
+      const maxBidText =
+        info.maxBid === null
+        ||
+        info.maxBid === undefined
+          ? '—'
+          : info.maxBid;
+
+      const rosterText =
+        info.rosterLimit
+          ? `${info.rosterCount}/${info.rosterLimit}`
+          : `${info.rosterCount}`;
+
+      const rolesHtml =
+        info.roleBadges
+          .map(
+            role => `
+              <span class="badge">
+                ${esc(role.label)}
+                ${role.count}${
+                  role.limit
+                    ? `/${role.limit}`
+                    : ''
+                }
+              </span>
+            `
+          )
+          .join('');
+
+      const playersHtml =
+        info.assignments.length
+          ? info.assignments
+              .slice()
+              .sort(
+                (a, b) =>
+                  String(
+                    a.player?.name
+                    ||
+                    ''
+                  )
+                    .localeCompare(
+                      String(
+                        b.player?.name
+                        ||
+                        ''
+                      ),
+                      'it'
+                    )
+              )
+              .map(
+                item => {
+                  const roles =
+                    playerRoles(
+                      item.player || {},
+                      state.auction
+                        ?.settings
+                        ?.fantasy_mode
+                    )
+                      .join('/');
+
+                  return `
+                    <div class="my-team-roster-player">
+                      <div>
+                        <strong>
+                          ${esc(
+                            item.player?.name
+                            ||
+                            '—'
+                          )}
+                        </strong>
+
+                        <small>
+                          ${esc(roles)}
+                          ·
+                          ${esc(
+                            item.player
+                              ?.serie_a_team
+                            ||
+                            ''
+                          )}
+                        </small>
+                      </div>
+
+                      <span class="badge primary">
+                        ${Number(
+                          item.purchase_price
+                          ||
+                          0
+                        )}
+                      </span>
+                    </div>
+                  `;
+                }
+              )
+              .join('')
+          : `
+              <div class="my-team-roster-empty">
+                Nessun acquisto ancora registrato.
+              </div>
+            `;
+
+      return `
+        <section class="panel my-team-auction-dashboard">
+
+          <div class="my-team-auction-head">
+            <div>
+              <div class="small soft">
+                Dashboard Presidente
+              </div>
+
+              <strong>
+                ${esc(info.teamName)}
+              </strong>
+            </div>
+
+            <span class="badge good">
+              LA MIA SQUADRA
+            </span>
+          </div>
+
+
+          <div class="my-team-auction-kpis">
+
+            <div class="my-team-auction-kpi">
+              <span>Crediti</span>
+              <strong>${info.remaining}</strong>
+            </div>
+
+            <div class="my-team-auction-kpi">
+              <span>Spesi</span>
+              <strong>${info.spent}</strong>
+            </div>
+
+            <div class="my-team-auction-kpi">
+              <span>Max bid</span>
+              <strong>${maxBidText}</strong>
+            </div>
+
+            <div class="my-team-auction-kpi">
+              <span>Rosa</span>
+              <strong>${rosterText}</strong>
+            </div>
+
+            <div class="my-team-auction-kpi">
+              <span>Pass</span>
+              <strong>${info.passesUsed}/5</strong>
+            </div>
+
+          </div>
+
+
+          <div class="my-team-role-progress">
+            ${rolesHtml}
+          </div>
+
+
+          <div class="my-team-roster-strip">
+            ${playersHtml}
+          </div>
+
+        </section>
+      `;
+    }
+
+
     async function loadAuction({ quiet = false } = {}) {
       const data = await api(ENDPOINTS.auction, { action:'getLobby' }, { quiet });
       if (!data?.ok) return;
       state.auction = data;
 
-      if (data.serverNow) state.serverOffsetMs = Date.parse(data.serverNow) - Date.now();
+      if (data.serverNow) {
+        state.serverOffsetMs =
+          Date.parse(data.serverNow)
+          -
+          Date.now();
+      }
+
+      await loadAuctionPersonalRoster(false);
+
       renderAuction();
       renderTv();
       updateHeader();
@@ -2261,6 +2863,8 @@
                 <div class="president-primary">
                   ${playerPrimaryHtml}
 
+                  ${renderAuctionPersonalDashboard()}
+
                   <section class="panel live-recent-bids">
                     <div class="panel-title">
                       <div><h2>Situazione asta</h2></div>
@@ -2736,7 +3340,36 @@
     }
 
     async function auctionAction(payload,successText=''){
-      try{await api(ENDPOINTS.auction,payload);if(successText)msg(successText,'success');await loadAuction()}catch(error){msg(error.message,'error')}
+      try{
+        await api(
+          ENDPOINTS.auction,
+          payload
+        );
+
+        if (
+          payload?.action
+          === 'awardPlayer'
+        ) {
+          await loadAuctionPersonalRoster(
+            true
+          );
+        }
+
+        if(successText){
+          msg(
+            successText,
+            'success'
+          );
+        }
+
+        await loadAuction();
+
+      }catch(error){
+        msg(
+          error.message,
+          'error'
+        );
+      }
     }
 
     function renderAuctionReview(){
