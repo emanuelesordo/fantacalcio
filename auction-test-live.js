@@ -1,723 +1,1342 @@
-/* auction-test-live.js
-   Add-on per asta di test con squadre reali.
-   Richiede league-auction.js?v=2 caricato prima di questo file.
-*/
+/* =========================================================
+   ASTA TEST - SQUADRE REALI
+   - pulsante Test accanto a Prepara asta
+   - Presidenti non obbligatori
+   - Admin/Banditore può operare per tutte le squadre
+   - review prima della cancellazione
+   ========================================================= */
 
 const testUi = {
-  bar: document.getElementById('simple-test-bar'),
-  toggle: document.getElementById('simple-test-toggle'),
-  help: document.getElementById('simple-test-help'),
-  auctioneer: document.getElementById('test-auctioneer-panel'),
-  team: document.getElementById('test-bid-team'),
-  amount: document.getElementById('test-bid-amount'),
-  bid: document.getElementById('test-place-bid'),
-  award: document.getElementById('test-award-player'),
-  finish: document.getElementById('test-finish-review'),
-  bidHelp: document.getElementById('test-bid-help'),
-  review: document.getElementById('test-roster-review'),
-  reviewList: document.getElementById('test-roster-review-list'),
-  print: document.getElementById('test-print-rosters'),
-  csv: document.getElementById('test-download-csv'),
-  purge: document.getElementById('test-purge-data'),
-  csvNote: document.getElementById('test-csv-note')
+
+  prepare:
+    document.getElementById(
+      'prepare-test-auction-button'
+    ),
+
+  auctioneer:
+    document.getElementById(
+      'test-auctioneer-panel'
+    ),
+
+  team:
+    document.getElementById(
+      'test-bid-team'
+    ),
+
+  amount:
+    document.getElementById(
+      'test-bid-amount'
+    ),
+
+  bid:
+    document.getElementById(
+      'test-place-bid'
+    ),
+
+  award:
+    document.getElementById(
+      'test-award-player'
+    ),
+
+  finish:
+    document.getElementById(
+      'test-finish-review'
+    ),
+
+  bidHelp:
+    document.getElementById(
+      'test-bid-help'
+    ),
+
+  review:
+    document.getElementById(
+      'test-roster-review'
+    ),
+
+  reviewList:
+    document.getElementById(
+      'test-roster-review-list'
+    ),
+
+  print:
+    document.getElementById(
+      'test-print-rosters'
+    ),
+
+  csv:
+    document.getElementById(
+      'test-download-csv'
+    ),
+
+  purge:
+    document.getElementById(
+      'test-purge-data'
+    ),
+
+  csvNote:
+    document.getElementById(
+      'test-csv-note'
+    )
 };
 
-let testLastBid = null;
 
+let testLastBid =
+  null;
+
+
+/* =========================================================
+   STATO
+   ========================================================= */
 
 function testSession() {
-  return auctionData?.auctionSession || null;
+
+  return auctionData
+    ?.auctionSession
+    || null;
 }
 
 
-function testEnabled() {
-  return (
-    testSession()?.is_test === true
-    || auctionData?.testMode?.enabled === true
-  );
+function isTestSession() {
+
+  return testSession()
+    ?.is_test
+    === true;
 }
 
 
 function testCanControl() {
-  return auctionData?.permissions?.canControlAuction === true;
+
+  return auctionData
+    ?.permissions
+    ?.canControlAuction
+    === true;
 }
 
 
 function participatingTeams() {
-  const ordered = (auctionData?.teamOrder || [])
-    .map(item => item.team)
-    .filter(Boolean);
 
-  return ordered.length ? ordered : (auctionData?.teams || []);
+  const ordered =
+    (
+      auctionData
+        ?.teamOrder
+      || []
+    )
+      .map(
+        item =>
+          item.team
+      )
+      .filter(Boolean);
+
+
+  return ordered.length
+    ? ordered
+    : (
+        auctionData
+          ?.teams
+        || []
+      );
 }
 
 
-function renderTestTeamList() {
-  if (!testEnabled() || !teamsBox) return;
+/* =========================================================
+   PULSANTE TEST
+   ========================================================= */
 
-  teamsBox.innerHTML = (auctionData?.teams || [])
-    .map(team => `
-      <div class="list-row">
-        <div class="list-row-main">
-          <div class="list-row-title">
-            <strong>${escapeHtml(team.name)}</strong>
-            <small>
-              ${
-                team.president
-                  ? `Presidente: ${escapeHtml(team.president.username)}`
-                  : 'Nessun Presidente · nel test opera il Banditore'
-              }
-            </small>
-          </div>
-          <span class="badge good">TEST OK</span>
-        </div>
-      </div>
-    `)
-    .join('');
-}
+function renderPrepareTestButton() {
 
-
-function renderTestMode() {
-  if (!auctionData || !testUi.bar) return;
-
-  const canControl = testCanControl();
-  const session = testSession();
-  const enabled = testEnabled();
-
-  testUi.bar.hidden = !canControl;
-  if (!canControl) return;
-
-  testUi.toggle.checked = enabled;
-  testUi.toggle.disabled = Boolean(session)
-    || auctionData?.testMode?.canToggle === false;
-
-  if (!enabled) {
-    testUi.help.textContent =
-      'Usa le squadre reali già create; nel test i Presidenti non sono obbligatori.';
+  if (!testUi.prepare) {
     return;
   }
 
-  const readiness = auctionData?.testReadiness || {
-    ready: false,
-    blockers: [],
-    teamCount: 0
-  };
 
-  if (!session) {
-    prepareButton.disabled = !readiness.ready;
+  const session =
+    testSession();
 
-    blockersBox.innerHTML = readiness.blockers?.length
-      ? readiness.blockers
-          .map(item => `• ${escapeHtml(item)}`)
-          .join('<br>')
-      : 'Modalità test pronta: i Presidenti non sono obbligatori.';
 
-    const readinessBadge = statusLine?.querySelector('.badge');
+  const canControl =
+    testCanControl();
 
-    if (readinessBadge) {
-      readinessBadge.textContent = readiness.ready
-        ? 'TEST PRONTO'
-        : 'TEST DA COMPLETARE';
 
-      readinessBadge.classList.toggle(
-        'good',
-        readiness.ready
-      );
+  testUi.prepare.hidden =
+    !canControl
+    ||
+    Boolean(session);
 
-      readinessBadge.classList.toggle(
-        'warning',
-        !readiness.ready
-      );
-    }
 
-    testUi.help.textContent =
-      `${readiness.teamCount || 0} squadre reali · minimo 2 · Presidenti non richiesti`;
+  if (
+    !canControl
+    ||
+    session
+  ) {
+    return;
+  }
+
+
+  const readiness =
+    auctionData
+      ?.testReadiness
+    || {
+      ready: false,
+      blockers: []
+    };
+
+
+  testUi.prepare.disabled =
+    !readiness.ready;
+
+
+  if (readiness.ready) {
+
+    testUi.prepare.title =
+      'Prepara una sessione temporanea con tutte le squadre reali presenti.';
 
   } else {
-    testUi.help.textContent = session.status === 'review'
-      ? 'Test concluso: le assegnazioni restano disponibili per il riepilogo.'
-      : 'Sessione temporanea: Admin/Banditore può operare per tutte le squadre.';
 
-    if (!statusLine?.querySelector('[data-simple-test-badge]')) {
-      const badge = document.createElement('span');
-
-      badge.className = 'badge warning';
-      badge.dataset.simpleTestBadge = 'true';
-      badge.textContent = 'TEST';
-
-      statusLine?.appendChild(badge);
-    }
+    testUi.prepare.title =
+      readiness.blockers
+        ?.join(' ')
+      ||
+      'Asta di test non disponibile.';
   }
-
-  if (session?.status === 'review') {
-    phaseTitle.textContent = 'Riepilogo test';
-
-    phaseSubtitle.textContent =
-      'Controlla ed esporta le rose prima di eliminare i dati temporanei.';
-  }
-
-  renderTestTeamList();
 }
 
 
+/* =========================================================
+   ASPETTO SESSIONE TEST
+   ========================================================= */
+
+function renderTestSessionStatus() {
+
+  if (!isTestSession()) {
+    return;
+  }
+
+
+  const session =
+    testSession();
+
+
+  const statusBadge =
+    statusLine
+      ?.querySelector(
+        '.badge'
+      );
+
+
+  if (statusBadge) {
+
+    statusBadge.classList
+      .remove(
+        'warning'
+      );
+
+
+    statusBadge.classList
+      .add(
+        'good'
+      );
+
+
+    if (
+      session.status
+      === 'prepared'
+    ) {
+
+      statusBadge.textContent =
+        'TEST PREPARATO';
+
+
+    } else if (
+      session.status
+      === 'live'
+    ) {
+
+      statusBadge.textContent =
+        'TEST LIVE';
+
+
+    } else if (
+      session.status
+      === 'review'
+    ) {
+
+      statusBadge.textContent =
+        'TEST REVIEW';
+    }
+  }
+
+
+  const testBadge =
+    statusLine
+      ?.querySelector(
+        '[data-test-session-badge]'
+      );
+
+
+  if (!testBadge) {
+
+    const badge =
+      document.createElement(
+        'span'
+      );
+
+
+    badge.className =
+      'badge warning';
+
+
+    badge.dataset
+      .testSessionBadge =
+      'true';
+
+
+    badge.textContent =
+      'TEMPORANEA';
+
+
+    statusLine
+      ?.appendChild(
+        badge
+      );
+  }
+
+
+  if (
+    session.status
+    === 'prepared'
+  ) {
+
+    blockersBox.textContent =
+      `Sessione test con ${
+        participatingTeams().length
+      } squadre reali. I Presidenti non sono obbligatori.`;
+
+
+  } else if (
+    session.status
+    === 'live'
+  ) {
+
+    blockersBox.textContent =
+      'Asta di test in corso. Le assegnazioni resteranno temporanee.';
+
+
+  } else if (
+    session.status
+    === 'review'
+  ) {
+
+    blockersBox.textContent =
+      'Test concluso: controlla o esporta le rose prima di eliminare i dati temporanei.';
+
+
+    phaseTitle.textContent =
+      'Riepilogo test';
+
+
+    phaseSubtitle.textContent =
+      'Rose temporanee ed esportazioni';
+  }
+}
+
+
+/* =========================================================
+   SQUADRE
+   ========================================================= */
+
+function renderTestTeamList() {
+
+  if (
+    !isTestSession()
+    ||
+    !teamsBox
+  ) {
+    return;
+  }
+
+
+  const teams =
+    auctionData
+      ?.teams
+    || [];
+
+
+  teamsBox.innerHTML =
+    teams
+      .map(
+        team => `
+
+          <div class="list-row">
+
+            <div class="list-row-main">
+
+              <div class="list-row-title">
+
+                <strong>
+                  ${escapeHtml(
+                    team.name
+                  )}
+                </strong>
+
+                <small>
+
+                  ${
+                    team.president
+
+                      ? `
+                        Presidente:
+                        ${escapeHtml(
+                          team
+                            .president
+                            .username
+                        )}
+                      `
+
+                      : 'Nessun Presidente · nel test può operare il Banditore'
+                  }
+
+                </small>
+
+              </div>
+
+
+              <span class="badge good">
+                TEST OK
+              </span>
+
+            </div>
+
+          </div>
+
+        `
+      )
+      .join('');
+}
+
+
+/* =========================================================
+   PANNELLO BANDITORE
+   ========================================================= */
+
 function renderTestAuctioneer() {
-  if (!testUi.auctioneer) return;
 
-  const session = testSession();
-  const player = auctionData?.currentPlayer;
+  if (!testUi.auctioneer) {
+    return;
+  }
 
-  const show = Boolean(
-    session?.is_test === true
-    && session.status === 'live'
-    && testCanControl()
-    && player
-  );
 
-  testUi.auctioneer.hidden = !show;
+  const session =
+    testSession();
 
-  if (!show) return;
 
-  const leaderId = session.current_bidder_team_id;
-  const previousTeam = testUi.team.value;
+  const player =
+    auctionData
+      ?.currentPlayer;
 
-  testUi.team.innerHTML = participatingTeams()
-    .map(team => `
-      <option
-        value="${escapeHtml(team.id)}"
-        ${team.id === leaderId ? 'disabled' : ''}
-      >
-        ${escapeHtml(team.name)}
-        ${team.id === leaderId ? ' · leader' : ''}
-      </option>
-    `)
-    .join('');
+
+  const show =
+    Boolean(
+      session
+      &&
+      session.is_test
+      === true
+      &&
+      session.status
+      === 'live'
+      &&
+      testCanControl()
+      &&
+      player
+    );
+
+
+  testUi.auctioneer.hidden =
+    !show;
+
+
+  if (!show) {
+    return;
+  }
+
+
+  const leaderId =
+    session
+      .current_bidder_team_id;
+
+
+  const previousTeam =
+    testUi.team.value;
+
+
+  const teams =
+    participatingTeams();
+
+
+  testUi.team.innerHTML =
+    teams
+      .map(
+        team => `
+
+          <option
+            value="${escapeHtml(
+              team.id
+            )}"
+            ${
+              team.id
+              === leaderId
+                ? 'disabled'
+                : ''
+            }
+          >
+            ${escapeHtml(
+              team.name
+            )}
+            ${
+              team.id
+              === leaderId
+                ? ' · leader'
+                : ''
+            }
+          </option>
+
+        `
+      )
+      .join('');
+
 
   if (
     previousTeam
-    && participatingTeams().some(
+    &&
+    teams.some(
       team =>
-        team.id === previousTeam
-        && team.id !== leaderId
+        team.id
+        === previousTeam
+        &&
+        team.id
+        !== leaderId
     )
   ) {
-    testUi.team.value = previousTeam;
+
+    testUi.team.value =
+      previousTeam;
   }
 
-  const minimum = Math.max(
-    1,
-    Number(session.current_bid || 0) + 1
-  );
 
-  testUi.amount.min = String(minimum);
+  const minimum =
+    Math.max(
+      1,
+      Number(
+        session.current_bid
+        || 0
+      )
+      +
+      1
+    );
+
+
+  testUi.amount.min =
+    String(
+      minimum
+    );
+
 
   if (
-    testLastBid !== session.current_bid
-    || !testUi.amount.value
-    || Number(testUi.amount.value) < minimum
+    testLastBid
+    !== session.current_bid
+    ||
+    !testUi.amount.value
+    ||
+    Number(
+      testUi.amount.value
+    )
+    <
+    minimum
   ) {
-    testUi.amount.value = String(minimum);
-    testLastBid = session.current_bid;
+
+    testUi.amount.value =
+      String(
+        minimum
+      );
+
+
+    testLastBid =
+      session.current_bid;
   }
 
-  const leader = auctionData?.currentBidderTeam;
 
-  testUi.bidHelp.textContent = leader
-    ? `Leader: ${leader.name} a ${session.current_bid}.`
-    : session.current_bid
-      ? `Base corrente: ${session.current_bid}. Nessun leader.`
-      : 'Nessuna offerta registrata.';
+  const leader =
+    auctionData
+      ?.currentBidderTeam;
+
+
+  testUi.bidHelp.textContent =
+    leader
+
+      ? `Leader: ${leader.name} a ${session.current_bid}.`
+
+      : session.current_bid
+
+        ? `Base corrente: ${session.current_bid}. Nessuna squadra leader.`
+
+        : 'Nessuna offerta registrata.';
+
 
   testUi.award.disabled =
     !leader
-    || !session.current_bid;
+    ||
+    !session.current_bid;
 }
 
 
+/* =========================================================
+   REVIEW
+   ========================================================= */
+
 function reviewData() {
-  return auctionData?.rosterReview || null;
+
+  return auctionData
+    ?.rosterReview
+    || null;
 }
 
 
 function renderTestReview() {
-  if (!testUi.review) return;
 
-  const session = testSession();
-  const review = reviewData();
-
-  const show = Boolean(
-    session?.is_test === true
-    && review
-    && (
-      review.totalAssignments > 0
-      || session.status === 'review'
-    )
-  );
-
-  testUi.review.hidden = !show;
-
-  if (!show) {
-    testUi.reviewList.innerHTML = '';
+  if (!testUi.review) {
     return;
   }
 
+
+  const session =
+    testSession();
+
+
+  const review =
+    reviewData();
+
+
+  const show =
+    Boolean(
+      session
+      &&
+      session.is_test
+      === true
+      &&
+      review
+      &&
+      (
+        review.totalAssignments
+        > 0
+        ||
+        session.status
+        === 'review'
+      )
+    );
+
+
+  testUi.review.hidden =
+    !show;
+
+
+  if (!show) {
+
+    testUi.reviewList.innerHTML =
+      '';
+
+    return;
+  }
+
+
   const finalReview =
-    session.status === 'review';
+    session.status
+    === 'review';
+
 
   testUi.purge.hidden =
     !finalReview;
 
+
   testUi.print.disabled =
-    review.totalAssignments < 1;
+    review.totalAssignments
+    < 1;
+
 
   testUi.csv.disabled =
-    review.totalAssignments < 1;
+    review.totalAssignments
+    < 1;
 
-  testUi.csvNote.textContent = finalReview
-    ? 'Le assegnazioni restano intatte finché non premi “Elimina dati test”.'
-    : 'Riepilogo parziale dell’asta di test in corso.';
 
-  testUi.reviewList.innerHTML = review.teams
-    .map(team => {
-      const players = team.players?.length
-        ? team.players
-            .map(assignment => {
-              const player =
-                assignment.player || {};
+  testUi.csvNote.textContent =
+    finalReview
 
-              const roles =
-                getPlayerRoles(player)
-                  .join('/');
+      ? 'Le assegnazioni restano intatte finché non premi “Elimina dati test”.'
 
-              return `
-                <div class="setting-row">
-                  <span>
-                    <strong>
-                      ${escapeHtml(
-                        player.name || 'Giocatore'
-                      )}
-                    </strong>
+      : 'Riepilogo parziale dell’asta di test in corso.';
 
-                    <small>
-                      ${escapeHtml(roles || '—')}
-                      ·
-                      ${escapeHtml(
-                        player.serie_a_team || '—'
-                      )}
-                    </small>
-                  </span>
 
-                  <strong>
+  testUi.reviewList.innerHTML =
+    review.teams
+      .map(
+        team => {
+
+          const players =
+            team.players
+              ?.length
+
+              ? team.players
+                  .map(
+                    assignment => {
+
+                      const player =
+                        assignment.player
+                        || {};
+
+
+                      const roles =
+                        getPlayerRoles(
+                          player
+                        )
+                          .join('/');
+
+
+                      return `
+
+                        <div class="setting-row">
+
+                          <span>
+
+                            <strong>
+                              ${escapeHtml(
+                                player.name
+                                || 'Giocatore'
+                              )}
+                            </strong>
+
+                            <small>
+                              ${escapeHtml(
+                                roles
+                                || '—'
+                              )}
+                              ·
+                              ${escapeHtml(
+                                player.serie_a_team
+                                || '—'
+                              )}
+                            </small>
+
+                          </span>
+
+
+                          <strong>
+                            ${escapeHtml(
+                              assignment
+                                .purchase_price
+                            )}
+                          </strong>
+
+                        </div>
+
+                      `;
+                    }
+                  )
+                  .join('')
+
+              : `
+                  <div class="empty-state">
+                    Nessun acquisto.
+                  </div>
+                `;
+
+
+          return `
+
+            <div class="league-card">
+
+              <div class="league-card-header">
+
+                <div>
+
+                  <h3>
                     ${escapeHtml(
-                      assignment.purchase_price
+                      team.name
                     )}
-                  </strong>
+                  </h3>
+
+                  <p>
+                    ${team.players.length} giocatori
+                    · spesi ${team.spent}
+                    · residui ${team.remaining}
+                  </p>
+
                 </div>
-              `;
-            })
-            .join('')
-        : `
-            <div class="empty-state">
-              Nessun acquisto.
+
+
+                <span class="badge">
+                  ${team.spent}
+                </span>
+
+              </div>
+
+
+              <div class="divider"></div>
+
+
+              ${players}
+
             </div>
+
           `;
-
-      return `
-        <div class="league-card">
-
-          <div class="league-card-header">
-
-            <div>
-              <h3>
-                ${escapeHtml(team.name)}
-              </h3>
-
-              <p>
-                ${team.players.length} giocatori
-                · spesi ${team.spent}
-                · residui ${team.remaining}
-              </p>
-            </div>
-
-            <span class="badge">
-              ${team.spent}
-            </span>
-
-          </div>
-
-          <div class="divider"></div>
-
-          ${players}
-
-        </div>
-      `;
-    })
-    .join('');
+        }
+      )
+      .join('');
 }
 
 
-async function refreshTestAuction() {
-  await loadLobby();
-}
+/* =========================================================
+   PREPARA TEST
+   ========================================================= */
+
+testUi.prepare
+  ?.addEventListener(
+    'click',
+    async () => {
+
+      testUi.prepare.disabled =
+        true;
 
 
-testUi.toggle?.addEventListener(
-  'change',
-  async () => {
-    const enabled =
-      testUi.toggle.checked;
+      const oldText =
+        testUi.prepare.textContent;
 
-    testUi.toggle.disabled =
-      true;
 
-    try {
-      const result = await callApi({
-        action: 'setTestMode',
-        enabled
-      });
+      testUi.prepare.textContent =
+        'Test...';
 
-      if (!result?.ok) {
-        throw new Error(
-          result?.error
-          || 'Impossibile modificare la modalità test.'
+
+      try {
+
+        const result =
+          await callApi({
+            action:
+              'prepareTestAuction'
+          });
+
+
+        if (!result?.ok) {
+
+          throw new Error(
+            result?.error
+            ||
+            'Impossibile preparare l’asta di test.'
+          );
+        }
+
+
+        showMessage(
+          'Sessione di test preparata.',
+          'success'
         );
+
+
+        await loadLobby();
+
+
+      } catch (error) {
+
+        console.error(error);
+
+
+        showMessage(
+          error.message
+          ||
+          'Errore durante la preparazione del test.',
+          'error'
+        );
+
+
+      } finally {
+
+        testUi.prepare.textContent =
+          oldText;
+
+
+        renderPrepareTestButton();
+      }
+    }
+  );
+
+
+/* =========================================================
+   OFFERTA BANDITORE
+   ========================================================= */
+
+testUi.bid
+  ?.addEventListener(
+    'click',
+    async () => {
+
+      const session =
+        testSession();
+
+
+      const teamId =
+        testUi.team.value;
+
+
+      const amount =
+        Number(
+          testUi.amount.value
+        );
+
+
+      if (
+        !session
+        ||
+        !teamId
+      ) {
+
+        showMessage(
+          'Seleziona una squadra.',
+          'error'
+        );
+
+        return;
       }
 
-      showMessage(
-        enabled
-          ? 'Asta di test attivata.'
-          : 'Asta di test disattivata.',
-        'success'
-      );
 
-      await refreshTestAuction();
-
-    } catch (error) {
-      console.error(error);
-
-      testUi.toggle.checked =
-        !enabled;
-
-      showMessage(
-        error.message
-        || 'Errore durante la modifica della modalità test.',
-        'error'
-      );
-
-    } finally {
-      renderTestMode();
-    }
-  }
-);
-
-
-testUi.bid?.addEventListener(
-  'click',
-  async () => {
-    const session =
-      testSession();
-
-    const teamId =
-      testUi.team.value;
-
-    const amount =
-      Number(testUi.amount.value);
-
-    if (!session || !teamId) {
-      showMessage(
-        'Seleziona una squadra.',
-        'error'
-      );
-
-      return;
-    }
-
-    const minimum = Math.max(
-      1,
-      Number(session.current_bid || 0) + 1
-    );
-
-    if (
-      !Number.isInteger(amount)
-      || amount < minimum
-    ) {
-      showMessage(
-        `L’offerta minima è ${minimum}.`,
-        'error'
-      );
-
-      return;
-    }
-
-    testUi.bid.disabled =
-      true;
-
-    const oldText =
-      testUi.bid.textContent;
-
-    testUi.bid.textContent =
-      'Registrazione...';
-
-    try {
-      const result = await callApi({
-        action: 'placeBid',
-        sessionId: session.id,
-        teamId,
-        amount,
-        source: 'TEST_BANDITORE'
-      });
-
-      if (!result?.ok) {
-        throw new Error(
-          result?.error
-          || 'Impossibile registrare l’offerta.'
+      const minimum =
+        Math.max(
+          1,
+          Number(
+            session.current_bid
+            || 0
+          )
+          +
+          1
         );
+
+
+      if (
+        !Number.isInteger(
+          amount
+        )
+        ||
+        amount < minimum
+      ) {
+
+        showMessage(
+          `L’offerta minima è ${minimum}.`,
+          'error'
+        );
+
+        return;
       }
 
-      showMessage(
-        `Offerta ${amount} registrata.`,
-        'success'
-      );
 
-      await refreshTestAuction();
-
-    } catch (error) {
-      console.error(error);
-
-      showMessage(
-        error.message
-        || 'Errore durante il rilancio.',
-        'error'
-      );
-
-    } finally {
       testUi.bid.disabled =
-        false;
+        true;
+
+
+      const oldText =
+        testUi.bid.textContent;
+
 
       testUi.bid.textContent =
-        oldText;
-    }
-  }
-);
+        'Registrazione...';
 
 
-testUi.award?.addEventListener(
-  'click',
-  async () => {
-    const session =
-      testSession();
+      try {
 
-    const leader =
-      auctionData?.currentBidderTeam;
+        const result =
+          await callApi({
 
-    if (
-      !session
-      || !leader
-      || !session.current_bid
-    ) {
-      showMessage(
-        'Non c’è un leader da aggiudicare.',
-        'error'
-      );
+            action:
+              'placeBid',
 
-      return;
-    }
+            sessionId:
+              session.id,
 
-    testUi.award.disabled =
-      true;
+            teamId,
 
-    const oldText =
-      testUi.award.textContent;
+            amount,
 
-    testUi.award.textContent =
-      'Aggiudicazione...';
+            source:
+              'TEST_BANDITORE'
+          });
 
-    try {
-      const result = await callApi({
-        action: 'awardPlayer',
-        sessionId: session.id
-      });
 
-      if (!result?.ok) {
-        throw new Error(
-          result?.error
-          || 'Impossibile aggiudicare il giocatore.'
+        if (!result?.ok) {
+
+          throw new Error(
+            result?.error
+            ||
+            'Impossibile registrare l’offerta.'
+          );
+        }
+
+
+        showMessage(
+          `Offerta ${amount} registrata.`,
+          'success'
         );
+
+
+        await loadLobby();
+
+
+      } catch (error) {
+
+        console.error(error);
+
+
+        showMessage(
+          error.message
+          ||
+          'Errore durante il rilancio.',
+          'error'
+        );
+
+
+      } finally {
+
+        testUi.bid.disabled =
+          false;
+
+
+        testUi.bid.textContent =
+          oldText;
+      }
+    }
+  );
+
+
+/* =========================================================
+   AGGIUDICA
+   ========================================================= */
+
+testUi.award
+  ?.addEventListener(
+    'click',
+    async () => {
+
+      const session =
+        testSession();
+
+
+      const leader =
+        auctionData
+          ?.currentBidderTeam;
+
+
+      if (
+        !session
+        ||
+        !leader
+        ||
+        !session.current_bid
+      ) {
+
+        showMessage(
+          'Non c’è un leader da aggiudicare.',
+          'error'
+        );
+
+        return;
       }
 
-      showMessage(
-        `Giocatore aggiudicato a ${leader.name} per ${session.current_bid}.`,
-        'success'
-      );
 
-      await refreshTestAuction();
-
-    } catch (error) {
-      console.error(error);
-
-      showMessage(
-        error.message
-        || 'Errore durante l’aggiudicazione.',
-        'error'
-      );
-
-    } finally {
       testUi.award.disabled =
-        false;
+        true;
+
+
+      const oldText =
+        testUi.award.textContent;
+
 
       testUi.award.textContent =
-        oldText;
-    }
-  }
-);
+        'Aggiudicazione...';
 
 
-testUi.finish?.addEventListener(
-  'click',
-  async () => {
-    const session =
-      testSession();
+      try {
 
-    if (!session) return;
+        const result =
+          await callApi({
 
-    testUi.finish.disabled =
-      true;
+            action:
+              'awardPlayer',
 
-    const oldText =
-      testUi.finish.textContent;
+            sessionId:
+              session.id
+          });
 
-    testUi.finish.textContent =
-      'Chiusura...';
 
-    try {
-      const result = await callApi({
-        action: 'finishTestReview',
-        sessionId: session.id
-      });
+        if (!result?.ok) {
 
-      if (!result?.ok) {
-        throw new Error(
-          result?.error
-          || 'Impossibile terminare il test.'
+          throw new Error(
+            result?.error
+            ||
+            'Impossibile aggiudicare il giocatore.'
+          );
+        }
+
+
+        showMessage(
+          `Giocatore aggiudicato a ${leader.name} per ${session.current_bid}.`,
+          'success'
         );
+
+
+        await loadLobby();
+
+
+      } catch (error) {
+
+        console.error(error);
+
+
+        showMessage(
+          error.message
+          ||
+          'Errore durante l’aggiudicazione.',
+          'error'
+        );
+
+
+      } finally {
+
+        testUi.award.disabled =
+          false;
+
+
+        testUi.award.textContent =
+          oldText;
+      }
+    }
+  );
+
+
+/* =========================================================
+   TERMINA TEST -> REVIEW
+   ========================================================= */
+
+testUi.finish
+  ?.addEventListener(
+    'click',
+    async () => {
+
+      const session =
+        testSession();
+
+
+      if (!session) {
+        return;
       }
 
-      showMessage(
-        'Test concluso. Le rose restano disponibili per controllo ed esportazione.',
-        'success'
-      );
 
-      await refreshTestAuction();
-
-    } catch (error) {
-      console.error(error);
-
-      showMessage(
-        error.message
-        || 'Errore durante la chiusura del test.',
-        'error'
-      );
-
-    } finally {
       testUi.finish.disabled =
-        false;
+        true;
+
+
+      const oldText =
+        testUi.finish.textContent;
+
 
       testUi.finish.textContent =
-        oldText;
-    }
-  }
-);
+        'Chiusura...';
 
+
+      try {
+
+        const result =
+          await callApi({
+
+            action:
+              'finishTestReview',
+
+            sessionId:
+              session.id
+          });
+
+
+        if (!result?.ok) {
+
+          throw new Error(
+            result?.error
+            ||
+            'Impossibile terminare il test.'
+          );
+        }
+
+
+        showMessage(
+          'Test concluso. Le rose restano disponibili per controllo ed esportazione.',
+          'success'
+        );
+
+
+        await loadLobby();
+
+
+      } catch (error) {
+
+        console.error(error);
+
+
+        showMessage(
+          error.message
+          ||
+          'Errore durante la chiusura del test.',
+          'error'
+        );
+
+
+      } finally {
+
+        testUi.finish.disabled =
+          false;
+
+
+        testUi.finish.textContent =
+          oldText;
+      }
+    }
+  );
+
+
+/* =========================================================
+   STAMPA / PDF
+   ========================================================= */
 
 function printableRostersHtml() {
+
   const review =
     reviewData();
 
+
   if (
     !review
-    || review.totalAssignments < 1
+    ||
+    review.totalAssignments
+    < 1
   ) {
+
     return '';
   }
 
+
   const leagueName =
-    auctionData?.league?.name
-    || 'Lega';
+    auctionData
+      ?.league
+      ?.name
+    ||
+    'Lega';
 
-  const teams = review.teams
-    .map(team => {
-      const rows = team.players
-        .map(assignment => {
-          const player =
-            assignment.player || {};
 
-          const roles =
-            getPlayerRoles(player)
-              .join('/');
+  const teams =
+    review.teams
+      .map(
+        team => {
+
+          const rows =
+            team.players
+              .map(
+                assignment => {
+
+                  const player =
+                    assignment.player
+                    || {};
+
+
+                  const roles =
+                    getPlayerRoles(
+                      player
+                    )
+                      .join('/');
+
+
+                  return `
+
+                    <tr>
+
+                      <td>
+                        ${escapeHtml(
+                          roles
+                          || '—'
+                        )}
+                      </td>
+
+                      <td>
+                        ${escapeHtml(
+                          player.name
+                          || 'Giocatore'
+                        )}
+                      </td>
+
+                      <td>
+                        ${escapeHtml(
+                          player.serie_a_team
+                          || '—'
+                        )}
+                      </td>
+
+                      <td class="price">
+                        ${escapeHtml(
+                          assignment
+                            .purchase_price
+                        )}
+                      </td>
+
+                    </tr>
+
+                  `;
+                }
+              )
+              .join('');
+
 
           return `
-            <tr>
-              <td>
-                ${escapeHtml(roles || '—')}
-              </td>
 
-              <td>
-                ${escapeHtml(
-                  player.name || 'Giocatore'
-                )}
-              </td>
+            <section>
 
-              <td>
+              <h2>
                 ${escapeHtml(
-                  player.serie_a_team || '—'
+                  team.name
                 )}
-              </td>
+              </h2>
 
-              <td class="price">
-                ${escapeHtml(
-                  assignment.purchase_price
-                )}
-              </td>
-            </tr>
+              <p>
+                Spesi: ${team.spent}
+                · Residui: ${team.remaining}
+                · Giocatori: ${team.players.length}
+              </p>
+
+              <table>
+
+                <thead>
+                  <tr>
+                    <th>Ruolo</th>
+                    <th>Giocatore</th>
+                    <th>Squadra</th>
+                    <th>Costo</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  ${rows}
+                </tbody>
+
+              </table>
+
+            </section>
+
           `;
-        })
-        .join('');
+        }
+      )
+      .join('');
 
-      return `
-        <section>
-
-          <h2>
-            ${escapeHtml(team.name)}
-          </h2>
-
-          <p>
-            Spesi: ${team.spent}
-            · Residui: ${team.remaining}
-            · Giocatori: ${team.players.length}
-          </p>
-
-          <table>
-
-            <thead>
-              <tr>
-                <th>Ruolo</th>
-                <th>Giocatore</th>
-                <th>Squadra</th>
-                <th>Costo</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              ${rows}
-            </tbody>
-
-          </table>
-
-        </section>
-      `;
-    })
-    .join('');
 
   return `<!DOCTYPE html>
+
 <html lang="it">
 
 <head>
@@ -725,7 +1344,9 @@ function printableRostersHtml() {
 <meta charset="UTF-8">
 
 <title>
-  Rose test - ${escapeHtml(leagueName)}
+  Rose test - ${escapeHtml(
+    leagueName
+  )}
 </title>
 
 <style>
@@ -741,7 +1362,10 @@ function printableRostersHtml() {
 
 body {
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
   color: #111;
   font-size: 10px;
 }
@@ -812,7 +1436,9 @@ td:last-child {
 <body>
 
 <h1>
-  Rose test · ${escapeHtml(leagueName)}
+  Rose test · ${escapeHtml(
+    leagueName
+  )}
 </h1>
 
 ${teams}
@@ -822,6 +1448,7 @@ ${teams}
 window.addEventListener(
   'load',
   () => {
+
     setTimeout(
       () => window.print(),
       150
@@ -837,67 +1464,96 @@ window.addEventListener(
 }
 
 
-testUi.print?.addEventListener(
-  'click',
-  () => {
-    const html =
-      printableRostersHtml();
+testUi.print
+  ?.addEventListener(
+    'click',
+    () => {
 
-    if (!html) {
-      showMessage(
-        'Non ci sono rose da stampare.',
-        'error'
+      const html =
+        printableRostersHtml();
+
+
+      if (!html) {
+
+        showMessage(
+          'Non ci sono rose da stampare.',
+          'error'
+        );
+
+        return;
+      }
+
+
+      const printWindow =
+        window.open(
+          '',
+          '_blank'
+        );
+
+
+      if (!printWindow) {
+
+        showMessage(
+          'Il browser ha bloccato la finestra di stampa.',
+          'error'
+        );
+
+        return;
+      }
+
+
+      printWindow.document.open();
+
+
+      printWindow.document.write(
+        html
       );
 
-      return;
+
+      printWindow.document.close();
     }
+  );
 
-    const printWindow =
-      window.open(
-        '',
-        '_blank'
-      );
 
-    if (!printWindow) {
-      showMessage(
-        'Il browser ha bloccato la finestra di stampa.',
-        'error'
-      );
-
-      return;
-    }
-
-    printWindow.document.open();
-
-    printWindow.document.write(
-      html
-    );
-
-    printWindow.document.close();
-  }
-);
-
+/* =========================================================
+   CSV
+   ========================================================= */
 
 function csvEscape(value) {
+
   const text =
-    String(value ?? '');
+    String(
+      value ?? ''
+    );
+
 
   if (
-    /[";\r\n]/.test(text)
+    /[";\r\n]/.test(
+      text
+    )
   ) {
+
     return `"${text.replaceAll(
       '"',
       '""'
     )}"`;
   }
 
+
   return text;
 }
 
 
 function safeFileName(value) {
-  return String(value || 'lega')
-    .normalize('NFD')
+
+  return String(
+    value
+    ||
+    'lega'
+  )
+    .normalize(
+      'NFD'
+    )
     .replace(
       /[\u0300-\u036f]/g,
       ''
@@ -911,7 +1567,8 @@ function safeFileName(value) {
       ''
     )
     .toLowerCase()
-    || 'lega';
+    ||
+    'lega';
 }
 
 
@@ -920,50 +1577,76 @@ function downloadTextFile(
   content,
   mimeType
 ) {
+
   const blob =
     new Blob(
-      [content],
+      [
+        content
+      ],
       {
-        type: mimeType
+        type:
+          mimeType
       }
     );
 
+
   const url =
-    URL.createObjectURL(blob);
+    URL.createObjectURL(
+      blob
+    );
+
 
   const link =
-    document.createElement('a');
+    document.createElement(
+      'a'
+    );
+
 
   link.href =
     url;
 
+
   link.download =
     filename;
 
-  document.body.appendChild(link);
+
+  document.body.appendChild(
+    link
+  );
+
 
   link.click();
 
+
   link.remove();
+
 
   setTimeout(
     () =>
-      URL.revokeObjectURL(url),
+      URL.revokeObjectURL(
+        url
+      ),
     1000
   );
 }
 
 
 function fantacalcioCsv() {
+
   const review =
     reviewData();
 
+
   if (
     !review
-    || review.totalAssignments < 1
+    ||
+    review.totalAssignments
+    < 1
   ) {
+
     return '';
   }
+
 
   const rows = [
     [
@@ -976,27 +1659,49 @@ function fantacalcioCsv() {
     ]
   ];
 
+
   for (
     const team
     of review.teams
   ) {
+
     for (
       const assignment
       of team.players
     ) {
-      const player =
-        assignment.player || {};
 
-      rows.push([
-        team.name,
-        player.source_player_id || '',
-        player.name || '',
-        getPlayerRoles(player).join('/'),
-        player.serie_a_team || '',
-        assignment.purchase_price
-      ]);
+      const player =
+        assignment.player
+        || {};
+
+
+      rows.push(
+        [
+          team.name,
+
+          player
+            .source_player_id
+          || '',
+
+          player.name
+          || '',
+
+          getPlayerRoles(
+            player
+          )
+            .join('/'),
+
+          player
+            .serie_a_team
+          || '',
+
+          assignment
+            .purchase_price
+        ]
+      );
     }
   }
+
 
   return '\uFEFF'
     +
@@ -1004,138 +1709,208 @@ function fantacalcioCsv() {
       .map(
         row =>
           row
-            .map(csvEscape)
+            .map(
+              csvEscape
+            )
             .join(';')
       )
       .join('\r\n');
 }
 
 
-testUi.csv?.addEventListener(
-  'click',
-  () => {
-    const csv =
-      fantacalcioCsv();
+testUi.csv
+  ?.addEventListener(
+    'click',
+    () => {
 
-    if (!csv) {
-      showMessage(
-        'Non ci sono rose da esportare.',
-        'error'
-      );
-
-      return;
-    }
-
-    downloadTextFile(
-      `rose_${safeFileName(
-        auctionData?.league?.name
-      )}.csv`,
-      csv,
-      'text/csv;charset=utf-8'
-    );
-
-    showMessage(
-      'CSV rose scaricato.',
-      'success'
-    );
-  }
-);
+      const csv =
+        fantacalcioCsv();
 
 
-testUi.purge?.addEventListener(
-  'click',
-  async () => {
-    const session =
-      testSession();
+      if (!csv) {
 
-    if (!session) return;
-
-    const confirmed =
-      window.confirm(
-        'Eliminare tutte le assegnazioni temporanee di questo test? '
-        +
-        'Le rose reali non verranno modificate.'
-      );
-
-    if (!confirmed) return;
-
-    testUi.purge.disabled =
-      true;
-
-    const oldText =
-      testUi.purge.textContent;
-
-    testUi.purge.textContent =
-      'Eliminazione...';
-
-    try {
-      const result = await callApi({
-        action: 'purgeTest',
-        sessionId: session.id
-      });
-
-      if (!result?.ok) {
-        throw new Error(
-          result?.error
-          || 'Impossibile eliminare i dati del test.'
+        showMessage(
+          'Non ci sono rose da esportare.',
+          'error'
         );
+
+        return;
       }
 
+
+      downloadTextFile(
+        `rose_${safeFileName(
+          auctionData
+            ?.league
+            ?.name
+        )}.csv`,
+
+        csv,
+
+        'text/csv;charset=utf-8'
+      );
+
+
       showMessage(
-        'Dati test eliminati. I giocatori del test sono nuovamente disponibili.',
+        'CSV rose scaricato.',
         'success'
       );
+    }
+  );
 
-      await refreshTestAuction();
 
-    } catch (error) {
-      console.error(error);
+/* =========================================================
+   ELIMINA DATI TEST
+   ========================================================= */
 
-      showMessage(
-        error.message
-        || 'Errore durante l’eliminazione dei dati test.',
-        'error'
-      );
+testUi.purge
+  ?.addEventListener(
+    'click',
+    async () => {
 
-    } finally {
+      const session =
+        testSession();
+
+
+      if (!session) {
+        return;
+      }
+
+
+      const confirmed =
+        window.confirm(
+          'Eliminare tutte le assegnazioni temporanee di questo test? Le rose reali non verranno modificate.'
+        );
+
+
+      if (!confirmed) {
+        return;
+      }
+
+
       testUi.purge.disabled =
-        false;
+        true;
+
+
+      const oldText =
+        testUi.purge.textContent;
+
 
       testUi.purge.textContent =
-        oldText;
-    }
-  }
-);
+        'Eliminazione...';
 
+
+      try {
+
+        const result =
+          await callApi({
+
+            action:
+              'purgeTest',
+
+            sessionId:
+              session.id
+          });
+
+
+        if (!result?.ok) {
+
+          throw new Error(
+            result?.error
+            ||
+            'Impossibile eliminare i dati del test.'
+          );
+        }
+
+
+        showMessage(
+          'Dati test eliminati. I giocatori sono nuovamente disponibili.',
+          'success'
+        );
+
+
+        await loadLobby();
+
+
+      } catch (error) {
+
+        console.error(error);
+
+
+        showMessage(
+          error.message
+          ||
+          'Errore durante l’eliminazione dei dati test.',
+          'error'
+        );
+
+
+      } finally {
+
+        testUi.purge.disabled =
+          false;
+
+
+        testUi.purge.textContent =
+          oldText;
+      }
+    }
+  );
+
+
+/* =========================================================
+   RENDER ADD-ON
+   ========================================================= */
 
 function renderAuctionTestAddon() {
-  renderTestMode();
+
+  renderPrepareTestButton();
+
+  renderTestSessionStatus();
+
+  renderTestTeamList();
+
   renderTestAuctioneer();
+
   renderTestReview();
 }
 
 
-/* Ogni refresh della pagina Asta aggiorna anche l'add-on. */
+/* =========================================================
+   AGGANCIO AL REFRESH PRINCIPALE
+   ========================================================= */
+
 const baseAuctionLoadLobby =
   loadLobby;
 
 
-loadLobby = async function () {
-  await baseAuctionLoadLobby();
+loadLobby =
+  async function () {
 
-  renderAuctionTestAddon();
-};
+    await baseAuctionLoadLobby();
 
 
-/* Il primo load di league-auction.js può essere già partito. */
+    renderAuctionTestAddon();
+  };
+
+
+/*
+ * Il primo load di league-auction.js
+ * può essere già partito.
+ */
 const initialTestRender =
   setInterval(
     () => {
-      if (!auctionData) return;
+
+      if (!auctionData) {
+        return;
+      }
+
 
       clearInterval(
         initialTestRender
       );
+
 
       renderAuctionTestAddon();
     },
