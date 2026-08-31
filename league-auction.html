@@ -114,6 +114,34 @@
     ></div>
 
 
+    <div
+      id="simple-test-bar"
+      class="league-actions"
+      hidden
+    >
+
+      <label>
+
+        <input
+          id="simple-test-toggle"
+          type="checkbox"
+        >
+
+        Asta di test
+
+      </label>
+
+
+      <span
+        id="simple-test-help"
+        class="setting-help"
+      >
+        Usa soltanto le squadre reali già create.
+      </span>
+
+    </div>
+
+
     <p
       id="auction-blockers"
       class="setting-help"
@@ -274,6 +302,97 @@
 
 
     <div
+      id="test-auctioneer-panel"
+      hidden
+    >
+
+      <div class="divider"></div>
+
+
+      <div class="section-heading">
+
+        <span class="section-label">
+          BANDITORE
+        </span>
+
+        <div>
+          <h3>Pannello offerte</h3>
+          <p>
+            Registra un rilancio per una delle squadre partecipanti.
+          </p>
+        </div>
+
+      </div>
+
+
+      <div class="form-grid">
+
+        <label class="form-field">
+
+          Squadra
+
+          <select
+            id="test-bid-team"
+          ></select>
+
+        </label>
+
+
+        <label class="form-field">
+
+          Offerta
+
+          <input
+            id="test-bid-amount"
+            type="number"
+            min="1"
+            step="1"
+          >
+
+        </label>
+
+      </div>
+
+
+      <div class="league-actions">
+
+        <button
+          id="test-place-bid"
+          type="button"
+        >
+          Registra offerta
+        </button>
+
+
+        <button
+          id="test-award-player"
+          type="button"
+          class="success"
+        >
+          Aggiudica al leader
+        </button>
+
+
+        <button
+          id="test-finish-review"
+          type="button"
+          class="secondary"
+        >
+          Termina test e visualizza rose
+        </button>
+
+      </div>
+
+
+      <p
+        id="test-bid-help"
+        class="setting-help"
+      ></p>
+
+    </div>
+
+
+    <div
       id="call-panel"
       hidden
     >
@@ -345,10 +464,83 @@
   </section>
 
 
+  <section
+    id="test-roster-review"
+    class="card"
+    hidden
+  >
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        REVIEW
+      </span>
+
+      <div>
+        <h2>Rose del test</h2>
+        <p>
+          Le assegnazioni sono ancora disponibili e non sono state eliminate.
+        </p>
+      </div>
+
+    </div>
+
+
+    <div class="league-actions">
+
+      <button
+        id="test-print-rosters"
+        type="button"
+        class="secondary"
+      >
+        Stampa / PDF
+      </button>
+
+
+      <button
+        id="test-download-csv"
+        type="button"
+        class="secondary"
+      >
+        CSV Fantacalcio (beta)
+      </button>
+
+
+      <button
+        id="test-purge-data"
+        type="button"
+        class="danger"
+      >
+        Elimina dati test
+      </button>
+
+    </div>
+
+
+    <p
+      id="test-csv-note"
+      class="setting-help"
+    >
+      Il CSV contiene fantasquadra, ID sorgente, nome,
+      ruolo, squadra e prezzo. La compatibilità 1:1 con
+      l'import ufficiale va validata con un file campione
+      esportato da FantaAsta Live.
+    </p>
+
+
+    <div
+      id="test-roster-review-list"
+      class="list"
+    ></div>
+
+  </section>
+
+
 </main>
 
 
 <script src="league-auction.js?v=2"></script>
+<script src="auction-test-live.js?v=1"></script>
 
 </body>
 
