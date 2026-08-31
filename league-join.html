@@ -32,7 +32,7 @@
       <h1>Entra in una lega</h1>
 
       <p>
-        Codice lega, ruoli e squadra in un'unica richiesta
+        Inserisci il codice, scegli i ruoli e completa la richiesta
       </p>
 
     </div>
@@ -88,7 +88,14 @@
   </section>
 
 
-  <section class="card">
+  <!-- =====================================================
+       STEP 1 - CODICE LEGA
+       ===================================================== -->
+
+  <section
+    id="league-code-section"
+    class="card"
+  >
 
     <div class="section-heading">
 
@@ -145,8 +152,12 @@
   </section>
 
 
+  <!-- =====================================================
+       STEP 2 - RUOLI
+       ===================================================== -->
+
   <section
-    id="request-section"
+    id="roles-section"
     class="card"
     hidden
   >
@@ -160,7 +171,7 @@
       <div>
 
         <h2 id="preview-league-name">
-          Lega
+          Ruoli nella lega
         </h2>
 
         <p id="preview-league-code">
@@ -172,7 +183,7 @@
     </div>
 
 
-    <h3>Quali ruoli richiedi?</h3>
+    <h3>Quali ruoli vuoi richiedere?</h3>
 
 
     <div class="form-grid">
@@ -190,7 +201,7 @@
         </span>
 
         <small class="setting-help">
-          Può gestire una squadra, nominare e rilanciare.
+          Gestisce una squadra, nomina e rilancia.
         </small>
 
       </label>
@@ -209,7 +220,7 @@
         </span>
 
         <small class="setting-help">
-          Affianca il Presidente; non nomina e non rilancia.
+          Affianca il Presidente della squadra.
         </small>
 
       </label>
@@ -255,99 +266,146 @@
     </div>
 
 
+    <div class="divider"></div>
+
+
+    <div class="league-actions">
+
+      <button
+        id="roles-continue-button"
+        type="button"
+      >
+        Continua
+      </button>
+
+    </div>
+
+
+    <p
+      id="roles-help"
+      class="setting-help"
+    >
+      Presidente e Vice richiedono l'associazione a una squadra.
+      Banditore e Presentatore no.
+    </p>
+
+  </section>
+
+
+  <!-- =====================================================
+       STEP 3 - SQUADRA
+       SOLO PRESIDENTE / VICE
+       ===================================================== -->
+
+  <section
+    id="team-section"
+    class="card"
+    hidden
+  >
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        3
+      </span>
+
+      <div>
+
+        <h2>Squadra</h2>
+
+        <p id="team-step-description">
+          Seleziona la squadra
+        </p>
+
+      </div>
+
+    </div>
+
+
     <div
-      id="team-panel"
-      class="conditional-panel"
-      hidden
+      id="team-mode-area"
+      class="form-grid"
     >
 
-      <h3>Squadra</h3>
+      <label class="form-field">
+
+        <span>
+          <input
+            id="team-mode-existing"
+            type="radio"
+            name="team-mode"
+            value="existing"
+            checked
+          >
+
+          Squadra esistente
+        </span>
+
+      </label>
 
 
-      <div
-        id="team-mode-area"
-        class="form-grid"
-      >
-
-        <label class="form-field">
-
-          <span>
-            <input
-              id="team-mode-existing"
-              type="radio"
-              name="team-mode"
-              value="existing"
-              checked
-            >
-
-            Squadra esistente
-          </span>
-
-        </label>
-
-
-        <label
-          id="team-create-choice"
-          class="form-field"
-          hidden
-        >
-
-          <span>
-            <input
-              id="team-mode-create"
-              type="radio"
-              name="team-mode"
-              value="create"
-            >
-
-            Crea nuova squadra
-          </span>
-
-        </label>
-
-      </div>
-
-
-      <div
-        id="existing-team-area"
-        class="form-grid"
-      >
-
-        <label class="form-field">
-
-          Squadra
-
-          <select id="existing-team-select">
-            <option value="">
-              Seleziona...
-            </option>
-          </select>
-
-        </label>
-
-      </div>
-
-
-      <div
-        id="new-team-area"
-        class="form-grid"
+      <label
+        id="team-create-choice"
+        class="form-field"
         hidden
       >
 
-        <label class="form-field">
-
-          Nome nuova squadra
-
+        <span>
           <input
-            id="new-team-name"
-            type="text"
-            maxlength="60"
-            placeholder="Nome squadra"
+            id="team-mode-create"
+            type="radio"
+            name="team-mode"
+            value="create"
           >
 
-        </label>
+          Crea nuova squadra
+        </span>
 
-      </div>
+      </label>
+
+    </div>
+
+
+    <div
+      id="existing-team-area"
+      class="form-grid"
+    >
+
+      <label class="form-field">
+
+        Squadra
+
+        <select id="existing-team-select">
+
+          <option value="">
+            Seleziona...
+          </option>
+
+        </select>
+
+      </label>
+
+    </div>
+
+
+    <div
+      id="new-team-area"
+      class="form-grid"
+      hidden
+    >
+
+      <label class="form-field">
+
+        Nome nuova squadra
+
+        <input
+          id="new-team-name"
+          type="text"
+          maxlength="60"
+          placeholder="Nome squadra"
+        >
+
+      </label>
 
     </div>
 
@@ -358,7 +416,16 @@
     <div class="league-actions">
 
       <button
-        id="submit-request-button"
+        id="team-back-button"
+        type="button"
+        class="secondary"
+      >
+        ← Ruoli
+      </button>
+
+
+      <button
+        id="submit-team-request-button"
         type="button"
       >
         Invia richiesta
@@ -366,11 +433,67 @@
 
     </div>
 
+  </section>
 
-    <p class="setting-help">
-      La richiesta viene salvata soltanto dopo la conferma.
-      L'Admin della lega vedrà subito la richiesta tra le approvazioni pending.
-    </p>
+
+  <!-- =====================================================
+       CONFERMA SENZA SQUADRA
+       SOLO BANDITORE / PRESENTATORE
+       ===================================================== -->
+
+  <section
+    id="no-team-confirm-section"
+    class="card"
+    hidden
+  >
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        3
+      </span>
+
+      <div>
+
+        <h2>Conferma richiesta</h2>
+
+        <p>
+          I ruoli selezionati non richiedono una squadra
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="no-team-summary"
+      class="list"
+    ></div>
+
+
+    <div class="divider"></div>
+
+
+    <div class="league-actions">
+
+      <button
+        id="no-team-back-button"
+        type="button"
+        class="secondary"
+      >
+        ← Ruoli
+      </button>
+
+
+      <button
+        id="submit-no-team-request-button"
+        type="button"
+      >
+        Invia richiesta
+      </button>
+
+    </div>
 
   </section>
 
@@ -378,7 +501,7 @@
 </main>
 
 
-<script src="league-join.js?v=1"></script>
+<script src="league-join.js?v=2"></script>
 
 </body>
 
