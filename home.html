@@ -241,10 +241,11 @@
     .table-wrap{min-height:0;overflow:auto;border:1px solid var(--line);border-radius:7px;background:var(--panel)}
     table{width:100%;border-collapse:separate;border-spacing:0;font-size:9px}
     .player-table{table-layout:fixed;min-width:840px}
-    .player-table col.col-player{width:34%}
-    .player-table col.col-team{width:16%}
-    .player-table col.col-slot{width:7%}
-    .player-table col.col-stat{width:8.6%}
+    .player-table col.col-player{width:25%}
+    .player-table col.col-role{width:9%}
+    .player-table col.col-team{width:15%}
+    .player-table col.col-slot{width:6%}
+    .player-table col.col-stat{width:9%}
     th{position:sticky;top:0;z-index:2;background:#0b2b50;border-bottom:1px solid var(--line2);text-align:left;white-space:nowrap}
     th button{width:100%;min-height:27px;border:0;border-radius:0;background:transparent;color:var(--soft);padding:4px 6px;text-align:left;font-size:8px}
     .player-table th.num-head,
@@ -2553,6 +2554,42 @@
       }
     }
 
+
+    .player-role-cell{
+      white-space:nowrap;
+    }
+
+    .player-role-cell .rolebadge + .rolebadge{
+      margin-left:2px;
+    }
+
+    .player-main{
+      min-width:180px;
+    }
+
+    .player-main .player-name{
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .auction-free-fixed [data-auction-sort]{
+      width:100%;
+      min-height:27px;
+      border:0;
+      border-radius:0;
+      background:transparent;
+      color:var(--soft);
+      padding:4px 6px;
+      text-align:left;
+      font-size:8px;
+    }
+
+    .auction-free-fixed th.num-head [data-auction-sort]{
+      text-align:right;
+    }
+
   </style>
 </head>
 <body>
@@ -2791,12 +2828,14 @@
             <table class="player-table">
               <colgroup>
                 <col class="col-player">
+                <col class="col-role">
                 <col class="col-team">
                 <col class="col-slot">
                 <col class="col-stat"><col class="col-stat"><col class="col-stat"><col class="col-stat"><col class="col-stat">
               </colgroup>
               <thead><tr>
                 <th><button data-list-sort="name">Calciatore <span>↑</span></button></th>
+                <th><button data-list-sort="role">Ruolo <span>↕</span></button></th>
                 <th><button data-list-sort="team">Squadra <span>↕</span></button></th>
                 <th class="num-head"><button data-list-sort="slot">Slot <span>↕</span></button></th>
                 <th class="num-head"><button data-list-sort="pma">PMA <span>↕</span></button></th>
@@ -2883,7 +2922,9 @@
       loading: new Set(),
       listRoles: new Set(['all']),
       listSort: { key: 'name', direction: 'asc' },
+
       auctionRoles: new Set(['all']),
+      auctionSort: { key: 'name', direction: 'asc' },
       auctionFilterSearch: '',
       auctionFilterTeam: 'all',
       auctionFilterSlot: 'all',
@@ -3689,8 +3730,86 @@
       });
     }
 
-    function sortValue(player, key) {
-      return ({name:player.name||'',team:player.serie_a_team||'',slot:player.slot,pma:player.pma,pfc:player.pfc,delta:player.pfc_pma_delta,fm:player.expected_fantasy_avg,tit:player.expected_titolarity})[key];
+    function roleSortOrder(mode) {
+      return mode === 'classic'
+        ? ['P', 'D', 'C', 'A']
+        : ['Por', 'B', 'Dc', 'Dd', 'Ds', 'E', 'M', 'C', 'W', 'T', 'A', 'Pc'];
+    }
+
+
+    function roleSortKey(player, mode) {
+      const order =
+        roleSortOrder(mode);
+
+      const roles =
+        playerRoles(
+          player,
+          mode
+        );
+
+      if (!roles.length) {
+        return {
+          rank: 999,
+          label: ''
+        };
+      }
+
+      const orderedRoles =
+        [...roles]
+          .sort(
+            (a, b) => {
+              const rankA =
+                order.indexOf(a);
+
+              const rankB =
+                order.indexOf(b);
+
+              return (
+                (rankA === -1 ? 999 : rankA)
+                -
+                (rankB === -1 ? 999 : rankB)
+              );
+            }
+          );
+
+      const firstRole =
+        orderedRoles[0];
+
+      const rank =
+        order.indexOf(
+          firstRole
+        );
+
+      return {
+        rank:
+          rank === -1
+            ? 999
+            : rank,
+
+        label:
+          orderedRoles.join('/')
+      };
+    }
+
+
+    function sortValue(player, key, mode) {
+      if (key === 'role') {
+        return roleSortKey(
+          player,
+          mode
+        );
+      }
+
+      return ({
+        name: player.name || '',
+        team: player.serie_a_team || '',
+        slot: player.slot,
+        pma: player.pma,
+        pfc: player.pfc,
+        delta: player.pfc_pma_delta,
+        fm: player.expected_fantasy_avg,
+        tit: player.expected_titolarity
+      })[key];
     }
 
     function compareValues(a,b) {
@@ -3704,12 +3823,94 @@
       return String(a).localeCompare(String(b),'it',{numeric:true,sensitivity:'base'});
     }
 
-    function sortedPlayers(players, sort) {
-      const factor = sort.direction === 'asc' ? 1 : -1;
-      return [...players].sort((a,b) => {
-        const result = compareValues(sortValue(a,sort.key), sortValue(b,sort.key));
-        return result !== 0 ? result*factor : String(a.name||'').localeCompare(String(b.name||''),'it');
-      });
+    function sortedPlayers(players, sort, mode) {
+      const factor =
+        sort.direction === 'asc'
+          ? 1
+          : -1;
+
+      return [...players]
+        .sort(
+          (a, b) => {
+
+            if (sort.key === 'role') {
+              const roleA =
+                roleSortKey(
+                  a,
+                  mode
+                );
+
+              const roleB =
+                roleSortKey(
+                  b,
+                  mode
+                );
+
+              if (
+                roleA.rank
+                !== roleB.rank
+              ) {
+                return (
+                  roleA.rank
+                  -
+                  roleB.rank
+                )
+                *
+                factor;
+              }
+
+              const roleLabelResult =
+                roleA.label
+                  .localeCompare(
+                    roleB.label,
+                    'it',
+                    {
+                      sensitivity: 'base'
+                    }
+                  );
+
+              if (roleLabelResult !== 0) {
+                return (
+                  roleLabelResult
+                  *
+                  factor
+                );
+              }
+
+            } else {
+              const result =
+                compareValues(
+                  sortValue(
+                    a,
+                    sort.key,
+                    mode
+                  ),
+                  sortValue(
+                    b,
+                    sort.key,
+                    mode
+                  )
+                );
+
+              if (result !== 0) {
+                return (
+                  result
+                  *
+                  factor
+                );
+              }
+            }
+
+            return String(a.name || '')
+              .localeCompare(
+                String(b.name || ''),
+                'it',
+                {
+                  sensitivity: 'base'
+                }
+              );
+          }
+        );
     }
 
     function playerRow(player, mode, extraClass = '') {
@@ -3717,7 +3918,17 @@
       const delta = Number(player.pfc_pma_delta);
       return `
         <tr class="${extraClass}" data-player-id="${esc(player.id)}">
-          <td><div class="player-main">${roles.map(role=>`<span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>`).join('')}<span class="player-name">${esc(player.name)}</span>${flagEmoji(player.nationality_iso2) ? `<span>${flagEmoji(player.nationality_iso2)}</span>` : ''}</div></td>
+          <td>
+            <div class="player-main">
+              <span class="player-name">${esc(player.name)}</span>
+              ${flagEmoji(player.nationality_iso2) ? `<span>${flagEmoji(player.nationality_iso2)}</span>` : ''}
+            </div>
+          </td>
+
+          <td class="player-role-cell">
+            ${roles.map(role=>`<span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>`).join('')}
+          </td>
+
           <td>${esc(player.serie_a_team || '—')}</td>
           <td class="num">${esc(player.slot ?? '—')}</td>
           <td class="num">${formatNumber(player.pma)}</td>
@@ -3732,9 +3943,36 @@
     function renderListTable() {
       if (!state.list) return;
       const controls = { search:$('list-search'), team:$('list-team'), slot:$('list-slot'), flag:$('list-flag') };
-      const filtered = filterPlayers(state.list.players || [], controls, state.listRoles, fantasyMode());
-      const sorted = sortedPlayers(filtered, state.listSort);
-      $('list-body').innerHTML = sorted.map(player => playerRow(player, fantasyMode())).join('') || '<tr><td colspan="8" class="soft" style="text-align:center;height:70px">Nessun giocatore.</td></tr>';
+      const mode =
+        fantasyMode();
+
+      const filtered =
+        filterPlayers(
+          state.list.players || [],
+          controls,
+          state.listRoles,
+          mode
+        );
+
+      const sorted =
+        sortedPlayers(
+          filtered,
+          state.listSort,
+          mode
+        );
+
+      $('list-body').innerHTML =
+        sorted
+          .map(
+            player =>
+              playerRow(
+                player,
+                mode
+              )
+          )
+          .join('')
+        ||
+        '<tr><td colspan="9" class="soft" style="text-align:center;height:70px">Nessun giocatore.</td></tr>';
     }
 
     ['list-search','list-team','list-slot','list-flag'].forEach(id => $(id).addEventListener(id === 'list-search' ? 'input' : 'change', renderListTable));
@@ -4393,6 +4631,7 @@
 
               <colgroup>
                 <col class="col-player">
+                <col class="col-role">
                 <col class="col-team">
                 <col class="col-slot">
                 <col class="col-stat">
@@ -4404,14 +4643,59 @@
 
               <thead>
                 <tr>
-                  <th>Calciatore</th>
-                  <th>Squadra</th>
-                  <th class="num-head">Slot</th>
-                  <th class="num-head">PMA</th>
-                  <th class="num-head">PFC</th>
-                  <th class="num-head">Δ</th>
-                  <th class="num-head">FM</th>
-                  <th class="num-head">Tit.</th>
+                  <th>
+                    <button data-auction-sort="name">
+                      Calciatore <span>↑</span>
+                    </button>
+                  </th>
+
+                  <th>
+                    <button data-auction-sort="role">
+                      Ruolo <span>↕</span>
+                    </button>
+                  </th>
+
+                  <th>
+                    <button data-auction-sort="team">
+                      Squadra <span>↕</span>
+                    </button>
+                  </th>
+
+                  <th class="num-head">
+                    <button data-auction-sort="slot">
+                      Slot <span>↕</span>
+                    </button>
+                  </th>
+
+                  <th class="num-head">
+                    <button data-auction-sort="pma">
+                      PMA <span>↕</span>
+                    </button>
+                  </th>
+
+                  <th class="num-head">
+                    <button data-auction-sort="pfc">
+                      PFC <span>↕</span>
+                    </button>
+                  </th>
+
+                  <th class="num-head">
+                    <button data-auction-sort="delta">
+                      Δ <span>↕</span>
+                    </button>
+                  </th>
+
+                  <th class="num-head">
+                    <button data-auction-sort="fm">
+                      FM <span>↕</span>
+                    </button>
+                  </th>
+
+                  <th class="num-head">
+                    <button data-auction-sort="tit">
+                      Tit. <span>↕</span>
+                    </button>
+                  </th>
                 </tr>
               </thead>
 
@@ -7157,6 +7441,74 @@
         state.auctionFilterFlag = event.target.value;
         renderAuctionPlayers();
       });
+
+
+      document
+        .querySelector(
+          '.auction-free-fixed thead'
+        )
+        ?.addEventListener(
+          'click',
+          event => {
+            const button =
+              event.target.closest(
+                '[data-auction-sort]'
+              );
+
+            if (!button) {
+              return;
+            }
+
+            const key =
+              button.dataset.auctionSort;
+
+            state.auctionSort =
+              state.auctionSort.key === key
+                ? {
+                    key,
+                    direction:
+                      state.auctionSort.direction === 'asc'
+                        ? 'desc'
+                        : 'asc'
+                  }
+                : {
+                    key,
+                    direction: 'asc'
+                  };
+
+            renderAuctionPlayers();
+          }
+        );
+    }
+
+
+    function updateAuctionSortIndicators() {
+      document
+        .querySelectorAll(
+          '[data-auction-sort]'
+        )
+        .forEach(
+          button => {
+            const indicator =
+              button.querySelector(
+                'span'
+              );
+
+            if (!indicator) {
+              return;
+            }
+
+            indicator.textContent =
+              button.dataset.auctionSort
+                === state.auctionSort.key
+                ? (
+                    state.auctionSort.direction === 'asc'
+                      ? '↑'
+                      : '↓'
+                  )
+                : '↕';
+          }
+        );
     }
 
     function renderAuctionPlayers() {
@@ -7173,21 +7525,24 @@
         flag: $('auction-flag-filter')
       };
 
-      const players =
+      const filteredPlayers =
         filterPlayers(
           data.callCandidates || [],
           controls,
           state.auctionRoles,
           mode
-        )
-          .sort(
-            (a, b) =>
-              String(a.name || '')
-                .localeCompare(
-                  String(b.name || ''),
-                  'it'
-                )
-          );
+        );
+
+      const players =
+        sortedPlayers(
+          filteredPlayers,
+          state.auctionSort,
+          mode
+        );
+
+
+      updateAuctionSortIndicators();
+
 
       body.innerHTML =
         players
@@ -7205,7 +7560,7 @@
         `
           <tr>
             <td
-              colspan="8"
+              colspan="9"
               class="soft"
               style="text-align:center;height:70px"
             >
