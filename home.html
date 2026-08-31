@@ -710,6 +710,7 @@
       listRoles: new Set(['all']),
       listSort: { key: 'name', direction: 'asc' },
       auctionRoles: new Set(['all']),
+      auctionDrawerOpen: true,
       auctionSelectedPlayerId: null,
       auctionBidSelection: null,
       auctionBidSelectionKey: '',
@@ -1681,7 +1682,7 @@
               </section>
             </div>
 
-            <details id="free-drawer" class="free-drawer" open>
+            <details id="free-drawer" class="free-drawer" ${state.auctionDrawerOpen ? 'open' : ''}>
               <summary>Svincolati</summary>
               <div class="drawer-content">
                 <div id="auction-rolebar" class="rolebar"></div>
@@ -1708,6 +1709,10 @@
 
       renderAuctionDrawerControls();
       renderAuctionPlayers();
+
+      $('free-drawer')?.addEventListener('toggle', event => {
+        state.auctionDrawerOpen = event.currentTarget.open;
+      });
 
       $('auction-call-confirm')?.addEventListener('click', async()=>{
         if(!state.auctionSelectedPlayerId)return;
