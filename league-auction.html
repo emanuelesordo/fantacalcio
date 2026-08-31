@@ -14,7 +14,7 @@
 
   <link
     rel="stylesheet"
-    href="style.css?v=20"
+    href="style.css?v=21"
   >
 
 </head>
@@ -57,6 +57,16 @@
       <span class="tab-description">Live</span>
     </a>
 
+    <a
+      id="presenter-tab"
+      href="league-presenter.html"
+      class="tab"
+      hidden
+    >
+      <span class="tab-title">TV</span>
+      <span class="tab-description">Presentatore</span>
+    </a>
+
     <a href="league-rosters.html" class="tab">
       <span class="tab-title">Rose</span>
       <span class="tab-description">Squadre</span>
@@ -87,7 +97,7 @@
   ></p>
 
 
-  <section class="card">
+  <section class="card auction-prep-card">
 
     <div class="section-heading">
 
@@ -149,11 +159,11 @@
 
   <div
     id="lobby-grid"
-    class="form-grid"
+    class="form-grid auction-lobby-grid"
   >
 
 
-    <section class="card">
+    <section class="card auction-lobby-card">
 
       <div class="section-heading">
 
@@ -177,7 +187,7 @@
     </section>
 
 
-    <section class="card">
+    <section class="card auction-lobby-card">
 
       <div class="section-heading">
 
@@ -425,6 +435,94 @@
           id="live-action-help"
           class="setting-help"
         ></p>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="vice-signal-panel"
+      hidden
+    >
+
+      <div class="divider"></div>
+
+
+      <div class="section-heading">
+
+        <span class="section-label">
+          VICE
+        </span>
+
+        <div>
+          <h3>Segnale privato</h3>
+          <p>
+            Suggerimento interno alla tua squadra
+          </p>
+        </div>
+
+      </div>
+
+
+      <div
+        id="vice-signal-current"
+        class="list"
+      ></div>
+
+
+      <div
+        id="vice-signal-controls"
+        hidden
+      >
+
+        <div class="league-actions">
+
+          <button
+            id="vice-signal-push"
+            type="button"
+            class="success"
+          >
+            Rilancia
+          </button>
+
+
+          <button
+            id="vice-signal-stop"
+            type="button"
+            class="danger"
+          >
+            Stop
+          </button>
+
+
+          <label class="form-field vice-limit-field">
+            Fino a
+
+            <select
+              id="vice-signal-limit"
+            ></select>
+          </label>
+
+
+          <button
+            id="vice-signal-limit-send"
+            type="button"
+            class="secondary"
+          >
+            Invia limite
+          </button>
+
+
+          <button
+            id="vice-signal-clear"
+            type="button"
+            class="secondary"
+          >
+            Cancella segnale
+          </button>
+
+        </div>
 
       </div>
 
@@ -695,6 +793,7 @@
 <script src="league-auction.js?v=3"></script>
 <script src="auction-live-controls.js?v=3"></script>
 <script src="auction-test-live.js?v=3"></script>
+<script src="auction-step6.js?v=1"></script>
 
 </body>
 
