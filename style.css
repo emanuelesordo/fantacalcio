@@ -2928,3 +2928,1343 @@ and
       9px;
   }
 }
+
+
+/* =========================================================
+   DENSITÀ UI V22
+   Riduce lo spazio sprecato in tutte le pagine.
+   ========================================================= */
+
+@media
+(min-width: 701px) {
+
+  .page-shell,
+  .admin-shell,
+  .admin-page {
+    margin:
+      20px auto
+      34px;
+  }
+
+
+  .page-header,
+  .admin-topbar,
+  .admin-header {
+    gap:
+      16px;
+
+    margin-bottom:
+      16px;
+  }
+
+
+  .page-header h1,
+  .admin-topbar h1,
+  .admin-header h1 {
+    font-size:
+      clamp(
+        25px,
+        3vw,
+        33px
+      );
+  }
+
+
+  .tabs,
+  .admin-tabs,
+  .admin-nav {
+    gap:
+      7px;
+
+    margin-bottom:
+      15px;
+  }
+
+
+  .tab,
+  .admin-tab,
+  .admin-nav a,
+  .admin-nav-disabled {
+    padding:
+      10px 12px;
+  }
+
+
+  .card,
+  .admin-card,
+  section {
+    padding:
+      16px;
+
+    border-radius:
+      var(--radius-lg);
+  }
+
+
+  .page-shell section,
+  .admin-shell section,
+  .admin-page section {
+    margin-bottom:
+      12px;
+  }
+
+
+  .section-heading {
+    gap:
+      10px;
+
+    margin-bottom:
+      12px;
+  }
+
+
+  .section-heading p {
+    font-size:
+      12px;
+  }
+
+
+  .list {
+    gap:
+      6px;
+  }
+
+
+  .list-row-main {
+    gap:
+      12px;
+
+    padding:
+      10px 12px;
+  }
+
+
+  .setting-row {
+    padding:
+      9px 0;
+  }
+
+
+  .league-actions {
+    gap:
+      6px;
+
+    margin-top:
+      9px;
+  }
+
+
+  button,
+  .button {
+    min-height:
+      38px;
+
+    padding:
+      8px 13px;
+  }
+
+
+  input,
+  select,
+  textarea {
+    min-height:
+      39px;
+
+    padding:
+      8px 10px;
+  }
+
+
+  .stats-grid {
+    gap:
+      7px;
+  }
+
+
+  .stat-card {
+    padding:
+      10px;
+  }
+
+
+  .stat-value {
+    font-size:
+      20px;
+  }
+
+
+  .empty-state {
+    padding:
+      18px 14px;
+  }
+
+
+  .divider {
+    margin:
+      12px 0;
+  }
+}
+
+
+/* =========================================================
+   DENSITÀ MOBILE GLOBALE
+   ========================================================= */
+
+@media
+(max-width: 700px) {
+
+  .page-shell,
+  .admin-shell,
+  .admin-page {
+    width:
+      calc(100% - 12px);
+
+    margin:
+      8px auto
+      18px;
+  }
+
+
+  .page-header,
+  .admin-topbar,
+  .admin-header {
+    margin-bottom:
+      9px;
+  }
+
+
+  .page-header h1,
+  .admin-topbar h1,
+  .admin-header h1 {
+    font-size:
+      22px;
+  }
+
+
+  .tabs,
+  .admin-tabs,
+  .admin-nav {
+    gap:
+      4px;
+
+    margin-bottom:
+      9px;
+  }
+
+
+  .tab,
+  .admin-tab,
+  .admin-nav a,
+  .admin-nav-disabled {
+    min-height:
+      36px;
+
+    padding:
+      7px 8px;
+
+    border-radius:
+      var(--radius-md);
+  }
+
+
+  .league-tabs .tab {
+    min-width:
+      70px;
+  }
+
+
+  .card,
+  .admin-card,
+  section {
+    padding:
+      11px;
+
+    border-radius:
+      var(--radius-lg);
+  }
+
+
+  .page-shell section,
+  .admin-shell section,
+  .admin-page section {
+    margin-bottom:
+      8px;
+  }
+
+
+  .section-heading {
+    gap:
+      8px;
+
+    margin-bottom:
+      9px;
+  }
+
+
+  .section-heading h2 {
+    font-size:
+      17px;
+  }
+
+
+  .section-heading p {
+    font-size:
+      11px;
+  }
+
+
+  .section-label {
+    min-width:
+      34px;
+
+    padding:
+      4px 6px;
+
+    font-size:
+      9px;
+  }
+
+
+  .list {
+    gap:
+      4px;
+  }
+
+
+  .list-row {
+    border-radius:
+      var(--radius-md);
+  }
+
+
+  .list-row-main {
+    gap:
+      8px;
+
+    padding:
+      8px 9px;
+  }
+
+
+  .list-row-title strong {
+    font-size:
+      13px;
+  }
+
+
+  .list-row-title small {
+    font-size:
+      10px;
+  }
+
+
+  .setting-row {
+    gap:
+      10px;
+
+    padding:
+      7px 0;
+  }
+
+
+  .setting-row,
+  .setting-row strong {
+    font-size:
+      12px;
+  }
+
+
+  .league-actions {
+    gap:
+      5px;
+
+    margin-top:
+      7px;
+  }
+
+
+  button,
+  .button {
+    min-height:
+      36px;
+
+    padding:
+      7px 10px;
+
+    font-size:
+      12px;
+  }
+
+
+  input,
+  select,
+  textarea {
+    min-height:
+      37px;
+
+    padding:
+      7px 9px;
+  }
+
+
+  .form-grid {
+    gap:
+      8px;
+  }
+
+
+  .stats-grid {
+    gap:
+      5px;
+  }
+
+
+  .stat-card {
+    padding:
+      8px;
+  }
+
+
+  .stat-value {
+    font-size:
+      18px;
+  }
+
+
+  .empty-state {
+    padding:
+      15px 10px;
+
+    font-size:
+      12px;
+  }
+
+
+  .divider {
+    margin:
+      9px 0;
+  }
+}
+
+
+/* =========================================================
+   ASTA LIVE - MODALITÀ OPERATIVA DEDICATA
+
+   Nessun menu, KPI o contenuto di lobby durante la sessione.
+   La pagina principale non scorre: scorrono solo i pannelli
+   che ne hanno bisogno.
+   ========================================================= */
+
+body.auction-live-mode {
+  height:
+    100dvh;
+
+  overflow:
+    hidden;
+}
+
+
+body.auction-live-mode
+.page-shell {
+  width:
+    min(
+      1480px,
+      calc(100% - 12px)
+    );
+
+  height:
+    100dvh;
+
+  margin:
+    0 auto;
+
+  padding:
+    6px 0;
+}
+
+
+body.auction-live-mode
+.page-header,
+
+body.auction-live-mode
+.league-tabs,
+
+body.auction-live-mode
+.auction-prep-card,
+
+body.auction-live-mode
+.auction-lobby-grid,
+
+body.auction-live-mode
+#prepared-session-section,
+
+body.auction-live-mode
+#test-roster-review {
+  display:
+    none !important;
+}
+
+
+body.auction-live-mode
+#page-message {
+  position:
+    fixed;
+
+  z-index:
+    50;
+
+  top:
+    6px;
+
+  left:
+    50%;
+
+  width:
+    min(
+      720px,
+      calc(100% - 20px)
+    );
+
+  min-height:
+    0;
+
+  margin:
+    0;
+
+  padding:
+    7px 10px;
+
+  border-radius:
+    var(--radius-md);
+
+  background:
+    rgba(6, 20, 38, .94);
+
+  text-align:
+    center;
+
+  pointer-events:
+    none;
+
+  transform:
+    translateX(-50%);
+}
+
+
+body.auction-live-mode
+#page-message:empty {
+  display:
+    none;
+}
+
+
+body.auction-live-mode
+#live-section {
+  display:
+    block !important;
+
+  height:
+    calc(100dvh - 12px);
+
+  margin:
+    0 !important;
+
+  padding:
+    10px;
+
+  overflow-y:
+    auto;
+
+  overscroll-behavior:
+    contain;
+
+  scrollbar-gutter:
+    stable;
+
+  box-shadow:
+    none;
+}
+
+
+body.auction-live-mode
+#live-section
+>
+.section-heading {
+  display:
+    none;
+}
+
+
+/* ---------------------------------------------------------
+   GIOCATORE CORRENTE
+   --------------------------------------------------------- */
+
+body.auction-live-mode
+#current-player-box
+.league-card {
+  padding:
+    10px 12px;
+
+  border-radius:
+    var(--radius-lg);
+}
+
+
+body.auction-live-mode
+#current-player-box
+.league-card-header {
+  align-items:
+    center;
+
+  gap:
+    10px;
+}
+
+
+body.auction-live-mode
+#current-player-box
+h2 {
+  margin:
+    0 0 2px;
+
+  font-size:
+    clamp(
+      23px,
+      3vw,
+      34px
+    );
+}
+
+
+body.auction-live-mode
+#current-player-box
+p {
+  margin:
+    0;
+
+  font-size:
+    12px;
+}
+
+
+body.auction-live-mode
+#current-player-box
+.league-card-header
+>
+.badge {
+  min-width:
+    54px;
+
+  justify-content:
+    center;
+
+  padding:
+    7px 10px;
+
+  font-size:
+    18px;
+}
+
+
+body.auction-live-mode
+#current-player-box
+.divider {
+  display:
+    none;
+}
+
+
+/*
+ * L'importo corrente è già presente nel badge principale:
+ * eliminiamo la riga duplicata.
+ */
+body.auction-live-mode
+#current-player-box
+.setting-row:first-of-type {
+  display:
+    none;
+}
+
+
+body.auction-live-mode
+#current-player-box
+.setting-row {
+  padding:
+    6px 0 0;
+}
+
+
+/* ---------------------------------------------------------
+   TIMER / CONTROLLI
+   --------------------------------------------------------- */
+
+body.auction-live-mode
+#live-control-panel
+>
+.divider,
+
+body.auction-live-mode
+#auctioneer-panel
+>
+.divider:first-child,
+
+body.auction-live-mode
+#vice-signal-panel
+>
+.divider:first-child {
+  margin:
+    8px 0;
+}
+
+
+body.auction-live-mode
+#live-control-panel
+>
+.section-heading {
+  display:
+    flex;
+
+  margin-bottom:
+    5px;
+}
+
+
+body.auction-live-mode
+#live-control-panel
+#live-timer-value {
+  font-size:
+    25px;
+}
+
+
+body.auction-live-mode
+#live-control-panel
+#live-timer-status {
+  margin:
+    0;
+
+  font-size:
+    11px;
+}
+
+
+body.auction-live-mode
+#live-president-controls
+.form-grid,
+
+body.auction-live-mode
+#auctioneer-panel
+.form-grid {
+  grid-template-columns:
+    minmax(
+      120px,
+      .75fr
+    )
+    minmax(
+      220px,
+      1.25fr
+    );
+
+  gap:
+    8px;
+}
+
+
+body.auction-live-mode
+#live-president-controls
+.form-field,
+
+body.auction-live-mode
+#auctioneer-panel
+.form-field {
+  gap:
+    5px;
+}
+
+
+body.auction-live-mode
+#auctioneer-team-buttons {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(
+        135px,
+        1fr
+      )
+    );
+
+  gap:
+    5px;
+}
+
+
+body.auction-live-mode
+#auctioneer-team-buttons
+button {
+  min-height:
+    36px;
+
+  margin:
+    0;
+
+  padding:
+    7px 9px;
+}
+
+
+body.auction-live-mode
+#auction-recent-bids {
+  max-height:
+    150px;
+
+  overflow-y:
+    auto;
+
+  overscroll-behavior:
+    contain;
+}
+
+
+/* ---------------------------------------------------------
+   VICE
+   --------------------------------------------------------- */
+
+body.auction-live-mode
+#vice-signal-panel
+.section-heading {
+  margin-bottom:
+    6px;
+}
+
+
+body.auction-live-mode
+#vice-signal-current
+.list-row-main {
+  padding:
+    7px 9px;
+}
+
+
+body.auction-live-mode
+#vice-signal-controls
+.league-actions {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      5,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  align-items:
+    end;
+
+  gap:
+    5px;
+}
+
+
+body.auction-live-mode
+.vice-limit-field {
+  max-width:
+    none;
+}
+
+
+/* ---------------------------------------------------------
+   CHIAMATA / LISTA SVINCOLATI
+
+   È il contenitore della lista a scorrere.
+   --------------------------------------------------------- */
+
+body.auction-live-mode.auction-call-mode
+#current-player-box,
+
+body.auction-live-mode.auction-call-mode
+#live-control-panel,
+
+body.auction-live-mode.auction-call-mode
+#vice-signal-panel,
+
+body.auction-live-mode.auction-call-mode
+#auctioneer-panel {
+  display:
+    none !important;
+}
+
+
+body.auction-live-mode.auction-call-mode
+#call-panel {
+  display:
+    block !important;
+
+  height:
+    100%;
+}
+
+
+body.auction-live-mode.auction-call-mode
+#call-panel
+>
+.divider {
+  display:
+    none;
+}
+
+
+body.auction-live-mode.auction-call-mode
+#call-team-title {
+  margin:
+    0 0 3px;
+
+  font-size:
+    20px;
+}
+
+
+body.auction-live-mode.auction-call-mode
+#call-permission-help {
+  margin:
+    0 0 7px;
+}
+
+
+body.auction-live-mode.auction-call-mode
+#call-form-area:not([hidden]) {
+  display:
+    grid !important;
+
+  grid-template-rows:
+    auto
+    minmax(
+      0,
+      1fr
+    );
+
+  height:
+    calc(
+      100dvh
+      -
+      72px
+    );
+
+  min-height:
+    0;
+}
+
+
+body.auction-live-mode.auction-call-mode
+#call-form-area
+>
+.form-grid {
+  grid-template-columns:
+    minmax(
+      0,
+      1fr
+    )
+    130px;
+
+  gap:
+    7px;
+
+  margin-bottom:
+    7px;
+}
+
+
+body.auction-live-mode
+#call-candidates {
+  display:
+    grid;
+
+  align-content:
+    start;
+
+  min-height:
+    0;
+
+  max-height:
+    none;
+
+  overflow-y:
+    auto;
+
+  overscroll-behavior:
+    contain;
+
+  padding-right:
+    3px;
+
+  scrollbar-gutter:
+    stable;
+}
+
+
+body.auction-live-mode
+#call-candidates
+.list-row {
+  width:
+    100%;
+
+  min-height:
+    0;
+
+  padding:
+    0;
+
+  text-align:
+    left;
+}
+
+
+body.auction-live-mode
+#call-candidates
+.list-row-main {
+  padding:
+    7px 9px;
+}
+
+
+body.auction-live-mode
+#call-candidates
+.list-row-title
+strong {
+  font-size:
+    13px;
+}
+
+
+body.auction-live-mode
+#call-candidates
+.list-row-title
+small {
+  font-size:
+    10px;
+}
+
+
+/* ---------------------------------------------------------
+   DESKTOP BANDITORE: due colonne solo quando serve.
+   --------------------------------------------------------- */
+
+@media
+(min-width: 901px) {
+
+  body.auction-live-mode.auction-bid-mode
+  #live-section:has(
+    #auctioneer-panel:not([hidden])
+  ) {
+    display:
+      grid !important;
+
+    grid-template-columns:
+      minmax(
+        300px,
+        .78fr
+      )
+      minmax(
+        480px,
+        1.22fr
+      );
+
+    grid-auto-flow:
+      row;
+
+    align-content:
+      start;
+
+    gap:
+      10px;
+  }
+
+
+  body.auction-live-mode.auction-bid-mode
+  #live-section:has(
+    #auctioneer-panel:not([hidden])
+  )
+  #current-player-box,
+
+  body.auction-live-mode.auction-bid-mode
+  #live-section:has(
+    #auctioneer-panel:not([hidden])
+  )
+  #live-control-panel,
+
+  body.auction-live-mode.auction-bid-mode
+  #live-section:has(
+    #auctioneer-panel:not([hidden])
+  )
+  #vice-signal-panel {
+    grid-column:
+      1;
+  }
+
+
+  body.auction-live-mode.auction-bid-mode
+  #live-section:has(
+    #auctioneer-panel:not([hidden])
+  )
+  #auctioneer-panel {
+    grid-column:
+      2;
+
+    grid-row:
+      1 / span 4;
+
+    min-width:
+      0;
+  }
+}
+
+
+/* ---------------------------------------------------------
+   MOBILE LIVE
+   --------------------------------------------------------- */
+
+@media
+(max-width: 700px) {
+
+  body.auction-live-mode
+  .page-shell {
+    width:
+      calc(100% - 6px);
+
+    padding:
+      3px 0;
+  }
+
+
+  body.auction-live-mode
+  #live-section {
+    height:
+      calc(100dvh - 6px);
+
+    padding:
+      7px;
+
+    border-radius:
+      var(--radius-md);
+  }
+
+
+  body.auction-live-mode
+  #current-player-box
+  .league-card {
+    padding:
+      8px 9px;
+  }
+
+
+  body.auction-live-mode
+  #current-player-box
+  h2 {
+    font-size:
+      22px;
+  }
+
+
+  body.auction-live-mode
+  #current-player-box
+  p {
+    font-size:
+      10px;
+  }
+
+
+  body.auction-live-mode
+  #current-player-box
+  .league-card-header
+  >
+  .badge {
+    min-width:
+      46px;
+
+    padding:
+      6px 8px;
+
+    font-size:
+      16px;
+  }
+
+
+  body.auction-live-mode
+  #live-president-controls
+  .form-grid,
+
+  body.auction-live-mode
+  #auctioneer-panel
+  .form-grid {
+    grid-template-columns:
+      92px
+      minmax(
+        0,
+        1fr
+      );
+  }
+
+
+  body.auction-live-mode
+  #auctioneer-team-buttons {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+
+  body.auction-live-mode
+  #auctioneer-team-buttons
+  button {
+    min-height:
+      34px;
+
+    padding:
+      6px;
+
+    font-size:
+      11px;
+  }
+
+
+  body.auction-live-mode
+  #vice-signal-controls
+  .league-actions {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+
+  body.auction-live-mode
+  #vice-signal-controls
+  button,
+
+  body.auction-live-mode
+  #vice-signal-controls
+  select {
+    min-height:
+      34px;
+  }
+
+
+  body.auction-live-mode.auction-call-mode
+  #call-team-title {
+    font-size:
+      17px;
+  }
+
+
+  body.auction-live-mode.auction-call-mode
+  #call-form-area {
+    height:
+      calc(
+        100dvh
+        -
+        58px
+      );
+  }
+
+
+  body.auction-live-mode.auction-call-mode
+  #call-form-area
+  >
+  .form-grid {
+    grid-template-columns:
+      minmax(
+        0,
+        1fr
+      )
+      92px;
+
+    gap:
+      5px;
+
+    margin-bottom:
+      5px;
+  }
+
+
+  body.auction-live-mode
+  #call-candidates
+  .list-row-main {
+    padding:
+      6px 7px;
+  }
+}
+
+
+/* =========================================================
+   SMARTPHONE MOLTO PICCOLI - ulteriore densità
+   ========================================================= */
+
+@media
+(max-width: 430px) {
+
+  .page-shell,
+  .admin-shell,
+  .admin-page {
+    width:
+      calc(100% - 8px);
+  }
+
+
+  .page-header,
+  .admin-topbar,
+  .admin-header {
+    gap:
+      7px;
+  }
+
+
+  .page-header h1,
+  .admin-topbar h1,
+  .admin-header h1 {
+    font-size:
+      20px;
+  }
+
+
+  .card,
+  .admin-card,
+  section {
+    padding:
+      9px;
+  }
+
+
+  .section-heading {
+    margin-bottom:
+      7px;
+  }
+
+
+  .section-heading h2 {
+    font-size:
+      16px;
+  }
+
+
+  .back-home {
+    min-height:
+      34px;
+
+    padding:
+      6px 8px;
+  }
+}
