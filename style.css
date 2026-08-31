@@ -2522,3 +2522,409 @@ and
     0 0 0 2px
     rgba(255, 255, 255, .2);
 }
+
+
+
+/* La navigazione lega può avere 5 o 6 voci in base ai ruoli. */
+.league-tabs {
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(90px, 1fr)
+    );
+}
+
+
+/* =========================================================
+   ASTA - STEP 6
+   Vice privato + mobile compatto
+   ========================================================= */
+
+.vice-limit-field {
+  min-width:
+    110px;
+
+  max-width:
+    150px;
+}
+
+
+#vice-signal-current {
+  margin-bottom:
+    10px;
+}
+
+
+#vice-signal-controls
+.league-actions {
+  align-items:
+    end;
+}
+
+
+#vice-signal-controls
+.form-field {
+  margin:
+    0;
+}
+
+
+#vice-signal-panel
+.list-row-main {
+  min-height:
+    0;
+}
+
+
+/* =========================================================
+   ASTA - MOBILE DENSO
+   ========================================================= */
+
+@media
+(max-width: 700px) {
+
+  body:has(#auction-phase-title)
+  .page-shell {
+    width:
+      calc(100% - 12px);
+
+    margin:
+      10px auto
+      24px;
+  }
+
+
+  body:has(#auction-phase-title)
+  .page-header {
+    align-items:
+      center;
+
+    margin-bottom:
+      10px;
+  }
+
+
+  body:has(#auction-phase-title)
+  .page-header h1 {
+    font-size:
+      23px;
+  }
+
+
+  body:has(#auction-phase-title)
+  .back-home {
+    min-height:
+      36px;
+
+    padding:
+      6px 10px;
+  }
+
+
+  body:has(#auction-phase-title)
+  .league-tabs {
+    gap:
+      5px;
+
+    margin-bottom:
+      10px;
+  }
+
+
+  body:has(#auction-phase-title)
+  .league-tabs
+  .tab {
+    min-width:
+      74px;
+
+    padding:
+      8px 7px;
+  }
+
+
+  body:has(#auction-phase-title)
+  .league-tabs
+  .tab-title {
+    font-size:
+      11px;
+  }
+
+
+  .auction-prep-card {
+    padding:
+      12px;
+
+    margin-bottom:
+      10px !important;
+  }
+
+
+  .auction-prep-card
+  .section-heading {
+    margin-bottom:
+      8px;
+  }
+
+
+  .auction-prep-card
+  .section-heading p {
+    display:
+      none;
+  }
+
+
+  .auction-prep-card
+  #auction-status-line {
+    gap:
+      5px;
+
+    margin-top:
+      0;
+  }
+
+
+  .auction-prep-card
+  #auction-blockers {
+    margin:
+      5px 0 0;
+
+    font-size:
+      11px;
+
+    line-height:
+      1.25;
+  }
+
+
+  .auction-prep-card
+  #auction-control-area {
+    gap:
+      6px;
+
+    margin-top:
+      8px;
+  }
+
+
+  .auction-prep-card
+  #auction-control-area
+  button {
+    min-height:
+      36px;
+
+    padding:
+      7px 11px;
+
+    font-size:
+      12px;
+  }
+
+
+  .auction-lobby-grid {
+    grid-template-columns:
+      1fr;
+
+    gap:
+      10px;
+  }
+
+
+  .auction-lobby-card {
+    padding:
+      12px;
+
+    margin-bottom:
+      0 !important;
+  }
+
+
+  .auction-lobby-card
+  .section-heading {
+    margin-bottom:
+      8px;
+  }
+
+
+  .auction-lobby-card
+  .section-heading p {
+    display:
+      none;
+  }
+
+
+  .auction-lobby-card
+  .section-label {
+    min-width:
+      36px;
+
+    padding:
+      4px 6px;
+  }
+
+
+  #auction-teams {
+    gap:
+      4px;
+  }
+
+
+  #auction-teams
+  .list-row {
+    border-radius:
+      var(--radius-md);
+  }
+
+
+  #auction-teams
+  .list-row-main {
+    gap:
+      8px;
+
+    min-height:
+      0;
+
+    padding:
+      7px 9px;
+  }
+
+
+  #auction-teams
+  .list-row-title
+  strong {
+    font-size:
+      13px;
+  }
+
+
+  #auction-teams
+  .list-row-title
+  small {
+    font-size:
+      10px;
+  }
+
+
+  #auction-teams
+  .badge {
+    flex:
+      0 0 auto;
+
+    padding:
+      3px 6px;
+
+    font-size:
+      9px;
+  }
+
+
+  #auction-settings
+  .setting-row {
+    min-height:
+      0;
+
+    padding:
+      7px 0;
+
+    font-size:
+      12px;
+  }
+
+
+  #auction-settings
+  .setting-row
+  strong {
+    font-size:
+      12px;
+  }
+
+
+  #live-section,
+  #prepared-session-section,
+  #test-roster-review {
+    padding:
+      12px;
+  }
+
+
+  #vice-signal-panel
+  .section-heading {
+    margin-bottom:
+      8px;
+  }
+
+
+  #vice-signal-current
+  .list-row-main {
+    padding:
+      8px 9px;
+  }
+
+
+  #vice-signal-controls
+  .league-actions {
+    display:
+      grid;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+
+    gap:
+      6px;
+  }
+
+
+  #vice-signal-controls
+  button,
+  #vice-signal-controls
+  select {
+    min-height:
+      38px;
+
+    font-size:
+      12px;
+  }
+
+
+  .vice-limit-field {
+    min-width:
+      0;
+
+    max-width:
+      none;
+  }
+}
+
+
+@media
+(max-width: 430px) {
+
+  body:has(#auction-phase-title)
+  .page-header h1 {
+    font-size:
+      21px;
+  }
+
+
+  body:has(#auction-phase-title)
+  .section-heading h2 {
+    font-size:
+      16px;
+  }
+
+
+  body:has(#auction-phase-title)
+  .section-heading {
+    gap:
+      8px;
+  }
+
+
+  body:has(#auction-phase-title)
+  .section-label {
+    font-size:
+      9px;
+  }
+}
