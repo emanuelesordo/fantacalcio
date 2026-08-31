@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Entra in una lega - Fantacalcio Live</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css?v=20"
+  >
+
+</head>
+
+
+<body>
+
+<main class="page-shell">
+
+
+  <header class="page-header">
+
+    <div>
+
+      <h1>Entra in una lega</h1>
+
+      <p>
+        Codice lega, ruoli e squadra in un'unica richiesta
+      </p>
+
+    </div>
+
+
+    <a
+      class="back-home"
+      href="leagues.html"
+    >
+      ← Le mie leghe
+    </a>
+
+  </header>
+
+
+  <p
+    id="join-message"
+    class="message"
+    aria-live="polite"
+  ></p>
+
+
+  <section
+    id="pending-section"
+    class="card"
+    hidden
+  >
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        STATO
+      </span>
+
+      <div>
+
+        <h2>Richieste in corso</h2>
+
+        <p>
+          Le richieste restano visibili fino all'approvazione
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="pending-list"
+      class="list"
+    ></div>
+
+  </section>
+
+
+  <section class="card">
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        1
+      </span>
+
+      <div>
+
+        <h2>Codice lega</h2>
+
+        <p>
+          Inserisci il codice ricevuto dall'Admin
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="form-grid">
+
+      <label class="form-field">
+
+        Codice
+
+        <input
+          id="league-code"
+          type="text"
+          autocomplete="off"
+          maxlength="30"
+          placeholder="Es. ABC123"
+        >
+
+      </label>
+
+
+      <div
+        class="form-field"
+        style="align-self:end"
+      >
+
+        <button
+          id="preview-league-button"
+          type="button"
+        >
+          Continua
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section
+    id="request-section"
+    class="card"
+    hidden
+  >
+
+    <div class="section-heading">
+
+      <span class="section-label">
+        2
+      </span>
+
+      <div>
+
+        <h2 id="preview-league-name">
+          Lega
+        </h2>
+
+        <p id="preview-league-code">
+          —
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <h3>Quali ruoli richiedi?</h3>
+
+
+    <div class="form-grid">
+
+      <label class="form-field">
+
+        <span>
+          <input
+            id="role-president"
+            type="checkbox"
+            value="president"
+          >
+
+          Presidente
+        </span>
+
+        <small class="setting-help">
+          Può gestire una squadra, nominare e rilanciare.
+        </small>
+
+      </label>
+
+
+      <label class="form-field">
+
+        <span>
+          <input
+            id="role-vice"
+            type="checkbox"
+            value="vice"
+          >
+
+          Vice
+        </span>
+
+        <small class="setting-help">
+          Affianca il Presidente; non nomina e non rilancia.
+        </small>
+
+      </label>
+
+
+      <label class="form-field">
+
+        <span>
+          <input
+            id="role-auctioneer"
+            type="checkbox"
+            value="auctioneer"
+          >
+
+          Banditore
+        </span>
+
+        <small class="setting-help">
+          Registra offerte orali e conferma le aggiudicazioni.
+        </small>
+
+      </label>
+
+
+      <label class="form-field">
+
+        <span>
+          <input
+            id="role-presenter"
+            type="checkbox"
+            value="presenter"
+          >
+
+          Presentatore
+        </span>
+
+        <small class="setting-help">
+          Accesso in sola lettura alla vista TV.
+        </small>
+
+      </label>
+
+    </div>
+
+
+    <div
+      id="team-panel"
+      class="conditional-panel"
+      hidden
+    >
+
+      <h3>Squadra</h3>
+
+
+      <div
+        id="team-mode-area"
+        class="form-grid"
+      >
+
+        <label class="form-field">
+
+          <span>
+            <input
+              id="team-mode-existing"
+              type="radio"
+              name="team-mode"
+              value="existing"
+              checked
+            >
+
+            Squadra esistente
+          </span>
+
+        </label>
+
+
+        <label
+          id="team-create-choice"
+          class="form-field"
+          hidden
+        >
+
+          <span>
+            <input
+              id="team-mode-create"
+              type="radio"
+              name="team-mode"
+              value="create"
+            >
+
+            Crea nuova squadra
+          </span>
+
+        </label>
+
+      </div>
+
+
+      <div
+        id="existing-team-area"
+        class="form-grid"
+      >
+
+        <label class="form-field">
+
+          Squadra
+
+          <select id="existing-team-select">
+            <option value="">
+              Seleziona...
+            </option>
+          </select>
+
+        </label>
+
+      </div>
+
+
+      <div
+        id="new-team-area"
+        class="form-grid"
+        hidden
+      >
+
+        <label class="form-field">
+
+          Nome nuova squadra
+
+          <input
+            id="new-team-name"
+            type="text"
+            maxlength="60"
+            placeholder="Nome squadra"
+          >
+
+        </label>
+
+      </div>
+
+    </div>
+
+
+    <div class="divider"></div>
+
+
+    <div class="league-actions">
+
+      <button
+        id="submit-request-button"
+        type="button"
+      >
+        Invia richiesta
+      </button>
+
+    </div>
+
+
+    <p class="setting-help">
+      La richiesta viene salvata soltanto dopo la conferma.
+      L'Admin della lega vedrà subito la richiesta tra le approvazioni pending.
+    </p>
+
+  </section>
+
+
+</main>
+
+
+<script src="league-join.js?v=1"></script>
+
+</body>
+
+</html>
