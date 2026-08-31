@@ -30,21 +30,6 @@ const createDescription =
     'create-description'
   )
 
-const codeForm =
-  document.getElementById(
-    'league-code-form'
-  )
-
-const codeInput =
-  document.getElementById(
-    'league-code'
-  )
-
-const leaguePreview =
-  document.getElementById(
-    'league-preview'
-  )
-
 const createForm =
   document.getElementById(
     'create-league-form'
@@ -54,9 +39,6 @@ const newLeagueName =
   document.getElementById(
     'new-league-name'
   )
-
-
-let currentPreview = null
 
 
 /* =========================================================
@@ -122,7 +104,6 @@ function roleLabel(role) {
       'Vice'
   }
 
-
   return labels[role] || '—'
 }
 
@@ -173,7 +154,7 @@ async function callApi(body) {
         }
       )
 
-  } catch (error) {
+  } catch {
 
     throw new Error(
       'Impossibile contattare il server.'
@@ -315,7 +296,7 @@ function renderMemberships(
 
       if (
         team.membershipStatus
-          === 'active'
+        === 'active'
       ) {
 
         teamStatus = `
@@ -378,17 +359,16 @@ function renderMemberships(
 
           ${teamInfo}
 
-
           ${
             league.status === 'active'
 
               ? `
-                <span class="league-code">
-                  ${escapeHtml(
-                    league.code
-                  )}
-                </span>
-              `
+                  <span class="league-code">
+                    ${escapeHtml(
+                      league.code
+                    )}
+                  </span>
+                `
 
               : ''
           }
@@ -451,7 +431,6 @@ function renderMemberships(
             })
           )
 
-
           window.location.href =
             'league.html'
         }
@@ -477,581 +456,6 @@ function renderMemberships(
 
 
 /* =========================================================
-   PREVIEW CODICE LEGA
-   ========================================================= */
-
-function renderLeaguePreview(
-  data
-) {
-
-  currentPreview =
-    data
-
-
-  leaguePreview.hidden =
-    false
-
-
-  const teams =
-    data.teams || []
-
-
-  leaguePreview.innerHTML = `
-
-    <div class="divider"></div>
-
-
-    <div class="section-heading">
-
-      <span class="section-label">
-        FOUND
-      </span>
-
-      <div>
-
-        <h2>
-          ${escapeHtml(
-            data.league.name
-          )}
-        </h2>
-
-        <p>
-          Codice:
-          ${escapeHtml(
-            data.league.code
-          )}
-        </p>
-
-      </div>
-
-    </div>
-
-
-    <div
-      id="join-team-list"
-      class="list"
-    ></div>
-
-
-    <div class="divider"></div>
-
-
-    <h3>
-      Crea una nuova squadra
-    </h3>
-
-
-    <p class="setting-help">
-      Se la squadra non esiste ancora,
-      puoi crearla e candidarti
-      automaticamente come Presidente.
-    </p>
-
-
-    <form id="new-team-form">
-
-      <label>
-
-        Nome squadra
-
-        <input
-          id="new-team-name"
-          type="text"
-          minlength="2"
-          maxlength="60"
-          placeholder="Es. Real Spritz"
-          required
-        >
-
-      </label>
-
-
-      <button type="submit">
-        Crea squadra e richiedi iscrizione
-      </button>
-
-    </form>
-
-  `
-
-
-  const teamList =
-    document.getElementById(
-      'join-team-list'
-    )
-
-
-  if (
-    teams.length === 0
-  ) {
-
-    teamList.innerHTML = `
-      <div class="empty-state">
-        Nessuna squadra disponibile.
-        Puoi crearne una nuova.
-      </div>
-    `
-
-  } else {
-
-    for (
-      const team
-      of teams
-    ) {
-
-      const row =
-        document.createElement(
-          'div'
-        )
-
-      row.className =
-        'list-row'
-
-
-      const description =
-        team.hasPresident
-
-          ? `
-            Presidente:
-            ${escapeHtml(
-              team.presidentUsername
-              || 'assegnato'
-            )}
-            · candidatura come Vice
-          `
-
-          : `
-            Nessun Presidente
-            · candidatura come Presidente
-          `
-
-
-      row.innerHTML = `
-
-        <div class="list-row-main">
-
-          <div class="list-row-title">
-
-            <strong>
-              ${escapeHtml(
-                team.name
-              )}
-            </strong>
-
-            <small>
-              ${description}
-            </small>
-
-          </div>
-
-
-          <button
-            type="button"
-            class="join-team-button"
-          >
-            Scegli
-          </button>
-
-        </div>
-
-      `
-
-
-      const button =
-        row.querySelector(
-          '.join-team-button'
-        )
-
-
-      button.addEventListener(
-        'click',
-        async () => {
-
-          await joinExistingTeam(
-            team.id,
-            button
-          )
-        }
-      )
-
-
-      teamList.appendChild(
-        row
-      )
-    }
-  }
-
-
-  const newTeamForm =
-    document.getElementById(
-      'new-team-form'
-    )
-
-
-  newTeamForm.addEventListener(
-    'submit',
-    async event => {
-
-      event.preventDefault()
-
-
-      const input =
-        document.getElementById(
-          'new-team-name'
-        )
-
-
-      const button =
-        newTeamForm.querySelector(
-          'button[type="submit"]'
-        )
-
-
-      await joinNewTeam(
-        input.value.trim(),
-        button
-      )
-    }
-  )
-}
-
-
-/* =========================================================
-   ISCRIZIONE A SQUADRA ESISTENTE
-   ========================================================= */
-
-async function joinExistingTeam(
-  teamId,
-  button
-) {
-
-  if (!currentPreview?.league?.code) {
-
-    showMessage(
-      'Lega non valida.',
-      'error'
-    )
-
-    return
-  }
-
-
-  showMessage('')
-
-
-  button.disabled =
-    true
-
-
-  const originalText =
-    button.textContent
-
-
-  button.textContent =
-    'Invio...'
-
-
-  try {
-
-    const data =
-      await callApi({
-
-        action:
-          'joinExistingTeam',
-
-        code:
-          currentPreview.league.code,
-
-        teamId
-      })
-
-
-    if (!data?.ok) {
-
-      showMessage(
-        data?.error ||
-        'Errore durante la richiesta.',
-        'error'
-      )
-
-      return
-    }
-
-
-    const role =
-      roleLabel(
-        data.request
-          ?.requested_role
-      )
-
-
-    leaguePreview.hidden =
-      true
-
-    currentPreview =
-      null
-
-    codeInput.value =
-      ''
-
-
-    showMessage(
-      `Richiesta inviata. Candidatura come ${role}.`,
-      'success'
-    )
-
-
-    await loadHome()
-
-
-  } catch (error) {
-
-    console.error(error)
-
-
-    showMessage(
-      error.message ||
-      'Errore durante la richiesta.',
-      'error'
-    )
-
-  } finally {
-
-    button.disabled =
-      false
-
-    button.textContent =
-      originalText
-  }
-}
-
-
-/* =========================================================
-   CREAZIONE SQUADRA + ISCRIZIONE
-   ========================================================= */
-
-async function joinNewTeam(
-  teamName,
-  button
-) {
-
-  if (!currentPreview?.league?.code) {
-
-    showMessage(
-      'Lega non valida.',
-      'error'
-    )
-
-    return
-  }
-
-
-  if (
-    teamName.length < 2
-  ) {
-
-    showMessage(
-      'Inserisci un nome squadra valido.',
-      'error'
-    )
-
-    return
-  }
-
-
-  showMessage('')
-
-
-  button.disabled =
-    true
-
-
-  const originalText =
-    button.textContent
-
-
-  button.textContent =
-    'Invio...'
-
-
-  try {
-
-    const data =
-      await callApi({
-
-        action:
-          'joinNewTeam',
-
-        code:
-          currentPreview.league.code,
-
-        teamName
-      })
-
-
-    if (!data?.ok) {
-
-      showMessage(
-        data?.error ||
-        'Errore durante la richiesta.',
-        'error'
-      )
-
-      return
-    }
-
-
-    leaguePreview.hidden =
-      true
-
-    currentPreview =
-      null
-
-    codeInput.value =
-      ''
-
-
-    showMessage(
-      'Squadra creata. Richiesta inviata come Presidente.',
-      'success'
-    )
-
-
-    await loadHome()
-
-
-  } catch (error) {
-
-    console.error(error)
-
-
-    showMessage(
-      error.message ||
-      'Errore durante la richiesta.',
-      'error'
-    )
-
-  } finally {
-
-    button.disabled =
-      false
-
-    button.textContent =
-      originalText
-  }
-}
-
-
-/* =========================================================
-   CERCA LEGA TRAMITE CODICE
-   ========================================================= */
-
-codeForm.addEventListener(
-  'submit',
-  async event => {
-
-    event.preventDefault()
-
-
-    showMessage('')
-
-
-    leaguePreview.hidden =
-      true
-
-    currentPreview =
-      null
-
-
-    const code =
-      codeInput
-        .value
-        .trim()
-        .toUpperCase()
-
-
-    if (!code) {
-
-      showMessage(
-        'Inserisci un codice lega.',
-        'error'
-      )
-
-      return
-    }
-
-
-    const button =
-      codeForm.querySelector(
-        'button[type="submit"]'
-      )
-
-
-    button.disabled =
-      true
-
-
-    const originalText =
-      button.textContent
-
-
-    button.textContent =
-      'Cerco...'
-
-
-    try {
-
-      const data =
-        await callApi({
-
-          action:
-            'previewLeagueCode',
-
-          code
-        })
-
-
-      if (!data?.ok) {
-
-        showMessage(
-          data?.error ||
-          'Lega non trovata.',
-          'error'
-        )
-
-        return
-      }
-
-
-      renderLeaguePreview(
-        data
-      )
-
-
-    } catch (error) {
-
-      console.error(error)
-
-
-      showMessage(
-        error.message ||
-        'Errore durante la ricerca.',
-        'error'
-      )
-
-    } finally {
-
-      button.disabled =
-        false
-
-      button.textContent =
-        originalText
-    }
-  }
-)
-
-
-/* =========================================================
    CREA NUOVA LEGA
    ========================================================= */
 
@@ -1060,7 +464,6 @@ createForm.addEventListener(
   async event => {
 
     event.preventDefault()
-
 
     showMessage('')
 
@@ -1089,14 +492,12 @@ createForm.addEventListener(
         'button[type="submit"]'
       )
 
-
     button.disabled =
       true
 
 
     const originalText =
       button.textContent
-
 
     button.textContent =
       'Creazione...'
@@ -1156,7 +557,6 @@ createForm.addEventListener(
     } catch (error) {
 
       console.error(error)
-
 
       showMessage(
         error.message ||
@@ -1247,7 +647,6 @@ async function loadHome() {
   } catch (error) {
 
     console.error(error)
-
 
     showMessage(
       error.message ||
