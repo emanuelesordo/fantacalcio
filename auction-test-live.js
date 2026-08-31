@@ -8,6 +8,16 @@
 
 const testUi = {
 
+  controlArea:
+    document.getElementById(
+      'auction-control-area'
+    ),
+
+  realPrepare:
+    document.getElementById(
+      'prepare-auction-button'
+    ),
+
   prepare:
     document.getElementById(
       'prepare-test-auction-button'
@@ -144,7 +154,12 @@ function participatingTeams() {
 
 function renderPrepareTestButton() {
 
-  if (!testUi.prepare) {
+  if (
+    !testUi.prepare
+    ||
+    !testUi.controlArea
+  ) {
+
     return;
   }
 
@@ -157,22 +172,80 @@ function renderPrepareTestButton() {
     testCanControl();
 
 
+  /*
+   * Il contenitore di avvio deve dipendere soltanto da:
+   * - permesso di controllo asta;
+   * - assenza di una sessione già aperta.
+   *
+   * NON dalla readiness dell'asta reale, perché il pulsante
+   * TEST usa regole differenti.
+   */
+  const showStartArea =
+    canControl
+    &&
+    !session;
+
+
+  testUi.controlArea.hidden =
+    !showStartArea;
+
+
   testUi.prepare.hidden =
-    !canControl
-    ||
-    Boolean(session);
+    !showStartArea;
 
 
   if (
-    !canControl
-    ||
-    session
+    testUi.realPrepare
   ) {
+
+    testUi.realPrepare.hidden =
+      !showStartArea;
+  }
+
+
+  if (!showStartArea) {
     return;
   }
 
 
-  const readiness =
+  /* -------------------------------------------------------
+     ASTA REALE
+     ------------------------------------------------------- */
+
+  const realReadiness =
+    auctionData
+      ?.readiness
+    || {
+      ready: false,
+      blockers: []
+    };
+
+
+  if (
+    testUi.realPrepare
+  ) {
+
+    testUi.realPrepare.disabled =
+      !realReadiness.ready;
+
+
+    testUi.realPrepare.title =
+      realReadiness.ready
+        ? 'Prepara la sessione d’asta reale.'
+        : (
+            realReadiness.blockers
+              ?.join(' ')
+            ||
+            'Asta reale non ancora pronta.'
+          );
+  }
+
+
+  /* -------------------------------------------------------
+     ASTA TEST
+     ------------------------------------------------------- */
+
+  const testReadiness =
     auctionData
       ?.testReadiness
     || {
@@ -182,22 +255,18 @@ function renderPrepareTestButton() {
 
 
   testUi.prepare.disabled =
-    !readiness.ready;
+    !testReadiness.ready;
 
 
-  if (readiness.ready) {
-
-    testUi.prepare.title =
-      'Prepara una sessione temporanea con tutte le squadre reali presenti.';
-
-  } else {
-
-    testUi.prepare.title =
-      readiness.blockers
-        ?.join(' ')
-      ||
-      'Asta di test non disponibile.';
-  }
+  testUi.prepare.title =
+    testReadiness.ready
+      ? 'Prepara una sessione temporanea con le squadre reali già presenti.'
+      : (
+          testReadiness.blockers
+            ?.join(' ')
+          ||
+          'Asta di test non disponibile.'
+        );
 }
 
 
