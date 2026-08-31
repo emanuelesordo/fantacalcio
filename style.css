@@ -7373,3 +7373,98 @@ td {
       1fr;
   }
 }
+
+
+/* =========================================================
+   UI V25 - FIX DRAWER SVINCOLATI COLLASSATO
+   Il drawer chiuso deve occupare soltanto la maniglia
+   sul bordo destro, non lasciare vuota la vecchia colonna.
+   ========================================================= */
+
+body.auction-live-mode.auction-call-mode
+#call-form-area.free-agents-collapsed:not([hidden]) {
+  grid-template-columns:
+    minmax(
+      0,
+      1fr
+    )
+    38px !important;
+}
+
+
+body.auction-live-mode.auction-call-mode
+#call-form-area.free-agents-collapsed
+.free-agents-drawer.is-collapsed {
+  width:
+    38px;
+
+  min-width:
+    38px;
+
+  max-width:
+    38px;
+
+  justify-self:
+    end;
+
+  grid-template-columns:
+    38px
+    0;
+
+  box-shadow:
+    none;
+}
+
+
+body.auction-live-mode.auction-call-mode
+#call-form-area.free-agents-collapsed
+.free-agents-content {
+  width:
+    0;
+
+  min-width:
+    0;
+
+  padding:
+    0;
+
+  overflow:
+    hidden;
+
+  visibility:
+    hidden;
+
+  pointer-events:
+    none;
+}
+
+
+@media
+(max-width: 700px) {
+
+  body.auction-live-mode.auction-call-mode
+  #call-form-area.free-agents-collapsed:not([hidden]) {
+    display:
+      block !important;
+  }
+
+
+  body.auction-live-mode.auction-call-mode
+  #call-form-area.free-agents-collapsed
+  .free-agents-drawer.is-collapsed {
+    position:
+      absolute;
+
+    right:
+      0;
+
+    width:
+      38px;
+
+    min-width:
+      38px;
+
+    max-width:
+      38px;
+  }
+}
