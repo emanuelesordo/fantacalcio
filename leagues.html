@@ -92,6 +92,7 @@
   <section
     id="join-section"
     class="card"
+    hidden
   >
 
     <div class="section-heading">
@@ -123,38 +124,10 @@
 
 
     <p class="setting-help">
-      Potrai richiedere Presidente, Vice,
-      Banditore e/o Presentatore.
-      La squadra verrà richiesta solo
-      per Presidente o Vice.
+      Presidente e Vice richiedono una squadra.
+      Banditore e Presentatore possono entrare
+      nella lega senza essere associati a una squadra.
     </p>
-
-
-    <!-- Compatibilità temporanea con leagues.js?v=1 -->
-
-    <form
-      id="league-code-form"
-      hidden
-    >
-
-      <input
-        id="league-code"
-        type="text"
-        maxlength="12"
-        autocomplete="off"
-      >
-
-      <button type="submit">
-        Cerca lega
-      </button>
-
-    </form>
-
-
-    <div
-      id="league-preview"
-      hidden
-    ></div>
 
   </section>
 
@@ -216,7 +189,7 @@
 </main>
 
 
-<script src="leagues.js?v=1"></script>
+<script src="leagues.js?v=2"></script>
 
 </body>
 
