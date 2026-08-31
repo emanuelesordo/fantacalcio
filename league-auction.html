@@ -14,7 +14,7 @@
 
   <link
     rel="stylesheet"
-    href="style.css?v=23"
+    href="style.css?v=24"
   >
 
 </head>
@@ -773,35 +773,209 @@
 
           <div class="free-agents-content">
 
-            <div class="free-agents-toolbar">
+            <div class="free-agents-title-row">
 
               <div>
                 <strong>Svincolati</strong>
                 <small id="free-agents-count">—</small>
               </div>
 
-              <label class="form-field">
-
-                <span class="auction-visually-hidden">
-                  Cerca giocatore
-                </span>
-
-                <input
-                  id="call-player-search"
-                  type="search"
-                  autocomplete="off"
-                  placeholder="Cerca nome, ruolo, squadra..."
-                >
-
-              </label>
+              <span class="setting-help">
+                Click sulla riga per chiamare
+              </span>
 
             </div>
 
 
             <div
-              id="call-candidates"
-              class="list free-agents-list"
+              id="auction-role-filter-bar"
+              class="role-filter-bar"
+              aria-label="Filtro ruolo"
             ></div>
+
+
+            <div
+              id="auction-player-filter-grid"
+              class="player-filter-grid"
+            >
+
+              <label class="player-filter-field">
+                Cerca
+
+                <input
+                  id="call-player-search"
+                  type="search"
+                  placeholder="Calciatore o squadra..."
+                  autocomplete="off"
+                >
+              </label>
+
+
+              <label class="player-filter-field">
+                Squadra
+
+                <select id="auction-player-team-filter">
+                  <option value="all">Tutte</option>
+                </select>
+              </label>
+
+
+              <label class="player-filter-field">
+                Slot
+
+                <select id="auction-player-slot-filter">
+                  <option value="all">Tutti</option>
+                </select>
+              </label>
+
+
+              <label class="player-filter-field">
+                Segnalazioni
+
+                <select id="auction-player-flag-filter">
+                  <option value="all">Tutte</option>
+                  <option value="market">Mercato</option>
+                  <option value="injury">Indisponibili / rientro incerto</option>
+                  <option value="new">Nuovi arrivi</option>
+                  <option value="penalties">Possibili rigoristi</option>
+                </select>
+              </label>
+
+
+              <button
+                id="auction-player-filter-reset"
+                class="secondary player-filter-reset"
+                type="button"
+              >
+                Azzera filtri
+              </button>
+
+            </div>
+
+
+            <div class="player-count-line">
+              <span id="auction-filtered-count">—</span>
+              <span id="auction-sort-label">Nome ↑</span>
+            </div>
+
+
+            <div
+              id="auction-player-table-wrap"
+              class="player-table-wrap auction-player-table-wrap"
+            >
+
+              <table class="player-table auction-player-table">
+
+                <colgroup>
+                  <col class="player-col-name">
+                  <col class="player-col-team">
+                  <col class="player-col-slot">
+                  <col class="player-col-pma">
+                  <col class="player-col-pfc">
+                  <col class="player-col-delta">
+                  <col class="player-col-fm">
+                  <col class="player-col-tit">
+                </colgroup>
+
+                <thead>
+                  <tr>
+
+                    <th>
+                      <button
+                        class="player-sort-button active"
+                        type="button"
+                        data-auction-sort="name"
+                      >
+                        Calciatore
+                        <span class="player-sort-indicator">↑</span>
+                      </button>
+                    </th>
+
+                    <th>
+                      <button
+                        class="player-sort-button"
+                        type="button"
+                        data-auction-sort="team"
+                      >
+                        Squadra
+                        <span class="player-sort-indicator">↕</span>
+                      </button>
+                    </th>
+
+                    <th>
+                      <button
+                        class="player-sort-button"
+                        type="button"
+                        data-auction-sort="slot"
+                      >
+                        Slot
+                        <span class="player-sort-indicator">↕</span>
+                      </button>
+                    </th>
+
+                    <th>
+                      <button
+                        class="player-sort-button"
+                        type="button"
+                        data-auction-sort="pma"
+                      >
+                        PMA
+                        <span class="player-sort-indicator">↕</span>
+                      </button>
+                    </th>
+
+                    <th>
+                      <button
+                        class="player-sort-button"
+                        type="button"
+                        data-auction-sort="pfc"
+                      >
+                        PFC
+                        <span class="player-sort-indicator">↕</span>
+                      </button>
+                    </th>
+
+                    <th>
+                      <button
+                        class="player-sort-button"
+                        type="button"
+                        data-auction-sort="delta"
+                      >
+                        Δ PFC-PMA
+                        <span class="player-sort-indicator">↕</span>
+                      </button>
+                    </th>
+
+                    <th>
+                      <button
+                        class="player-sort-button"
+                        type="button"
+                        data-auction-sort="fm"
+                      >
+                        Exp. FM
+                        <span class="player-sort-indicator">↕</span>
+                      </button>
+                    </th>
+
+                    <th>
+                      <button
+                        class="player-sort-button"
+                        type="button"
+                        data-auction-sort="tit"
+                      >
+                        Exp. Tit.
+                        <span class="player-sort-indicator">↕</span>
+                      </button>
+                    </th>
+
+                  </tr>
+                </thead>
+
+                <tbody id="call-candidates"></tbody>
+
+              </table>
+
+            </div>
 
           </div>
 
@@ -893,7 +1067,7 @@
 <script src="auction-live-controls.js?v=3"></script>
 <script src="auction-test-live.js?v=3"></script>
 <script src="auction-vice.js?v=1"></script>
-<script src="auction-ui.js?v=2"></script>
+<script src="auction-ui.js?v=3"></script>
 
 </body>
 
