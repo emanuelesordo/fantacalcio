@@ -2148,6 +2148,87 @@
       }
     }
 
+
+    /* =====================================================
+       ASTA COCKPIT V4 - nessun drawer copre le aree fisse
+       ===================================================== */
+    .auction-cockpit{
+      padding-bottom:0!important;
+      grid-template-rows:42px minmax(0,1fr) auto auto!important;
+    }
+    .auction-cockpit-stage{min-height:0;overflow:hidden}
+    .auction-cockpit-stage-grid{
+      height:100%;min-height:0;display:grid;
+      grid-template-columns:auto minmax(0,1fr);
+      gap:5px;overflow:hidden
+    }
+    .auction-cockpit-stage-grid>.auction-president-grid{min-width:0;min-height:0}
+
+    .auction-awards-drawer{
+      position:relative!important;z-index:auto!important;
+      inset:auto!important;height:100%!important;
+      width:320px;min-width:320px;max-width:320px;
+      border-radius:9px!important;box-shadow:none!important;overflow:hidden
+    }
+    .auction-awards-drawer:not([open]){
+      width:31px!important;min-width:31px!important;max-width:31px!important
+    }
+    .auction-awards-drawer>summary{right:0}
+
+    .auction-rosters-drawer{
+      position:relative!important;z-index:auto!important;inset:auto!important;
+      width:100%!important;height:29px;min-height:29px;max-height:29px;
+      border-radius:9px!important;box-shadow:none!important;overflow:hidden
+    }
+    .auction-rosters-drawer[open]{
+      height:clamp(230px,42dvh,480px)!important;
+      min-height:230px;max-height:480px
+    }
+    .auction-rosters-content{height:calc(100% - 29px)}
+
+    .auctioneer-undo{background:#6f4c1f!important;border-color:#a77736!important}
+    .auctioneer-undo-assignment{background:#5b3040!important;border-color:#96536d!important}
+    .auction-roster-icon-btn.swap{
+      background:#174678;border-color:#3977b5;font-size:14px
+    }
+
+    .auction-transfer-modal{
+      position:fixed;z-index:300;inset:0;display:grid;place-items:center;
+      padding:16px;background:rgba(2,12,24,.66);backdrop-filter:blur(2px)
+    }
+    .auction-transfer-card{
+      width:min(430px,calc(100vw - 24px));padding:12px;
+      border:1px solid var(--line2);border-radius:10px;background:#0a213d;
+      box-shadow:0 18px 50px rgba(0,0,0,.5);display:grid;gap:9px
+    }
+    .auction-transfer-card h3{margin:0;font-size:16px}
+    .auction-transfer-card p{margin:0;color:var(--soft);font-size:10px}
+    .auction-transfer-actions{display:flex;justify-content:flex-end;gap:5px}
+
+    @media(max-width:1100px){
+      .auction-awards-drawer[open]{width:260px;min-width:260px;max-width:260px}
+    }
+    @media(max-width:700px){
+      .auction-cockpit{grid-template-rows:38px minmax(0,1fr) auto auto!important}
+      .auction-cockpit-stage-grid{
+        grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)
+      }
+      .auction-awards-drawer,.auction-awards-drawer:not([open]){
+        width:100%!important;min-width:100%!important;max-width:100%!important;
+        height:29px!important
+      }
+      .auction-awards-drawer[open]{height:160px!important}
+      .auction-awards-drawer>summary{
+        position:relative;inset:auto;width:100%;height:29px;
+        writing-mode:horizontal-tb;text-orientation:mixed;
+        border-left:0;border-bottom:1px solid var(--line2)
+      }
+      .auction-awards-content{height:calc(100% - 29px);margin-right:0}
+      .auction-rosters-drawer[open]{
+        height:clamp(220px,48dvh,420px)!important;min-height:220px
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -2492,6 +2573,9 @@
       auctionAdminPlayerId: null,
       auctionAdminPrice: 1,
       auctionAdminTeamId: null,
+
+      auctionTransferAssignmentId: null,
+      auctionTransferTargetTeamId: null,
 
       auctionPersonalRoster: null,
       auctionPersonalRosterFetchedAt: 0,
@@ -4215,6 +4299,18 @@
 
                                       <button
                                         type="button"
+                                        class="auction-roster-icon-btn swap transfer-roster-player"
+                                        data-assignment="${esc(item.id)}"
+                                        data-player="${esc(item.player?.name || 'Giocatore')}"
+                                        data-team-id="${esc(team.id)}"
+                                        data-team="${esc(team.name)}"
+                                        title="Cambia squadra"
+                                      >
+                                        ⇄
+                                      </button>
+
+                                      <button
+                                        type="button"
                                         class="auction-roster-icon-btn edit-roster-price"
                                         data-assignment="${esc(item.id)}"
                                         data-player="${esc(item.player?.name || 'Giocatore')}"
@@ -4279,7 +4375,7 @@
                 <div class="small soft">
                   ${
                     canEdit
-                      ? '✎ modifica prezzo · × rimuove il giocatore'
+                      ? '⇄ cambia squadra · ✎ modifica prezzo · × rimuove'
                       : 'Consultazione aggiornata dell’asta'
                   }
                 </div>
@@ -4302,6 +4398,79 @@
           </div>
 
         </details>
+      `;
+    }
+
+
+    function renderAuctionTransferModal() {
+      const id = state.auctionTransferAssignmentId;
+
+      if (!id || !auctionCanControl()) {
+        return '';
+      }
+
+      const data = state.auctionPersonalRoster;
+      const assignment =
+        (data?.assignments || [])
+          .find(item => item.id === id) || null;
+
+      if (!assignment) {
+        return '';
+      }
+
+      const teams = data?.teams || state.auction?.teams || [];
+      const currentTeam =
+        teams.find(team => team.id === assignment.team_id) || null;
+      const targets =
+        teams.filter(team => team.id !== assignment.team_id);
+
+      if (
+        !state.auctionTransferTargetTeamId ||
+        !targets.some(team => team.id === state.auctionTransferTargetTeamId)
+      ) {
+        state.auctionTransferTargetTeamId = targets[0]?.id || null;
+      }
+
+      return `
+        <div class="auction-transfer-modal">
+          <div class="auction-transfer-card">
+            <div>
+              <h3>Cambia squadra</h3>
+              <p>
+                ${esc(assignment.player?.name || 'Giocatore')}
+                · ${esc(currentTeam?.name || 'squadra corrente')}
+                · prezzo ${Number(assignment.purchase_price || 0)}
+              </p>
+            </div>
+
+            <label>
+              Nuova squadra
+              <select id="auction-transfer-target">
+                ${targets.map(team => `
+                  <option
+                    value="${esc(team.id)}"
+                    ${team.id === state.auctionTransferTargetTeamId ? 'selected' : ''}
+                  >
+                    ${esc(team.name)}
+                  </option>
+                `).join('')}
+              </select>
+            </label>
+
+            <div class="auction-transfer-actions">
+              <button id="auction-transfer-cancel" class="secondary" type="button">
+                Annulla
+              </button>
+              <button
+                id="auction-transfer-confirm"
+                type="button"
+                ${targets.length ? '' : 'disabled'}
+              >
+                Conferma cambio
+              </button>
+            </div>
+          </div>
+        </div>
       `;
     }
 
@@ -5119,11 +5288,30 @@
                   <div class="auctioneer-head-actions">
 
                     <button
-                      id="auction-undo-last"
+                      id="auction-undo-bid"
                       class="auctioneer-undo"
                       type="button"
+                      ${
+                        hasPlayer
+                        &&
+                        (d.recentBids || []).some(
+                          bid => !['CALL','TEST_BANDITORE']
+                            .includes(String(bid.source || '').toUpperCase())
+                        )
+                          ? ''
+                          : 'disabled'
+                      }
                     >
-                      ↶ ANNULLA ULTIMA OPERAZIONE
+                      ↶ ANNULLA ULTIMA OFFERTA
+                    </button>
+
+                    <button
+                      id="auction-undo-assignment"
+                      class="auctioneer-undo-assignment"
+                      type="button"
+                      ${(d.recentAwards || []).length ? '' : 'disabled'}
+                    >
+                      ↶ ANNULLA ULTIMA ASSEGNAZIONE
                     </button>
 
                     <button
@@ -5413,36 +5601,34 @@
 
           <div class="auction-cockpit-stage">
 
-            <div class="auction-president-grid">
+            <div class="auction-cockpit-stage-grid">
 
-              ${renderAuctionCockpitTeamPanel()}
+              ${renderAuctionAwardsDrawer()}
 
+              <div class="auction-president-grid">
 
-              <div class="auction-table-column">
+                ${renderAuctionCockpitTeamPanel()}
 
-                ${playerHeroHtml}
+                <div class="auction-table-column">
+                  ${playerHeroHtml}
+                  ${actionHtml}
+                  ${viceHtml}
+                  ${recentBidsHtml}
+                </div>
 
-                ${actionHtml}
-
-                ${viceHtml}
-
-                ${recentBidsHtml}
+                ${renderAuctionFixedFreeAgents(hasPlayer)}
 
               </div>
-
-
-              ${renderAuctionFixedFreeAgents(hasPlayer)}
 
             </div>
 
           </div>
 
-
           ${adminHtml}
 
-          ${renderAuctionAwardsDrawer()}
-
           ${renderAuctionAllRostersDrawer()}
+
+          ${renderAuctionTransferModal()}
 
         </div>
       `;
@@ -5866,30 +6052,128 @@
         );
 
 
-      $('auction-undo-last')
+      $('auction-undo-bid')
         ?.addEventListener(
           'click',
           async () => {
-            if (
-              !confirm(
-                'Annullare l’ultima operazione reversibile dell’asta?'
-              )
-            ) {
+            if (!confirm(
+              'Annullare l’ultima offerta? Verranno ripristinati importo e leader precedenti.'
+            )) {
               return;
             }
 
             await auctionAction(
               {
-                action:
-                  'undoLastOperation',
-
-                sessionId:
-                  s.id
+                action: 'undoLastBid',
+                sessionId: s.id
               },
-              'Ultima operazione annullata.'
+              'Ultima offerta annullata.'
             );
           }
         );
+
+
+      $('auction-undo-assignment')
+        ?.addEventListener(
+          'click',
+          async () => {
+            const last = (d.recentAwards || [])[0];
+            const label = last
+              ? `${last.player?.name || 'il giocatore'} → ${last.team?.name || 'squadra'} per ${Number(last.price || 0)}`
+              : 'l’ultima assegnazione';
+
+            if (!confirm(
+              `Annullare l’ultima assegnazione ufficiale (${label})? Il giocatore tornerà svincolato e i crediti saranno restituiti.`
+            )) {
+              return;
+            }
+
+            await auctionAction(
+              {
+                action: 'undoLastAssignment',
+                sessionId: s.id
+              },
+              'Ultima assegnazione annullata.'
+            );
+          }
+        );
+
+
+      document
+        .querySelectorAll('.transfer-roster-player')
+        .forEach(button => {
+          button.addEventListener('click', () => {
+            state.auctionTransferAssignmentId =
+              button.dataset.assignment;
+
+            const other =
+              (state.auctionPersonalRoster?.teams || d.teams || [])
+                .find(team => team.id !== button.dataset.teamId);
+
+            state.auctionTransferTargetTeamId =
+              other?.id || null;
+
+            renderAuctionLive();
+          });
+        });
+
+
+      $('auction-transfer-target')
+        ?.addEventListener('change', event => {
+          state.auctionTransferTargetTeamId =
+            event.target.value || null;
+        });
+
+
+      $('auction-transfer-cancel')
+        ?.addEventListener('click', () => {
+          state.auctionTransferAssignmentId = null;
+          state.auctionTransferTargetTeamId = null;
+          renderAuctionLive();
+        });
+
+
+      $('auction-transfer-confirm')
+        ?.addEventListener('click', async () => {
+          const assignment =
+            (state.auctionPersonalRoster?.assignments || [])
+              .find(item => item.id === state.auctionTransferAssignmentId);
+
+          const teams =
+            state.auctionPersonalRoster?.teams || d.teams || [];
+
+          const target =
+            teams.find(team => team.id === state.auctionTransferTargetTeamId);
+
+          const source =
+            teams.find(team => team.id === assignment?.team_id);
+
+          if (!assignment || !target) {
+            return msg('Seleziona una squadra di destinazione.', 'error');
+          }
+
+          if (!confirm(
+            `Spostare ${assignment.player?.name || 'il giocatore'} da ${source?.name || 'squadra attuale'} a ${target.name}, mantenendo il prezzo di ${Number(assignment.purchase_price || 0)}?`
+          )) {
+            return;
+          }
+
+          const assignmentId = state.auctionTransferAssignmentId;
+          const targetTeamId = state.auctionTransferTargetTeamId;
+
+          state.auctionTransferAssignmentId = null;
+          state.auctionTransferTargetTeamId = null;
+
+          await auctionAction(
+            {
+              action: 'transferRosterPlayer',
+              sessionId: s.id,
+              assignmentId,
+              targetTeamId
+            },
+            'Squadra del giocatore aggiornata.'
+          );
+        });
 
 
       document
@@ -6395,7 +6679,8 @@
             'manualAward',
             'editRosterPrice',
             'removeRosterPlayer',
-            'undoLastOperation'
+            'transferRosterPlayer',
+            'undoLastAssignment'
           ].includes(
             payload?.action
           )
