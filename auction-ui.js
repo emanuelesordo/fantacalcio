@@ -1,39 +1,64 @@
 /* =========================================================
    auction-ui.js
-   UI operativa asta:
-   - quick bid +1/+2/+3/+5/+10 con conferma separata
-   - drawer svincolati a destra con scroll interno
-   - timer visuale con finestra tecnica di sincronizzazione
+   UI asta:
+   - quick bid +1/+2/+3/+5/+10
+   - conferma separata
+   - drawer Svincolati = Listone
+   - tutti gli svincolati
+   - filtri ruolo multipli (ALL esclusivo), ricerca, squadra,
+     slot, segnalazioni
+   - ordinamento tabella
+   - timer visuale sincronizzato
    ========================================================= */
 
-const auctionUiQuickOffsets = [1, 2, 3, 5, 10];
+const $auction = id => document.getElementById(id);
 
-const auctionUiElements = {
-  liveQuick: document.getElementById('live-bid-quick'),
-  liveSelect: document.getElementById('live-bid-amount'),
-  liveSelected: document.getElementById('live-selected-bid'),
-  liveConfirm: document.getElementById('live-bid-button'),
-  auctioneerQuick: document.getElementById('auctioneer-bid-quick'),
-  auctioneerSelect: document.getElementById('auctioneer-bid-amount'),
-  auctioneerSelected: document.getElementById('auctioneer-selected-bid'),
-  callFormArea: document.getElementById('call-form-area'),
-  freeAgentsDrawer: document.getElementById('free-agents-drawer'),
-  freeAgentsToggle: document.getElementById('free-agents-toggle'),
-  freeAgentsToggleIcon: document.getElementById('free-agents-toggle-icon'),
-  freeAgentsCount: document.getElementById('free-agents-count'),
-  freeAgentsList: document.getElementById('call-candidates'),
-  freeAgentsSearch: document.getElementById('call-player-search'),
-  timer: document.getElementById('auction-timer-display'),
-  timerStatus: document.getElementById('auction-timer-display-status')
+const auctionUi = {
+  liveQuick: $auction('live-bid-quick'),
+  liveSelect: $auction('live-bid-amount'),
+  liveSelected: $auction('live-selected-bid'),
+  liveConfirm: $auction('live-bid-button'),
+  auctioneerQuick: $auction('auctioneer-bid-quick'),
+  auctioneerSelect: $auction('auctioneer-bid-amount'),
+  auctioneerSelected: $auction('auctioneer-selected-bid'),
+  callFormArea: $auction('call-form-area'),
+  drawer: $auction('free-agents-drawer'),
+  toggle: $auction('free-agents-toggle'),
+  toggleIcon: $auction('free-agents-toggle-icon'),
+  totalCount: $auction('free-agents-count'),
+  roleBar: $auction('auction-role-filter-bar'),
+  search: $auction('call-player-search'),
+  team: $auction('auction-player-team-filter'),
+  slot: $auction('auction-player-slot-filter'),
+  flag: $auction('auction-player-flag-filter'),
+  reset: $auction('auction-player-filter-reset'),
+  filteredCount: $auction('auction-filtered-count'),
+  sortLabel: $auction('auction-sort-label'),
+  tableWrap: $auction('auction-player-table-wrap'),
+  body: $auction('call-candidates'),
+  timer: $auction('auction-timer-display'),
+  timerStatus: $auction('auction-timer-display-status')
 };
 
-let auctionUiLastMode = null;
-let auctionUiFreeAgentsKey = '';
-let auctionUiDrawerCollapsed = false;
+const QUICK_OFFSETS = [1, 2, 3, 5, 10];
 
+let auctionUiLastMode = null;
+let auctionUiDrawerCollapsed = false;
+let auctionUiRoles = new Set(['all']);
+let auctionUiSort = { key: 'name', direction: 'asc' };
+let auctionUiOptionsKey = '';
+let auctionUiRenderKey = '';
+
+/* Rimuove il listener di ricerca del vecchio renderer da 50 righe. */
+if (auctionUi.search) {
+  const oldSearch = auctionUi.search;
+  const cleanSearch = oldSearch.cloneNode(true);
+  oldSearch.replaceWith(cleanSearch);
+  auctionUi.search = cleanSearch;
+}
 
 /* =========================================================
-   STATO / MODALITÀ
+   STATO
    ========================================================= */
 
 function auctionUiSession() {
@@ -42,15 +67,20 @@ function auctionUiSession() {
     : null;
 }
 
-
-function auctionUiIsLive() {
-  return auctionUiSession()?.status === 'live';
+function auctionUiSettings() {
+  return (
+    auctionUiSession()?.setup_snapshot ||
+    (typeof auctionData !== 'undefined' ? auctionData?.settings : null) ||
+    {}
+  );
 }
 
+function auctionUiFantasyMode() {
+  return auctionUiSettings()?.fantasy_mode || 'classic';
+}
 
 function auctionUiIsCallMode() {
   const session = auctionUiSession();
-
   return Boolean(
     session &&
     session.status === 'live' &&
@@ -58,10 +88,8 @@ function auctionUiIsCallMode() {
   );
 }
 
-
 function auctionUiIsBidMode() {
   const session = auctionUiSession();
-
   return Boolean(
     session &&
     session.status === 'live' &&
@@ -69,58 +97,36 @@ function auctionUiIsBidMode() {
   );
 }
 
-
 function auctionUiApplyMode() {
   if (typeof auctionData === 'undefined') return;
 
-  const isLive = auctionUiIsLive();
-  const isCallMode = auctionUiIsCallMode();
-  const isBidMode = auctionUiIsBidMode();
+  const live = auctionUiSession()?.status === 'live';
+  const call = auctionUiIsCallMode();
+  const bid = auctionUiIsBidMode();
 
-  document.body.classList.toggle(
-    'auction-live-mode',
-    isLive
-  );
+  document.body.classList.toggle('auction-live-mode', live);
+  document.body.classList.toggle('auction-call-mode', call);
+  document.body.classList.toggle('auction-bid-mode', bid);
 
-  document.body.classList.toggle(
-    'auction-call-mode',
-    isCallMode
-  );
-
-  document.body.classList.toggle(
-    'auction-bid-mode',
-    isBidMode
-  );
-
-  const nextMode =
-    isCallMode
-      ? 'call'
-      : isBidMode
-        ? 'bid'
-        : 'lobby';
-
+  const nextMode = call ? 'call' : bid ? 'bid' : 'lobby';
   if (nextMode === auctionUiLastMode) return;
 
   auctionUiLastMode = nextMode;
 
-  document
-    .getElementById('live-section')
-    ?.scrollTo({
-      top: 0,
-      behavior: 'instant'
-    });
+  $auction('live-section')?.scrollTo({
+    top: 0,
+    behavior: 'instant'
+  });
 
-  auctionUiElements
-    .freeAgentsList
-    ?.scrollTo({
-      top: 0,
-      behavior: 'instant'
-    });
+  auctionUi.tableWrap?.scrollTo({
+    top: 0,
+    left: 0,
+    behavior: 'instant'
+  });
 }
 
-
 /* =========================================================
-   TIMER VISUALE
+   TIMER
    ========================================================= */
 
 function auctionUiNowMs() {
@@ -129,20 +135,8 @@ function auctionUiNowMs() {
     : Date.now();
 }
 
-
-function auctionUiFormatSeconds(milliseconds) {
-  return `${Math.max(
-    0,
-    Math.ceil(milliseconds / 1000)
-  )}s`;
-}
-
-
 function auctionUiRenderTimer() {
-  const timer = auctionUiElements.timer;
-  const status = auctionUiElements.timerStatus;
-
-  if (!timer || !status) return;
+  if (!auctionUi.timer || !auctionUi.timerStatus) return;
 
   const session = auctionUiSession();
 
@@ -151,149 +145,93 @@ function auctionUiRenderTimer() {
     session.status !== 'live' ||
     !session.current_player_id
   ) {
-    timer.textContent = '—';
-    status.textContent = 'In attesa';
+    auctionUi.timer.textContent = '—';
+    auctionUi.timerStatus.textContent = 'In attesa';
     return;
   }
 
   if (session.hold_active === true) {
-    const holdSeconds =
-      Number(session.hold_remaining_seconds);
+    const seconds = Number(session.hold_remaining_seconds);
 
-    timer.textContent =
-      Number.isFinite(holdSeconds)
-        ? `${Math.max(
-            0,
-            Math.ceil(holdSeconds)
-          )}s`
-        : '—';
+    auctionUi.timer.textContent = Number.isFinite(seconds)
+      ? `${Math.max(0, Math.ceil(seconds))}s`
+      : '—';
 
-    status.textContent =
-      'HOLD — timer sospeso';
-
+    auctionUi.timerStatus.textContent = 'HOLD — timer sospeso';
     return;
   }
 
   if (session.timer_expired_at) {
-    timer.textContent = '0s';
-
-    status.textContent =
+    auctionUi.timer.textContent = '0s';
+    auctionUi.timerStatus.textContent =
       'TIMER SCADUTO — ATTESA BANDITORE';
-
     return;
   }
 
   if (!session.timer_deadline) {
-    timer.textContent = '—';
-
-    status.textContent =
-      session.current_bidder_team_id
-        ? 'Timer non avviato'
-        : 'In attesa della prima offerta';
-
+    auctionUi.timer.textContent = '—';
+    auctionUi.timerStatus.textContent = session.current_bidder_team_id
+      ? 'Timer non avviato'
+      : 'In attesa della prima offerta';
     return;
   }
 
-  const deadline =
-    Date.parse(session.timer_deadline);
+  const deadline = Date.parse(session.timer_deadline);
 
   if (!Number.isFinite(deadline)) {
-    timer.textContent = '—';
-
-    status.textContent =
-      'Timer non disponibile';
-
+    auctionUi.timer.textContent = '—';
+    auctionUi.timerStatus.textContent = 'Timer non disponibile';
     return;
   }
 
-  const rawRemaining =
-    Math.max(
-      0,
-      deadline - auctionUiNowMs()
-    );
-
-  const configuredSeconds =
-    Number(session.current_timer_seconds);
+  const rawMs = Math.max(0, deadline - auctionUiNowMs());
+  const configuredSeconds = Number(session.current_timer_seconds);
 
   const configuredMs =
-    Number.isFinite(configuredSeconds) &&
-    configuredSeconds > 0
+    Number.isFinite(configuredSeconds) && configuredSeconds > 0
       ? configuredSeconds * 1000
       : null;
 
-  /*
-   * I 3 secondi tecnici concessi dal server
-   * non vengono visualizzati come countdown.
-   *
-   * Durante quel tempo il timer rimane al
-   * valore pieno configurato.
-   */
-  const visibleRemaining =
+  const visibleMs =
     configuredMs === null
-      ? rawRemaining
-      : Math.min(
-          rawRemaining,
-          configuredMs
-        );
+      ? rawMs
+      : Math.min(rawMs, configuredMs);
 
-  timer.textContent =
-    auctionUiFormatSeconds(
-      visibleRemaining
-    );
+  auctionUi.timer.textContent =
+    `${Math.max(0, Math.ceil(visibleMs / 1000))}s`;
 
-  if (rawRemaining <= 0) {
-    status.textContent =
+  if (rawMs <= 0) {
+    auctionUi.timerStatus.textContent =
       'TIMER SCADUTO — ATTESA BANDITORE';
-
   } else if (
     configuredMs !== null &&
-    rawRemaining > configuredMs + 100
+    rawMs > configuredMs + 100
   ) {
-    status.textContent =
+    auctionUi.timerStatus.textContent =
       'Sincronizzazione dispositivi…';
-
   } else {
-    status.textContent =
-      'Tempo residuo';
+    auctionUi.timerStatus.textContent = 'Tempo residuo';
   }
 }
-
 
 /* =========================================================
    QUICK BID
    ========================================================= */
 
-function auctionUiBidAnchor() {
-  const session = auctionUiSession();
-
-  return session
-    ? Math.max(
-        0,
-        Number(
-          session.current_bid || 0
-        )
-      )
-    : 0;
-}
-
-
-function auctionUiMinimumBid() {
-  if (
-    typeof nextValidBid === 'function'
-  ) {
-    return Number(
-      nextValidBid() || 1
-    );
-  }
-
+function auctionUiCurrentBid() {
   return Math.max(
-    1,
-    auctionUiBidAnchor() + 1
+    0,
+    Number(auctionUiSession()?.current_bid || 0)
   );
 }
 
+function auctionUiMinimumBid() {
+  return typeof nextValidBid === 'function'
+    ? Number(nextValidBid() || 1)
+    : Math.max(1, auctionUiCurrentBid() + 1);
+}
 
-function auctionUiPresidentMaxBid() {
+function auctionUiPresidentMax() {
   if (
     typeof liveActorTeamId !== 'function' ||
     typeof capacityForTeam !== 'function'
@@ -301,696 +239,886 @@ function auctionUiPresidentMaxBid() {
     return 0;
   }
 
-  const teamId =
-    liveActorTeamId();
+  const teamId = liveActorTeamId();
+  const capacity = teamId ? capacityForTeam(teamId) : null;
 
-  if (!teamId) return 0;
-
-  const capacity =
-    capacityForTeam(teamId);
-
-  return Math.max(
-    0,
-    Number(
-      capacity?.max_bid || 0
-    )
-  );
+  return Math.max(0, Number(capacity?.max_bid || 0));
 }
 
-
-function auctionUiAuctioneerMaxBid() {
-  return typeof maxCapacityAcrossTeams
-    === 'function'
-      ? Math.max(
-          0,
-          Number(
-            maxCapacityAcrossTeams() || 0
-          )
-        )
-      : 0;
+function auctionUiAuctioneerMax() {
+  return typeof maxCapacityAcrossTeams === 'function'
+    ? Math.max(0, Number(maxCapacityAcrossTeams() || 0))
+    : 0;
 }
 
-
-function auctionUiSelectedAmount(select) {
-  return Math.max(
-    0,
-    Number(
-      select?.value || 0
-    )
-  );
-}
-
-
-function auctionUiQuickButtonHtml(
-  offset,
-  target,
-  selected,
-  disabled
-) {
+function auctionUiQuickButton(offset, amount, selected, disabled) {
   return `
     <button
       type="button"
-      class="auction-quick-bid-button ${
-        selected
-          ? 'is-selected'
-          : ''
-      }"
-      data-quick-bid="${target}"
+      class="auction-quick-bid-button ${selected ? 'is-selected' : ''}"
+      data-quick-bid="${amount}"
       ${disabled ? 'disabled' : ''}
     >
-      <span>
-        +${offset}
-      </span>
-
-      <strong>
-        ${target}
-      </strong>
+      <span>+${offset}</span>
+      <strong>${amount}</strong>
     </button>
   `;
 }
 
-
-function auctionUiRenderQuickGrid(
-  container,
-  select,
-  maximum
-) {
+function auctionUiRenderQuickGrid(container, select, maximum) {
   if (!container || !select) return;
 
-  const selected =
-    auctionUiSelectedAmount(select);
+  const selected = Number(select.value || 0);
+  const current = auctionUiCurrentBid();
+  const minimum = auctionUiMinimumBid();
 
-  const current =
-    auctionUiBidAnchor();
+  container.innerHTML = QUICK_OFFSETS.map(offset => {
+    const amount = current + offset;
+    const disabled = amount < minimum || amount > maximum;
 
-  const minimum =
-    auctionUiMinimumBid();
-
-  container.innerHTML =
-    auctionUiQuickOffsets
-      .map(offset => {
-        const target =
-          current + offset;
-
-        const disabled =
-          target < minimum ||
-          target > maximum;
-
-        return auctionUiQuickButtonHtml(
-          offset,
-          target,
-          selected === target,
-          disabled
-        );
-      })
-      .join('');
+    return auctionUiQuickButton(
+      offset,
+      amount,
+      selected === amount,
+      disabled
+    );
+  }).join('');
 }
 
-
 function auctionUiRenderQuickBids() {
-  const session =
-    auctionUiSession();
+  if (!auctionUiIsBidMode()) return;
 
-  if (
-    !session ||
-    session.status !== 'live' ||
-    !session.current_player_id
-  ) {
-    return;
-  }
-
-  /*
-   * PRESIDENTE
-   */
   auctionUiRenderQuickGrid(
-    auctionUiElements.liveQuick,
-    auctionUiElements.liveSelect,
-    auctionUiPresidentMaxBid()
+    auctionUi.liveQuick,
+    auctionUi.liveSelect,
+    auctionUiPresidentMax()
   );
 
-  const liveSelected =
-    auctionUiSelectedAmount(
-      auctionUiElements.liveSelect
-    );
+  const presidentSelected = Number(auctionUi.liveSelect?.value || 0);
 
-  if (
-    auctionUiElements.liveSelected
-  ) {
-    auctionUiElements
-      .liveSelected
-      .textContent =
-        liveSelected > 0
-          ? `Selezionato ${liveSelected}`
-          : 'Selezionato —';
+  if (auctionUi.liveSelected) {
+    auctionUi.liveSelected.textContent = presidentSelected > 0
+      ? `Selezionato ${presidentSelected}`
+      : 'Selezionato —';
   }
 
-  if (
-    auctionUiElements.liveConfirm
-  ) {
-    auctionUiElements
-      .liveConfirm
-      .textContent =
-        liveSelected > 0
-          ? `Conferma ${liveSelected}`
-          : 'Conferma rilancio';
+  if (auctionUi.liveConfirm) {
+    auctionUi.liveConfirm.textContent = presidentSelected > 0
+      ? `Conferma ${presidentSelected}`
+      : 'Conferma rilancio';
   }
 
-  /*
-   * BANDITORE
-   */
   auctionUiRenderQuickGrid(
-    auctionUiElements.auctioneerQuick,
-    auctionUiElements.auctioneerSelect,
-    auctionUiAuctioneerMaxBid()
+    auctionUi.auctioneerQuick,
+    auctionUi.auctioneerSelect,
+    auctionUiAuctioneerMax()
   );
 
   const auctioneerSelected =
-    auctionUiSelectedAmount(
-      auctionUiElements.auctioneerSelect
-    );
+    Number(auctionUi.auctioneerSelect?.value || 0);
 
-  if (
-    auctionUiElements
-      .auctioneerSelected
-  ) {
-    auctionUiElements
-      .auctioneerSelected
-      .textContent =
-        auctioneerSelected > 0
-          ? `Selezionato ${auctioneerSelected}`
-          : 'Selezionato —';
+  if (auctionUi.auctioneerSelected) {
+    auctionUi.auctioneerSelected.textContent = auctioneerSelected > 0
+      ? `Selezionato ${auctioneerSelected}`
+      : 'Selezionato —';
   }
 }
 
-
-function auctionUiSelectQuickAmount(
-  select,
-  amount
-) {
+function auctionUiSelectAmount(select, amount) {
   if (!select) return;
 
-  const optionExists =
-    Array
-      .from(
-        select.options || []
-      )
-      .some(
-        option =>
-          Number(option.value)
-          === amount
-      );
+  const exists = Array.from(select.options || [])
+    .some(option => Number(option.value) === amount);
 
-  if (!optionExists) return;
+  if (!exists) return;
 
-  select.value =
-    String(amount);
+  select.value = String(amount);
 
-  /*
-   * Il change informa il vecchio motore
-   * del nuovo importo, ma NON effettua
-   * alcuna offerta.
-   */
   select.dispatchEvent(
-    new Event(
-      'change',
-      {
-        bubbles: true
-      }
-    )
+    new Event('change', { bubbles: true })
   );
 
   auctionUiRenderQuickBids();
 }
 
+auctionUi.liveQuick?.addEventListener('click', event => {
+  const button = event.target.closest('[data-quick-bid]');
+  if (!button || button.disabled) return;
 
-auctionUiElements
-  .liveQuick
-  ?.addEventListener(
-    'click',
-    event => {
-      const button =
-        event.target.closest(
-          '[data-quick-bid]'
-        );
-
-      if (
-        !button ||
-        button.disabled
-      ) {
-        return;
-      }
-
-      auctionUiSelectQuickAmount(
-        auctionUiElements.liveSelect,
-        Number(
-          button.dataset.quickBid
-        )
-      );
-    }
+  auctionUiSelectAmount(
+    auctionUi.liveSelect,
+    Number(button.dataset.quickBid)
   );
+});
 
+auctionUi.auctioneerQuick?.addEventListener('click', event => {
+  const button = event.target.closest('[data-quick-bid]');
+  if (!button || button.disabled) return;
 
-auctionUiElements
-  .auctioneerQuick
-  ?.addEventListener(
-    'click',
-    event => {
-      const button =
-        event.target.closest(
-          '[data-quick-bid]'
-        );
-
-      if (
-        !button ||
-        button.disabled
-      ) {
-        return;
-      }
-
-      auctionUiSelectQuickAmount(
-        auctionUiElements.auctioneerSelect,
-        Number(
-          button.dataset.quickBid
-        )
-      );
-    }
+  auctionUiSelectAmount(
+    auctionUi.auctioneerSelect,
+    Number(button.dataset.quickBid)
   );
+});
 
-
-auctionUiElements
-  .auctioneerSelect
-  ?.addEventListener(
-    'change',
-    auctionUiRenderQuickBids
-  );
-
+auctionUi.auctioneerSelect?.addEventListener(
+  'change',
+  auctionUiRenderQuickBids
+);
 
 /* =========================================================
-   LISTA SVINCOLATI
+   DATI LISTONE
    ========================================================= */
 
+function auctionUiPlayers() {
+  return typeof auctionData !== 'undefined'
+    ? auctionData?.callCandidates || []
+    : [];
+}
+
 function auctionUiPlayerRoles(player) {
-  if (
-    typeof getPlayerRoles === 'function'
-  ) {
-    return getPlayerRoles(
-      player
-    ).join('/');
-  }
-
-  if (
-    Array.isArray(
-      player?.mantra_roles
-    )
-  ) {
-    return player
-      .mantra_roles
-      .join('/');
-  }
-
-  return (
-    player?.classic_role || '—'
-  );
-}
-
-
-function auctionUiFilteredFreeAgents() {
-  const source =
-    typeof auctionData !== 'undefined'
-      ? auctionData
-          ?.callCandidates || []
+  if (auctionUiFantasyMode() === 'classic') {
+    return player?.classic_role
+      ? [player.classic_role]
       : [];
-
-  const query =
-    String(
-      auctionUiElements
-        .freeAgentsSearch
-        ?.value || ''
-    )
-      .trim()
-      .toLowerCase();
-
-  if (!query) {
-    return source;
   }
 
-  return source.filter(
-    player => {
-      const roles =
-        auctionUiPlayerRoles(
-          player
-        );
+  const mantra = Array.isArray(player?.mantra_roles)
+    ? player.mantra_roles.filter(Boolean)
+    : [];
 
-      return [
-        player.name,
-        player.serie_a_team,
-        player.classic_role,
-        roles
-      ]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase()
-        .includes(query);
-    }
-  );
+  return mantra.length
+    ? mantra
+    : player?.classic_role
+      ? [player.classic_role]
+      : [];
 }
 
-
-function auctionUiRenderFreeAgents(
-  force = false
-) {
-  const list =
-    auctionUiElements.freeAgentsList;
-
-  if (!list) return;
-
-  if (!auctionUiIsCallMode()) {
-    auctionUiFreeAgentsKey = '';
-    return;
-  }
-
-  const filtered =
-    auctionUiFilteredFreeAgents();
-
-  const total =
-    typeof auctionData !== 'undefined'
-      ? auctionData
-          ?.callCandidates
-          ?.length || 0
-      : 0;
-
-  if (
-    auctionUiElements.freeAgentsCount
-  ) {
-    auctionUiElements
-      .freeAgentsCount
-      .textContent =
-        filtered.length === total
-          ? `${total}`
-          : `${filtered.length}/${total}`;
-  }
-
-  const query =
-    String(
-      auctionUiElements
-        .freeAgentsSearch
-        ?.value || ''
-    )
-      .trim()
-      .toLowerCase();
-
-  const key =
-    [
-      query,
-      filtered.length,
-      filtered[0]?.id || '',
-      filtered[
-        filtered.length - 1
-      ]?.id || ''
-    ].join('|');
-
-  if (
-    !force &&
-    key === auctionUiFreeAgentsKey
-  ) {
-    return;
-  }
-
-  auctionUiFreeAgentsKey = key;
-
-  const previousScroll =
-    list.scrollTop;
-
-  if (!filtered.length) {
-    list.innerHTML = `
-      <div class="empty-state">
-        Nessun giocatore trovato.
-      </div>
-    `;
-
-    return;
-  }
-
-  /*
-   * Nessuno slice(0, 50):
-   * ora può essere caricata l'intera lista,
-   * perché lo scroll è del contenitore.
-   */
-  list.innerHTML =
-    filtered
-      .map(
-        player => {
-          const roles =
-            auctionUiPlayerRoles(
-              player
-            );
-
-          return `
-            <button
-              type="button"
-              class="list-row"
-              data-call-player="${escapeHtml(
-                player.id
-              )}"
-            >
-              <span class="list-row-main">
-
-                <span class="list-row-title">
-
-                  <strong>
-                    ${escapeHtml(
-                      player.name
-                    )}
-                  </strong>
-
-                  <small>
-                    ${escapeHtml(
-                      roles || '—'
-                    )}
-                    ·
-                    ${escapeHtml(
-                      player.serie_a_team
-                      || '—'
-                    )}
-                    · Q.
-                    ${escapeHtml(
-                      player.quotation
-                      ?? '—'
-                    )}
-                  </small>
-
-                </span>
-
-              </span>
-            </button>
-          `;
-        }
-      )
-      .join('');
-
-  list.scrollTop =
-    previousScroll;
+function auctionUiRoleClass(role) {
+  return String(role || '')
+    .trim()
+    .toLowerCase()
+    .replaceAll(' ', '-');
 }
 
-
-auctionUiElements
-  .freeAgentsSearch
-  ?.addEventListener(
-    'input',
-    () => {
-      auctionUiRenderFreeAgents(
-        true
-      );
-    }
-  );
-
+function auctionUiRoleOrder() {
+  return auctionUiFantasyMode() === 'classic'
+    ? ['P', 'D', 'C', 'A']
+    : ['Por', 'B', 'Dc', 'Dd', 'Ds', 'E', 'M', 'C', 'W', 'T', 'A', 'Pc'];
+}
 
 /* =========================================================
-   DRAWER SVINCOLATI
+   FILTRI RUOLO
+   ========================================================= */
+
+function auctionUiRenderRoleFilters() {
+  if (!auctionUi.roleBar) return;
+
+  const all = `
+    <button
+      type="button"
+      class="role-filter-button role-all ${auctionUiRoles.has('all') ? 'active' : ''}"
+      data-auction-role="all"
+    >
+      ALL
+    </button>
+  `;
+
+  const roles = auctionUiRoleOrder().map(role => `
+    <button
+      type="button"
+      class="role-filter-button role-${auctionUiRoleClass(role)} ${auctionUiRoles.has(role) ? 'active' : ''}"
+      data-auction-role="${escapeHtml(role)}"
+    >
+      ${escapeHtml(role)}
+    </button>
+  `).join('');
+
+  auctionUi.roleBar.innerHTML = all + roles;
+}
+
+function auctionUiToggleRole(role) {
+  if (role === 'all') {
+    auctionUiRoles = new Set(['all']);
+  } else {
+    auctionUiRoles.delete('all');
+
+    if (auctionUiRoles.has(role)) {
+      auctionUiRoles.delete(role);
+    } else {
+      auctionUiRoles.add(role);
+    }
+
+    if (!auctionUiRoles.size) {
+      auctionUiRoles.add('all');
+    }
+  }
+
+  auctionUiRenderRoleFilters();
+  auctionUiRenderListone(true);
+}
+
+auctionUi.roleBar?.addEventListener('click', event => {
+  const button = event.target.closest('[data-auction-role]');
+  if (!button) return;
+
+  auctionUiToggleRole(button.dataset.auctionRole);
+});
+
+/* =========================================================
+   OPZIONI FILTRI
+   ========================================================= */
+
+function auctionUiSetOptions(select, values, allLabel) {
+  if (!select) return;
+
+  const previous = select.value;
+
+  select.innerHTML = `
+    <option value="all">${escapeHtml(allLabel)}</option>
+    ${values.map(value => `
+      <option value="${escapeHtml(value)}">
+        ${escapeHtml(value)}
+      </option>
+    `).join('')}
+  `;
+
+  if (
+    Array.from(select.options)
+      .some(option => option.value === previous)
+  ) {
+    select.value = previous;
+  }
+}
+
+function auctionUiRefreshFilterOptions() {
+  const players = auctionUiPlayers();
+
+  const teams = [...new Set(
+    players
+      .map(player => player.serie_a_team)
+      .filter(Boolean)
+  )].sort((a, b) =>
+    String(a).localeCompare(String(b), 'it', {
+      sensitivity: 'base'
+    })
+  );
+
+  const slots = [...new Set(
+    players
+      .map(player => player.slot)
+      .filter(value =>
+        value !== null &&
+        value !== undefined &&
+        String(value).trim() !== ''
+      )
+      .map(String)
+  )].sort((a, b) =>
+    String(a).localeCompare(String(b), 'it', {
+      numeric: true
+    })
+  );
+
+  const key = JSON.stringify({
+    teams,
+    slots,
+    mode: auctionUiFantasyMode()
+  });
+
+  if (key === auctionUiOptionsKey) return;
+  auctionUiOptionsKey = key;
+
+  auctionUiSetOptions(auctionUi.team, teams, 'Tutte');
+  auctionUiSetOptions(auctionUi.slot, slots, 'Tutti');
+  auctionUiRenderRoleFilters();
+}
+
+/* =========================================================
+   FILTRAGGIO
+   ========================================================= */
+
+function auctionUiMatchesRole(player) {
+  if (auctionUiRoles.has('all')) return true;
+
+  return auctionUiPlayerRoles(player)
+    .some(role => auctionUiRoles.has(role));
+}
+
+function auctionUiMatchesFlag(player, flag) {
+  if (flag === 'all') return true;
+
+  if (flag === 'market') {
+    return player?.market_flag === true;
+  }
+
+  if (flag === 'new') {
+    return player?.new_arrival === true;
+  }
+
+  if (flag === 'injury') {
+    return Boolean(
+      player?.uncertain_return === true ||
+      (
+        player?.unavailable_until_round !== null &&
+        player?.unavailable_until_round !== undefined &&
+        String(player.unavailable_until_round).trim() !== ''
+      )
+    );
+  }
+
+  if (flag === 'penalties') {
+    return Number(player?.penalty_probability || 0) > 0;
+  }
+
+  return true;
+}
+
+function auctionUiFilteredPlayers() {
+  const query = String(auctionUi.search?.value || '')
+    .trim()
+    .toLowerCase();
+
+  const team = auctionUi.team?.value || 'all';
+  const slot = auctionUi.slot?.value || 'all';
+  const flag = auctionUi.flag?.value || 'all';
+
+  return auctionUiPlayers().filter(player => {
+    if (!auctionUiMatchesRole(player)) return false;
+
+    if (
+      team !== 'all' &&
+      String(player.serie_a_team || '') !== team
+    ) {
+      return false;
+    }
+
+    if (
+      slot !== 'all' &&
+      String(player.slot ?? '') !== slot
+    ) {
+      return false;
+    }
+
+    if (!auctionUiMatchesFlag(player, flag)) {
+      return false;
+    }
+
+    if (!query) return true;
+
+    const searchable = [
+      player.name,
+      player.serie_a_team,
+      player.classic_role,
+      ...auctionUiPlayerRoles(player),
+      player.slot
+    ]
+      .filter(value => value !== null && value !== undefined)
+      .join(' ')
+      .toLowerCase();
+
+    return searchable.includes(query);
+  });
+}
+
+/* =========================================================
+   ORDINAMENTO
+   ========================================================= */
+
+function auctionUiSortValue(player, key) {
+  const values = {
+    name: player?.name || '',
+    team: player?.serie_a_team || '',
+    slot: player?.slot,
+    pma: player?.pma,
+    pfc: player?.pfc,
+    delta: player?.pfc_pma_delta,
+    fm: player?.expected_fantasy_avg,
+    tit: player?.expected_titolarity
+  };
+
+  return values[key];
+}
+
+function auctionUiCompare(a, b) {
+  const emptyA = a === null || a === undefined || a === '';
+  const emptyB = b === null || b === undefined || b === '';
+
+  if (emptyA && emptyB) return 0;
+  if (emptyA) return 1;
+  if (emptyB) return -1;
+
+  const numberA = Number(a);
+  const numberB = Number(b);
+
+  if (Number.isFinite(numberA) && Number.isFinite(numberB)) {
+    return numberA - numberB;
+  }
+
+  return String(a).localeCompare(String(b), 'it', {
+    sensitivity: 'base',
+    numeric: true
+  });
+}
+
+function auctionUiSortedPlayers(players) {
+  const factor =
+    auctionUiSort.direction === 'asc'
+      ? 1
+      : -1;
+
+  return [...players].sort((a, b) => {
+    const result = auctionUiCompare(
+      auctionUiSortValue(a, auctionUiSort.key),
+      auctionUiSortValue(b, auctionUiSort.key)
+    );
+
+    if (result !== 0) return result * factor;
+
+    return String(a?.name || '').localeCompare(
+      String(b?.name || ''),
+      'it',
+      { sensitivity: 'base' }
+    );
+  });
+}
+
+function auctionUiUpdateSortHeader() {
+  document
+    .querySelectorAll('[data-auction-sort]')
+    .forEach(button => {
+      const active =
+        button.dataset.auctionSort === auctionUiSort.key;
+
+      button.classList.toggle('active', active);
+
+      const indicator =
+        button.querySelector('.player-sort-indicator');
+
+      if (indicator) {
+        indicator.textContent = active
+          ? auctionUiSort.direction === 'asc'
+            ? '↑'
+            : '↓'
+          : '↕';
+      }
+    });
+
+  if (auctionUi.sortLabel) {
+    const labels = {
+      name: 'Nome',
+      team: 'Squadra',
+      slot: 'Slot',
+      pma: 'PMA',
+      pfc: 'PFC',
+      delta: 'Δ',
+      fm: 'Exp. FM',
+      tit: 'Exp. Tit.'
+    };
+
+    auctionUi.sortLabel.textContent =
+      `${labels[auctionUiSort.key] || auctionUiSort.key} ${
+        auctionUiSort.direction === 'asc' ? '↑' : '↓'
+      }`;
+  }
+}
+
+$auction('auction-player-table-wrap')
+  ?.querySelector('thead')
+  ?.addEventListener('click', event => {
+    const button = event.target.closest('[data-auction-sort]');
+    if (!button) return;
+
+    const key = button.dataset.auctionSort;
+
+    if (auctionUiSort.key === key) {
+      auctionUiSort.direction =
+        auctionUiSort.direction === 'asc'
+          ? 'desc'
+          : 'asc';
+    } else {
+      auctionUiSort = {
+        key,
+        direction: 'asc'
+      };
+    }
+
+    auctionUiRenderListone(true);
+  });
+
+/* =========================================================
+   CELLE / BADGE
+   ========================================================= */
+
+function auctionUiFlagEmoji(iso2) {
+  const code = String(iso2 || '')
+    .trim()
+    .toUpperCase();
+
+  if (!/^[A-Z]{2}$/.test(code)) return '';
+
+  return [...code]
+    .map(char =>
+      String.fromCodePoint(
+        127397 + char.charCodeAt(0)
+      )
+    )
+    .join('');
+}
+
+function auctionUiRoleBadges(player) {
+  return auctionUiPlayerRoles(player)
+    .map(role => `
+      <span class="role-badge role-${auctionUiRoleClass(role)}">
+        ${escapeHtml(role)}
+      </span>
+    `)
+    .join('');
+}
+
+function auctionUiSignalBadges(player) {
+  const badges = [];
+
+  if (player?.market_flag === true) {
+    badges.push(
+      '<span class="player-alert-flag" title="Mercato">⇄</span>'
+    );
+  }
+
+  if (player?.new_arrival === true) {
+    badges.push(
+      '<span class="player-alert-flag" title="Nuovo arrivo">NEW</span>'
+    );
+  }
+
+  if (
+    player?.uncertain_return === true ||
+    (
+      player?.unavailable_until_round !== null &&
+      player?.unavailable_until_round !== undefined &&
+      String(player.unavailable_until_round).trim() !== ''
+    )
+  ) {
+    badges.push(
+      '<span class="player-alert-flag warning" title="Indisponibile / rientro incerto">!</span>'
+    );
+  }
+
+  if (Number(player?.penalty_probability || 0) > 0) {
+    badges.push(
+      '<span class="player-alert-flag" title="Possibile rigorista">PEN</span>'
+    );
+  }
+
+  return badges.join('');
+}
+
+function auctionUiNumber(value) {
+  if (value === null || value === undefined || value === '') {
+    return '—';
+  }
+
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return escapeHtml(value);
+  }
+
+  return Number.isInteger(number)
+    ? String(number)
+    : number.toFixed(2).replace(/\.?0+$/, '');
+}
+
+function auctionUiPlayerRow(player) {
+  const delta = Number(player?.pfc_pma_delta);
+
+  const deltaClass = Number.isFinite(delta)
+    ? delta > 0
+      ? 'player-delta-positive'
+      : delta < 0
+        ? 'player-delta-negative'
+        : ''
+    : '';
+
+  const flag = auctionUiFlagEmoji(player?.nationality_iso2);
+
+  return `
+    <tr
+      class="player-row auction-call-player-row"
+      data-call-player="${escapeHtml(player.id)}"
+      title="Chiama ${escapeHtml(player.name || 'giocatore')}"
+    >
+      <td>
+        <div class="player-main-cell">
+          <span class="player-role-badges">
+            ${auctionUiRoleBadges(player)}
+          </span>
+
+          <span class="player-name-block">
+            <span class="player-name">
+              ${escapeHtml(player.name || '—')}
+            </span>
+
+            ${
+              flag
+                ? `
+                  <span
+                    class="player-flag"
+                    title="${escapeHtml(
+                      player.nationality_name ||
+                      player.nationality_iso2 ||
+                      ''
+                    )}"
+                  >
+                    ${flag}
+                  </span>
+                `
+                : ''
+            }
+
+            <span class="player-alert-flags">
+              ${auctionUiSignalBadges(player)}
+            </span>
+          </span>
+        </div>
+      </td>
+
+      <td class="player-team">
+        ${escapeHtml(player.serie_a_team || '—')}
+      </td>
+
+      <td class="player-number">
+        ${escapeHtml(player.slot ?? '—')}
+      </td>
+
+      <td class="player-number">
+        ${auctionUiNumber(player.pma)}
+      </td>
+
+      <td class="player-number strong">
+        ${auctionUiNumber(player.pfc)}
+      </td>
+
+      <td class="player-number ${deltaClass}">
+        ${auctionUiNumber(player.pfc_pma_delta)}
+      </td>
+
+      <td class="player-number">
+        ${auctionUiNumber(player.expected_fantasy_avg)}
+      </td>
+
+      <td class="player-number">
+        ${auctionUiNumber(player.expected_titolarity)}
+      </td>
+    </tr>
+  `;
+}
+
+/* =========================================================
+   RENDER LISTONE NEL DRAWER
+   ========================================================= */
+
+function auctionUiRenderListone(force = false) {
+  if (!auctionUi.body) return;
+
+  if (!auctionUiIsCallMode()) {
+    auctionUiRenderKey = '';
+    return;
+  }
+
+  auctionUiRefreshFilterOptions();
+
+  const filtered = auctionUiFilteredPlayers();
+  const sorted = auctionUiSortedPlayers(filtered);
+  const total = auctionUiPlayers().length;
+
+  if (auctionUi.totalCount) {
+    auctionUi.totalCount.textContent =
+      `${total} giocatori`;
+  }
+
+  if (auctionUi.filteredCount) {
+    auctionUi.filteredCount.textContent =
+      `${filtered.length} di ${total}`;
+  }
+
+  auctionUiUpdateSortHeader();
+
+  const key = JSON.stringify({
+    q: auctionUi.search?.value || '',
+    team: auctionUi.team?.value || 'all',
+    slot: auctionUi.slot?.value || 'all',
+    flag: auctionUi.flag?.value || 'all',
+    roles: [...auctionUiRoles].sort(),
+    sort: auctionUiSort,
+    total,
+    first: sorted[0]?.id || '',
+    last: sorted.at(-1)?.id || ''
+  });
+
+  if (!force && key === auctionUiRenderKey) return;
+  auctionUiRenderKey = key;
+
+  const oldScroll = auctionUi.tableWrap?.scrollTop || 0;
+
+  auctionUi.body.innerHTML = sorted.length
+    ? sorted.map(auctionUiPlayerRow).join('')
+    : `
+      <tr>
+        <td colspan="8" class="player-table-empty">
+          Nessun giocatore trovato.
+        </td>
+      </tr>
+    `;
+
+  if (auctionUi.tableWrap) {
+    auctionUi.tableWrap.scrollTop = oldScroll;
+  }
+}
+
+function auctionUiFilterChanged() {
+  auctionUiRenderListone(true);
+}
+
+auctionUi.search?.addEventListener('input', auctionUiFilterChanged);
+auctionUi.team?.addEventListener('change', auctionUiFilterChanged);
+auctionUi.slot?.addEventListener('change', auctionUiFilterChanged);
+auctionUi.flag?.addEventListener('change', auctionUiFilterChanged);
+
+auctionUi.reset?.addEventListener('click', () => {
+  if (auctionUi.search) auctionUi.search.value = '';
+  if (auctionUi.team) auctionUi.team.value = 'all';
+  if (auctionUi.slot) auctionUi.slot.value = 'all';
+  if (auctionUi.flag) auctionUi.flag.value = 'all';
+
+  auctionUiRoles = new Set(['all']);
+  auctionUiSort = {
+    key: 'name',
+    direction: 'asc'
+  };
+
+  auctionUiRenderRoleFilters();
+  auctionUiRenderListone(true);
+});
+
+/* =========================================================
+   DRAWER
    ========================================================= */
 
 function auctionUiRenderDrawer() {
-  const area =
-    auctionUiElements.callFormArea;
-
-  const drawer =
-    auctionUiElements.freeAgentsDrawer;
-
-  const toggle =
-    auctionUiElements.freeAgentsToggle;
-
   if (
-    !area ||
-    !drawer ||
-    !toggle
+    !auctionUi.callFormArea ||
+    !auctionUi.drawer ||
+    !auctionUi.toggle
   ) {
     return;
   }
 
-  area.classList.toggle(
+  auctionUi.callFormArea.classList.toggle(
     'free-agents-collapsed',
     auctionUiDrawerCollapsed
   );
 
-  drawer.classList.toggle(
+  auctionUi.drawer.classList.toggle(
     'is-collapsed',
     auctionUiDrawerCollapsed
   );
 
-  toggle.setAttribute(
+  auctionUi.toggle.setAttribute(
     'aria-expanded',
-    auctionUiDrawerCollapsed
-      ? 'false'
-      : 'true'
+    auctionUiDrawerCollapsed ? 'false' : 'true'
   );
 
-  toggle.title =
-    auctionUiDrawerCollapsed
-      ? 'Mostra lista svincolati'
-      : 'Nascondi lista svincolati';
+  auctionUi.toggle.title = auctionUiDrawerCollapsed
+    ? 'Mostra lista svincolati'
+    : 'Nascondi lista svincolati';
 
-  if (
-    auctionUiElements
-      .freeAgentsToggleIcon
-  ) {
-    auctionUiElements
-      .freeAgentsToggleIcon
-      .textContent =
-        auctionUiDrawerCollapsed
-          ? '‹'
-          : '›';
+  if (auctionUi.toggleIcon) {
+    auctionUi.toggleIcon.textContent =
+      auctionUiDrawerCollapsed ? '‹' : '›';
   }
 }
 
+auctionUi.toggle?.addEventListener('click', () => {
+  auctionUiDrawerCollapsed = !auctionUiDrawerCollapsed;
 
-auctionUiElements
-  .freeAgentsToggle
-  ?.addEventListener(
-    'click',
-    () => {
-      auctionUiDrawerCollapsed =
-        !auctionUiDrawerCollapsed;
+  try {
+    localStorage.setItem(
+      'fantacalcio_free_agents_collapsed',
+      auctionUiDrawerCollapsed ? '1' : '0'
+    );
+  } catch {
+    // Preferenza non essenziale.
+  }
 
-      try {
-        localStorage.setItem(
-          'fantacalcio_free_agents_collapsed',
-          auctionUiDrawerCollapsed
-            ? '1'
-            : '0'
-        );
-      } catch {
-        // Preferenza non essenziale.
-      }
-
-      auctionUiRenderDrawer();
-    }
-  );
-
+  auctionUiRenderDrawer();
+});
 
 try {
   auctionUiDrawerCollapsed =
     localStorage.getItem(
       'fantacalcio_free_agents_collapsed'
     ) === '1';
-
 } catch {
   auctionUiDrawerCollapsed = false;
 }
 
-
 /* =========================================================
-   INTEGRAZIONE CON MOTORE ESISTENTE
+   INTEGRAZIONE CON IL MOTORE ESISTENTE
    ========================================================= */
+
+/*
+ * Il vecchio renderCallPanel chiama renderCallCandidates().
+ * Lo sostituiamo: niente più slice(0, 50).
+ */
+if (typeof renderCallCandidates === 'function') {
+  renderCallCandidates = function () {
+    auctionUiRenderListone(true);
+  };
+}
 
 function auctionUiRenderExtras() {
   auctionUiApplyMode();
   auctionUiRenderDrawer();
   auctionUiRenderQuickBids();
-  auctionUiRenderFreeAgents();
+  auctionUiRenderListone();
 }
 
-
-/*
- * Il motore live continua a fare tutto il lavoro
- * server-side. Qui aggiungiamo soltanto la nuova UI.
- */
-if (
-  typeof renderAuctionLiveControls
-  === 'function'
-) {
-  const auctionUiBaseRenderAuctionLiveControls =
+if (typeof renderAuctionLiveControls === 'function') {
+  const baseRenderAuctionLiveControls =
     renderAuctionLiveControls;
 
-  renderAuctionLiveControls =
-    function () {
-      auctionUiBaseRenderAuctionLiveControls();
-      auctionUiRenderExtras();
-    };
+  renderAuctionLiveControls = function () {
+    baseRenderAuctionLiveControls();
+    auctionUiRenderExtras();
+  };
 }
 
+if (typeof loadLobby === 'function') {
+  const baseLoadLobby = loadLobby;
 
-/*
- * Aggiornamento anche dopo le operazioni manuali
- * che richiamano loadLobby().
- */
-if (
-  typeof loadLobby === 'function'
-) {
-  const auctionUiBaseLoadLobby =
-    loadLobby;
-
-  loadLobby =
-    async function () {
-      await auctionUiBaseLoadLobby();
-      auctionUiRenderExtras();
-    };
+  loadLobby = async function () {
+    await baseLoadLobby();
+    auctionUiRenderExtras();
+  };
 }
 
+/* Display timer: solo client, nessuna chiamata server. */
+setInterval(auctionUiRenderTimer, 100);
 
-/* =========================================================
-   LOOP VISUALE
-   ========================================================= */
+/* Cambi fase lobby/chiamata/rilanci. */
+setInterval(auctionUiApplyMode, 500);
 
-/*
- * Solo il display viene aggiornato a 100 ms.
- * Non genera chiamate al server.
- */
-setInterval(
-  auctionUiRenderTimer,
-  100
-);
+/* Primo render. */
+const auctionUiInitialRender = setInterval(() => {
+  if (
+    typeof auctionData === 'undefined' ||
+    !auctionData
+  ) {
+    return;
+  }
 
+  clearInterval(auctionUiInitialRender);
 
-/*
- * Controlla eventuali passaggi
- * lobby / chiamata / rilanci.
- */
-setInterval(
-  auctionUiApplyMode,
-  500
-);
-
-
-/*
- * Primo render quando auctionData
- * è disponibile.
- */
-const auctionUiInitialRender =
-  setInterval(
-    () => {
-      if (
-        typeof auctionData === 'undefined' ||
-        !auctionData
-      ) {
-        return;
-      }
-
-      clearInterval(
-        auctionUiInitialRender
-      );
-
-      auctionUiRenderExtras();
-      auctionUiRenderTimer();
-    },
-    100
-  );
+  auctionUiRenderExtras();
+  auctionUiRenderTimer();
+}, 100);
