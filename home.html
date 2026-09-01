@@ -4612,6 +4612,88 @@
       font-size:18px;
     }
 
+    .auction-status-team-kpis{
+      min-width:0;
+      display:grid;
+      grid-template-columns:minmax(90px,1.2fr) repeat(4,minmax(54px,.7fr));
+      align-items:center;
+      gap:4px;
+    }
+
+    .auction-status-team-kpis>strong{
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-size:10px;
+    }
+
+    .auction-status-team-kpis>span{
+      min-width:0;
+      height:28px;
+      padding:2px 5px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:3px;
+      border:1px solid rgba(54,99,145,.74);
+      border-radius:6px;
+      background:rgba(8,27,48,.76);
+    }
+
+    .auction-status-team-kpis small{
+      color:var(--muted);
+      font-size:6px;
+      font-weight:900;
+      text-transform:uppercase;
+    }
+
+    .auction-status-team-kpis b{
+      font-size:10px;
+      white-space:nowrap;
+    }
+
+    .auction-middle-quick{
+      padding:5px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:rgba(10,32,59,.88);
+    }
+
+    .auction-middle-quick .auction-status-quick{
+      grid-template-columns:repeat(5,minmax(0,1fr));
+    }
+
+    .auction-middle-quick .auction-status-quick-label{
+      grid-column:1 / -1;
+    }
+
+    .auction-middle-quick .auction-command-bid-confirm{
+      grid-column:1 / -1;
+      width:100%;
+    }
+
+    .auction-middle-vice-slot{
+      min-height:0;
+    }
+
+    .auction-roster-line.is-empty>.rolebadge{
+      min-width:17px;
+      height:12px;
+      min-height:0;
+      padding:0 2px;
+      font-size:5px;
+      line-height:12px;
+    }
+
+    .auction-roster-empty-label{
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      color:rgba(155,183,218,.42);
+      font-size:6px;
+    }
+
     .auction-middle-column .auction-command-bar{
       min-height:0!important;
       grid-template-columns:64px minmax(0,1fr)!important;
@@ -4700,11 +4782,36 @@
 
     @media(max-width:1100px){
       .auction-lower-main{
-        grid-template-columns:minmax(280px,.72fr) minmax(0,1.28fr) auto!important;
+        grid-template-columns:minmax(230px,.65fr) minmax(210px,.55fr) minmax(360px,1.15fr) auto!important;
       }
-      .auction-middle-column{display:none!important}
+      .auction-middle-column{display:grid!important}
+      .auction-free-fixed{grid-column:3!important}
+      .auction-call-queue-drawer{grid-column:4!important}
+      .auction-status-team-kpis>strong{display:none}
+      .auction-status-team-kpis{
+        grid-template-columns:repeat(4,minmax(48px,1fr));
+      }
+    }
+
+    @media(max-width:850px){
+      .auction-lower-main{
+        grid-template-columns:minmax(205px,.55fr) minmax(360px,1.2fr) auto!important;
+      }
+      .auction-lower-main>.auction-team-column{display:none!important}
+      .auction-middle-column{grid-column:1!important}
       .auction-free-fixed{grid-column:2!important}
       .auction-call-queue-drawer{grid-column:3!important}
+      .auction-status-team-kpis>span:last-child{display:none}
+      .auction-status-team-kpis{
+        grid-template-columns:repeat(3,minmax(46px,1fr));
+      }
+    }
+
+    @media(max-width:760px){
+      .auction-status-team-kpis{display:none!important}
+      .auction-statusbar{
+        grid-template-columns:auto minmax(0,1fr) auto auto!important;
+      }
     }
   </style>
 </head>
@@ -6622,6 +6729,9 @@
         );
 
       let rosterLimit = null;
+      let rosterMin = null;
+      let rosterMax = null;
+      let roleLimits = {};
       let roleBadges = [];
 
       if (
@@ -6649,6 +6759,19 @@
                 ),
               0
             );
+
+        rosterMin = rosterLimit;
+        rosterMax = rosterLimit;
+        roleLimits = Object.fromEntries(
+          ['P', 'D', 'C', 'A']
+            .map(role => [
+              role,
+              {
+                min: Number(limits?.[role] || 0),
+                max: Number(limits?.[role] || 0)
+              }
+            ])
+        );
 
         roleBadges =
           ['P', 'D', 'C', 'A']
@@ -6734,6 +6857,25 @@
           ||
           null;
 
+        rosterMin =
+          Number(mantra?.total?.min ?? rosterLimit ?? 23)
+          || 23;
+
+        rosterMax =
+          Number(mantra?.total?.max ?? rosterLimit ?? 32)
+          || 32;
+
+        roleLimits = {
+          Por: {
+            min: Number(mantra?.goalkeepers?.min ?? 2),
+            max: Number(mantra?.goalkeepers?.max ?? 3)
+          },
+          MOV: {
+            min: Number(mantra?.outfield?.min ?? 0),
+            max: Number(mantra?.outfield?.max ?? rosterMax)
+          }
+        };
+
         roleBadges = [
           {
             label: 'POR',
@@ -6806,6 +6948,9 @@
           capacity?.roster_limit
           ??
           rosterLimit,
+        rosterMin,
+        rosterMax,
+        roleLimits,
         roleBadges,
         assignments
       };
@@ -6817,7 +6962,7 @@
         auctionMyTeamDashboardData();
 
       if (!info) {
-        if (part === 'kpis') {
+        if (part === 'kpis' || part === 'status-kpis') {
           return '';
         }
 
@@ -6991,20 +7136,106 @@
           .localeCompare(String(b.player?.name || ''), 'it')
       );
 
-      const rosterRowCount =
+      const mode =
+        state.auction?.settings?.fantasy_mode
+        || 'classic';
+
+      const rosterMinSlots =
+        Math.max(23, Number(info.rosterMin || info.rosterLimit || 23));
+
+      const rosterMaxSlots =
         Math.max(
-          23,
-          Math.min(
-            32,
-            Number(info.rosterLimit || 32)
-          )
+          rosterMinSlots,
+          Math.min(32, Number(info.rosterMax || info.rosterLimit || 32))
         );
 
+      const projectedRosterCount =
+        info.assignments.length + queueEntries.length;
+
+      const rosterRowCount =
+        Math.max(
+          rosterMinSlots,
+          Math.min(rosterMaxSlots, projectedRosterCount)
+        );
+
+      let slottedRosterEntries = [];
+
+      if (mode === 'classic') {
+        ['P', 'D', 'C', 'A']
+          .forEach(role => {
+            const group =
+              rosterEntries.filter(entry =>
+                entry.player?.classic_role === role
+              );
+
+            const required =
+              Number(info.roleLimits?.[role]?.min || 0);
+
+            slottedRosterEntries.push(...group);
+
+            for (
+              let index = group.length;
+              index < required;
+              index += 1
+            ) {
+              slottedRosterEntries.push({
+                empty: true,
+                emptyRole: role
+              });
+            }
+          });
+      } else {
+        const isGoalkeeperEntry = entry =>
+          playerRoles(entry.player || {}, mode)
+            .some(role => ['P', 'Por'].includes(role));
+
+        const goalkeepers =
+          rosterEntries.filter(isGoalkeeperEntry);
+
+        const outfield =
+          rosterEntries.filter(entry => !isGoalkeeperEntry(entry));
+
+        slottedRosterEntries.push(...goalkeepers);
+
+        const minimumGoalkeepers =
+          Number(info.roleLimits?.Por?.min ?? 2);
+
+        for (
+          let index = goalkeepers.length;
+          index < minimumGoalkeepers;
+          index += 1
+        ) {
+          slottedRosterEntries.push({
+            empty: true,
+            emptyRole: 'Por'
+          });
+        }
+
+        slottedRosterEntries.push(...outfield);
+      }
+
+      while (slottedRosterEntries.length < rosterRowCount) {
+        slottedRosterEntries.push({ empty: true });
+      }
+
       const visibleRosterEntries =
-        rosterEntries.slice(0, rosterRowCount);
+        slottedRosterEntries.slice(0, rosterRowCount);
 
       const rosterHtml =
         visibleRosterEntries.map(entry => {
+              if (entry.empty) {
+                return `
+                  <div class="auction-roster-line is-empty" aria-label="Slot rosa vuoto">
+                    ${
+                      entry.emptyRole
+                        ? `<span class="rolebadge" data-role="${esc(entry.emptyRole)}">${esc(entry.emptyRole)}</span>`
+                        : '<span class="auction-roster-empty-index">—</span>'
+                    }
+                    <span class="auction-roster-empty-label">Slot disponibile</span>
+                  </div>
+                `;
+              }
+
               const roles =
                 playerRoles(
                   entry.player || {},
@@ -7027,26 +7258,7 @@
                   </span>
                 </div>
               `;
-            }).join('')
-        +
-        Array.from({
-          length:
-            Math.max(
-              0,
-              rosterRowCount - visibleRosterEntries.length
-            )
-        })
-          .map((_, index) => `
-            <div class="auction-roster-line is-empty" aria-hidden="true">
-              <span class="auction-roster-empty-index">
-                ${visibleRosterEntries.length + index + 1}
-              </span>
-            </div>
-          `)
-          .join('');
-
-      const projectedRosterCount =
-        info.assignments.length + queueEntries.length;
+            }).join('');
 
       const teamKpisHtml = `
         <section class="auction-team-card auction-middle-team-kpis">
@@ -7112,6 +7324,16 @@
         </section>
       `;
 
+      const teamStatusKpisHtml = `
+        <div class="auction-status-team-kpis" aria-label="Riepilogo squadra">
+          <strong>${esc(info.teamName)}</strong>
+          <span><small>Crediti</small><b>${info.remaining}</b></span>
+          <span><small>Max</small><b>${maxBid}</b></span>
+          <span><small>Rosa</small><b>${projectedRosterCount}/${info.rosterMax || info.rosterLimit || '—'}</b></span>
+          <span><small>Spesi</small><b>${info.spent}</b></span>
+        </div>
+      `;
+
       const teamRosterHtml = `
         <div class="auction-team-column">
           <section class="auction-team-roster">
@@ -7135,6 +7357,10 @@
 
       if (part === 'kpis') {
         return teamKpisHtml;
+      }
+
+      if (part === 'status-kpis') {
+        return teamStatusKpisHtml;
       }
 
       if (part === 'roster') {
@@ -7341,6 +7567,110 @@
         ||
         []
       );
+    }
+
+
+    function auctionQueueCapacityForPlayer(player) {
+      const info =
+        auctionMyTeamDashboardData();
+
+      if (!info || !player) {
+        return { allowed: true };
+      }
+
+      const mode =
+        state.auction?.settings?.fantasy_mode
+        || 'classic';
+
+      const assignments =
+        info.assignments || [];
+
+      const queue =
+        auctionQueueRows();
+
+      const totalMaximum =
+        Number(info.rosterMax || info.rosterLimit || 32);
+
+      if (
+        totalMaximum > 0
+        && assignments.length + queue.length >= totalMaximum
+      ) {
+        return {
+          allowed: false,
+          message: `La rosa ha già occupato tutti i ${totalMaximum} slot, inclusa la Coda.`
+        };
+      }
+
+      if (mode === 'classic') {
+        const role =
+          player.classic_role;
+
+        const roleMaximum =
+          Number(info.roleLimits?.[role]?.max || 0);
+
+        if (roleMaximum <= 0) {
+          return {
+            allowed: false,
+            message: `Il ruolo ${role || 'del giocatore'} non ha slot configurati.`
+          };
+        }
+
+        const acquired =
+          assignments.filter(item =>
+            item.player?.classic_role === role
+          ).length;
+
+        const queued =
+          queue.filter(item =>
+            item.player?.classic_role === role
+          ).length;
+
+        const remaining =
+          roleMaximum - acquired - queued;
+
+        return remaining > 0
+          ? { allowed: true, remaining }
+          : {
+              allowed: false,
+              message: `Nessuno slot ${role} disponibile: ${acquired} acquistati e ${queued} già in Coda su ${roleMaximum}.`
+            };
+      }
+
+      const isGoalkeeper = candidate =>
+        playerRoles(candidate || {}, mode)
+          .some(role => ['P', 'Por'].includes(role));
+
+      const goalkeeper =
+        isGoalkeeper(player);
+
+      const bucket =
+        goalkeeper ? 'Por' : 'MOV';
+
+      const label =
+        goalkeeper ? 'portieri' : 'movimento';
+
+      const roleMaximum =
+        Number(info.roleLimits?.[bucket]?.max || totalMaximum);
+
+      const acquired =
+        assignments.filter(item =>
+          goalkeeper === isGoalkeeper(item.player)
+        ).length;
+
+      const queued =
+        queue.filter(item =>
+          goalkeeper === isGoalkeeper(item.player)
+        ).length;
+
+      const remaining =
+        roleMaximum - acquired - queued;
+
+      return remaining > 0
+        ? { allowed: true, remaining }
+        : {
+            allowed: false,
+            message: `Nessuno slot ${label} disponibile: ${acquired} acquistati e ${queued} già in Coda su ${roleMaximum}.`
+          };
     }
 
 
@@ -7594,6 +7924,18 @@
       ) {
         return msg(
           'Il giocatore è già nella coda.',
+          'warning'
+        );
+      }
+
+      const capacity =
+        auctionQueueCapacityForPlayer(
+          player
+        );
+
+      if (!capacity.allowed) {
+        return msg(
+          capacity.message,
           'warning'
         );
       }
@@ -8254,6 +8596,11 @@
         auctionCallMode()
         &&
         auctionHasPresidentRole();
+
+      const queueCapacity =
+        auctionQueueCapacityForPlayer(
+          player
+        );
 
       return `
         <aside class="auction-free-fixed">
@@ -10696,7 +11043,7 @@
             </div>
 
 
-            ${quickStripHtml}
+            ${renderAuctionCockpitTeamPanel('status-kpis')}
 
 
             <div class="auction-status-phase">
@@ -10741,8 +11088,10 @@
 
                 <div class="auction-middle-column">
                   ${topBarHtml}
-                  ${renderAuctionCockpitTeamPanel('kpis')}
-                  ${viceHtml}
+                  <section class="auction-middle-quick">
+                    ${quickStripHtml}
+                  </section>
+                  <div class="auction-middle-vice-slot">${viceHtml}</div>
                   ${recentBidsHtml}
                 </div>
 
@@ -11943,11 +12292,14 @@
                 data-queue-add="${esc(player.id)}"
                 ${
                   auctionCanManageCallQueue()
+                  && queueCapacity.allowed
                     ? ''
                     : 'disabled'
                 }
                 title="${
-                  auctionHasPresidentRole()
+                  !queueCapacity.allowed
+                    ? esc(queueCapacity.message)
+                    : auctionHasPresidentRole()
                     ? (
                         auctionQueueModeAvailable()
                           ? 'Aggiungi subito in coda con base 1'
