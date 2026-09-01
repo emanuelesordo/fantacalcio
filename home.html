@@ -3492,6 +3492,48 @@
       }
     }
 
+
+    /* =====================================================
+       CODA V11 - PANNELLO DESTRO
+       ===================================================== */
+
+    .auction-call-queue-drawer{
+      align-self:stretch;
+    }
+
+    .auction-call-queue-drawer>summary{
+      background:#1b528c!important;
+    }
+
+    .auction-call-queue-drawer[open]>summary{
+      background:#174678!important;
+    }
+
+    .auction-call-queue-drawer[open]{
+      width:330px;
+      min-width:330px;
+      max-width:330px;
+    }
+
+    .auction-call-queue-drawer .auction-queue-price::before{
+      content:'BASE';
+      display:block;
+      margin-bottom:1px;
+      color:var(--muted);
+      font-size:6px;
+      font-weight:900;
+      text-align:center;
+      letter-spacing:.04em;
+    }
+
+    @media(max-width:1320px){
+      .auction-call-queue-drawer[open]{
+        width:285px;
+        min-width:285px;
+        max-width:285px;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -5633,19 +5675,48 @@
     }
 
 
-    function auctionCanManageCallQueue() {
-      return Boolean(
-        auctionDualModeEnabled()
-        &&
-        auctionCallMode()
-        &&
+    function auctionQueueModeAvailable() {
+      const s =
+        auctionSession();
+
+      if (
+        !s
+        ||
+        !auctionDualModeEnabled()
+        ||
+        !auctionCallMode()
+        ||
         state.auction
           ?.permissions
           ?.isPresident
+        !== true
+      ) {
+        return false;
+      }
+
+      /*
+       * CODA è disponibile in QUALSIASI momento diverso
+       * dal vero turno di chiamata personale:
+       *
+       * - lotto di un altro Presidente in corso       -> CODA
+       * - lotto chiamato da me ancora in corso        -> CODA
+       * - attesa del turno di un altro Presidente     -> CODA
+       * - mio turno, nessun giocatore ancora chiamato -> OK
+       */
+      return Boolean(
+        s.current_player_id
+        ||
+        s.current_nomination_team_id
+          !== auctionMyTeamId()
+      );
+    }
+
+
+    function auctionCanManageCallQueue() {
+      return Boolean(
+        auctionQueueModeAvailable()
         &&
         !auctionUseMobilePresidentConsole()
-        &&
-        !auctionOwnCallTurn()
       );
     }
 
@@ -5714,8 +5785,12 @@
                   <small>
                     ${
                       editable
-                        ? `Drag & drop · ${seconds}s per chiamare`
-                        : 'Coda bloccata durante il tuo turno di chiamata'
+                        ? (
+                            auctionSession()?.current_player_id
+                              ? `Modificabile durante il lotto · drag & drop`
+                              : `Drag & drop · ${seconds}s per chiamare`
+                          )
+                        : 'È il tuo turno: il primo elemento valido viene chiamato automaticamente'
                     }
                   </small>
                 </div>
@@ -8125,13 +8200,19 @@
           : 'CODA';
 
 
+      const queueModeNow =
+        d.permissions?.isPresident === true
+        &&
+        auctionQueueModeAvailable();
+
+
       const topActionDisabled =
         !selectedCall
         ||
         (
           !ownCallNow
           &&
-          !auctionCanManageCallQueue()
+          !queueModeNow
         );
 
 
@@ -9265,7 +9346,7 @@
             if (
               d.permissions?.isPresident
               &&
-              auctionCanManageCallQueue()
+              auctionQueueModeAvailable()
             ) {
               await addPlayerToAuctionQueue(
                 selected.id,
@@ -10296,7 +10377,11 @@
                 }
                 title="${
                   state.auction?.permissions?.isPresident
-                    ? 'Aggiungi in coda con base 1'
+                    ? (
+                        auctionQueueModeAvailable()
+                          ? 'Aggiungi subito in coda con base 1'
+                          : 'Nel tuo turno usa OK nella fascia superiore'
+                      )
                     : 'Solo il Presidente può usare la coda'
                 }"
               >
