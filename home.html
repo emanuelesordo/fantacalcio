@@ -2590,6 +2590,388 @@
       text-align:right;
     }
 
+
+    /* =====================================================
+       DUAL DEVICE AUCTION
+       ===================================================== */
+
+    .auction-team-mini-kpis{
+      grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    }
+
+    .auction-call-queue{
+      min-height:0;
+      display:grid;
+      grid-template-rows:auto minmax(0,1fr);
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:var(--panel);
+      overflow:hidden;
+    }
+
+    .auction-call-queue-head{
+      min-height:34px;
+      padding:5px 7px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:6px;
+      border-bottom:1px solid var(--line);
+      background:var(--panel2);
+    }
+
+    .auction-call-queue-head strong{
+      font-size:10px;
+    }
+
+    .auction-call-queue-head small{
+      display:block;
+      color:var(--soft);
+      font-size:7px;
+      margin-top:1px;
+    }
+
+    .auction-call-queue-list{
+      min-height:0;
+      overflow:auto;
+      overscroll-behavior:contain;
+      padding:4px;
+      display:grid;
+      align-content:start;
+      gap:3px;
+    }
+
+    .auction-call-queue-row{
+      min-width:0;
+      min-height:38px;
+      padding:4px 5px;
+      display:grid;
+      grid-template-columns:20px 24px minmax(0,1fr) 72px 28px;
+      gap:4px;
+      align-items:center;
+      border:1px solid rgba(40,89,142,.58);
+      border-radius:6px;
+      background:#0a294a;
+    }
+
+    .auction-call-queue-row[draggable="true"]{
+      cursor:grab;
+    }
+
+    .auction-call-queue-row.is-dragging{
+      opacity:.45;
+    }
+
+    .auction-queue-handle{
+      color:var(--muted);
+      font-size:14px;
+      text-align:center;
+      cursor:grab;
+      user-select:none;
+    }
+
+    .auction-queue-position{
+      width:22px;
+      height:22px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:5px;
+      background:var(--panel3);
+      font-size:8px;
+      font-weight:950;
+    }
+
+    .auction-queue-player{
+      min-width:0;
+    }
+
+    .auction-queue-player strong{
+      display:block;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-size:9px;
+    }
+
+    .auction-queue-player small{
+      display:block;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      color:var(--soft);
+      font-size:7px;
+    }
+
+    .auction-queue-price{
+      min-width:0;
+    }
+
+    .auction-queue-price input{
+      min-height:28px;
+      padding:3px 5px;
+      text-align:center;
+      font-size:9px;
+    }
+
+    .auction-queue-remove{
+      width:27px;
+      min-width:27px;
+      min-height:27px;
+      padding:0;
+      background:var(--danger);
+    }
+
+    .auction-queue-add{
+      width:26px;
+      min-width:26px;
+      min-height:25px;
+      padding:0;
+      border-radius:5px;
+      background:#245d9d;
+      border-color:#387fc2;
+      font-size:14px;
+    }
+
+    .auction-queue-added{
+      min-width:26px;
+      height:22px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:2px 4px;
+      border-radius:5px;
+      background:var(--good);
+      font-size:7px;
+      font-weight:950;
+    }
+
+    .auction-free-fixed .col-queue{
+      width:42px;
+    }
+
+    .auction-free-fixed th.queue-head,
+    .auction-free-fixed td.queue-cell{
+      text-align:center;
+    }
+
+    .auction-middle-column.has-call-queue{
+      grid-template-rows:minmax(120px,1fr) minmax(80px,.65fr)!important;
+    }
+
+    .auction-middle-column.has-call-queue .auction-call-queue{
+      grid-row:1;
+    }
+
+    .auction-middle-column.has-call-queue .auction-bid-history{
+      grid-row:2;
+    }
+
+    .auction-middle-column.has-call-queue .auction-vice-strip{
+      grid-row:auto;
+    }
+
+    .auction-call-timeout-note{
+      color:#ffc98d;
+    }
+
+
+    /* =====================================================
+       SMART LIVE PATCH
+       ===================================================== */
+
+    #auction-live-current-bid,
+    #auction-mobile-current-bid{
+      font-variant-numeric:tabular-nums;
+    }
+
+
+    /* =====================================================
+       SMARTPHONE: CONSOLE PURA PRESIDENTE
+       ===================================================== */
+
+    .auction-mobile-console{
+      height:100%;
+      min-height:0;
+      padding:6px;
+      display:grid;
+      grid-template-rows:auto minmax(0,1fr) auto;
+      gap:6px;
+      background:
+        radial-gradient(circle at 50% 12%,rgba(52,120,246,.12),transparent 36%),
+        var(--bg);
+      overflow:hidden;
+    }
+
+    .auction-mobile-console-top{
+      min-width:0;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:7px;
+      align-items:center;
+      padding:6px 8px;
+      border:1px solid var(--line);
+      border-radius:9px;
+      background:var(--panel);
+    }
+
+    .auction-mobile-console-top strong{
+      display:block;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-size:12px;
+    }
+
+    .auction-mobile-console-top small{
+      display:block;
+      color:var(--soft);
+      font-size:8px;
+      margin-top:1px;
+    }
+
+    .auction-mobile-timer{
+      min-width:72px;
+      height:42px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid #4d92df;
+      border-radius:8px;
+      background:#123b6a;
+      font-size:22px;
+      font-weight:950;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .auction-mobile-main{
+      min-height:0;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:10px;
+      padding:10px;
+      border:1px solid var(--line2);
+      border-radius:12px;
+      background:linear-gradient(150deg,#10345e,#081b33);
+      overflow:hidden;
+    }
+
+    .auction-mobile-kicker{
+      color:#83a9d5;
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      text-align:center;
+    }
+
+    .auction-mobile-player{
+      overflow:hidden;
+      text-overflow:ellipsis;
+      text-align:center;
+      font-size:clamp(35px,10vw,58px);
+      line-height:.92;
+      font-weight:950;
+      letter-spacing:-.04em;
+    }
+
+    .auction-mobile-meta{
+      color:#b0c6e1;
+      text-align:center;
+      font-size:10px;
+    }
+
+    .auction-mobile-bid-box{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:6px;
+    }
+
+    .auction-mobile-bid-stat{
+      min-height:78px;
+      padding:8px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      border:1px solid var(--line);
+      border-radius:9px;
+      background:#0a2848;
+      text-align:center;
+    }
+
+    .auction-mobile-bid-stat span{
+      color:var(--muted);
+      font-size:8px;
+      text-transform:uppercase;
+    }
+
+    .auction-mobile-bid-stat strong{
+      margin-top:3px;
+      font-size:30px;
+      line-height:.9;
+      font-weight:950;
+    }
+
+    .auction-mobile-leader{
+      max-width:100%;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-size:13px!important;
+    }
+
+    .auction-mobile-quick{
+      display:grid;
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      gap:4px;
+    }
+
+    .auction-mobile-quick .quick-btn{
+      min-height:53px;
+    }
+
+    .auction-mobile-confirm{
+      min-height:55px;
+      width:100%;
+      font-size:17px;
+    }
+
+    .auction-mobile-team-strip{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:4px;
+    }
+
+    .auction-mobile-team-strip .auction-team-mini-kpi{
+      min-height:43px;
+      text-align:center;
+    }
+
+    .auction-mobile-call-wait{
+      min-height:90px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:5px;
+      text-align:center;
+      color:var(--soft);
+    }
+
+    @media(min-width:721px){
+      .auction-mobile-console{
+        display:none!important;
+      }
+    }
+
+    @media(max-width:720px){
+      body.auction-live .auction-mobile-console{
+        display:grid;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -2753,6 +3135,35 @@
               <label>Direzione<select id="setup-turn-direction"><option value="clockwise">Orario</option><option value="counterclockwise">Antiorario</option></select></label>
               <label>Ordina lista per<select id="setup-list-sort"><option value="alphabetical">Alfabetico</option><option value="quotation">Quotazione</option></select></label>
               <label>Direzione lista<select id="setup-list-dir"><option value="asc">Crescente</option><option value="desc">Decrescente</option></select></label>
+
+              <label id="setup-device-mode-wrap">
+                Interfaccia Presidenti
+                <select id="setup-device-mode">
+                  <option value="standard">Standard</option>
+                  <option value="dual">PC + Smartphone</option>
+                </select>
+              </label>
+
+              <label id="setup-call-timeout-wrap">
+                Tempo per chiamare (sec)
+                <input
+                  id="setup-call-timeout"
+                  type="number"
+                  min="5"
+                  max="120"
+                  step="1"
+                >
+              </label>
+
+              <label id="setup-call-penalty-wrap">
+                Penalità chiamata mancata
+                <input
+                  id="setup-call-penalty"
+                  type="number"
+                  min="0"
+                  step="1"
+                >
+              </label>
             </div>
           </section>
 
@@ -2949,7 +3360,10 @@
       auctionBidSelectionKey: '',
 
       auctionRenderSignature: '',
+      auctionLiveSignature: '',
       auctionRosterSignature: '',
+
+      auctionQueueDragPlayerId: null,
 
       lastAuctionFetchAt: 0,
       serverOffsetMs: 0
@@ -3558,6 +3972,19 @@
       $('setup-turn-direction').value = s.turn_direction || 'clockwise';
       $('setup-timer-mode').value = s.timer_mode || 'dynamic';
       $('setup-fixed-timer').value = s.fixed_timer_seconds ?? 10;
+
+      $('setup-device-mode').value =
+        s.president_device_mode
+        || 'standard';
+
+      $('setup-call-timeout').value =
+        s.nomination_timeout_seconds
+        ?? 20;
+
+      $('setup-call-penalty').value =
+        s.nomination_timeout_penalty
+        ?? 1;
+
       updateSetupVisibility();
     }
 
@@ -3570,9 +3997,42 @@
       $('setup-list-sort').disabled = $('setup-nomination').value !== 'list';
       $('setup-list-dir').disabled = $('setup-nomination').value !== 'list';
       $('setup-fixed-timer').disabled = $('setup-timer-mode').value !== 'fixed';
+
+      const callMode =
+        $('setup-nomination').value
+        === 'call';
+
+      const dualMode =
+        callMode
+        &&
+        $('setup-device-mode').value
+        === 'dual';
+
+      $('setup-device-mode').disabled =
+        !callMode;
+
+      $('setup-call-timeout').disabled =
+        !dualMode;
+
+      $('setup-call-penalty').disabled =
+        !dualMode;
     }
 
-    ['setup-fantasy-mode','setup-under','setup-bid-mode','setup-nomination','setup-timer-mode'].forEach(id => $(id).addEventListener('change', updateSetupVisibility));
+    [
+      'setup-fantasy-mode',
+      'setup-under',
+      'setup-bid-mode',
+      'setup-nomination',
+      'setup-timer-mode',
+      'setup-device-mode'
+    ].forEach(
+      id =>
+        $(id)
+          .addEventListener(
+            'change',
+            updateSetupVisibility
+          )
+    );
 
     $('setup-form').addEventListener('submit', async event => {
       event.preventDefault();
@@ -3598,7 +4058,22 @@
         bidMode: $('setup-bid-mode').value,
         turnDirection: $('setup-turn-direction').value,
         timerMode: $('setup-timer-mode').value,
-        fixedTimerSeconds: Number($('setup-fixed-timer').value)
+        fixedTimerSeconds: Number($('setup-fixed-timer').value),
+
+        presidentDeviceMode:
+          $('setup-device-mode').value,
+
+        nominationTimeoutSeconds:
+          Number(
+            $('setup-call-timeout').value
+            || 20
+          ),
+
+        nominationTimeoutPenalty:
+          Number(
+            $('setup-call-penalty').value
+            || 0
+          )
       };
 
       try {
@@ -4284,6 +4759,23 @@
         initialCredits,
         spent,
         remaining,
+
+        nominationPenaltyCredits:
+          Number(
+            teamState
+              ?.nomination_penalty_credits
+            ||
+            0
+          ),
+
+        missedNominations:
+          Number(
+            teamState
+              ?.missed_nominations
+            ||
+            0
+          ),
+
         passesUsed:
           Number(
             teamState?.passes_used
@@ -4528,6 +5020,13 @@
                 <strong>${info.passesUsed}/5</strong>
               </div>
 
+              <div class="auction-team-mini-kpi">
+                <span>Pen. chiamata</span>
+                <strong>
+                  ${info.nominationPenaltyCredits}
+                </strong>
+              </div>
+
             </div>
 
 
@@ -4553,6 +5052,993 @@
 
         </div>
       `;
+    }
+
+
+    function auctionDualModeEnabled() {
+      const d =
+        state.auction;
+
+      return (
+        d?.auctionSession
+          ?.setup_snapshot
+          ?.president_device_mode
+        ||
+        d?.settings
+          ?.president_device_mode
+        ||
+        'standard'
+      ) === 'dual';
+    }
+
+
+    function auctionUseMobilePresidentConsole() {
+      return Boolean(
+        auctionDualModeEnabled()
+        &&
+        state.auction
+          ?.permissions
+          ?.isPresident
+        &&
+        window.matchMedia(
+          '(max-width: 720px)'
+        )
+          .matches
+      );
+    }
+
+
+    function auctionCallMode() {
+      return (
+        state.auction
+          ?.auctionSession
+          ?.setup_snapshot
+          ?.nomination_mode
+        ||
+        state.auction
+          ?.settings
+          ?.nomination_mode
+      ) === 'call';
+    }
+
+
+    function auctionOwnCallTurn() {
+      const s =
+        auctionSession();
+
+      return Boolean(
+        s
+        &&
+        !s.current_player_id
+        &&
+        s.current_nomination_team_id
+          === auctionMyTeamId()
+      );
+    }
+
+
+    function auctionCanManageCallQueue() {
+      return Boolean(
+        auctionDualModeEnabled()
+        &&
+        auctionCallMode()
+        &&
+        state.auction
+          ?.permissions
+          ?.isPresident
+        &&
+        !auctionUseMobilePresidentConsole()
+        &&
+        !auctionOwnCallTurn()
+      );
+    }
+
+
+    function auctionQueueRows() {
+      return (
+        state.auction
+          ?.myCallQueue
+        ||
+        []
+      );
+    }
+
+
+    function renderAuctionCallQueue() {
+      if (
+        !auctionDualModeEnabled()
+        ||
+        !auctionCallMode()
+        ||
+        !state.auction
+          ?.permissions
+          ?.isPresident
+        ||
+        auctionUseMobilePresidentConsole()
+      ) {
+        return '';
+      }
+
+      const rows =
+        auctionQueueRows();
+
+      const editable =
+        auctionCanManageCallQueue();
+
+      const baseMode =
+        state.auction
+          ?.settings
+          ?.auction_base_mode
+        ||
+        'free';
+
+      const seconds =
+        Number(
+          state.auction
+            ?.settings
+            ?.nomination_timeout_seconds
+          ||
+          20
+        );
+
+      return `
+        <section class="auction-call-queue">
+
+          <div class="auction-call-queue-head">
+
+            <div>
+              <strong>
+                Coda prossime chiamate
+              </strong>
+
+              <small>
+                ${
+                  editable
+                    ? `Trascina per riordinare · ${seconds}s per chiamare`
+                    : 'Turno di chiamata attivo: coda temporaneamente bloccata'
+                }
+              </small>
+            </div>
+
+            <span class="badge primary">
+              ${rows.length}
+            </span>
+
+          </div>
+
+
+          <div
+            id="auction-call-queue-list"
+            class="auction-call-queue-list"
+          >
+
+            ${
+              rows.length
+                ? rows.map(
+                    (item, index) => `
+                      <div
+                        class="auction-call-queue-row"
+                        data-queue-player="${esc(item.player_id)}"
+                        draggable="${editable ? 'true' : 'false'}"
+                      >
+
+                        <span class="auction-queue-handle">
+                          ⋮⋮
+                        </span>
+
+                        <span class="auction-queue-position">
+                          ${index + 1}
+                        </span>
+
+                        <div class="auction-queue-player">
+                          <strong>
+                            ${esc(item.player?.name || 'Giocatore')}
+                          </strong>
+
+                          <small>
+                            ${esc(
+                              playerRoles(
+                                item.player || {},
+                                state.auction?.settings?.fantasy_mode
+                              )
+                                .join('/')
+                            )}
+                            ·
+                            ${esc(item.player?.serie_a_team || '')}
+                          </small>
+                        </div>
+
+
+                        <div class="auction-queue-price">
+
+                          ${
+                            baseMode === 'quotation'
+                              ? `
+                                  <span
+                                    class="badge"
+                                    title="Base da quotazione"
+                                  >
+                                    Q ${Number(item.opening_bid || 1)}
+                                  </span>
+                                `
+                              : `
+                                  <input
+                                    class="auction-queue-price-input"
+                                    data-queue-price="${esc(item.player_id)}"
+                                    type="number"
+                                    min="1"
+                                    step="1"
+                                    value="${Number(item.opening_bid || 1)}"
+                                    ${editable ? '' : 'disabled'}
+                                    title="Base d'asta automatica"
+                                  >
+                                `
+                          }
+
+                        </div>
+
+
+                        <button
+                          type="button"
+                          class="auction-queue-remove"
+                          data-queue-remove="${esc(item.player_id)}"
+                          ${editable ? '' : 'disabled'}
+                          title="Rimuovi dalla coda"
+                        >
+                          ×
+                        </button>
+
+                      </div>
+                    `
+                  )
+                    .join('')
+                : `
+                    <div class="live-placeholder">
+                      Aggiungi giocatori dalla lista Svincolati.
+                      Il primo ancora libero verrà chiamato automaticamente
+                      quando arriverà il tuo turno.
+                    </div>
+                  `
+            }
+
+          </div>
+
+        </section>
+      `;
+    }
+
+
+    async function saveAuctionCallQueueItems(
+      items,
+      successText = ''
+    ) {
+      const sessionId =
+        auctionSession()?.id;
+
+      if (!sessionId) {
+        return;
+      }
+
+      try {
+        await api(
+          ENDPOINTS.auction,
+          {
+            action:
+              'saveCallQueue',
+
+            sessionId,
+
+            items
+          }
+        );
+
+        if (successText) {
+          msg(
+            successText,
+            'success'
+          );
+        }
+
+        /*
+         * Dopo un salvataggio esplicito vogliamo leggere
+         * la coda normalizzata dal server.
+         */
+        await loadAuction({
+          quiet: true
+        });
+
+      } catch (error) {
+        msg(
+          error.message,
+          'error'
+        );
+      }
+    }
+
+
+    async function addPlayerToAuctionQueue(
+      playerId
+    ) {
+      if (!auctionCanManageCallQueue()) {
+        return;
+      }
+
+      const d =
+        state.auction;
+
+      const player =
+        (d.callCandidates || [])
+          .find(
+            item =>
+              item.id === playerId
+          );
+
+      if (!player) {
+        return;
+      }
+
+      const existing =
+        auctionQueueRows();
+
+      if (
+        existing.some(
+          item =>
+            item.player_id
+            === playerId
+        )
+      ) {
+        return msg(
+          'Il giocatore è già nella coda.',
+          'warning'
+        );
+      }
+
+      const openingBid =
+        d.settings?.auction_base_mode
+          === 'quotation'
+          ? Math.max(
+              1,
+              Number(
+                player.quotation
+                ||
+                1
+              )
+            )
+          : 1;
+
+      const items = [
+        ...existing.map(
+          item => ({
+            playerId:
+              item.player_id,
+
+            openingBid:
+              Number(
+                item.opening_bid
+                ||
+                1
+              )
+          })
+        ),
+
+        {
+          playerId,
+          openingBid
+        }
+      ];
+
+      await saveAuctionCallQueueItems(
+        items,
+        `${player.name} aggiunto alla coda.`
+      );
+    }
+
+
+    function attachAuctionCallQueueEvents() {
+      const list =
+        $('auction-call-queue-list');
+
+      if (!list) {
+        return;
+      }
+
+      list
+        .querySelectorAll(
+          '[data-queue-remove]'
+        )
+        .forEach(button => {
+          button
+            .addEventListener(
+              'click',
+              async () => {
+                const playerId =
+                  button.dataset.queueRemove;
+
+                const items =
+                  auctionQueueRows()
+                    .filter(
+                      item =>
+                        item.player_id
+                        !== playerId
+                    )
+                    .map(
+                      item => ({
+                        playerId:
+                          item.player_id,
+
+                        openingBid:
+                          Number(
+                            item.opening_bid
+                            ||
+                            1
+                          )
+                      })
+                    );
+
+                await saveAuctionCallQueueItems(
+                  items
+                );
+              }
+            );
+        });
+
+
+      list
+        .querySelectorAll(
+          '[data-queue-price]'
+        )
+        .forEach(input => {
+          input
+            .addEventListener(
+              'change',
+              async () => {
+                const playerId =
+                  input.dataset.queuePrice;
+
+                const nextPrice =
+                  Math.max(
+                    1,
+                    Number(
+                      input.value
+                      ||
+                      1
+                    )
+                  );
+
+                const items =
+                  auctionQueueRows()
+                    .map(
+                      item => ({
+                        playerId:
+                          item.player_id,
+
+                        openingBid:
+                          item.player_id
+                            === playerId
+                              ? nextPrice
+                              : Number(
+                                  item.opening_bid
+                                  ||
+                                  1
+                                )
+                      })
+                    );
+
+                await saveAuctionCallQueueItems(
+                  items
+                );
+              }
+            );
+        });
+
+
+      list
+        .querySelectorAll(
+          '.auction-call-queue-row[draggable="true"]'
+        )
+        .forEach(row => {
+
+          row.addEventListener(
+            'dragstart',
+            event => {
+              state.auctionQueueDragPlayerId =
+                row.dataset.queuePlayer;
+
+              row.classList.add(
+                'is-dragging'
+              );
+
+              event.dataTransfer.effectAllowed =
+                'move';
+            }
+          );
+
+
+          row.addEventListener(
+            'dragend',
+            () => {
+              state.auctionQueueDragPlayerId =
+                null;
+
+              row.classList.remove(
+                'is-dragging'
+              );
+            }
+          );
+
+
+          row.addEventListener(
+            'dragover',
+            event => {
+              event.preventDefault();
+              event.dataTransfer.dropEffect =
+                'move';
+            }
+          );
+
+
+          row.addEventListener(
+            'drop',
+            async event => {
+              event.preventDefault();
+
+              const dragged =
+                state.auctionQueueDragPlayerId;
+
+              const target =
+                row.dataset.queuePlayer;
+
+              if (
+                !dragged
+                ||
+                !target
+                ||
+                dragged === target
+              ) {
+                return;
+              }
+
+              const rows =
+                auctionQueueRows();
+
+              const from =
+                rows.findIndex(
+                  item =>
+                    item.player_id
+                    === dragged
+                );
+
+              const to =
+                rows.findIndex(
+                  item =>
+                    item.player_id
+                    === target
+                );
+
+              if (
+                from < 0
+                ||
+                to < 0
+              ) {
+                return;
+              }
+
+              const reordered =
+                [...rows];
+
+              const [
+                moved
+              ] =
+                reordered.splice(
+                  from,
+                  1
+                );
+
+              reordered.splice(
+                to,
+                0,
+                moved
+              );
+
+              await saveAuctionCallQueueItems(
+                reordered.map(
+                  item => ({
+                    playerId:
+                      item.player_id,
+
+                    openingBid:
+                      Number(
+                        item.opening_bid
+                        ||
+                        1
+                      )
+                  })
+                )
+              );
+            }
+          );
+        });
+    }
+
+
+    function renderAuctionMobilePresidentConsole() {
+      const d =
+        state.auction;
+
+      const s =
+        d.auctionSession;
+
+      const info =
+        auctionMyTeamDashboardData();
+
+      const hasPlayer =
+        Boolean(
+          s.current_player_id
+        );
+
+      const player =
+        d.currentPlayer;
+
+      const currentBid =
+        Number(
+          s.current_bid
+          ||
+          0
+        );
+
+      const selectedBid =
+        Number(
+          state.auctionBidSelection
+          ||
+          auctionBidDefault()
+        );
+
+      const wildMode =
+        d.settings?.bid_mode
+        !== 'turn';
+
+      const myTurn =
+        wildMode
+        ||
+        !d.currentTurnTeam
+        ||
+        d.currentTurnTeam.id
+          === auctionMyTeamId();
+
+      const canBid =
+        hasPlayer
+        &&
+        myTurn;
+
+      const firstQueue =
+        d.myCallQueue?.[0]
+        ||
+        null;
+
+      $('auction-root').innerHTML = `
+        <div class="auction-mobile-console">
+
+          <header class="auction-mobile-console-top">
+
+            <div>
+              <strong>
+                ${esc(info?.teamName || 'La mia squadra')}
+              </strong>
+
+              <small id="auction-status-sub-live">
+                ${
+                  hasPlayer
+                    ? (
+                        d.settings?.bid_mode === 'turn'
+                          ? `Turno: ${d.currentTurnTeam?.name || '—'}`
+                          : 'Rilanci liberi'
+                      )
+                    : `Chiama: ${d.currentNominationTeam?.name || '—'}`
+                }
+              </small>
+            </div>
+
+            <div
+              id="auction-timer-label"
+              class="auction-mobile-timer"
+            >
+              —
+            </div>
+
+          </header>
+
+
+          <main class="auction-mobile-main">
+
+            ${
+              hasPlayer
+                ? `
+                    <div class="auction-mobile-kicker">
+                      Giocatore in asta
+                    </div>
+
+                    <div class="auction-mobile-player">
+                      ${esc(player?.name || 'Giocatore')}
+                    </div>
+
+                    <div class="auction-mobile-meta">
+                      ${esc(
+                        playerRoles(
+                          player || {},
+                          d.settings?.fantasy_mode
+                        )
+                          .join('/')
+                      )}
+                      ·
+                      ${esc(player?.serie_a_team || '')}
+                    </div>
+
+
+                    <div class="auction-mobile-bid-box">
+
+                      <div class="auction-mobile-bid-stat">
+                        <span>Offerta</span>
+
+                        <strong id="auction-mobile-current-bid">
+                          ${currentBid || '—'}
+                        </strong>
+                      </div>
+
+                      <div class="auction-mobile-bid-stat">
+                        <span>Leader</span>
+
+                        <strong
+                          id="auction-mobile-leader"
+                          class="auction-mobile-leader"
+                        >
+                          ${esc(d.currentBidderTeam?.name || 'Nessuno')}
+                        </strong>
+                      </div>
+
+                    </div>
+
+
+                    <div class="auction-mobile-team-strip">
+
+                      <div class="auction-team-mini-kpi">
+                        <span>Crediti</span>
+                        <strong>${info?.remaining ?? '—'}</strong>
+                      </div>
+
+                      <div class="auction-team-mini-kpi">
+                        <span>Max bid</span>
+                        <strong>${info?.maxBid ?? '—'}</strong>
+                      </div>
+
+                      <div class="auction-team-mini-kpi">
+                        <span>Rosa</span>
+                        <strong>
+                          ${info?.rosterCount ?? 0}${info?.rosterLimit ? `/${info.rosterLimit}` : ''}
+                        </strong>
+                      </div>
+
+                    </div>
+
+                  `
+                : `
+                    <div class="auction-mobile-kicker">
+                      Turno di chiamata
+                    </div>
+
+                    <div class="auction-mobile-player">
+                      ${esc(d.currentNominationTeam?.name || 'In attesa')}
+                    </div>
+
+                    <div class="auction-mobile-call-wait">
+                      ${
+                        auctionOwnCallTurn()
+                          ? `
+                              <strong>È il tuo turno.</strong>
+                              <span>
+                                La chiamata viene gestita dal PC.
+                                ${
+                                  firstQueue
+                                    ? `Prima coda: ${esc(firstQueue.player?.name || 'giocatore')}.`
+                                    : 'Nessun giocatore in coda.'
+                                }
+                              </span>
+                            `
+                          : `
+                              <strong>Attendi il tuo turno.</strong>
+                              <span>
+                                Continua a gestire Listone e coda dal PC.
+                              </span>
+                            `
+                      }
+                    </div>
+                  `
+            }
+
+          </main>
+
+
+          ${
+            hasPlayer
+              ? `
+                  <footer>
+
+                    <div class="auction-mobile-quick">
+
+                      ${[1,2,3,5,10].map(offset => {
+                        const amount =
+                          currentBid + offset;
+
+                        return `
+                          <button
+                            type="button"
+                            class="quick-btn ${
+                              selectedBid === amount
+                                ? 'selected'
+                                : ''
+                            }"
+                            data-offset="${offset}"
+                            data-amount="${amount}"
+                            ${canBid ? '' : 'disabled'}
+                          >
+                            <span>+${offset}</span>
+                            <strong>${amount}</strong>
+                          </button>
+                        `;
+                      }).join('')}
+
+                    </div>
+
+                    ${
+                      d.viceSignal
+                        ? `
+                            <div
+                              class="auction-vice-strip"
+                              style="margin-top:6px;justify-content:center"
+                            >
+                              <strong>
+                                ${esc(d.viceSignal.viceUsername || 'Vice')}
+                              </strong>
+
+                              <span class="badge ${
+                                d.viceSignal.type === 'stop'
+                                  ? 'danger'
+                                  : 'good'
+                              }">
+                                ${
+                                  esc(
+                                    d.viceSignal.type === 'limit'
+                                      ? `FINO A ${d.viceSignal.amount}`
+                                      : d.viceSignal.type === 'push'
+                                        ? 'RILANCIA'
+                                        : 'STOP'
+                                  )
+                                }
+                              </span>
+                            </div>
+                          `
+                        : ''
+                    }
+
+                    <button
+                      id="auction-mobile-confirm"
+                      class="auction-mobile-confirm"
+                      type="button"
+                      ${canBid ? '' : 'disabled'}
+                      style="margin-top:6px"
+                    >
+                      RILANCIA A ${selectedBid}
+                    </button>
+
+                    ${
+                      d.settings?.bid_mode === 'turn'
+                      &&
+                      canBid
+                        ? `
+                            <div class="auction-turn-actions">
+                              <button
+                                id="auction-mobile-pass"
+                                class="secondary"
+                                type="button"
+                              >
+                                PASSA
+                              </button>
+
+                              <button
+                                id="auction-mobile-abandon"
+                                class="danger"
+                                type="button"
+                              >
+                                ABBANDONA
+                              </button>
+                            </div>
+                          `
+                        : ''
+                    }
+
+                  </footer>
+                `
+              : `
+                  <footer class="small soft" style="text-align:center">
+                    Console mobile dedicata ai rilanci.
+                  </footer>
+                `
+          }
+
+        </div>
+      `;
+
+
+      document
+        .querySelectorAll(
+          '.auction-mobile-console .quick-btn'
+        )
+        .forEach(button => {
+          button.addEventListener(
+            'click',
+            () => {
+              state.auctionBidSelection =
+                Number(
+                  button.dataset.amount
+                );
+
+              renderAuctionMobilePresidentConsole();
+              renderAuctionTimer();
+            }
+          );
+        });
+
+
+      $('auction-mobile-confirm')
+        ?.addEventListener(
+          'click',
+          () =>
+            placeBid(
+              auctionMyTeamId(),
+              Number(
+                state.auctionBidSelection
+                ||
+                auctionBidDefault()
+              ),
+              'APP'
+            )
+        );
+
+
+      $('auction-mobile-pass')
+        ?.addEventListener(
+          'click',
+          () =>
+            auctionAction({
+              action:
+                'passTurn',
+
+              sessionId:
+                s.id,
+
+              teamId:
+                auctionMyTeamId()
+            })
+        );
+
+
+      $('auction-mobile-abandon')
+        ?.addEventListener(
+          'click',
+          () =>
+            auctionAction({
+              action:
+                'abandonTurn',
+
+              sessionId:
+                s.id,
+
+              teamId:
+                auctionMyTeamId()
+            })
+        );
+
+
+      renderAuctionTimer();
     }
 
 
@@ -4639,6 +6125,14 @@
                 <col class="col-stat">
                 <col class="col-stat">
                 <col class="col-stat">
+
+                ${
+                  auctionDualModeEnabled()
+                  &&
+                  state.auction?.permissions?.isPresident
+                    ? '<col class="col-queue">'
+                    : ''
+                }
               </colgroup>
 
               <thead>
@@ -4696,6 +6190,18 @@
                       Tit. <span>↕</span>
                     </button>
                   </th>
+
+                  ${
+                    auctionDualModeEnabled()
+                    &&
+                    state.auction?.permissions?.isPresident
+                      ? `
+                          <th class="queue-head">
+                            Coda
+                          </th>
+                        `
+                      : ''
+                  }
                 </tr>
               </thead>
 
@@ -5284,7 +6790,7 @@
     }
 
 
-    function auctionDataSignature(data) {
+    function auctionStructureSignature(data) {
       const session =
         data?.auctionSession
         ||
@@ -5301,6 +6807,67 @@
             item.price
           ]);
 
+      const queue =
+        (data?.myCallQueue || [])
+          .map(item => [
+            item.player_id,
+            item.position,
+            item.opening_bid
+          ]);
+
+      const teamPenalties =
+        (data?.teamOrder || [])
+          .map(item => [
+            item.team_id,
+            item.nomination_penalty_credits || 0,
+            item.missed_nominations || 0
+          ]);
+
+      return JSON.stringify({
+        sessionId:
+          session?.id || null,
+
+        status:
+          session?.status || null,
+
+        player:
+          session?.current_player_id || null,
+
+        nominationTeam:
+          session?.current_nomination_team_id || null,
+
+        awards,
+        queue,
+        teamPenalties,
+
+        deviceMode:
+          session?.setup_snapshot
+            ?.president_device_mode
+          ||
+          data?.settings
+            ?.president_device_mode
+          ||
+          'standard'
+      });
+    }
+
+
+    function auctionLiveStateSignature(data) {
+      const session =
+        data?.auctionSession
+        ||
+        null;
+
+      const recentBids =
+        (data?.recentBids || [])
+          .slice(0, 12)
+          .map(item => [
+            item.id,
+            item.team_id,
+            item.amount,
+            item.source
+          ]);
+
       const vice =
         data?.viceSignal
           ? [
@@ -5308,62 +6875,36 @@
               data.viceSignal.signal_type,
               data.viceSignal.type,
               data.viceSignal.amount,
-              data.viceSignal.updated_at,
               data.viceSignal.created_at
             ]
           : null;
 
       return JSON.stringify({
-        sessionId:
-          session?.id
-          ||
-          null,
-
-        status:
-          session?.status
-          ||
-          null,
-
-        version:
-          session?.version
-          ??
-          null,
-
-        player:
-          session?.current_player_id
-          ||
-          null,
-
-        nominationTeam:
-          session?.current_nomination_team_id
-          ||
-          null,
-
         bid:
-          session?.current_bid
-          ??
-          null,
+          session?.current_bid ?? null,
 
         bidder:
-          session?.current_bidder_team_id
-          ||
-          null,
+          session?.current_bidder_team_id || null,
 
         turn:
-          session?.current_turn_team_id
-          ||
-          null,
+          session?.current_turn_team_id || null,
 
         hold:
-          session?.hold_active
-          === true,
+          session?.hold_active === true,
 
-        expired:
-          session?.timer_expired_at
-          ||
-          null,
+        timer:
+          session?.timer_deadline || null,
 
-        awards,
+        timerExpired:
+          session?.timer_expired_at || null,
+
+        nominationTimer:
+          session?.nomination_deadline || null,
+
+        nominationExpired:
+          session?.nomination_expired_at || null,
+
+        recentBids,
         vice
       });
     }
@@ -5399,14 +6940,9 @@
       }
 
       const snapshot = {
-        id:
-          active.id,
-
-        start:
-          null,
-
-        end:
-          null
+        id: active.id,
+        start: null,
+        end: null
       };
 
       if (
@@ -5438,8 +6974,7 @@
 
       try {
         element.focus({
-          preventScroll:
-            true
+          preventScroll: true
         });
 
         if (
@@ -5454,8 +6989,196 @@
           );
         }
       } catch {
-        // Ripristino focus non essenziale.
+        // Non essenziale.
       }
+    }
+
+
+    function renderRecentBidChips() {
+      const box =
+        $('auction-live-recent-bids');
+
+      if (!box) {
+        return;
+      }
+
+      box.innerHTML =
+        (state.auction?.recentBids || [])
+          .slice(0, 10)
+          .map(bid => `
+            <div class="auction-bid-chip">
+              <span>
+                ${esc(bid.team?.name || 'Squadra')}
+              </span>
+
+              <strong>
+                ${bid.amount}
+              </strong>
+            </div>
+          `)
+          .join('')
+        ||
+        '<span class="small soft">Nessun rilancio.</span>';
+    }
+
+
+    function patchAuctionLiveDynamic() {
+      const d =
+        state.auction;
+
+      const s =
+        d?.auctionSession;
+
+      if (!s) {
+        return;
+      }
+
+      ensureBidSelection();
+
+      const currentBid =
+        Number(
+          s.current_bid
+          ||
+          0
+        );
+
+      const selectedBid =
+        Number(
+          state.auctionBidSelection
+          ||
+          auctionBidDefault()
+        );
+
+      const bidAmount =
+        $('auction-live-current-bid');
+
+      if (bidAmount) {
+        bidAmount.textContent =
+          currentBid || '—';
+      }
+
+      const mobileBid =
+        $('auction-mobile-current-bid');
+
+      if (mobileBid) {
+        mobileBid.textContent =
+          currentBid || '—';
+      }
+
+      const leaderName =
+        d.currentBidderTeam?.name
+        ||
+        'Nessuno';
+
+      const leader =
+        $('auction-live-leader');
+
+      if (leader) {
+        leader.textContent =
+          leaderName;
+      }
+
+      const mobileLeader =
+        $('auction-mobile-leader');
+
+      if (mobileLeader) {
+        mobileLeader.textContent =
+          leaderName;
+      }
+
+      const statusSub =
+        $('auction-status-sub-live');
+
+      if (statusSub) {
+        statusSub.textContent =
+          s.current_player_id
+            ? (
+                d.settings?.bid_mode === 'turn'
+                  ? `Turno: ${d.currentTurnTeam?.name || '—'}`
+                  : 'Rilanci liberi'
+              )
+            : `Chiama: ${d.currentNominationTeam?.name || '—'}`;
+      }
+
+
+      document
+        .querySelectorAll(
+          '.quick-btn[data-offset]'
+        )
+        .forEach(button => {
+          const offset =
+            Number(
+              button.dataset.offset
+            );
+
+          const amount =
+            currentBid
+            +
+            offset;
+
+          button.dataset.amount =
+            String(amount);
+
+          const strong =
+            button.querySelector(
+              'strong'
+            );
+
+          if (strong) {
+            strong.textContent =
+              String(amount);
+          }
+
+          button.classList.toggle(
+            'selected',
+            amount === selectedBid
+          );
+        });
+
+
+      const selectedBadge =
+        $('auction-selected-bid-badge');
+
+      if (selectedBadge) {
+        selectedBadge.textContent =
+          String(selectedBid);
+      }
+
+
+      const presidentConfirm =
+        $('president-bid');
+
+      if (presidentConfirm) {
+        presidentConfirm.textContent =
+          `CONFERMA ${selectedBid}`;
+      }
+
+
+      const mobileConfirm =
+        $('auction-mobile-confirm');
+
+      if (mobileConfirm) {
+        mobileConfirm.textContent =
+          `RILANCIA A ${selectedBid}`;
+      }
+
+
+      const correctAmount =
+        $('auction-correct-amount');
+
+      if (
+        correctAmount
+        &&
+        document.activeElement
+        !== correctAmount
+      ) {
+        correctAmount.value =
+          String(selectedBid);
+      }
+
+
+      renderRecentBidChips();
+      renderAuctionTimer();
     }
 
 
@@ -5481,8 +7204,13 @@
       }
 
 
-      const nextSignature =
-        auctionDataSignature(
+      const nextStructureSignature =
+        auctionStructureSignature(
+          data
+        );
+
+      const nextLiveSignature =
+        auctionLiveStateSignature(
           data
         );
 
@@ -5491,14 +7219,21 @@
           data
         );
 
+
       const firstLoad =
         !state.auctionRenderSignature;
 
-      const changed =
+      const structureChanged =
         firstLoad
         ||
-        nextSignature
+        nextStructureSignature
           !== state.auctionRenderSignature;
+
+      const liveChanged =
+        firstLoad
+        ||
+        nextLiveSignature
+          !== state.auctionLiveSignature;
 
       const rosterChanged =
         firstLoad
@@ -5521,17 +7256,34 @@
       }
 
 
+      if (
+        onlyIfChanged
+        &&
+        !structureChanged
+        &&
+        !liveChanged
+      ) {
+        return;
+      }
+
+
       /*
-       * Polling live:
-       * se sul server non è cambiata alcuna operazione
-       * NON tocchiamo il DOM. Ricerca, cursore, select e scroll
-       * restano quindi completamente stabili.
+       * Un semplice rilancio NON ricostruisce più il cockpit.
+       * Aggiorniamo soltanto importo, leader, tasti, timer e log:
+       * ricerche, filtri, coda e scroll del PC non vengono toccati.
        */
       if (
         onlyIfChanged
         &&
-        !changed
+        !structureChanged
+        &&
+        liveChanged
       ) {
+        state.auctionLiveSignature =
+          nextLiveSignature;
+
+        patchAuctionLiveDynamic();
+        renderTv();
         return;
       }
 
@@ -5552,7 +7304,10 @@
 
 
       state.auctionRenderSignature =
-        nextSignature;
+        nextStructureSignature;
+
+      state.auctionLiveSignature =
+        nextLiveSignature;
 
       state.auctionRosterSignature =
         nextRosterSignature;
@@ -5561,7 +7316,6 @@
       renderAuction();
       renderTv();
       updateHeader();
-
 
       restoreAuctionFocus(
         focusSnapshot
@@ -5615,7 +7369,30 @@
 
     function auctionSettingsRows(settings={}) {
       const rows = [
-        ['Modalità',settings.fantasy_mode],['Crediti',settings.initial_credits],['Chiamata',settings.nomination_mode],['Base',settings.auction_base_mode],['Rilanci',settings.bid_mode],['Timer',settings.timer_mode]
+        ['Modalità', settings.fantasy_mode],
+        ['Crediti', settings.initial_credits],
+        ['Chiamata', settings.nomination_mode],
+        ['Base', settings.auction_base_mode],
+        ['Rilanci', settings.bid_mode],
+        ['Timer', settings.timer_mode],
+        [
+          'Presidenti',
+          settings.president_device_mode === 'dual'
+            ? 'PC + Smartphone'
+            : 'Standard'
+        ],
+        [
+          'Tempo chiamata',
+          settings.president_device_mode === 'dual'
+            ? `${settings.nomination_timeout_seconds || 20}s`
+            : '—'
+        ],
+        [
+          'Penalità',
+          settings.president_device_mode === 'dual'
+            ? `${settings.nomination_timeout_penalty || 0} crediti`
+            : '—'
+        ]
       ];
       return rows.map(([a,b])=>`<div class="compact-row"><strong>${esc(a)}</strong><span class="badge">${esc(b ?? '—')}</span></div>`).join('');
     }
@@ -5728,6 +7505,14 @@
           : `Chiama: ${d.currentNominationTeam?.name || '—'}`;
 
 
+      if (
+        auctionUseMobilePresidentConsole()
+      ) {
+        renderAuctionMobilePresidentConsole();
+        return;
+      }
+
+
       const playerHeroHtml =
         hasPlayer
           ? `
@@ -5764,13 +7549,13 @@
 
                   <span>Offerta corrente</span>
 
-                  <strong>
+                  <strong id="auction-live-current-bid">
                     ${currentBid || '—'}
                   </strong>
 
                   <div class="auction-current-leader">
                     Leader:
-                    <b>
+                    <b id="auction-live-leader">
                       ${esc(d.currentBidderTeam?.name || 'Nessuno')}
                     </b>
                   </div>
@@ -5833,7 +7618,10 @@
                 <div class="auction-action-head">
                   <strong>La tua offerta</strong>
 
-                  <span class="badge good">
+                  <span
+                    id="auction-selected-bid-badge"
+                    class="badge good"
+                  >
                     ${selectedBid}
                   </span>
                 </div>
@@ -5856,6 +7644,7 @@
                                   ? 'selected'
                                   : ''
                               }"
+                              data-offset="${offset}"
                               data-amount="${amount}"
                               type="button"
                               ${
@@ -6117,7 +7906,10 @@
             </span>
           </div>
 
-          <div class="auction-bid-chips">
+          <div
+            id="auction-live-recent-bids"
+            class="auction-bid-chips"
+          >
 
             ${
               (d.recentBids || [])
@@ -6463,7 +8255,10 @@
                   ${esc(d.league?.name || state.selectedLeague?.name || 'Asta')}
                 </div>
 
-                <div class="auction-status-sub">
+                <div
+                  id="auction-status-sub-live"
+                  class="auction-status-sub"
+                >
                   ${esc(turnLabel)}
                 </div>
 
@@ -6519,7 +8314,8 @@
                 ${renderAuctionCockpitTeamPanel()}
 
 
-                <div class="auction-middle-column">
+                <div class="auction-middle-column ${renderAuctionCallQueue() ? 'has-call-queue' : ''}">
+                  ${renderAuctionCallQueue()}
                   ${viceHtml}
                   ${recentBidsHtml}
                 </div>
@@ -6545,6 +8341,7 @@
 
       renderAuctionDrawerControls();
       renderAuctionPlayers();
+      attachAuctionCallQueueEvents();
       renderAuctionAdminSearchResults();
 
 
@@ -7511,18 +9308,181 @@
         );
     }
 
-    function renderAuctionPlayers() {
-      const body = $('auction-player-body');
-      if (!body) return;
+    function auctionPlayerRow(
+      player,
+      mode
+    ) {
+      const roles =
+        playerRoles(
+          player,
+          mode
+        );
 
-      const data = state.auction;
-      const mode = data.settings?.fantasy_mode || 'classic';
+      const delta =
+        Number(
+          player.pfc_pma_delta
+        );
+
+      const queuedIndex =
+        auctionQueueRows()
+          .findIndex(
+            item =>
+              item.player_id
+              === player.id
+          );
+
+      const showQueue =
+        auctionDualModeEnabled()
+        &&
+        state.auction
+          ?.permissions
+          ?.isPresident;
+
+      const queueAction =
+        queuedIndex >= 0
+          ? `
+              <span
+                class="auction-queue-added"
+                title="Già in coda"
+              >
+                #${queuedIndex + 1}
+              </span>
+            `
+          : `
+              <button
+                type="button"
+                class="auction-queue-add"
+                data-queue-add="${esc(player.id)}"
+                ${auctionCanManageCallQueue() ? '' : 'disabled'}
+                title="Aggiungi alla coda chiamate"
+              >
+                +
+              </button>
+            `;
+
+      return `
+        <tr
+          data-player-id="${esc(player.id)}"
+          class="${
+            player.id === state.auctionSelectedPlayerId
+              ? 'selected-player'
+              : ''
+          }"
+        >
+
+          <td>
+            <div class="player-main">
+              <span class="player-name">
+                ${esc(player.name)}
+              </span>
+
+              ${
+                flagEmoji(player.nationality_iso2)
+                  ? `<span>${flagEmoji(player.nationality_iso2)}</span>`
+                  : ''
+              }
+            </div>
+          </td>
+
+
+          <td class="player-role-cell">
+            ${
+              roles.map(role => `
+                <span
+                  class="rolebadge"
+                  data-role="${esc(role)}"
+                >
+                  ${esc(role)}
+                </span>
+              `).join('')
+            }
+          </td>
+
+
+          <td>
+            ${esc(player.serie_a_team || '—')}
+          </td>
+
+          <td class="num">
+            ${esc(player.slot ?? '—')}
+          </td>
+
+          <td class="num">
+            ${formatNumber(player.pma)}
+          </td>
+
+          <td class="num">
+            <strong>
+              ${formatNumber(player.pfc)}
+            </strong>
+          </td>
+
+          <td class="num ${
+            Number.isFinite(delta)
+              ? (
+                  delta > 0
+                    ? 'positive'
+                    : delta < 0
+                      ? 'negative'
+                      : ''
+                )
+              : ''
+          }">
+            ${formatNumber(player.pfc_pma_delta)}
+          </td>
+
+          <td class="num">
+            ${formatNumber(player.expected_fantasy_avg)}
+          </td>
+
+          <td class="num">
+            ${formatNumber(player.expected_titolarity)}
+          </td>
+
+
+          ${
+            showQueue
+              ? `
+                  <td class="queue-cell">
+                    ${queueAction}
+                  </td>
+                `
+              : ''
+          }
+
+        </tr>
+      `;
+    }
+
+
+    function renderAuctionPlayers() {
+      const body =
+        $('auction-player-body');
+
+      if (!body) {
+        return;
+      }
+
+      const data =
+        state.auction;
+
+      const mode =
+        data.settings?.fantasy_mode
+        ||
+        'classic';
 
       const controls = {
-        search: $('auction-search'),
-        team: $('auction-team-filter'),
-        slot: $('auction-slot-filter'),
-        flag: $('auction-flag-filter')
+        search:
+          $('auction-search'),
+
+        team:
+          $('auction-team-filter'),
+
+        slot:
+          $('auction-slot-filter'),
+
+        flag:
+          $('auction-flag-filter')
       };
 
       const filteredPlayers =
@@ -7544,23 +9504,29 @@
       updateAuctionSortIndicators();
 
 
+      const showQueue =
+        auctionDualModeEnabled()
+        &&
+        state.auction
+          ?.permissions
+          ?.isPresident;
+
+
       body.innerHTML =
         players
-          .map(player =>
-            playerRow(
-              player,
-              mode,
-              player.id === state.auctionSelectedPlayerId
-                ? 'selected-player'
-                : ''
-            )
+          .map(
+            player =>
+              auctionPlayerRow(
+                player,
+                mode
+              )
           )
           .join('')
         ||
         `
           <tr>
             <td
-              colspan="9"
+              colspan="${showQueue ? 10 : 9}"
               class="soft"
               style="text-align:center;height:70px"
             >
@@ -7569,30 +9535,65 @@
           </tr>
         `;
 
-      /*
-       * Durante i rilanci il Listone resta consultabile,
-       * ma non può cambiare il giocatore in asta.
-       */
-      if (auctionSession()?.current_player_id) {
-        return;
-      }
 
       body
         .querySelectorAll(
-          '[data-player-id]'
+          '[data-queue-add]'
         )
-        .forEach(row => {
-          row.addEventListener(
+        .forEach(button => {
+          button.addEventListener(
             'click',
-            () => {
-              state.auctionSelectedPlayerId =
-                row.dataset.playerId;
+            event => {
+              event.stopPropagation();
 
-              renderAuctionLive();
+              addPlayerToAuctionQueue(
+                button.dataset.queueAdd
+              );
             }
           );
         });
+
+
+      /*
+       * Se è il nostro turno di chiamata,
+       * il click sulla riga seleziona il giocatore da chiamare subito.
+       * Negli altri momenti il Listone resta consultabile
+       * e la coda usa il pulsante + dedicato.
+       */
+      if (
+        !auctionSession()?.current_player_id
+        &&
+        state.auction
+          ?.permissions
+          ?.canCallCurrentPlayer
+      ) {
+
+        body
+          .querySelectorAll(
+            '[data-player-id]'
+          )
+          .forEach(row => {
+            row.addEventListener(
+              'click',
+              event => {
+                if (
+                  event.target.closest(
+                    '[data-queue-add]'
+                  )
+                ) {
+                  return;
+                }
+
+                state.auctionSelectedPlayerId =
+                  row.dataset.playerId;
+
+                renderAuctionLive();
+              }
+            );
+          });
+      }
     }
+
 
     function auctionBidDefault() {
       const s = auctionSession();
@@ -7693,13 +9694,95 @@
     }
 
     function renderAuctionTimer(){
-      const label=$('auction-timer-label');if(!label)return;
-      const s=auctionSession();if(!s?.timer_deadline){label.textContent=s?.hold_active?'HOLD':'—';return}
-      if(s.hold_active){label.textContent='HOLD';return}
-      const remain=Math.max(0,Date.parse(s.timer_deadline)-(Date.now()+state.serverOffsetMs));
-      const configured=Number(s.current_timer_seconds||0)*1000;
-      const visible=configured>0?Math.min(remain,configured):remain;
-      label.textContent=`${Math.ceil(visible/1000)}s`;
+      const label =
+        $('auction-timer-label');
+
+      if (!label) {
+        return;
+      }
+
+      const s =
+        auctionSession();
+
+      if (!s) {
+        label.textContent = '—';
+        return;
+      }
+
+      if (
+        s.current_player_id
+        &&
+        s.hold_active
+      ) {
+        label.textContent = 'HOLD';
+        return;
+      }
+
+      const isBidTimer =
+        Boolean(
+          s.current_player_id
+          &&
+          s.timer_deadline
+        );
+
+      const deadline =
+        isBidTimer
+          ? s.timer_deadline
+          : (
+              !s.current_player_id
+                ? s.nomination_deadline
+                : null
+            );
+
+      const configuredSeconds =
+        isBidTimer
+          ? Number(
+              s.current_timer_seconds
+              ||
+              0
+            )
+          : Number(
+              s.nomination_timer_seconds
+              ||
+              state.auction
+                ?.settings
+                ?.nomination_timeout_seconds
+              ||
+              0
+            );
+
+      if (!deadline) {
+        label.textContent = '—';
+        return;
+      }
+
+      const remain =
+        Math.max(
+          0,
+          Date.parse(deadline)
+          -
+          (
+            Date.now()
+            +
+            state.serverOffsetMs
+          )
+        );
+
+      const configured =
+        configuredSeconds
+        *
+        1000;
+
+      const visible =
+        configured > 0
+          ? Math.min(
+              remain,
+              configured
+            )
+          : remain;
+
+      label.textContent =
+        `${Math.ceil(visible / 1000)}s`;
     }
 
     /* =====================================================
@@ -7720,13 +9803,69 @@
     }
 
     function renderTvTimer(){
-      const d=state.auction,s=d?.auctionSession;if(!s){$('tv-timer').textContent='—';return}
-      if(s.hold_active){$('tv-timer').textContent='HOLD';return}
-      if(!s.timer_deadline){$('tv-timer').textContent='—';return}
-      const remain=Math.max(0,Date.parse(s.timer_deadline)-(Date.now()+state.serverOffsetMs));
-      const configured=Number(s.current_timer_seconds||0)*1000;
-      const visible=configured>0?Math.min(remain,configured):remain;
-      $('tv-timer').textContent=`${Math.ceil(visible/1000)}s`;
+      const d =
+        state.auction;
+
+      const s =
+        d?.auctionSession;
+
+      if (!s) {
+        $('tv-timer').textContent = '—';
+        return;
+      }
+
+      if (
+        s.current_player_id
+        &&
+        s.hold_active
+      ) {
+        $('tv-timer').textContent = 'HOLD';
+        return;
+      }
+
+      const deadline =
+        s.current_player_id
+          ? s.timer_deadline
+          : s.nomination_deadline;
+
+      if (!deadline) {
+        $('tv-timer').textContent = '—';
+        return;
+      }
+
+      const configuredSeconds =
+        s.current_player_id
+          ? Number(s.current_timer_seconds || 0)
+          : Number(
+              s.nomination_timer_seconds
+              ||
+              d.settings?.nomination_timeout_seconds
+              ||
+              0
+            );
+
+      const remain =
+        Math.max(
+          0,
+          Date.parse(deadline)
+          -
+          (
+            Date.now()
+            +
+            state.serverOffsetMs
+          )
+        );
+
+      const configured =
+        configuredSeconds * 1000;
+
+      const visible =
+        configured > 0
+          ? Math.min(remain, configured)
+          : remain;
+
+      $('tv-timer').textContent =
+        `${Math.ceil(visible / 1000)}s`;
     }
 
     $('tv-fullscreen').addEventListener('click',async()=>{
@@ -7852,6 +9991,43 @@
 
     document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadCurrentView(true)});
     window.addEventListener('focus',()=>loadCurrentView(true));
+
+    let auctionMobileModeLast =
+      window.matchMedia(
+        '(max-width: 720px)'
+      )
+        .matches;
+
+    window.addEventListener(
+      'resize',
+      () => {
+        const nextMobile =
+          window.matchMedia(
+            '(max-width: 720px)'
+          )
+            .matches;
+
+        if (
+          nextMobile
+          !== auctionMobileModeLast
+        ) {
+          auctionMobileModeLast =
+            nextMobile;
+
+          if (
+            state.view === 'auction'
+            &&
+            auctionSession()?.status === 'live'
+            &&
+            auctionDualModeEnabled()
+            &&
+            state.auction?.permissions?.isPresident
+          ) {
+            renderAuctionLive();
+          }
+        }
+      }
+    );
 
     /* =====================================================
        START
