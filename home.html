@@ -4518,54 +4518,51 @@
 
   
     /* =====================================================
-       GLASS SYSTEM 2026 · modern minimalist + cobalt
+       GLASS SYSTEM 2026 · VISUAL ONLY
+       -----------------------------------------------------
+       IMPORTANTE:
+       questo layer modifica ESCLUSIVAMENTE l'aspetto.
+       Nessun display/grid/width/height/padding/margin viene
+       ridefinito qui, così il layout precedente resta identico.
        ===================================================== */
+
     :root{
       --bg:#061426;
-      --panel:#0c2442;
-      --panel2:#12345d;
-      --panel3:#173f70;
-      --line:#28598e;
-      --line2:#3977b5;
+      --panel:rgba(12,36,66,.58);
+      --panel2:rgba(18,52,93,.52);
+      --panel3:rgba(23,63,112,.52);
+      --line:rgba(111,165,226,.22);
+      --line2:rgba(117,178,247,.36);
       --text:#f5f8ff;
-      --soft:#9bb7da;
-      --muted:#6f91ba;
+      --soft:#a9c2df;
+      --muted:#7395bd;
       --primary:#3478f6;
       --primary2:#2462d4;
-      --good:#1f6c58;
-      --warn:#81513a;
-      --danger:#84384d;
-
-      --glass:rgba(12,36,66,.58);
-      --glass-strong:rgba(10,31,58,.82);
-      --glass-soft:rgba(27,67,111,.30);
-      --glass-faint:rgba(255,255,255,.035);
-      --glass-border:rgba(164,202,255,.14);
-      --glass-border-strong:rgba(130,184,255,.28);
-      --glass-highlight:rgba(255,255,255,.07);
-      --shadow:0 18px 50px rgba(0,8,22,.28);
-      --shadow-soft:0 10px 28px rgba(0,8,22,.18);
-      --focus:0 0 0 3px rgba(52,120,246,.20);
-      --r:16px;
-      --radius-sm:9px;
-      --radius-md:12px;
-      --radius-lg:16px;
-      --radius-xl:22px;
-      --header-h:52px;
-      --nav-h:44px;
-      --gap:8px;
+      --good:#1f8067;
+      --warn:#8b5b38;
+      --danger:#943c55;
+      --shadow:0 14px 38px rgba(0,7,20,.26);
+      --glass-border:rgba(158,202,255,.16);
+      --glass-border-strong:rgba(118,184,255,.30);
+      --glass-highlight:rgba(255,255,255,.055);
+      --glass-soft:rgba(16,49,86,.42);
+      --glass-deep:rgba(6,26,50,.68);
     }
 
-    html{background:#04101f}
+    html{
+      background:#061426;
+    }
+
     body{
       background:
-        radial-gradient(80rem 50rem at -10% -15%,rgba(52,120,246,.22),transparent 55%),
-        radial-gradient(60rem 42rem at 108% 5%,rgba(31,105,202,.18),transparent 58%),
-        radial-gradient(55rem 48rem at 58% 118%,rgba(20,78,151,.13),transparent 58%),
-        linear-gradient(145deg,#04101f 0%,#061426 42%,#07182d 100%);
-      color:var(--text);
-      letter-spacing:-.005em;
+        radial-gradient(circle at 12% 2%,rgba(52,120,246,.18),transparent 34rem),
+        radial-gradient(circle at 92% 8%,rgba(36,98,212,.13),transparent 30rem),
+        linear-gradient(145deg,#05101f 0%,#061426 47%,#071b31 100%);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
     }
+
     body::before,
     body::after{
       content:"";
@@ -4573,419 +4570,358 @@
       pointer-events:none;
       z-index:-1;
       border-radius:999px;
-      filter:blur(60px);
-      opacity:.32;
+      filter:blur(95px);
+      opacity:.24;
     }
-    body::before{width:28vw;height:28vw;min-width:260px;min-height:260px;left:-9vw;top:12vh;background:#1e67c8}
-    body::after{width:24vw;height:24vw;min-width:220px;min-height:220px;right:-7vw;bottom:-8vh;background:#164d91}
 
-    ::selection{background:rgba(67,137,255,.45);color:#fff}
-    *{scrollbar-width:thin;scrollbar-color:rgba(116,169,235,.36) transparent}
-    *::-webkit-scrollbar{width:7px;height:7px}
-    *::-webkit-scrollbar-track{background:transparent}
-    *::-webkit-scrollbar-thumb{background:rgba(116,169,235,.30);border-radius:999px}
-    *::-webkit-scrollbar-thumb:hover{background:rgba(116,169,235,.48)}
+    body::before{
+      inset:11vh auto auto -8vw;
+      width:30vw;
+      height:30vw;
+      background:#2678ee;
+    }
 
-    .app{padding:8px;gap:8px}
+    body::after{
+      inset:auto -7vw -10vh auto;
+      width:28vw;
+      height:28vw;
+      background:#174e93;
+    }
+
+    *{
+      scrollbar-color:rgba(126,177,236,.34) transparent;
+    }
+
+    *::-webkit-scrollbar-thumb{
+      background:rgba(126,177,236,.30);
+      border-radius:999px;
+    }
 
     .app-head,
-    .main-nav,
     .panel,
     .league-pill,
-    .league-card,
+    .nav-btn,
+    .kpi,
     .compact-row,
     .field-band,
-    .kpi,
     .table-wrap,
     details.team-card,
-    .auction-statusbar,
-    .auction-player-hero,
-    .auction-action-card,
     .auction-team-card,
     .auction-team-roster,
-    .auction-bid-history,
-    .auction-free-fixed,
+    .auction-overview-card,
     .auction-command-bar,
     .auction-caller-controls,
+    .auction-middle-quick,
+    .auction-bid-history,
+    .auction-action-card,
+    .auction-player-hero,
+    .auction-current-offer,
+    .auction-free-fixed,
     .auction-call-queue,
-    .auction-call-queue-drawer,
+    .auctioneer-console,
     .auctioneer-console-drawer,
     .auction-rosters-drawer,
     .auction-awards-drawer,
-    .auction-transfer-card,
     .auction-mobile-console-top,
-    .auction-mobile-main{
+    .auction-mobile-bid-box,
+    .auction-mobile-call-wait,
+    .tv-stage,
+    .tv-player{
+      background:linear-gradient(145deg,rgba(18,52,93,.54),rgba(7,27,52,.50))!important;
       border-color:var(--glass-border)!important;
-      background:linear-gradient(145deg,rgba(17,48,86,.66),rgba(7,28,53,.52))!important;
-      box-shadow:inset 0 1px 0 var(--glass-highlight),var(--shadow-soft);
-      backdrop-filter:blur(18px) saturate(145%);
-      -webkit-backdrop-filter:blur(18px) saturate(145%);
+      box-shadow:
+        inset 0 1px 0 var(--glass-highlight),
+        0 10px 28px rgba(0,7,20,.16);
+      -webkit-backdrop-filter:blur(18px) saturate(135%);
+      backdrop-filter:blur(18px) saturate(135%);
     }
 
-    .app-head{
-      padding:7px 10px;
-      border-radius:17px;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 12px 28px rgba(0,7,19,.20);
-    }
-    .brand{font-size:15px;font-weight:850;letter-spacing:-.035em}
-    .league-pill{border-radius:12px;padding:5px 9px;background:rgba(31,75,124,.38)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
-    .league-pill strong{font-size:10px}.league-pill small,.user-label{font-size:8px}
-
-    .main-nav{
-      padding:4px;
-      border:1px solid var(--glass-border);
-      border-radius:15px;
-      background:rgba(7,26,49,.46)!important;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 9px 24px rgba(0,7,19,.14);
-      backdrop-filter:blur(16px) saturate(140%);
-      -webkit-backdrop-filter:blur(16px) saturate(140%);
-    }
-    .nav-btn{
-      min-height:34px;
-      border:0!important;
-      border-radius:10px;
-      background:transparent!important;
-      color:var(--soft);
-      font-weight:750;
-      transition:background .16s ease,color .16s ease,transform .16s ease,box-shadow .16s ease;
-    }
-    .nav-btn:hover{background:rgba(255,255,255,.055)!important;color:#fff;filter:none;transform:none}
-    .nav-btn.active{
-      color:#fff;
-      background:linear-gradient(135deg,rgba(52,120,246,.94),rgba(36,98,212,.88))!important;
-      box-shadow:0 8px 20px rgba(20,83,188,.28),inset 0 1px 0 rgba(255,255,255,.18);
-    }
-
-    button,.btn{
-      min-height:34px;
-      padding:6px 11px;
-      border:1px solid rgba(121,179,255,.16);
-      border-radius:10px;
-      background:linear-gradient(135deg,#3b82f6,#2867dc);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 7px 16px rgba(11,68,166,.15);
-      font-size:10px;
-      font-weight:800;
-      letter-spacing:.005em;
-      transition:transform .13s ease,filter .13s ease,background .13s ease,border-color .13s ease,box-shadow .13s ease;
-    }
-    button:hover,.btn:hover{filter:brightness(1.07);transform:translateY(-1px)}
-    button:active,.btn:active{transform:translateY(0);filter:brightness(.98)}
-    button:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:none;box-shadow:var(--focus)}
-    button.secondary,.btn.secondary{
-      color:#e8f2ff;
-      border-color:var(--glass-border-strong);
-      background:rgba(29,73,119,.42)!important;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.07);
-    }
-    button.secondary:hover,.btn.secondary:hover{background:rgba(42,91,145,.56)!important}
-    button.good{background:linear-gradient(135deg,#23795f,#1b634f)!important;border-color:rgba(103,224,184,.16)}
-    button.warn{background:linear-gradient(135deg,#925d3a,#74472f)!important}
-    button.danger{background:linear-gradient(135deg,#963d56,#773043)!important;border-color:rgba(255,143,170,.16)}
-    button:disabled{opacity:.32;transform:none;box-shadow:none}
-
-    input,select,textarea{
-      min-height:34px;
-      padding:6px 9px;
-      border:1px solid var(--glass-border);
-      border-radius:10px;
-      background:rgba(4,24,47,.46)!important;
-      color:var(--text);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
-      backdrop-filter:blur(10px);
-      -webkit-backdrop-filter:blur(10px);
-      font-size:10px;
-      transition:border-color .15s ease,background .15s ease,box-shadow .15s ease;
-    }
-    input:hover,select:hover,textarea:hover{border-color:rgba(132,187,255,.25)}
-    input:focus,select:focus,textarea:focus{border-color:rgba(98,161,255,.68);background:rgba(7,32,61,.70)!important;box-shadow:var(--focus)}
-    input::placeholder,textarea::placeholder{color:rgba(155,183,218,.48)}
-
-    .panel{border-radius:18px;padding:11px}
-    .panel-title{margin-bottom:9px}.panel-title h2,.panel-title h3{font-size:14px;font-weight:820;letter-spacing:-.025em}.panel-title p{font-size:8px}
-    .compact-row{border-radius:11px;background:rgba(19,56,96,.32)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.025);transition:background .15s ease,border-color .15s ease}
-    .compact-row:hover{background:rgba(32,75,123,.44)!important;border-color:rgba(118,176,249,.22)!important}
-    .compact-row strong{font-size:10px}.compact-row small{font-size:7px}
-    .field-band{border-radius:12px;background:rgba(20,58,99,.28)!important}
-
-    .badge{
-      min-height:20px;
-      padding:3px 7px;
-      border:1px solid rgba(142,190,250,.10);
-      border-radius:999px;
-      background:rgba(49,91,139,.48);
-      color:#dcecff;
-      font-size:7px;
-      letter-spacing:.035em;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
-    }
-    .badge.primary{background:rgba(52,120,246,.78);border-color:rgba(114,166,255,.28)}
-    .badge.good{background:rgba(31,108,88,.78);border-color:rgba(100,217,181,.16)}
-    .badge.warn{background:rgba(129,81,58,.78);border-color:rgba(240,180,128,.15)}
-    .badge.danger{background:rgba(132,56,77,.80);border-color:rgba(246,136,164,.15)}
-
-    .kpis{gap:6px}.kpi{min-height:42px;border-radius:12px;background:rgba(23,62,105,.30)!important;padding:7px 9px}.kpi span{font-size:7px}.kpi strong{font-size:15px;font-weight:850;letter-spacing:-.03em}
-
-    .message{
-      top:9px;
-      padding:8px 12px;
-      border-color:var(--glass-border-strong);
-      border-radius:13px;
-      background:rgba(6,26,50,.84);
-      box-shadow:0 16px 40px rgba(0,8,22,.34),inset 0 1px 0 rgba(255,255,255,.08);
-      backdrop-filter:blur(20px) saturate(145%);
-      -webkit-backdrop-filter:blur(20px) saturate(145%);
-      font-size:10px;
-    }
-
-    /* LISTONE / TABLES */
-    .table-wrap{border-radius:14px;overflow:auto;background:rgba(6,27,51,.34)!important}
-    table{background:transparent}
-    th{
-      background:rgba(8,32,60,.90)!important;
-      border-bottom-color:rgba(115,173,244,.20)!important;
-      backdrop-filter:blur(14px);
-      -webkit-backdrop-filter:blur(14px);
-    }
-    th button{color:#9db9da;font-weight:800;letter-spacing:.02em}
-    td{border-bottom-color:rgba(115,173,244,.09)!important}
-    tbody tr{transition:background .12s ease}
-    tbody tr:hover{background:rgba(45,96,154,.22)!important}
-    tbody tr.selected-player{background:linear-gradient(90deg,rgba(52,120,246,.20),rgba(52,120,246,.06))!important;box-shadow:inset 3px 0 0 #4a8df7}
-    .rolebadge{border:1px solid rgba(255,255,255,.12);border-radius:7px;box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
-
-    /* LEAGUES / GENERIC CARDS */
-    .league-card,details.team-card{border-radius:16px!important;overflow:hidden}
-    details.team-card summary{background:rgba(25,62,104,.35)!important;border-bottom:1px solid transparent}
-    details.team-card[open] summary{border-bottom-color:var(--glass-border)}
-    .roster-player{border-color:rgba(132,184,246,.10)!important;background:rgba(12,45,80,.18)}
-
-    /* =====================================================
-       ASTA · GLASS COCKPIT
-       ===================================================== */
-    body.auction-live{
-      background:
-        radial-gradient(70rem 40rem at 54% -10%,rgba(52,120,246,.20),transparent 56%),
-        radial-gradient(42rem 35rem at 100% 70%,rgba(23,79,151,.16),transparent 60%),
-        linear-gradient(145deg,#030e1c,#061426 45%,#07182d);
-    }
-    body.auction-live .app{padding:6px;gap:6px}
-    .auction-root,.auction-live-shell,.auction-cockpit{border-radius:18px}
-    .auction-cockpit{gap:7px!important;padding:0!important;background:transparent!important}
-
-    .auction-statusbar{
-      min-height:42px;
-      padding:5px 8px;
-      border-radius:14px!important;
-      background:linear-gradient(115deg,rgba(15,49,89,.68),rgba(8,28,53,.55))!important;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 10px 26px rgba(0,7,18,.18);
-    }
-    .auction-status-title{font-weight:850;letter-spacing:-.025em}.auction-status-sub{color:#9db9da}
-    .auction-live-mark{border:1px solid rgba(87,222,174,.16);background:rgba(24,94,75,.34);border-radius:999px;padding:4px 7px}
-    .auction-live-dot{box-shadow:0 0 0 4px rgba(77,217,170,.10),0 0 13px rgba(77,217,170,.32)}
-    .auction-status-timer,.auction-mobile-timer{
-      border-color:rgba(103,165,255,.28)!important;
-      background:linear-gradient(145deg,rgba(41,102,184,.45),rgba(19,62,111,.42))!important;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 7px 20px rgba(19,78,162,.14)!important;
-      border-radius:11px!important;
-      font-variant-numeric:tabular-nums;
-    }
-
-    .auction-cockpit-stage,.auction-lower-stage,.auction-lower-main,.auction-middle-column{gap:7px!important}
-    .auction-player-hero,
-    .auction-action-card,
+    .app-head,
+    .panel,
+    details.team-card,
+    .auction-command-bar,
     .auction-team-card,
     .auction-team-roster,
-    .auction-bid-history,
-    .auction-free-fixed{
-      border-radius:16px!important;
-      overflow:hidden;
+    .auction-overview-card,
+    .auction-action-card,
+    .auction-player-hero,
+    .auction-free-fixed,
+    .auction-call-queue,
+    .auctioneer-console,
+    .tv-stage{
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.055),
+        0 14px 36px rgba(0,7,20,.20);
     }
 
-    .auction-player-hero{
-      background:
-        radial-gradient(circle at 12% 30%,rgba(61,133,246,.22),transparent 44%),
-        linear-gradient(145deg,rgba(17,56,100,.72),rgba(7,27,52,.58))!important;
-    }
-    .auction-player-kicker,.auction-command-label{color:#7398c3!important;letter-spacing:.08em}
-    .auction-player-name-live{font-weight:900;letter-spacing:-.055em;text-shadow:0 4px 18px rgba(0,0,0,.18)}
-    .auction-player-meta-live{color:#aac1dc!important}
-    .auction-current-offer{
-      border:1px solid rgba(114,170,250,.14)!important;
-      border-radius:13px!important;
-      background:rgba(7,32,61,.36)!important;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
-    }
-    .auction-current-offer strong{font-weight:950;letter-spacing:-.055em;color:#fff}
-    .auction-current-leader{color:#8eadd0!important}
-
-    .auction-command-bar{
-      padding:6px!important;
-      gap:6px!important;
-      border-radius:15px!important;
-      background:linear-gradient(135deg,rgba(14,47,86,.58),rgba(6,26,50,.46))!important;
-    }
-    .auction-command-cell{
-      border-color:rgba(136,187,249,.10)!important;
-      border-radius:10px!important;
-      background:rgba(11,39,72,.26)!important;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
-    }
-    .auction-command-cell strong{letter-spacing:-.025em}
-    .auction-caller-controls{border-radius:14px!important;padding:6px!important}
-    .auction-command-action.ok{background:linear-gradient(135deg,#2b8b69,#1d6d55)!important}
-    .auction-command-action.queue{background:linear-gradient(135deg,#3a7fe7,#275fc4)!important}
-
-    .quick-grid,.auction-status-quick,.auction-mobile-quick{gap:5px!important}
-    .quick-btn{
-      border:1px solid rgba(119,174,245,.12)!important;
-      border-radius:10px!important;
-      background:rgba(24,65,110,.38)!important;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.055)!important;
-    }
-    .quick-btn:hover{background:rgba(37,84,137,.54)!important}
-    .quick-btn.selected{
-      border-color:rgba(111,172,255,.55)!important;
-      background:linear-gradient(145deg,rgba(52,120,246,.84),rgba(38,93,198,.78))!important;
-      box-shadow:0 0 0 2px rgba(52,120,246,.14),inset 0 1px 0 rgba(255,255,255,.17)!important;
-    }
-    .auction-bid-confirm,.auction-command-bid-confirm,.auction-mobile-confirm{background:linear-gradient(135deg,#3b82f6,#265fc9)!important;border-radius:12px!important;box-shadow:0 10px 24px rgba(31,91,197,.22),inset 0 1px 0 rgba(255,255,255,.17)!important}
-
-    .auction-team-card,.auction-team-roster{background:linear-gradient(145deg,rgba(16,48,86,.60),rgba(7,28,52,.46))!important}
-    .auction-team-big-kpi,.auction-team-mini-kpi{
-      border-color:rgba(133,185,248,.10)!important;
-      background:rgba(15,50,88,.30)!important;
-      border-radius:11px!important;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
-    }
-    .auction-team-big-kpi strong{letter-spacing:-.045em}
-    .auction-team-roster-list{scrollbar-gutter:stable}
-    .auction-roster-line{
-      border-color:rgba(130,182,245,.08)!important;
-      background:rgba(13,42,75,.18)!important;
-      border-radius:8px!important;
-      transition:background .12s ease,border-color .12s ease;
-    }
-    .auction-roster-line:hover{background:rgba(30,70,116,.28)!important;border-color:rgba(130,182,245,.15)!important}
-    .auction-roster-line.is-queued{border-style:dashed!important;background:rgba(37,91,158,.18)!important}
-    .auction-roster-line.is-empty{opacity:.46;background:transparent!important;border-style:dashed!important}
-
-    .auction-bid-history{background:linear-gradient(145deg,rgba(14,45,80,.48),rgba(6,27,51,.36))!important}
-    .auction-bid-chip{
-      border:1px solid rgba(132,184,246,.09)!important;
-      border-radius:9px!important;
-      background:rgba(21,58,99,.26)!important;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
-    }
-    .auction-bid-chip strong{color:#dcebff}
-    .auction-vice-strip{border-color:rgba(135,185,245,.11)!important;border-radius:12px!important;background:rgba(20,59,101,.27)!important}
-
-    /* fixed free agents */
-    .auction-free-fixed{
-      border:1px solid var(--glass-border)!important;
-      background:linear-gradient(155deg,rgba(15,49,88,.62),rgba(6,27,51,.48))!important;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 14px 34px rgba(0,8,22,.18)!important;
-    }
-    .auction-free-fixed-head{padding:7px 9px!important;border-bottom:1px solid rgba(131,184,247,.10)!important;background:rgba(21,60,103,.20)!important}
-    .auction-free-fixed-head strong{font-weight:850;letter-spacing:-.02em}
-    .auction-free-fixed .drawer-filters{padding:6px!important;border-bottom:1px solid rgba(131,184,247,.08)!important;background:rgba(7,32,60,.16)!important}
-    .auction-free-fixed .drawer-table{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
-    .auction-free-fixed th{background:rgba(7,31,58,.90)!important}
-    .auction-free-fixed td{border-bottom-color:rgba(126,179,241,.075)!important}
-    .auction-queue-add{border-radius:8px!important;background:rgba(47,108,183,.58)!important;border-color:rgba(119,179,249,.24)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.10)!important}
-    .auction-queue-added{border-radius:999px!important;background:rgba(31,108,88,.75)!important}
-
-    /* queue drawer */
-    .auction-call-queue-drawer{
-      border-radius:14px!important;
-      background:linear-gradient(145deg,rgba(15,48,86,.72),rgba(7,26,50,.62))!important;
-      box-shadow:0 14px 34px rgba(0,8,22,.20),inset 0 1px 0 rgba(255,255,255,.07)!important;
-    }
-    .auction-call-queue-drawer>summary{
-      background:rgba(39,91,150,.48)!important;
-      border-color:rgba(136,188,250,.13)!important;
-      font-weight:850;
-      letter-spacing:.04em;
-    }
-    .auction-call-queue-row{border-color:rgba(131,184,247,.09)!important;border-radius:9px!important;background:rgba(15,48,84,.24)!important}
-    .auction-queue-handle{color:#7698bd!important}
-
-    /* drawers / banditore */
-    .auctioneer-console-drawer,
-    .auction-rosters-drawer,
-    .auction-awards-drawer{
-      border-radius:14px!important;
-      border-color:var(--glass-border)!important;
-      background:rgba(7,27,52,.70)!important;
-      box-shadow:0 15px 36px rgba(0,8,22,.22),inset 0 1px 0 rgba(255,255,255,.055)!important;
-    }
-    .auctioneer-console-drawer>summary,
-    .auction-rosters-drawer>summary,
-    .auction-awards-drawer>summary{
-      border-color:rgba(135,187,250,.13)!important;
-      background:linear-gradient(100deg,rgba(40,91,151,.62),rgba(24,67,119,.42))!important;
-      color:#edf6ff!important;
-    }
-    .auctioneer-console-drawer>.auctioneer-console{background:rgba(5,25,48,.34)!important}
-    .auctioneer-console{border-color:transparent!important;background:transparent!important;box-shadow:none!important}
-    .auctioneer-manual-award{border-color:rgba(132,185,248,.10)!important}
-    .auctioneer-search-result{background:rgba(20,60,102,.66)!important;border-color:rgba(132,185,248,.13)!important}
-    .auctioneer-search-result:hover{background:rgba(36,82,136,.78)!important}
-    .auction-rosters-team{border-color:rgba(132,185,248,.10)!important;border-radius:12px!important;background:rgba(14,45,79,.25)!important}
-    .auction-rosters-player{border-color:rgba(132,185,248,.075)!important;background:rgba(8,35,64,.18)!important}
-    .auction-award-row{border-color:rgba(132,185,248,.08)!important;border-radius:10px!important;background:rgba(13,44,78,.22)!important}
-    .auction-transfer-modal{background:rgba(0,10,23,.58)!important;backdrop-filter:blur(12px) saturate(125%)!important;-webkit-backdrop-filter:blur(12px) saturate(125%)!important}
-    .auction-transfer-card{border-radius:18px!important;background:linear-gradient(145deg,rgba(15,49,88,.92),rgba(6,27,52,.90))!important;box-shadow:0 24px 70px rgba(0,5,16,.48),inset 0 1px 0 rgba(255,255,255,.09)!important}
-
-    /* mobile president console */
-    .auction-mobile-console{padding:8px!important;gap:8px!important;background:transparent!important}
-    .auction-mobile-console-top{border-radius:15px!important;padding:8px 10px!important}
-    .auction-mobile-main{border-radius:18px!important;background:radial-gradient(circle at 50% 8%,rgba(59,130,246,.20),transparent 46%),linear-gradient(150deg,rgba(17,55,98,.68),rgba(5,24,47,.58))!important}
-    .auction-mobile-player{font-weight:950;letter-spacing:-.055em}
-    .auction-mobile-bid-stat{border-color:rgba(132,185,248,.11)!important;border-radius:12px!important;background:rgba(7,32,60,.34)!important}
-
-    /* responsive global */
-    @media(max-width:900px){
-      :root{--gap:6px}
-      .app{padding:6px;gap:6px}
-      .panel{padding:9px;border-radius:15px}
-      .home-layout,.manage-layout{gap:6px}
-      .auction-lower-main{gap:6px!important}
-      .auction-player-hero,.auction-action-card,.auction-team-card,.auction-team-roster,.auction-bid-history,.auction-free-fixed{border-radius:14px!important}
+    .main-nav{
+      background:rgba(6,26,50,.28);
+      border-color:rgba(148,198,255,.10);
+      -webkit-backdrop-filter:blur(16px);
+      backdrop-filter:blur(16px);
     }
 
-    @media(max-width:720px){
-      :root{--header-h:48px;--nav-h:42px}
-      .app{padding:5px}
-      .app-head{border-radius:14px;padding:6px 8px}
-      .brand{font-size:13px}.league-pill{padding:4px 7px}.league-pill strong{max-width:34vw}
-      .main-nav{border-radius:13px;padding:3px}
-      .nav-btn{min-height:34px;min-width:59px;border-radius:9px;font-size:9px}
-      .panel{border-radius:14px;padding:8px}
-      button,.btn,input,select,textarea{border-radius:9px}
-      .grid-2,.grid-3,.setup-layout{grid-template-columns:1fr}
-      .setup-layout .full{grid-column:auto}
-      .home-layout,.manage-layout{grid-template-columns:1fr;height:auto;min-height:100%}
-      .rosters-grid{grid-template-columns:1fr}
-      .filters{grid-template-columns:minmax(0,1fr) minmax(90px,.6fr);gap:5px}
-      .filters>*:nth-child(n+3){grid-column:auto}
-      .player-table{min-width:690px}
-      body.auction-live .app{padding:4px}
+    .nav-btn{
+      background:rgba(20,55,96,.42)!important;
+      color:var(--soft)!important;
+      border-color:rgba(145,195,255,.11)!important;
+      box-shadow:none;
     }
 
-    @media(max-width:560px){
-      .user-label{display:none}
-      .head-actions{gap:3px}.head-actions button{padding-inline:8px}
-      .league-pill small{display:none}
-      .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
-      .filters{grid-template-columns:1fr 1fr}
-      .rolebar{grid-column:1/-1}
-      .auction-statusbar{border-radius:12px!important}
-      .auction-free-fixed{border-radius:12px!important}
-      .auctioneer-console-drawer,.auction-rosters-drawer,.auction-awards-drawer,.auction-call-queue-drawer{border-radius:12px!important}
+    .nav-btn:hover{
+      background:rgba(34,83,142,.52)!important;
+      color:var(--text)!important;
+      border-color:rgba(140,195,255,.22)!important;
     }
 
-    @media(prefers-reduced-motion:reduce){
-      *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+    .nav-btn.active,
+    .main-nav .nav-btn[aria-current="page"]{
+      background:linear-gradient(135deg,#3478f6,#2462d4)!important;
+      color:#fff!important;
+      border-color:rgba(121,178,255,.58)!important;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.18),
+        0 7px 18px rgba(23,79,177,.24);
+    }
+
+    button,
+    .btn{
+      background:linear-gradient(135deg,#3a80fb,#2b69df);
+      border-color:rgba(148,197,255,.18);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.13),
+        0 5px 13px rgba(8,44,103,.20);
+      transition:filter .14s ease,border-color .14s ease,box-shadow .14s ease,opacity .14s ease;
+    }
+
+    button:hover,
+    .btn:hover{
+      filter:brightness(1.08);
+      border-color:rgba(167,211,255,.32);
+    }
+
+    button.secondary,
+    .btn.secondary{
+      background:rgba(24,67,114,.50)!important;
+      color:var(--text)!important;
+      border-color:rgba(143,195,255,.18)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+    }
+
+    button.good,
+    .btn.good{
+      background:linear-gradient(135deg,#238c70,#176b59)!important;
+    }
+
+    button.warn,
+    .btn.warn{
+      background:linear-gradient(135deg,#9b653a,#754729)!important;
+    }
+
+    button.danger,
+    .btn.danger{
+      background:linear-gradient(135deg,#a94a63,#7f3348)!important;
+    }
+
+    input,
+    select,
+    textarea{
+      background:rgba(5,27,52,.58)!important;
+      color:var(--text)!important;
+      border-color:rgba(135,188,247,.18)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
+      -webkit-backdrop-filter:blur(12px);
+      backdrop-filter:blur(12px);
+    }
+
+    input:hover,
+    select:hover,
+    textarea:hover{
+      border-color:rgba(136,193,255,.28)!important;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus{
+      border-color:#65a6ff!important;
+      box-shadow:0 0 0 3px rgba(52,120,246,.15),inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    input::placeholder,
+    textarea::placeholder{
+      color:#718eaf;
+    }
+
+    .badge{
+      background:rgba(38,84,138,.50);
+      border:1px solid rgba(148,200,255,.13);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.045);
+    }
+
+    .badge.primary{
+      background:linear-gradient(135deg,#3478f6,#2869df)!important;
+      border-color:rgba(139,193,255,.24)!important;
+    }
+
+    .badge.good{
+      background:rgba(29,118,91,.58)!important;
+      border-color:rgba(111,236,190,.15)!important;
+    }
+
+    .badge.warn{
+      background:rgba(139,88,49,.58)!important;
+      border-color:rgba(255,194,126,.16)!important;
+    }
+
+    .badge.danger{
+      background:rgba(143,54,77,.60)!important;
+      border-color:rgba(255,141,166,.17)!important;
+    }
+
+    .kpi,
+    .compact-row,
+    .field-band,
+    .roster-player,
+    .order-row,
+    .auction-roster-line,
+    .auction-bid-chip,
+    .auction-call-queue-row,
+    .auction-team-mini-kpi,
+    .auction-team-big-kpi,
+    .auction-status-team-kpis > span{
+      background:rgba(18,55,96,.34)!important;
+      border-color:rgba(139,191,249,.12)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+    }
+
+    .compact-row:hover,
+    .roster-player:hover,
+    .auction-roster-line:hover,
+    .auction-call-queue-row:hover{
+      background:rgba(29,75,126,.44)!important;
+      border-color:rgba(143,198,255,.20)!important;
+    }
+
+    th{
+      background:rgba(7,35,66,.88)!important;
+      color:#b8cbe1!important;
+      border-bottom-color:rgba(130,184,246,.20)!important;
+      -webkit-backdrop-filter:blur(14px);
+      backdrop-filter:blur(14px);
+    }
+
+    th button{
+      color:#9eb9d7!important;
+      background:transparent!important;
+      box-shadow:none!important;
+    }
+
+    td{
+      border-bottom-color:rgba(92,142,198,.13)!important;
+    }
+
+    tbody tr:hover{
+      background:rgba(38,91,151,.18)!important;
+    }
+
+    tbody tr.selected-player{
+      background:rgba(52,120,246,.15)!important;
+      box-shadow:inset 3px 0 0 #5795ff;
+    }
+
+    details.team-card summary,
+    .auction-free-fixed-head,
+    .auction-call-queue-head,
+    .auction-team-roster-head,
+    .auction-overview-head,
+    .auction-bid-history-title,
+    .auctioneer-console-drawer > summary,
+    .auction-rosters-drawer > summary,
+    .auction-awards-drawer > summary{
+      background:rgba(21,59,101,.36)!important;
+      border-color:rgba(138,190,248,.12)!important;
+      -webkit-backdrop-filter:blur(14px);
+      backdrop-filter:blur(14px);
+    }
+
+    .auction-statusbar{
+      background:linear-gradient(145deg,rgba(11,39,72,.78),rgba(7,27,52,.70))!important;
+      border-color:rgba(146,197,255,.17)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 12px 28px rgba(0,7,20,.17);
+      -webkit-backdrop-filter:blur(18px) saturate(130%);
+      backdrop-filter:blur(18px) saturate(130%);
+    }
+
+    .auction-live-mark{
+      background:rgba(24,111,83,.40)!important;
+      border-color:rgba(104,235,181,.17)!important;
+      color:#caffeb!important;
+    }
+
+    .auction-live-dot{
+      box-shadow:0 0 0 4px rgba(53,219,151,.10),0 0 16px rgba(53,219,151,.34);
+    }
+
+    .auction-status-timer,
+    .auction-command-timer{
+      background:rgba(5,27,52,.46)!important;
+      border-color:rgba(137,189,248,.14)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
+    }
+
+    .auction-command-player strong,
+    .auction-player-name-live,
+    .auction-mobile-player{
+      text-shadow:0 6px 22px rgba(0,8,22,.28);
+    }
+
+    .auction-current-offer,
+    .auction-command-offer,
+    .auction-mobile-bid-stat{
+      background:linear-gradient(145deg,rgba(34,81,139,.34),rgba(6,30,58,.36))!important;
+    }
+
+    .auction-queue-add,
+    .auction-command-action.queue{
+      background:rgba(32,78,132,.48)!important;
+      border-color:rgba(135,193,255,.20)!important;
+    }
+
+    .auction-command-action.ok,
+    .auction-queue-added{
+      background:rgba(31,124,95,.55)!important;
+      border-color:rgba(106,232,183,.18)!important;
+      color:#d2fff0!important;
+    }
+
+    .auctioneer-console{
+      background:linear-gradient(145deg,rgba(18,47,84,.76),rgba(7,27,51,.72))!important;
+    }
+
+    .message{
+      background:rgba(5,26,50,.88)!important;
+      border-color:rgba(135,190,253,.26)!important;
+      box-shadow:0 18px 48px rgba(0,6,18,.32),inset 0 1px 0 rgba(255,255,255,.06);
+      -webkit-backdrop-filter:blur(20px) saturate(135%);
+      backdrop-filter:blur(20px) saturate(135%);
+    }
+
+    .positive{color:#72e5b1!important}
+    .negative{color:#ff92a8!important}
+
+    .rolebadge,
+    .rolebtn,
+    .auction-role-summary{
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.10);
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      *,*::before,*::after{
+        scroll-behavior:auto!important;
+        transition-duration:.001ms!important;
+        animation-duration:.001ms!important;
+        animation-iteration-count:1!important;
+      }
     }
 
   </style>
