@@ -1,5 +1,35 @@
 <!doctype html>
 <html lang="it">
+<!--
+  ============================================================
+  FANTACALCIO LIVE - HOME MONOLITICA
+  ============================================================
+
+  File applicativo canonico.
+
+  Hash routes:
+    home.html#/leagues
+    home.html#/home
+    home.html#/manage
+    home.html#/setup
+    home.html#/list
+    home.html#/rosters
+    home.html#/auction
+    home.html#/tv
+
+  Questo file contiene:
+    - shell HTML
+    - tutte le view
+    - CSS
+    - stato
+    - API client
+    - hash router
+    - feature modules
+    - polling live
+
+  index.html resta esclusivamente il login.
+  ============================================================
+-->
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -3534,6 +3564,23 @@
       }
     }
 
+
+    /* =====================================================
+       HASH ROUTER / NAV
+       ===================================================== */
+
+    .main-nav .nav-btn{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+    }
+
+    .main-nav .nav-btn[aria-current="page"]{
+      background:var(--primary);
+      border-color:var(--primary);
+    }
+
   </style>
 </head>
 <body>
@@ -3557,14 +3604,14 @@
       </div>
     </header>
 
-    <nav id="main-nav" class="main-nav" hidden>
-      <button class="nav-btn active" data-view="home" type="button">Home</button>
-      <button class="nav-btn" data-view="manage" type="button">Membri</button>
-      <button id="nav-setup" class="nav-btn" data-view="setup" type="button">Setup</button>
-      <button class="nav-btn" data-view="list" type="button">Listone</button>
-      <button class="nav-btn" data-view="rosters" type="button">Rose</button>
-      <button class="nav-btn" data-view="auction" type="button">Asta</button>
-      <button id="nav-tv" class="nav-btn" data-view="tv" type="button">TV</button>
+    <nav id="main-nav" class="main-nav" hidden aria-label="Navigazione lega">
+      <a class="nav-btn active" data-view="home" href="#/home">Home</a>
+      <a class="nav-btn" data-view="manage" href="#/manage">Membri</a>
+      <a id="nav-setup" class="nav-btn" data-view="setup" href="#/setup">Setup</a>
+      <a class="nav-btn" data-view="list" href="#/list">Listone</a>
+      <a class="nav-btn" data-view="rosters" href="#/rosters">Rose</a>
+      <a class="nav-btn" data-view="auction" href="#/auction">Asta</a>
+      <a id="nav-tv" class="nav-btn" data-view="tv" href="#/tv">TV</a>
     </nav>
 
     <main class="workspace">
@@ -3877,7 +3924,11 @@
     const state = {
       session: null,
       selectedLeague: null,
+
+      route: 'leagues',
       view: 'leagues',
+      routeReady: false,
+
       dashboard: null,
       management: null,
       setup: null,
@@ -4024,42 +4075,283 @@
     }
 
     /* =====================================================
-       NAVIGAZIONE / LEGA
+       ROUTER HASH / LEGA
        ===================================================== */
 
-    function updateHeader() {
-      const league = state.selectedLeague;
-      $('league-pill').hidden = !league;
-      $('main-nav').hidden = !league;
+    const ROUTES = Object.freeze({
+      leagues: { id: 'leagues', hash: '#/leagues', leagueRequired: false },
+      home: { id: 'home', hash: '#/home', leagueRequired: true },
+      manage: { id: 'manage', hash: '#/manage', leagueRequired: true },
+      setup: { id: 'setup', hash: '#/setup', leagueRequired: true },
+      list: { id: 'list', hash: '#/list', leagueRequired: true },
+      rosters: { id: 'rosters', hash: '#/rosters', leagueRequired: true },
+      auction: { id: 'auction', hash: '#/auction', leagueRequired: true },
+      tv: { id: 'tv', hash: '#/tv', leagueRequired: true }
+    });
 
-      if (league) {
-        $('league-pill-name').textContent = league.name || 'Lega';
-        $('league-pill-code').textContent = league.code || '';
+
+    function normalizeRouteName(value) {
+      const route =
+        String(value || '')
+          .trim()
+          .toLowerCase();
+
+      return ROUTES[route]
+        ? route
+        : null;
+    }
+
+
+    function routeFromHash(hash = window.location.hash) {
+      const raw =
+        String(hash || '')
+          .replace(/^#\/?/, '')
+          .split('?')[0]
+          .split('&')[0]
+          .trim();
+
+      return normalizeRouteName(raw);
+    }
+
+
+    function defaultRoute() {
+      return state.selectedLeague?.id
+        ? 'home'
+        : 'leagues';
+    }
+
+
+    function resolveRoute(route) {
+      const normalized =
+        normalizeRouteName(route)
+        ||
+        defaultRoute();
+
+      if (
+        ROUTES[normalized].leagueRequired
+        &&
+        !state.selectedLeague?.id
+      ) {
+        return 'leagues';
       }
 
-      const username = state.dashboard?.currentUser?.username;
-      $('user-label').textContent = username || '';
-
-      const permissions = state.dashboard?.permissions || state.auction?.permissions || {};
-      $('nav-setup').hidden = !(permissions.isLeagueAdmin || permissions.isSuperAdmin);
-      $('nav-tv').hidden = !(permissions.isPresenter || permissions.isLeagueAdmin || permissions.isAuctioneer || permissions.isSuperAdmin);
+      return normalized;
     }
 
-    function switchView(view, { load = true } = {}) {
-      state.view = view;
 
-      document.querySelectorAll('.view').forEach(section => {
-        section.classList.toggle('active', section.id === `view-${view}`);
-      });
+    function updateHeader() {
+      const league =
+        state.selectedLeague;
 
-      document.querySelectorAll('.nav-btn').forEach(button => {
-        button.classList.toggle('active', button.dataset.view === view);
-      });
+      $('league-pill').hidden =
+        !league;
 
-      document.body.classList.remove('auction-live');
+      $('main-nav').hidden =
+        !league
+        ||
+        state.view === 'leagues';
 
-      if (load) loadCurrentView(true);
+      if (league) {
+        $('league-pill-name').textContent =
+          league.name || 'Lega';
+
+        $('league-pill-code').textContent =
+          league.code || '';
+      }
+
+      const username =
+        state.dashboard?.currentUser?.username;
+
+      $('user-label').textContent =
+        username || '';
+
+      const permissions =
+        state.dashboard?.permissions
+        ||
+        state.auction?.permissions
+        ||
+        {};
+
+      $('nav-setup').hidden =
+        !(
+          permissions.isLeagueAdmin
+          ||
+          permissions.isSuperAdmin
+        );
+
+      $('nav-tv').hidden =
+        !(
+          permissions.isPresenter
+          ||
+          permissions.isLeagueAdmin
+          ||
+          permissions.isAuctioneer
+          ||
+          permissions.isSuperAdmin
+        );
     }
+
+
+    async function activateRoute(
+      requestedRoute,
+      { load = true } = {}
+    ) {
+      const route =
+        resolveRoute(requestedRoute);
+
+      state.route =
+        route;
+
+      state.view =
+        route;
+
+      document
+        .querySelectorAll('.view')
+        .forEach(section => {
+          section.classList.toggle(
+            'active',
+            section.id === `view-${route}`
+          );
+        });
+
+      document
+        .querySelectorAll('.nav-btn')
+        .forEach(link => {
+          const active =
+            link.dataset.view === route;
+
+          link.classList.toggle(
+            'active',
+            active
+          );
+
+          if (active) {
+            link.setAttribute(
+              'aria-current',
+              'page'
+            );
+          } else {
+            link.removeAttribute(
+              'aria-current'
+            );
+          }
+        });
+
+      document.body
+        .classList
+        .remove('auction-live');
+
+      updateHeader();
+
+      if (load) {
+        await loadCurrentView(true);
+      }
+    }
+
+
+    let pendingHashLoad =
+      null;
+
+
+    function switchView(
+      requestedRoute,
+      {
+        load = true,
+        replace = false
+      } = {}
+    ) {
+      const route =
+        resolveRoute(requestedRoute);
+
+      const nextHash =
+        ROUTES[route].hash;
+
+      if (
+        window.location.hash === nextHash
+      ) {
+        return activateRoute(
+          route,
+          { load }
+        );
+      }
+
+      if (replace) {
+        history.replaceState(
+          null,
+          '',
+          nextHash
+        );
+
+        return activateRoute(
+          route,
+          { load }
+        );
+      }
+
+      pendingHashLoad =
+        load;
+
+      window.location.hash =
+        nextHash;
+
+      return Promise.resolve();
+    }
+
+
+    async function syncRouteFromHash() {
+      const route =
+        resolveRoute(
+          routeFromHash()
+        );
+
+      const expectedHash =
+        ROUTES[route].hash;
+
+      if (
+        window.location.hash !== expectedHash
+      ) {
+        history.replaceState(
+          null,
+          '',
+          expectedHash
+        );
+      }
+
+      const load =
+        pendingHashLoad === null
+          ? true
+          : pendingHashLoad;
+
+      pendingHashLoad =
+        null;
+
+      await activateRoute(
+        route,
+        { load }
+      );
+    }
+
+
+    window.addEventListener(
+      'hashchange',
+      () => {
+        syncRouteFromHash()
+          .catch(error => {
+            console.error(
+              'ROUTER:',
+              error
+            );
+
+            msg(
+              error.message
+              ||
+              'Errore di navigazione.',
+              'error'
+            );
+          });
+      }
+    );
+
 
     function selectLeague(league) {
       state.selectedLeague = {
@@ -4068,25 +4360,62 @@
         code: league.code
       };
 
-      setLocalJson('fantacalcio_selected_league', state.selectedLeague);
+      setLocalJson(
+        'fantacalcio_selected_league',
+        state.selectedLeague
+      );
+
       state.dashboard = null;
       state.management = null;
       state.setup = null;
       state.list = null;
       state.rosters = null;
       state.auction = null;
+
       updateHeader();
+
       switchView('home');
     }
 
-    $('league-switch-btn').addEventListener('click', () => switchView('leagues'));
-    $('reload-btn').addEventListener('click', () => loadCurrentView(true));
-    $('exit-btn').addEventListener('click', () => { window.location.href = 'index.html'; });
-    $('auction-back-live').addEventListener('click', () => switchView('home'));
 
-    document.querySelectorAll('.nav-btn').forEach(button => {
-      button.addEventListener('click', () => switchView(button.dataset.view));
-    });
+    $('league-switch-btn')
+      .addEventListener(
+        'click',
+        () =>
+          switchView('leagues')
+      );
+
+
+    $('reload-btn')
+      .addEventListener(
+        'click',
+        () =>
+          loadCurrentView(true)
+      );
+
+
+    $('exit-btn')
+      .addEventListener(
+        'click',
+        () => {
+          window.location.href =
+            'index.html';
+        }
+      );
+
+
+    $('auction-back-live')
+      .addEventListener(
+        'click',
+        () =>
+          switchView('home')
+      );
+
+
+    /*
+     * La main-nav usa direttamente href="#/route".
+     * Back/forward del browser funzionano tramite hashchange.
+     */
 
     /* =====================================================
        LEGHE / ONBOARDING
@@ -5747,9 +6076,7 @@
         ||
         !auctionCallMode()
         ||
-        !state.auction
-          ?.permissions
-          ?.isPresident
+        !auctionHasPresidentRole()
         ||
         auctionUseMobilePresidentConsole()
       ) {
@@ -8143,18 +8470,14 @@
       const canCall =
         !hasPlayer
         &&
-        d.permissions
-          ?.isPresident
-        === true
+        auctionHasPresidentRole()
         &&
         auctionOwnCallTurn();
 
       const canPresidentBid =
         hasPlayer
         &&
-        d.permissions
-          ?.isPresident
-        === true;
+        auctionHasPresidentRole();
 
       const canSelectBid =
         hasPlayer
@@ -10364,9 +10687,7 @@
       const queueAction =
         queuedIndex >= 0
         &&
-        state.auction
-          ?.permissions
-          ?.isPresident
+        auctionHasPresidentRole()
           ? `
               <span
                 class="auction-queue-added"
@@ -11090,7 +11411,7 @@
             &&
             auctionDualModeEnabled()
             &&
-            state.auction?.permissions?.isPresident
+            auctionHasPresidentRole()
           ) {
             renderAuctionLive();
           }
@@ -11099,33 +11420,123 @@
     );
 
     /* =====================================================
-       START
+       BOOT / START
        ===================================================== */
 
-    async function start(){
-      state.session=getLocalJson('fantacalcio_session');
-      if(!state.session?.token){window.location.href='index.html';return}
+    async function start() {
+      state.session =
+        getLocalJson(
+          'fantacalcio_session'
+        );
 
-      state.selectedLeague=getLocalJson('fantacalcio_selected_league');
-      updateHeader();
+      if (!state.session?.token) {
+        window.location.href =
+          'index.html';
 
-      if(state.selectedLeague?.id){
-        switchView('home',{load:false});
-        try{await loadDashboard()}catch(error){
-          console.error(error);
-          state.selectedLeague=null;
-          localStorage.removeItem('fantacalcio_selected_league');
-          updateHeader();
-          switchView('leagues',{load:false});
-          await loadLeagues();
-        }
-      }else{
-        switchView('leagues',{load:false});
-        await loadLeagues();
+        return;
       }
+
+      state.selectedLeague =
+        getLocalJson(
+          'fantacalcio_selected_league'
+        );
+
+      let requestedRoute =
+        routeFromHash()
+        ||
+        defaultRoute();
+
+      if (!state.selectedLeague?.id) {
+        await switchView(
+          'leagues',
+          {
+            load: false,
+            replace: true
+          }
+        );
+
+        await loadLeagues();
+
+        state.routeReady =
+          true;
+
+        return;
+      }
+
+      /*
+       * Valida la lega salvata e carica subito permessi/ruoli.
+       * È importante anche per utenti con ruoli cumulati,
+       * ad esempio Admin + Presidente.
+       */
+      try {
+        await loadDashboard();
+
+      } catch (error) {
+        console.error(
+          'LEAGUE RESTORE:',
+          error
+        );
+
+        state.selectedLeague =
+          null;
+
+        localStorage.removeItem(
+          'fantacalcio_selected_league'
+        );
+
+        updateHeader();
+
+        await switchView(
+          'leagues',
+          {
+            load: false,
+            replace: true
+          }
+        );
+
+        await loadLeagues();
+
+        state.routeReady =
+          true;
+
+        return;
+      }
+
+      requestedRoute =
+        resolveRoute(
+          requestedRoute
+        );
+
+      await switchView(
+        requestedRoute,
+        {
+          load:
+            requestedRoute !== 'home',
+
+          replace:
+            !routeFromHash()
+        }
+      );
+
+      state.routeReady =
+        true;
     }
 
-    start();
+
+    start()
+      .catch(error => {
+        console.error(
+          'START:',
+          error
+        );
+
+        msg(
+          error.message
+          ||
+          'Impossibile avviare la webapp.',
+          'error'
+        );
+      });
   </script>
 </body>
 </html>
