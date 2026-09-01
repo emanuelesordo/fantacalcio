@@ -4454,6 +4454,222 @@
       .auction-command-base{grid-column:1!important}
       .auction-command-action-wrap{grid-column:2!important}
     }
+
+    /* V14: rosa | chiamata | svincolati, tre colonne verticali. */
+    .auction-lower-main{
+      grid-template-columns:
+        minmax(340px,.78fr)
+        minmax(285px,.62fr)
+        minmax(520px,1.38fr)
+        auto!important;
+      align-items:stretch;
+    }
+
+    .auction-lower-main>.auction-team-column{
+      grid-template-columns:minmax(0,1fr)!important;
+      grid-template-rows:auto minmax(0,1fr)!important;
+    }
+
+    .auction-team-card{
+      padding:6px!important;
+    }
+
+    .auction-team-card-head{
+      margin-bottom:4px!important;
+    }
+
+    .auction-team-primary-kpis{
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      margin-bottom:3px;
+    }
+
+    .auction-team-big-kpi{
+      min-height:43px;
+      padding:4px 6px;
+    }
+
+    .auction-team-big-kpi strong{
+      font-size:20px;
+    }
+
+    .auction-team-mini-kpi{
+      min-height:26px;
+      padding:3px 4px;
+    }
+
+    .auction-role-strip{
+      margin-top:3px;
+    }
+
+    .auction-role-strip .badge{
+      padding:2px 5px;
+      font-size:7px;
+    }
+
+    .auction-team-roster-list{
+      padding:3px;
+      gap:1px;
+      overflow:hidden!important;
+      grid-template-rows:repeat(32,minmax(0,1fr));
+    }
+
+    .auction-roster-line{
+      min-height:0!important;
+      height:auto;
+      padding:1px 4px;
+      gap:3px;
+      border-radius:4px;
+    }
+
+    .auction-roster-player-main{
+      min-width:0;
+      display:flex;
+      align-items:center;
+      gap:4px;
+    }
+
+    .auction-roster-player-main>strong{
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-size:8px;
+    }
+
+    .auction-roster-mini-roles{
+      flex:0 0 auto;
+      display:flex;
+      gap:1px;
+    }
+
+    .auction-roster-mini-roles .rolebadge{
+      min-width:17px;
+      min-height:14px;
+      padding:1px 3px;
+      border-radius:4px;
+      font-size:6px;
+    }
+
+    .auction-roster-price{
+      min-width:24px;
+      padding:1px 4px;
+      border-radius:4px;
+      background:var(--primary);
+      color:#fff;
+      text-align:center;
+      font-size:7px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+
+    .auction-roster-line.is-queued{
+      opacity:.43;
+      border-style:dashed;
+      background:#17314d;
+    }
+
+    .auction-roster-price.queued{
+      background:#5f7894;
+    }
+
+    .auction-middle-column{
+      grid-template-rows:auto auto minmax(0,1fr)!important;
+    }
+
+    .auction-middle-column .auction-command-bar{
+      min-height:0!important;
+      grid-template-columns:64px minmax(0,1fr)!important;
+      grid-template-rows:auto auto;
+      align-content:start;
+    }
+
+    .auction-middle-column .auction-command-timer{
+      grid-column:1;
+      grid-row:1;
+    }
+
+    .auction-middle-column .auction-command-player{
+      grid-column:2;
+      grid-row:1;
+    }
+
+    .auction-middle-column .auction-command-offer{
+      grid-column:1 / -1;
+      grid-row:2;
+      min-height:70px;
+    }
+
+    .auction-middle-column .auction-command-player strong{
+      font-size:clamp(19px,2vw,30px)!important;
+    }
+
+    .auction-free-fixed{
+      grid-template-rows:auto auto auto minmax(0,1fr)!important;
+    }
+
+    .auction-caller-controls{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 66px 84px;
+      gap:4px;
+      padding:5px 7px;
+      border-bottom:1px solid var(--line);
+      background:rgba(9,31,55,.82);
+    }
+
+    .auction-caller-controls label{
+      min-width:0;
+    }
+
+    .auction-caller-controls input,
+    .auction-caller-controls .auction-command-action{
+      min-height:34px;
+      height:34px;
+    }
+
+    .auction-free-fixed .rolebar{
+      gap:2px;
+      padding:3px 6px 0;
+    }
+
+    .auction-free-fixed .rolebtn{
+      min-width:27px;
+      min-height:25px;
+      padding:2px 5px;
+      font-size:8px;
+    }
+
+    .auction-free-fixed .drawer-filters{
+      gap:3px;
+      padding:0 6px 4px;
+    }
+
+    .auction-free-fixed .drawer-filters label{
+      font-size:7px;
+    }
+
+    .auction-free-fixed .drawer-filters select{
+      min-height:29px;
+      padding:3px 5px;
+    }
+
+    @media(max-width:1450px){
+      .auction-lower-main{
+        grid-template-columns:minmax(310px,.72fr) minmax(250px,.58fr) minmax(450px,1.3fr) auto!important;
+      }
+      .auction-status-quick-label{display:none}
+      .auction-status-quick{
+        grid-template-columns:repeat(5,minmax(36px,1fr)) minmax(90px,1.35fr);
+      }
+    }
+
+    @media(max-width:1100px){
+      .auction-lower-main{
+        grid-template-columns:minmax(280px,.72fr) minmax(0,1.28fr) auto!important;
+      }
+      .auction-middle-column{display:none!important}
+      .auction-free-fixed{grid-column:2!important}
+      .auction-call-queue-drawer{grid-column:3!important}
+    }
   </style>
 </head>
 <body>
@@ -6689,47 +6905,82 @@
           `)
           .join('');
 
+      const queueEntries =
+        auctionQueueRows()
+          .filter(item => item.player)
+          .map(item => ({
+            player: item.player,
+            price: Number(item.opening_bid || 1),
+            queued: true,
+            position: Number(item.position || 0)
+          }));
+
+      const rosterEntries = [
+        ...info.assignments.map(item => ({
+          player: item.player || {},
+          price: Number(item.purchase_price || 0),
+          queued: false,
+          position: 0
+        })),
+        ...queueEntries
+      ];
+
+      const roleSequence =
+        roleOrder(
+          state.auction?.settings?.fantasy_mode
+        );
+
+      const entryRoleRank = entry => {
+        const ranks =
+          playerRoles(
+            entry.player || {},
+            state.auction?.settings?.fantasy_mode
+          )
+            .map(role => roleSequence.indexOf(role))
+            .filter(index => index >= 0);
+
+        return ranks.length
+          ? Math.min(...ranks)
+          : roleSequence.length;
+      };
+
+      rosterEntries.sort((a, b) =>
+        entryRoleRank(a) - entryRoleRank(b)
+        || Number(a.queued) - Number(b.queued)
+        || String(a.player?.name || '')
+          .localeCompare(String(b.player?.name || ''), 'it')
+      );
+
       const rosterHtml =
-        info.assignments.length
-          ? info.assignments
-              .slice()
-              .sort((a, b) =>
-                String(a.player?.name || '')
-                  .localeCompare(
-                    String(b.player?.name || ''),
-                    'it'
-                  )
-              )
-              .map(item => {
-                const roles =
-                  playerRoles(
-                    item.player || {},
-                    state.auction?.settings?.fantasy_mode
-                  )
-                    .join('/');
+        rosterEntries.length
+          ? rosterEntries.map(entry => {
+              const roles =
+                playerRoles(
+                  entry.player || {},
+                  state.auction?.settings?.fantasy_mode
+                );
 
-                return `
-                  <div class="auction-roster-line">
-                    <div>
-                      <strong>${esc(item.player?.name || '—')}</strong>
-                      <small>
-                        ${esc(roles)}
-                        · ${esc(item.player?.serie_a_team || '')}
-                      </small>
-                    </div>
-
-                    <span class="badge primary">
-                      ${Number(item.purchase_price || 0)}
+              return `
+                <div class="auction-roster-line ${entry.queued ? 'is-queued' : ''}">
+                  <div class="auction-roster-player-main">
+                    <span class="auction-roster-mini-roles">
+                      ${roles.map(role => `
+                        <span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>
+                      `).join('')}
                     </span>
+                    <strong>${esc(entry.player?.name || '—')}</strong>
                   </div>
-                `;
-              })
-              .join('')
-          : `
-              <div class="my-team-roster-empty">
-                Nessun acquisto ancora registrato.
-              </div>
-            `;
+
+                  <span class="auction-roster-price ${entry.queued ? 'queued' : ''}">
+                    ${entry.queued ? `Q${entry.position || ''} · ` : ''}${entry.price}
+                  </span>
+                </div>
+              `;
+            }).join('')
+          : '<div class="my-team-roster-empty">Rosa ancora vuota.</div>';
+
+      const projectedRosterCount =
+        info.assignments.length + queueEntries.length;
 
       return `
         <div class="auction-team-column">
@@ -6800,8 +7051,8 @@
           <section class="auction-team-roster">
 
             <div class="auction-team-roster-head">
-              <strong>Giocatori acquistati</strong>
-              <span class="badge">${info.assignments.length}</span>
+              <strong>Rosa in creazione</strong>
+              <span class="badge">${projectedRosterCount}${info.rosterLimit ? `/${info.rosterLimit}` : ''}</span>
             </div>
 
             <div class="auction-team-roster-list">
@@ -7909,7 +8160,7 @@
     }
 
 
-    function renderAuctionFixedFreeAgents(hasPlayer) {
+    function renderAuctionFixedFreeAgents(hasPlayer, callerControlsHtml = '') {
       const total =
         state.auction?.callCandidates?.length
         ||
@@ -7931,10 +8182,13 @@
             </div>
 
             <span class="small soft">
-              ricerca dalla fascia superiore
+              ricerca e chiamata
             </span>
 
           </div>
+
+
+          ${callerControlsHtml}
 
 
           <div>
@@ -9533,12 +9787,14 @@
             </small>
           </div>
 
+        </section>
+      `;
 
-          <label class="auction-command-cell auction-command-search">
-            <span class="auction-command-label">
-              Ricerca giocatore
-            </span>
 
+      const callerControlsHtml = `
+        <section class="auction-caller-controls">
+          <label class="auction-command-search">
+            <span class="auction-command-label">Ricerca giocatore</span>
             <input
               id="auction-top-search"
               type="search"
@@ -9548,12 +9804,8 @@
             >
           </label>
 
-
-          <label class="auction-command-cell auction-command-base">
-            <span class="auction-command-label">
-              Base
-            </span>
-
+          <label class="auction-command-base">
+            <span class="auction-command-label">Base</span>
             <input
               id="auction-top-base"
               type="number"
@@ -9563,18 +9815,12 @@
             >
           </label>
 
-
-          <div class="auction-command-action-wrap">
-            <button
-              id="auction-top-action"
-              type="button"
-              class="auction-command-action ${ownCallNow ? 'ok' : 'queue'}"
-              ${topActionDisabled ? 'disabled' : ''}
-            >
-              ${topActionLabel}
-            </button>
-          </div>
-
+          <button
+            id="auction-top-action"
+            type="button"
+            class="auction-command-action ${ownCallNow ? 'ok' : 'queue'}"
+            ${topActionDisabled ? 'disabled' : ''}
+          >${topActionLabel}</button>
         </section>
       `;
 
@@ -10399,10 +10645,6 @@
 
 
           <div class="auction-cockpit-stage">
-
-            ${topBarHtml}
-
-
             <div class="auction-lower-stage">
 
               ${renderAuctionAwardsDrawer()}
@@ -10414,12 +10656,13 @@
 
 
                 <div class="auction-middle-column">
+                  ${topBarHtml}
                   ${viceHtml}
                   ${recentBidsHtml}
                 </div>
 
 
-                ${renderAuctionFixedFreeAgents(hasPlayer)}
+                ${renderAuctionFixedFreeAgents(hasPlayer, callerControlsHtml)}
 
                 ${renderAuctionCallQueue()}
 
