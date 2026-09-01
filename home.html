@@ -5613,6 +5613,21 @@
     }
 
 
+    function auctionHasPresidentRole() {
+      return Boolean(
+        state.auction
+          ?.permissions
+          ?.isPresident
+        === true
+        ||
+        state.auction
+          ?.myTeam
+          ?.role
+        === 'president'
+      );
+    }
+
+
     function auctionDualModeEnabled() {
       const d =
         state.auction;
@@ -5634,9 +5649,7 @@
       return Boolean(
         auctionDualModeEnabled()
         &&
-        state.auction
-          ?.permissions
-          ?.isPresident
+        auctionHasPresidentRole()
         &&
         window.matchMedia(
           '(max-width: 720px)'
@@ -5686,10 +5699,7 @@
         ||
         !auctionCallMode()
         ||
-        state.auction
-          ?.permissions
-          ?.isPresident
-        !== true
+        !auctionHasPresidentRole()
       ) {
         return false;
       }
@@ -7646,8 +7656,7 @@
       }
 
       const isPresident =
-        d.permissions?.isPresident
-        === true;
+        auctionHasPresidentRole();
 
       const ownCall =
         isPresident
@@ -8189,7 +8198,7 @@
 
 
       const ownCallNow =
-        d.permissions?.isPresident === true
+        auctionHasPresidentRole()
         &&
         auctionOwnCallTurn();
 
@@ -8201,7 +8210,7 @@
 
 
       const queueModeNow =
-        d.permissions?.isPresident === true
+        auctionHasPresidentRole()
         &&
         auctionQueueModeAvailable();
 
@@ -9293,13 +9302,14 @@
 
 
             /*
-             * Solo il Presidente della squadra di turno
-             * può effettuare la chiamata dal selettore.
-             * Admin/Banditore usano esclusivamente
-             * la console di supporto.
+             * La chiamata dal selettore appartiene al ruolo Presidente.
+             * Un Admin che è anche Presidente mantiene quindi TUTTE
+             * le funzioni del Presidente per la propria squadra.
+             * Il solo ruolo Admin/Banditore non consente invece
+             * di chiamare al posto degli altri Presidenti.
              */
             if (
-              d.permissions?.isPresident
+              auctionHasPresidentRole()
               &&
               auctionOwnCallTurn()
             ) {
@@ -9344,7 +9354,7 @@
 
 
             if (
-              d.permissions?.isPresident
+              auctionHasPresidentRole()
               &&
               auctionQueueModeAvailable()
             ) {
@@ -10376,7 +10386,7 @@
                     : 'disabled'
                 }
                 title="${
-                  state.auction?.permissions?.isPresident
+                  auctionHasPresidentRole()
                     ? (
                         auctionQueueModeAvailable()
                           ? 'Aggiungi subito in coda con base 1'
