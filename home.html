@@ -4309,510 +4309,685 @@
       }
     }
 
-    /* V13: console rilanci nella fascia alta e riepiloghi compatti. */
-    .auction-statusbar{
-      grid-template-columns:auto minmax(150px,.65fr) minmax(430px,1.6fr) auto auto!important;
-    }
 
-    .auction-status-quick{
-      min-width:0;
-      display:grid;
-      grid-template-columns:auto repeat(5,minmax(42px,1fr)) minmax(105px,1.45fr);
-      align-items:center;
-      gap:4px;
-    }
-
-    .auction-status-quick-label{
-      color:var(--muted);
-      font-size:7px;
-      font-weight:950;
-      text-transform:uppercase;
-      letter-spacing:.06em;
-    }
-
-    .auction-status-quick .quick-btn{
-      min-height:28px;
-      height:28px;
-      padding:1px 4px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:3px;
-      border-radius:6px;
-    }
-
-    .auction-status-quick .quick-btn span,
-    .auction-status-quick .quick-btn strong{
-      font-size:9px;
-      line-height:1;
-    }
-
-    .auction-status-quick .auction-command-bid-confirm{
-      min-height:28px;
-      height:28px;
-      white-space:nowrap;
-    }
+    /* =====================================================
+       ASTA V13 · RICOMPOSIZIONE COCKPIT
+       ===================================================== */
 
     .auction-command-bar{
-      grid-template-columns:68px minmax(240px,1.35fr) minmax(140px,.7fr)
-        minmax(220px,1.1fr) 68px 74px!important;
-      min-height:72px!important;
-    }
-
-    .auction-command-player small{
-      display:flex!important;
-      align-items:center;
-      gap:4px;
-      min-width:0;
-    }
-
-    .auction-command-player small .rolebadge{
-      flex:0 0 auto;
-    }
-
-    .auction-command-player small>span:last-child{
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-    }
-
-    .auction-command-offer small{
-      max-width:100%;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-      color:var(--soft);
-      font-size:9px;
-      font-weight:800;
-    }
-
-    .auction-command-bid-confirm{
-      min-width:0;
-      padding:3px 5px;
-      border-color:#398f75;
-      background:var(--good);
-      font-size:9px;
-      line-height:1.05;
-    }
-
-    .auction-lower-main{
-      grid-template-columns:minmax(520px,1.2fr) minmax(155px,.36fr)
-        minmax(430px,1.55fr) auto!important;
-    }
-
-    .auction-lower-main>.auction-team-column{
-      grid-template-columns:minmax(240px,.82fr) minmax(270px,1.18fr)!important;
-      grid-template-rows:minmax(0,1fr)!important;
-    }
-
-    .auction-lower-main>.auction-team-column>.auction-team-card,
-    .auction-lower-main>.auction-team-column>.auction-team-roster,
-    .auction-lower-main>.auction-team-column>.auction-overview-card{
-      height:100%;
-      min-height:0;
-    }
-
-    .auction-call-queue-drawer-content{
-      display:flex;
-      min-height:0;
-      overflow:hidden!important;
-    }
-
-    .auction-call-queue-drawer .auction-call-queue{
-      flex:1 1 auto;
-      min-height:0;
-      overflow:hidden;
-    }
-
-    .auction-call-queue-drawer .auction-call-queue-list{
-      min-height:0;
-      max-height:100%;
-      overflow-y:auto!important;
-      overflow-x:hidden!important;
-      scrollbar-gutter:stable;
-    }
-
-    @media(max-width:1280px){
-      .auction-statusbar{
-        grid-template-columns:auto minmax(125px,.55fr) minmax(360px,1.45fr) auto auto!important;
-      }
-      .auction-command-bar{
-        grid-template-columns:62px minmax(180px,1fr) 110px minmax(210px,1.15fr)!important;
-        grid-auto-rows:minmax(42px,auto);
-      }
-      .auction-command-search{grid-column:1 / 3!important}
-      .auction-command-base{grid-column:3!important}
-      .auction-command-action-wrap{grid-column:4!important}
-    }
-
-    @media(max-width:760px){
-      .auction-statusbar{grid-template-columns:auto minmax(0,1fr) auto auto!important}
-      .auction-status-quick{display:none!important}
-      .auction-command-bar{grid-template-columns:58px minmax(0,1fr)!important}
-      .auction-command-offer{grid-column:1!important}
-      .auction-command-search{grid-column:1 / -1!important}
-      .auction-command-base{grid-column:1!important}
-      .auction-command-action-wrap{grid-column:2!important}
-    }
-
-    /* V14: rosa | chiamata | svincolati, tre colonne verticali. */
-    .auction-lower-main{
       grid-template-columns:
-        minmax(340px,.78fr)
-        minmax(285px,.62fr)
-        minmax(520px,1.38fr)
-        auto!important;
+        72px
+        minmax(280px,1.45fr)
+        minmax(190px,.8fr)
+        minmax(190px,.85fr)
+        minmax(260px,1.15fr)
+        82px
+        90px!important;
       align-items:stretch;
     }
 
-    .auction-lower-main>.auction-team-column{
-      grid-template-columns:minmax(0,1fr)!important;
-      grid-template-rows:auto minmax(0,1fr)!important;
-    }
-
-    .auction-team-card{
-      padding:6px!important;
-    }
-
-    .auction-team-card-head{
-      margin-bottom:4px!important;
-    }
-
-    .auction-team-primary-kpis{
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      margin-bottom:3px;
-    }
-
-    .auction-team-big-kpi{
-      min-height:43px;
-      padding:4px 6px;
-    }
-
-    .auction-team-big-kpi strong{
-      font-size:20px;
-    }
-
-    .auction-team-mini-kpi{
-      min-height:26px;
-      padding:3px 4px;
-    }
-
-    .auction-role-strip{
-      margin-top:3px;
-    }
-
-    .auction-role-strip .badge{
-      padding:2px 5px;
-      font-size:7px;
-    }
-
-    .auction-team-roster-list{
-      padding:3px;
-      gap:1px;
-      overflow:hidden!important;
-      grid-template-rows:repeat(var(--roster-row-count,32),minmax(0,1fr));
-    }
-
-    .auction-roster-line{
-      min-height:0!important;
-      height:100%;
-      padding:0 4px;
-      gap:3px;
-      border-radius:4px;
-      overflow:hidden;
-    }
-
-    .auction-roster-player-main{
-      min-width:0;
-      display:flex;
+    .auction-command-player{
+      display:grid!important;
+      grid-template-columns:minmax(0,1fr) auto;
+      grid-template-rows:auto auto auto;
+      column-gap:8px;
       align-items:center;
-      gap:4px;
     }
 
-    .auction-roster-player-main>strong{
-      min-width:0;
+    .auction-command-player .auction-command-label{
+      grid-column:1 / 3;
+    }
+
+    .auction-command-player strong{
+      grid-column:1;
+      grid-row:2;
+    }
+
+    .auction-command-player .auction-inline-roles{
+      grid-column:2;
+      grid-row:2;
+      display:flex;
+      gap:3px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    .auction-command-player small{
+      grid-column:1 / 3;
+      grid-row:3;
+    }
+
+    .auction-command-best{
+      display:grid!important;
+      grid-template-columns:1fr;
+      align-content:center;
+      text-align:left;
+    }
+
+    .auction-command-best strong{
+      font-size:clamp(30px,3vw,44px);
+      line-height:.95;
+      font-weight:950;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .auction-command-best b{
+      display:block;
+      margin-top:4px;
       overflow:hidden;
       text-overflow:ellipsis;
       white-space:nowrap;
-      font-size:8px;
-      line-height:1;
-    }
-
-    .auction-roster-mini-roles{
-      flex:0 0 auto;
-      display:flex;
-      gap:1px;
-    }
-
-    .auction-roster-mini-roles .rolebadge{
-      min-width:15px;
-      min-height:0;
-      height:12px;
-      padding:0 2px;
-      border-radius:4px;
-      font-size:5px;
-      line-height:12px;
-    }
-
-    .auction-roster-price{
-      min-width:24px;
-      padding:1px 4px;
-      border-radius:4px;
-      background:var(--primary);
-      color:#fff;
-      text-align:center;
-      font-size:7px;
-      font-weight:900;
-      white-space:nowrap;
-      line-height:1.2;
-    }
-
-    .auction-roster-line.is-queued{
-      opacity:.43;
-      border-style:dashed;
-      background:#17314d;
-    }
-
-    .auction-roster-price.queued{
-      background:#5f7894;
-    }
-
-    .auction-roster-line.is-empty{
-      border-color:rgba(40,89,142,.22);
-      background:rgba(8,29,50,.38);
-    }
-
-    .auction-roster-empty-index{
-      color:rgba(126,161,199,.34);
-      font-size:6px;
-      line-height:1;
-    }
-
-    .auction-middle-column{
-      grid-template-rows:auto auto auto minmax(0,1fr)!important;
-    }
-
-    .auction-middle-team-kpis{
-      min-height:0;
-    }
-
-    .auction-middle-team-kpis .auction-team-card-head strong{
       font-size:12px;
     }
 
-    .auction-middle-team-kpis .auction-team-primary-kpis{
-      grid-template-columns:repeat(2,minmax(0,1fr));
+    .auction-quick-strip{
+      min-height:40px;
+      display:grid;
+      grid-template-columns:
+        minmax(210px,.75fr)
+        minmax(0,1fr);
+      gap:7px;
+      align-items:stretch;
     }
 
-    .auction-middle-team-kpis .auction-team-big-kpi{
-      min-height:38px;
-    }
-
-    .auction-middle-team-kpis .auction-team-big-kpi strong{
-      font-size:18px;
-    }
-
-    .auction-status-team-kpis{
+    .auction-quick-team-summary{
       min-width:0;
       display:grid;
-      grid-template-columns:minmax(90px,1.2fr) repeat(4,minmax(54px,.7fr));
-      align-items:center;
-      gap:4px;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:5px;
+      padding:5px;
+      border:1px solid rgba(45,84,124,.78);
+      border-radius:12px;
+      background:linear-gradient(180deg,rgba(17,38,64,.94),rgba(10,27,47,.94));
+      box-shadow:var(--shadow-sm);
     }
 
-    .auction-status-team-kpis>strong{
+    .auction-quick-team-summary .auction-team-mini-kpi{
+      min-width:0;
+      padding:5px 7px;
+    }
+
+    .auction-quick-team-summary .auction-team-mini-kpi span{
+      display:block;
+      color:var(--muted);
+      font-size:7px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+
+    .auction-quick-team-summary .auction-team-mini-kpi strong{
+      display:block;
       overflow:hidden;
       text-overflow:ellipsis;
       white-space:nowrap;
-      font-size:10px;
+      font-size:16px;
+      margin-top:1px;
     }
 
-    .auction-status-team-kpis>span{
+    .auction-quick-bid-console{
       min-width:0;
-      height:28px;
-      padding:2px 5px;
+      display:grid;
+      grid-template-columns:auto repeat(5,minmax(58px,1fr)) minmax(120px,1.3fr);
+      gap:5px;
+      align-items:stretch;
+      padding:5px;
+      border:1px solid rgba(45,84,124,.78);
+      border-radius:12px;
+      background:linear-gradient(180deg,rgba(17,38,64,.94),rgba(10,27,47,.94));
+      box-shadow:var(--shadow-sm);
+    }
+
+    .auction-quick-bid-console .auction-command-label{
       display:flex;
       align-items:center;
-      justify-content:space-between;
-      gap:3px;
-      border:1px solid rgba(54,99,145,.74);
-      border-radius:6px;
-      background:rgba(8,27,48,.76);
+      padding:0 6px;
     }
 
-    .auction-status-team-kpis small{
-      color:var(--muted);
-      font-size:6px;
-      font-weight:900;
-      text-transform:uppercase;
+    .auction-quick-bid-console .quick-btn,
+    .auction-quick-bid-console .auction-mobile-confirm{
+      min-height:38px!important;
+      height:100%;
+      border-radius:9px!important;
     }
 
-    .auction-status-team-kpis b{
-      font-size:10px;
-      white-space:nowrap;
+    /* il vecchio pannello squadra a sinistra diventa solo lista acquisti */
+    .auction-team-column .auction-team-card{
+      display:none!important;
     }
 
-    .auction-middle-quick{
-      padding:5px;
-      border:1px solid var(--line);
-      border-radius:8px;
-      background:rgba(10,32,59,.88);
-    }
-
-    .auction-middle-quick .auction-status-quick{
-      grid-template-columns:repeat(5,minmax(0,1fr));
-    }
-
-    .auction-middle-quick .auction-status-quick-label{
-      grid-column:1 / -1;
-    }
-
-    .auction-middle-quick .auction-command-bid-confirm{
-      grid-column:1 / -1;
-      width:100%;
-    }
-
-    .auction-middle-vice-slot{
-      min-height:0;
-    }
-
-    .auction-roster-line.is-empty>.rolebadge{
-      min-width:17px;
-      height:12px;
-      min-height:0;
-      padding:0 2px;
-      font-size:5px;
-      line-height:12px;
-    }
-
-    .auction-roster-empty-label{
-      min-width:0;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-      color:rgba(155,183,218,.42);
-      font-size:6px;
-    }
-
-    .auction-middle-column .auction-command-bar{
-      min-height:0!important;
-      grid-template-columns:64px minmax(0,1fr)!important;
-      grid-template-rows:auto auto;
-      align-content:start;
-    }
-
-    .auction-middle-column .auction-command-timer{
-      grid-column:1;
-      grid-row:1;
-    }
-
-    .auction-middle-column .auction-command-player{
-      grid-column:2;
-      grid-row:1;
-    }
-
-    .auction-middle-column .auction-command-offer{
-      grid-column:1 / -1;
-      grid-row:2;
-      min-height:70px;
-    }
-
-    .auction-middle-column .auction-command-player strong{
-      font-size:clamp(19px,2vw,30px)!important;
-    }
-
-    .auction-free-fixed{
-      grid-template-rows:auto auto auto minmax(0,1fr)!important;
-    }
-
-    .auction-caller-controls{
-      display:grid;
-      grid-template-columns:minmax(0,1fr) 66px 84px;
-      gap:4px;
-      padding:5px 7px;
-      border-bottom:1px solid var(--line);
-      background:rgba(9,31,55,.82);
-    }
-
-    .auction-caller-controls label{
+    .auction-team-column{
       min-width:0;
     }
 
-    .auction-caller-controls input,
-    .auction-caller-controls .auction-command-action{
+    .auction-team-column .auction-team-roster{
+      height:100%;
+      min-height:0;
+      margin-top:0!important;
+    }
+
+    .auction-lower-main{
+      grid-template-columns:
+        minmax(245px,.7fr)
+        minmax(135px,.36fr)
+        minmax(470px,1.65fr)
+        auto!important;
+    }
+
+    @media(max-width:1180px){
+      .auction-command-bar{
+        grid-template-columns:
+          62px
+          minmax(230px,1.25fr)
+          minmax(170px,.75fr)
+          minmax(200px,1fr)
+          72px
+          82px!important;
+      }
+
+      .auction-command-search{
+        grid-column:auto!important;
+      }
+
+      .auction-quick-strip{
+        grid-template-columns:1fr;
+      }
+
+      .auction-quick-bid-console{
+        grid-template-columns:auto repeat(5,minmax(54px,1fr)) minmax(110px,1.2fr);
+      }
+    }
+
+    @media(max-width:900px){
+      .auction-quick-team-summary{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+
+      .auction-quick-bid-console{
+        grid-template-columns:repeat(3,minmax(0,1fr));
+      }
+
+      .auction-quick-bid-console .auction-command-label{
+        grid-column:1 / 4;
+      }
+
+      .auction-quick-bid-console .auction-mobile-confirm{
+        grid-column:1 / 4;
+      }
+    }
+
+  
+    /* =====================================================
+       GLASS SYSTEM 2026 · modern minimalist + cobalt
+       ===================================================== */
+    :root{
+      --bg:#061426;
+      --panel:#0c2442;
+      --panel2:#12345d;
+      --panel3:#173f70;
+      --line:#28598e;
+      --line2:#3977b5;
+      --text:#f5f8ff;
+      --soft:#9bb7da;
+      --muted:#6f91ba;
+      --primary:#3478f6;
+      --primary2:#2462d4;
+      --good:#1f6c58;
+      --warn:#81513a;
+      --danger:#84384d;
+
+      --glass:rgba(12,36,66,.58);
+      --glass-strong:rgba(10,31,58,.82);
+      --glass-soft:rgba(27,67,111,.30);
+      --glass-faint:rgba(255,255,255,.035);
+      --glass-border:rgba(164,202,255,.14);
+      --glass-border-strong:rgba(130,184,255,.28);
+      --glass-highlight:rgba(255,255,255,.07);
+      --shadow:0 18px 50px rgba(0,8,22,.28);
+      --shadow-soft:0 10px 28px rgba(0,8,22,.18);
+      --focus:0 0 0 3px rgba(52,120,246,.20);
+      --r:16px;
+      --radius-sm:9px;
+      --radius-md:12px;
+      --radius-lg:16px;
+      --radius-xl:22px;
+      --header-h:52px;
+      --nav-h:44px;
+      --gap:8px;
+    }
+
+    html{background:#04101f}
+    body{
+      background:
+        radial-gradient(80rem 50rem at -10% -15%,rgba(52,120,246,.22),transparent 55%),
+        radial-gradient(60rem 42rem at 108% 5%,rgba(31,105,202,.18),transparent 58%),
+        radial-gradient(55rem 48rem at 58% 118%,rgba(20,78,151,.13),transparent 58%),
+        linear-gradient(145deg,#04101f 0%,#061426 42%,#07182d 100%);
+      color:var(--text);
+      letter-spacing:-.005em;
+    }
+    body::before,
+    body::after{
+      content:"";
+      position:fixed;
+      pointer-events:none;
+      z-index:-1;
+      border-radius:999px;
+      filter:blur(60px);
+      opacity:.32;
+    }
+    body::before{width:28vw;height:28vw;min-width:260px;min-height:260px;left:-9vw;top:12vh;background:#1e67c8}
+    body::after{width:24vw;height:24vw;min-width:220px;min-height:220px;right:-7vw;bottom:-8vh;background:#164d91}
+
+    ::selection{background:rgba(67,137,255,.45);color:#fff}
+    *{scrollbar-width:thin;scrollbar-color:rgba(116,169,235,.36) transparent}
+    *::-webkit-scrollbar{width:7px;height:7px}
+    *::-webkit-scrollbar-track{background:transparent}
+    *::-webkit-scrollbar-thumb{background:rgba(116,169,235,.30);border-radius:999px}
+    *::-webkit-scrollbar-thumb:hover{background:rgba(116,169,235,.48)}
+
+    .app{padding:8px;gap:8px}
+
+    .app-head,
+    .main-nav,
+    .panel,
+    .league-pill,
+    .league-card,
+    .compact-row,
+    .field-band,
+    .kpi,
+    .table-wrap,
+    details.team-card,
+    .auction-statusbar,
+    .auction-player-hero,
+    .auction-action-card,
+    .auction-team-card,
+    .auction-team-roster,
+    .auction-bid-history,
+    .auction-free-fixed,
+    .auction-command-bar,
+    .auction-caller-controls,
+    .auction-call-queue,
+    .auction-call-queue-drawer,
+    .auctioneer-console-drawer,
+    .auction-rosters-drawer,
+    .auction-awards-drawer,
+    .auction-transfer-card,
+    .auction-mobile-console-top,
+    .auction-mobile-main{
+      border-color:var(--glass-border)!important;
+      background:linear-gradient(145deg,rgba(17,48,86,.66),rgba(7,28,53,.52))!important;
+      box-shadow:inset 0 1px 0 var(--glass-highlight),var(--shadow-soft);
+      backdrop-filter:blur(18px) saturate(145%);
+      -webkit-backdrop-filter:blur(18px) saturate(145%);
+    }
+
+    .app-head{
+      padding:7px 10px;
+      border-radius:17px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 12px 28px rgba(0,7,19,.20);
+    }
+    .brand{font-size:15px;font-weight:850;letter-spacing:-.035em}
+    .league-pill{border-radius:12px;padding:5px 9px;background:rgba(31,75,124,.38)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+    .league-pill strong{font-size:10px}.league-pill small,.user-label{font-size:8px}
+
+    .main-nav{
+      padding:4px;
+      border:1px solid var(--glass-border);
+      border-radius:15px;
+      background:rgba(7,26,49,.46)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 9px 24px rgba(0,7,19,.14);
+      backdrop-filter:blur(16px) saturate(140%);
+      -webkit-backdrop-filter:blur(16px) saturate(140%);
+    }
+    .nav-btn{
       min-height:34px;
-      height:34px;
+      border:0!important;
+      border-radius:10px;
+      background:transparent!important;
+      color:var(--soft);
+      font-weight:750;
+      transition:background .16s ease,color .16s ease,transform .16s ease,box-shadow .16s ease;
+    }
+    .nav-btn:hover{background:rgba(255,255,255,.055)!important;color:#fff;filter:none;transform:none}
+    .nav-btn.active{
+      color:#fff;
+      background:linear-gradient(135deg,rgba(52,120,246,.94),rgba(36,98,212,.88))!important;
+      box-shadow:0 8px 20px rgba(20,83,188,.28),inset 0 1px 0 rgba(255,255,255,.18);
     }
 
-    .auction-free-fixed .rolebar{
-      gap:2px;
-      padding:3px 6px 0;
+    button,.btn{
+      min-height:34px;
+      padding:6px 11px;
+      border:1px solid rgba(121,179,255,.16);
+      border-radius:10px;
+      background:linear-gradient(135deg,#3b82f6,#2867dc);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 7px 16px rgba(11,68,166,.15);
+      font-size:10px;
+      font-weight:800;
+      letter-spacing:.005em;
+      transition:transform .13s ease,filter .13s ease,background .13s ease,border-color .13s ease,box-shadow .13s ease;
     }
-
-    .auction-free-fixed .rolebtn{
-      min-width:27px;
-      min-height:25px;
-      padding:2px 5px;
-      font-size:8px;
+    button:hover,.btn:hover{filter:brightness(1.07);transform:translateY(-1px)}
+    button:active,.btn:active{transform:translateY(0);filter:brightness(.98)}
+    button:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:none;box-shadow:var(--focus)}
+    button.secondary,.btn.secondary{
+      color:#e8f2ff;
+      border-color:var(--glass-border-strong);
+      background:rgba(29,73,119,.42)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.07);
     }
+    button.secondary:hover,.btn.secondary:hover{background:rgba(42,91,145,.56)!important}
+    button.good{background:linear-gradient(135deg,#23795f,#1b634f)!important;border-color:rgba(103,224,184,.16)}
+    button.warn{background:linear-gradient(135deg,#925d3a,#74472f)!important}
+    button.danger{background:linear-gradient(135deg,#963d56,#773043)!important;border-color:rgba(255,143,170,.16)}
+    button:disabled{opacity:.32;transform:none;box-shadow:none}
 
-    .auction-free-fixed .drawer-filters{
-      gap:3px;
-      padding:0 6px 4px;
+    input,select,textarea{
+      min-height:34px;
+      padding:6px 9px;
+      border:1px solid var(--glass-border);
+      border-radius:10px;
+      background:rgba(4,24,47,.46)!important;
+      color:var(--text);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+      font-size:10px;
+      transition:border-color .15s ease,background .15s ease,box-shadow .15s ease;
     }
+    input:hover,select:hover,textarea:hover{border-color:rgba(132,187,255,.25)}
+    input:focus,select:focus,textarea:focus{border-color:rgba(98,161,255,.68);background:rgba(7,32,61,.70)!important;box-shadow:var(--focus)}
+    input::placeholder,textarea::placeholder{color:rgba(155,183,218,.48)}
 
-    .auction-free-fixed .drawer-filters label{
+    .panel{border-radius:18px;padding:11px}
+    .panel-title{margin-bottom:9px}.panel-title h2,.panel-title h3{font-size:14px;font-weight:820;letter-spacing:-.025em}.panel-title p{font-size:8px}
+    .compact-row{border-radius:11px;background:rgba(19,56,96,.32)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.025);transition:background .15s ease,border-color .15s ease}
+    .compact-row:hover{background:rgba(32,75,123,.44)!important;border-color:rgba(118,176,249,.22)!important}
+    .compact-row strong{font-size:10px}.compact-row small{font-size:7px}
+    .field-band{border-radius:12px;background:rgba(20,58,99,.28)!important}
+
+    .badge{
+      min-height:20px;
+      padding:3px 7px;
+      border:1px solid rgba(142,190,250,.10);
+      border-radius:999px;
+      background:rgba(49,91,139,.48);
+      color:#dcecff;
       font-size:7px;
+      letter-spacing:.035em;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .badge.primary{background:rgba(52,120,246,.78);border-color:rgba(114,166,255,.28)}
+    .badge.good{background:rgba(31,108,88,.78);border-color:rgba(100,217,181,.16)}
+    .badge.warn{background:rgba(129,81,58,.78);border-color:rgba(240,180,128,.15)}
+    .badge.danger{background:rgba(132,56,77,.80);border-color:rgba(246,136,164,.15)}
+
+    .kpis{gap:6px}.kpi{min-height:42px;border-radius:12px;background:rgba(23,62,105,.30)!important;padding:7px 9px}.kpi span{font-size:7px}.kpi strong{font-size:15px;font-weight:850;letter-spacing:-.03em}
+
+    .message{
+      top:9px;
+      padding:8px 12px;
+      border-color:var(--glass-border-strong);
+      border-radius:13px;
+      background:rgba(6,26,50,.84);
+      box-shadow:0 16px 40px rgba(0,8,22,.34),inset 0 1px 0 rgba(255,255,255,.08);
+      backdrop-filter:blur(20px) saturate(145%);
+      -webkit-backdrop-filter:blur(20px) saturate(145%);
+      font-size:10px;
     }
 
-    .auction-free-fixed .drawer-filters select{
-      min-height:29px;
-      padding:3px 5px;
+    /* LISTONE / TABLES */
+    .table-wrap{border-radius:14px;overflow:auto;background:rgba(6,27,51,.34)!important}
+    table{background:transparent}
+    th{
+      background:rgba(8,32,60,.90)!important;
+      border-bottom-color:rgba(115,173,244,.20)!important;
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+    }
+    th button{color:#9db9da;font-weight:800;letter-spacing:.02em}
+    td{border-bottom-color:rgba(115,173,244,.09)!important}
+    tbody tr{transition:background .12s ease}
+    tbody tr:hover{background:rgba(45,96,154,.22)!important}
+    tbody tr.selected-player{background:linear-gradient(90deg,rgba(52,120,246,.20),rgba(52,120,246,.06))!important;box-shadow:inset 3px 0 0 #4a8df7}
+    .rolebadge{border:1px solid rgba(255,255,255,.12);border-radius:7px;box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+
+    /* LEAGUES / GENERIC CARDS */
+    .league-card,details.team-card{border-radius:16px!important;overflow:hidden}
+    details.team-card summary{background:rgba(25,62,104,.35)!important;border-bottom:1px solid transparent}
+    details.team-card[open] summary{border-bottom-color:var(--glass-border)}
+    .roster-player{border-color:rgba(132,184,246,.10)!important;background:rgba(12,45,80,.18)}
+
+    /* =====================================================
+       ASTA · GLASS COCKPIT
+       ===================================================== */
+    body.auction-live{
+      background:
+        radial-gradient(70rem 40rem at 54% -10%,rgba(52,120,246,.20),transparent 56%),
+        radial-gradient(42rem 35rem at 100% 70%,rgba(23,79,151,.16),transparent 60%),
+        linear-gradient(145deg,#030e1c,#061426 45%,#07182d);
+    }
+    body.auction-live .app{padding:6px;gap:6px}
+    .auction-root,.auction-live-shell,.auction-cockpit{border-radius:18px}
+    .auction-cockpit{gap:7px!important;padding:0!important;background:transparent!important}
+
+    .auction-statusbar{
+      min-height:42px;
+      padding:5px 8px;
+      border-radius:14px!important;
+      background:linear-gradient(115deg,rgba(15,49,89,.68),rgba(8,28,53,.55))!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 10px 26px rgba(0,7,18,.18);
+    }
+    .auction-status-title{font-weight:850;letter-spacing:-.025em}.auction-status-sub{color:#9db9da}
+    .auction-live-mark{border:1px solid rgba(87,222,174,.16);background:rgba(24,94,75,.34);border-radius:999px;padding:4px 7px}
+    .auction-live-dot{box-shadow:0 0 0 4px rgba(77,217,170,.10),0 0 13px rgba(77,217,170,.32)}
+    .auction-status-timer,.auction-mobile-timer{
+      border-color:rgba(103,165,255,.28)!important;
+      background:linear-gradient(145deg,rgba(41,102,184,.45),rgba(19,62,111,.42))!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 7px 20px rgba(19,78,162,.14)!important;
+      border-radius:11px!important;
+      font-variant-numeric:tabular-nums;
     }
 
-    @media(max-width:1450px){
-      .auction-lower-main{
-        grid-template-columns:minmax(310px,.72fr) minmax(250px,.58fr) minmax(450px,1.3fr) auto!important;
-      }
-      .auction-status-quick-label{display:none}
-      .auction-status-quick{
-        grid-template-columns:repeat(5,minmax(36px,1fr)) minmax(90px,1.35fr);
-      }
+    .auction-cockpit-stage,.auction-lower-stage,.auction-lower-main,.auction-middle-column{gap:7px!important}
+    .auction-player-hero,
+    .auction-action-card,
+    .auction-team-card,
+    .auction-team-roster,
+    .auction-bid-history,
+    .auction-free-fixed{
+      border-radius:16px!important;
+      overflow:hidden;
     }
 
-    @media(max-width:1100px){
-      .auction-lower-main{
-        grid-template-columns:minmax(230px,.65fr) minmax(210px,.55fr) minmax(360px,1.15fr) auto!important;
-      }
-      .auction-middle-column{display:grid!important}
-      .auction-free-fixed{grid-column:3!important}
-      .auction-call-queue-drawer{grid-column:4!important}
-      .auction-status-team-kpis>strong{display:none}
-      .auction-status-team-kpis{
-        grid-template-columns:repeat(4,minmax(48px,1fr));
-      }
+    .auction-player-hero{
+      background:
+        radial-gradient(circle at 12% 30%,rgba(61,133,246,.22),transparent 44%),
+        linear-gradient(145deg,rgba(17,56,100,.72),rgba(7,27,52,.58))!important;
+    }
+    .auction-player-kicker,.auction-command-label{color:#7398c3!important;letter-spacing:.08em}
+    .auction-player-name-live{font-weight:900;letter-spacing:-.055em;text-shadow:0 4px 18px rgba(0,0,0,.18)}
+    .auction-player-meta-live{color:#aac1dc!important}
+    .auction-current-offer{
+      border:1px solid rgba(114,170,250,.14)!important;
+      border-radius:13px!important;
+      background:rgba(7,32,61,.36)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    .auction-current-offer strong{font-weight:950;letter-spacing:-.055em;color:#fff}
+    .auction-current-leader{color:#8eadd0!important}
+
+    .auction-command-bar{
+      padding:6px!important;
+      gap:6px!important;
+      border-radius:15px!important;
+      background:linear-gradient(135deg,rgba(14,47,86,.58),rgba(6,26,50,.46))!important;
+    }
+    .auction-command-cell{
+      border-color:rgba(136,187,249,.10)!important;
+      border-radius:10px!important;
+      background:rgba(11,39,72,.26)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+    }
+    .auction-command-cell strong{letter-spacing:-.025em}
+    .auction-caller-controls{border-radius:14px!important;padding:6px!important}
+    .auction-command-action.ok{background:linear-gradient(135deg,#2b8b69,#1d6d55)!important}
+    .auction-command-action.queue{background:linear-gradient(135deg,#3a7fe7,#275fc4)!important}
+
+    .quick-grid,.auction-status-quick,.auction-mobile-quick{gap:5px!important}
+    .quick-btn{
+      border:1px solid rgba(119,174,245,.12)!important;
+      border-radius:10px!important;
+      background:rgba(24,65,110,.38)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.055)!important;
+    }
+    .quick-btn:hover{background:rgba(37,84,137,.54)!important}
+    .quick-btn.selected{
+      border-color:rgba(111,172,255,.55)!important;
+      background:linear-gradient(145deg,rgba(52,120,246,.84),rgba(38,93,198,.78))!important;
+      box-shadow:0 0 0 2px rgba(52,120,246,.14),inset 0 1px 0 rgba(255,255,255,.17)!important;
+    }
+    .auction-bid-confirm,.auction-command-bid-confirm,.auction-mobile-confirm{background:linear-gradient(135deg,#3b82f6,#265fc9)!important;border-radius:12px!important;box-shadow:0 10px 24px rgba(31,91,197,.22),inset 0 1px 0 rgba(255,255,255,.17)!important}
+
+    .auction-team-card,.auction-team-roster{background:linear-gradient(145deg,rgba(16,48,86,.60),rgba(7,28,52,.46))!important}
+    .auction-team-big-kpi,.auction-team-mini-kpi{
+      border-color:rgba(133,185,248,.10)!important;
+      background:rgba(15,50,88,.30)!important;
+      border-radius:11px!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+    }
+    .auction-team-big-kpi strong{letter-spacing:-.045em}
+    .auction-team-roster-list{scrollbar-gutter:stable}
+    .auction-roster-line{
+      border-color:rgba(130,182,245,.08)!important;
+      background:rgba(13,42,75,.18)!important;
+      border-radius:8px!important;
+      transition:background .12s ease,border-color .12s ease;
+    }
+    .auction-roster-line:hover{background:rgba(30,70,116,.28)!important;border-color:rgba(130,182,245,.15)!important}
+    .auction-roster-line.is-queued{border-style:dashed!important;background:rgba(37,91,158,.18)!important}
+    .auction-roster-line.is-empty{opacity:.46;background:transparent!important;border-style:dashed!important}
+
+    .auction-bid-history{background:linear-gradient(145deg,rgba(14,45,80,.48),rgba(6,27,51,.36))!important}
+    .auction-bid-chip{
+      border:1px solid rgba(132,184,246,.09)!important;
+      border-radius:9px!important;
+      background:rgba(21,58,99,.26)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+    }
+    .auction-bid-chip strong{color:#dcebff}
+    .auction-vice-strip{border-color:rgba(135,185,245,.11)!important;border-radius:12px!important;background:rgba(20,59,101,.27)!important}
+
+    /* fixed free agents */
+    .auction-free-fixed{
+      border:1px solid var(--glass-border)!important;
+      background:linear-gradient(155deg,rgba(15,49,88,.62),rgba(6,27,51,.48))!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 14px 34px rgba(0,8,22,.18)!important;
+    }
+    .auction-free-fixed-head{padding:7px 9px!important;border-bottom:1px solid rgba(131,184,247,.10)!important;background:rgba(21,60,103,.20)!important}
+    .auction-free-fixed-head strong{font-weight:850;letter-spacing:-.02em}
+    .auction-free-fixed .drawer-filters{padding:6px!important;border-bottom:1px solid rgba(131,184,247,.08)!important;background:rgba(7,32,60,.16)!important}
+    .auction-free-fixed .drawer-table{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+    .auction-free-fixed th{background:rgba(7,31,58,.90)!important}
+    .auction-free-fixed td{border-bottom-color:rgba(126,179,241,.075)!important}
+    .auction-queue-add{border-radius:8px!important;background:rgba(47,108,183,.58)!important;border-color:rgba(119,179,249,.24)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.10)!important}
+    .auction-queue-added{border-radius:999px!important;background:rgba(31,108,88,.75)!important}
+
+    /* queue drawer */
+    .auction-call-queue-drawer{
+      border-radius:14px!important;
+      background:linear-gradient(145deg,rgba(15,48,86,.72),rgba(7,26,50,.62))!important;
+      box-shadow:0 14px 34px rgba(0,8,22,.20),inset 0 1px 0 rgba(255,255,255,.07)!important;
+    }
+    .auction-call-queue-drawer>summary{
+      background:rgba(39,91,150,.48)!important;
+      border-color:rgba(136,188,250,.13)!important;
+      font-weight:850;
+      letter-spacing:.04em;
+    }
+    .auction-call-queue-row{border-color:rgba(131,184,247,.09)!important;border-radius:9px!important;background:rgba(15,48,84,.24)!important}
+    .auction-queue-handle{color:#7698bd!important}
+
+    /* drawers / banditore */
+    .auctioneer-console-drawer,
+    .auction-rosters-drawer,
+    .auction-awards-drawer{
+      border-radius:14px!important;
+      border-color:var(--glass-border)!important;
+      background:rgba(7,27,52,.70)!important;
+      box-shadow:0 15px 36px rgba(0,8,22,.22),inset 0 1px 0 rgba(255,255,255,.055)!important;
+    }
+    .auctioneer-console-drawer>summary,
+    .auction-rosters-drawer>summary,
+    .auction-awards-drawer>summary{
+      border-color:rgba(135,187,250,.13)!important;
+      background:linear-gradient(100deg,rgba(40,91,151,.62),rgba(24,67,119,.42))!important;
+      color:#edf6ff!important;
+    }
+    .auctioneer-console-drawer>.auctioneer-console{background:rgba(5,25,48,.34)!important}
+    .auctioneer-console{border-color:transparent!important;background:transparent!important;box-shadow:none!important}
+    .auctioneer-manual-award{border-color:rgba(132,185,248,.10)!important}
+    .auctioneer-search-result{background:rgba(20,60,102,.66)!important;border-color:rgba(132,185,248,.13)!important}
+    .auctioneer-search-result:hover{background:rgba(36,82,136,.78)!important}
+    .auction-rosters-team{border-color:rgba(132,185,248,.10)!important;border-radius:12px!important;background:rgba(14,45,79,.25)!important}
+    .auction-rosters-player{border-color:rgba(132,185,248,.075)!important;background:rgba(8,35,64,.18)!important}
+    .auction-award-row{border-color:rgba(132,185,248,.08)!important;border-radius:10px!important;background:rgba(13,44,78,.22)!important}
+    .auction-transfer-modal{background:rgba(0,10,23,.58)!important;backdrop-filter:blur(12px) saturate(125%)!important;-webkit-backdrop-filter:blur(12px) saturate(125%)!important}
+    .auction-transfer-card{border-radius:18px!important;background:linear-gradient(145deg,rgba(15,49,88,.92),rgba(6,27,52,.90))!important;box-shadow:0 24px 70px rgba(0,5,16,.48),inset 0 1px 0 rgba(255,255,255,.09)!important}
+
+    /* mobile president console */
+    .auction-mobile-console{padding:8px!important;gap:8px!important;background:transparent!important}
+    .auction-mobile-console-top{border-radius:15px!important;padding:8px 10px!important}
+    .auction-mobile-main{border-radius:18px!important;background:radial-gradient(circle at 50% 8%,rgba(59,130,246,.20),transparent 46%),linear-gradient(150deg,rgba(17,55,98,.68),rgba(5,24,47,.58))!important}
+    .auction-mobile-player{font-weight:950;letter-spacing:-.055em}
+    .auction-mobile-bid-stat{border-color:rgba(132,185,248,.11)!important;border-radius:12px!important;background:rgba(7,32,60,.34)!important}
+
+    /* responsive global */
+    @media(max-width:900px){
+      :root{--gap:6px}
+      .app{padding:6px;gap:6px}
+      .panel{padding:9px;border-radius:15px}
+      .home-layout,.manage-layout{gap:6px}
+      .auction-lower-main{gap:6px!important}
+      .auction-player-hero,.auction-action-card,.auction-team-card,.auction-team-roster,.auction-bid-history,.auction-free-fixed{border-radius:14px!important}
     }
 
-    @media(max-width:850px){
-      .auction-lower-main{
-        grid-template-columns:minmax(205px,.55fr) minmax(360px,1.2fr) auto!important;
-      }
-      .auction-lower-main>.auction-team-column{display:none!important}
-      .auction-middle-column{grid-column:1!important}
-      .auction-free-fixed{grid-column:2!important}
-      .auction-call-queue-drawer{grid-column:3!important}
-      .auction-status-team-kpis>span:last-child{display:none}
-      .auction-status-team-kpis{
-        grid-template-columns:repeat(3,minmax(46px,1fr));
-      }
+    @media(max-width:720px){
+      :root{--header-h:48px;--nav-h:42px}
+      .app{padding:5px}
+      .app-head{border-radius:14px;padding:6px 8px}
+      .brand{font-size:13px}.league-pill{padding:4px 7px}.league-pill strong{max-width:34vw}
+      .main-nav{border-radius:13px;padding:3px}
+      .nav-btn{min-height:34px;min-width:59px;border-radius:9px;font-size:9px}
+      .panel{border-radius:14px;padding:8px}
+      button,.btn,input,select,textarea{border-radius:9px}
+      .grid-2,.grid-3,.setup-layout{grid-template-columns:1fr}
+      .setup-layout .full{grid-column:auto}
+      .home-layout,.manage-layout{grid-template-columns:1fr;height:auto;min-height:100%}
+      .rosters-grid{grid-template-columns:1fr}
+      .filters{grid-template-columns:minmax(0,1fr) minmax(90px,.6fr);gap:5px}
+      .filters>*:nth-child(n+3){grid-column:auto}
+      .player-table{min-width:690px}
+      body.auction-live .app{padding:4px}
     }
 
-    @media(max-width:760px){
-      .auction-status-team-kpis{display:none!important}
-      .auction-statusbar{
-        grid-template-columns:auto minmax(0,1fr) auto auto!important;
-      }
+    @media(max-width:560px){
+      .user-label{display:none}
+      .head-actions{gap:3px}.head-actions button{padding-inline:8px}
+      .league-pill small{display:none}
+      .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .filters{grid-template-columns:1fr 1fr}
+      .rolebar{grid-column:1/-1}
+      .auction-statusbar{border-radius:12px!important}
+      .auction-free-fixed{border-radius:12px!important}
+      .auctioneer-console-drawer,.auction-rosters-drawer,.auction-awards-drawer,.auction-call-queue-drawer{border-radius:12px!important}
     }
+
+    @media(prefers-reduced-motion:reduce){
+      *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+    }
+
   </style>
 </head>
 <body>
@@ -6729,9 +6904,6 @@
         );
 
       let rosterLimit = null;
-      let rosterMin = null;
-      let rosterMax = null;
-      let roleLimits = {};
       let roleBadges = [];
 
       if (
@@ -6759,19 +6931,6 @@
                 ),
               0
             );
-
-        rosterMin = rosterLimit;
-        rosterMax = rosterLimit;
-        roleLimits = Object.fromEntries(
-          ['P', 'D', 'C', 'A']
-            .map(role => [
-              role,
-              {
-                min: Number(limits?.[role] || 0),
-                max: Number(limits?.[role] || 0)
-              }
-            ])
-        );
 
         roleBadges =
           ['P', 'D', 'C', 'A']
@@ -6857,25 +7016,6 @@
           ||
           null;
 
-        rosterMin =
-          Number(mantra?.total?.min ?? rosterLimit ?? 23)
-          || 23;
-
-        rosterMax =
-          Number(mantra?.total?.max ?? rosterLimit ?? 32)
-          || 32;
-
-        roleLimits = {
-          Por: {
-            min: Number(mantra?.goalkeepers?.min ?? 2),
-            max: Number(mantra?.goalkeepers?.max ?? 3)
-          },
-          MOV: {
-            min: Number(mantra?.outfield?.min ?? 0),
-            max: Number(mantra?.outfield?.max ?? rosterMax)
-          }
-        };
-
         roleBadges = [
           {
             label: 'POR',
@@ -6948,24 +7088,17 @@
           capacity?.roster_limit
           ??
           rosterLimit,
-        rosterMin,
-        rosterMax,
-        roleLimits,
         roleBadges,
         assignments
       };
     }
 
 
-    function renderAuctionCockpitTeamPanel(part = 'all') {
+    function renderAuctionCockpitTeamPanel() {
       const info =
         auctionMyTeamDashboardData();
 
       if (!info) {
-        if (part === 'kpis' || part === 'status-kpis') {
-          return '';
-        }
-
         const d = state.auction;
         const initialCredits =
           Number(
@@ -7090,178 +7223,52 @@
           `)
           .join('');
 
-      const queueEntries =
-        auctionQueueRows()
-          .filter(item => item.player)
-          .map(item => ({
-            player: item.player,
-            price: Number(item.opening_bid || 1),
-            queued: true,
-            position: Number(item.position || 0)
-          }));
-
-      const rosterEntries = [
-        ...info.assignments.map(item => ({
-          player: item.player || {},
-          price: Number(item.purchase_price || 0),
-          queued: false,
-          position: 0
-        })),
-        ...queueEntries
-      ];
-
-      const roleSequence =
-        roleOrder(
-          state.auction?.settings?.fantasy_mode
-        );
-
-      const entryRoleRank = entry => {
-        const ranks =
-          playerRoles(
-            entry.player || {},
-            state.auction?.settings?.fantasy_mode
-          )
-            .map(role => roleSequence.indexOf(role))
-            .filter(index => index >= 0);
-
-        return ranks.length
-          ? Math.min(...ranks)
-          : roleSequence.length;
-      };
-
-      rosterEntries.sort((a, b) =>
-        entryRoleRank(a) - entryRoleRank(b)
-        || Number(a.queued) - Number(b.queued)
-        || String(a.player?.name || '')
-          .localeCompare(String(b.player?.name || ''), 'it')
-      );
-
-      const mode =
-        state.auction?.settings?.fantasy_mode
-        || 'classic';
-
-      const rosterMinSlots =
-        Math.max(23, Number(info.rosterMin || info.rosterLimit || 23));
-
-      const rosterMaxSlots =
-        Math.max(
-          rosterMinSlots,
-          Math.min(32, Number(info.rosterMax || info.rosterLimit || 32))
-        );
-
-      const projectedRosterCount =
-        info.assignments.length + queueEntries.length;
-
-      const rosterRowCount =
-        Math.max(
-          rosterMinSlots,
-          Math.min(rosterMaxSlots, projectedRosterCount)
-        );
-
-      let slottedRosterEntries = [];
-
-      if (mode === 'classic') {
-        ['P', 'D', 'C', 'A']
-          .forEach(role => {
-            const group =
-              rosterEntries.filter(entry =>
-                entry.player?.classic_role === role
-              );
-
-            const required =
-              Number(info.roleLimits?.[role]?.min || 0);
-
-            slottedRosterEntries.push(...group);
-
-            for (
-              let index = group.length;
-              index < required;
-              index += 1
-            ) {
-              slottedRosterEntries.push({
-                empty: true,
-                emptyRole: role
-              });
-            }
-          });
-      } else {
-        const isGoalkeeperEntry = entry =>
-          playerRoles(entry.player || {}, mode)
-            .some(role => ['P', 'Por'].includes(role));
-
-        const goalkeepers =
-          rosterEntries.filter(isGoalkeeperEntry);
-
-        const outfield =
-          rosterEntries.filter(entry => !isGoalkeeperEntry(entry));
-
-        slottedRosterEntries.push(...goalkeepers);
-
-        const minimumGoalkeepers =
-          Number(info.roleLimits?.Por?.min ?? 2);
-
-        for (
-          let index = goalkeepers.length;
-          index < minimumGoalkeepers;
-          index += 1
-        ) {
-          slottedRosterEntries.push({
-            empty: true,
-            emptyRole: 'Por'
-          });
-        }
-
-        slottedRosterEntries.push(...outfield);
-      }
-
-      while (slottedRosterEntries.length < rosterRowCount) {
-        slottedRosterEntries.push({ empty: true });
-      }
-
-      const visibleRosterEntries =
-        slottedRosterEntries.slice(0, rosterRowCount);
-
       const rosterHtml =
-        visibleRosterEntries.map(entry => {
-              if (entry.empty) {
+        info.assignments.length
+          ? info.assignments
+              .slice()
+              .sort((a, b) =>
+                String(a.player?.name || '')
+                  .localeCompare(
+                    String(b.player?.name || ''),
+                    'it'
+                  )
+              )
+              .map(item => {
+                const roles =
+                  playerRoles(
+                    item.player || {},
+                    state.auction?.settings?.fantasy_mode
+                  )
+                    .join('/');
+
                 return `
-                  <div class="auction-roster-line is-empty" aria-label="Slot rosa vuoto">
-                    ${
-                      entry.emptyRole
-                        ? `<span class="rolebadge" data-role="${esc(entry.emptyRole)}">${esc(entry.emptyRole)}</span>`
-                        : '<span class="auction-roster-empty-index">—</span>'
-                    }
-                    <span class="auction-roster-empty-label">Slot disponibile</span>
+                  <div class="auction-roster-line">
+                    <div>
+                      <strong>${esc(item.player?.name || '—')}</strong>
+                      <small>
+                        ${esc(roles)}
+                        · ${esc(item.player?.serie_a_team || '')}
+                      </small>
+                    </div>
+
+                    <span class="badge primary">
+                      ${Number(item.purchase_price || 0)}
+                    </span>
                   </div>
                 `;
-              }
+              })
+              .join('')
+          : `
+              <div class="my-team-roster-empty">
+                Nessun acquisto ancora registrato.
+              </div>
+            `;
 
-              const roles =
-                playerRoles(
-                  entry.player || {},
-                  state.auction?.settings?.fantasy_mode
-                );
+      return `
+        <div class="auction-team-column">
 
-              return `
-                <div class="auction-roster-line ${entry.queued ? 'is-queued' : ''}">
-                  <div class="auction-roster-player-main">
-                    <span class="auction-roster-mini-roles">
-                      ${roles.map(role => `
-                        <span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>
-                      `).join('')}
-                    </span>
-                    <strong>${esc(entry.player?.name || '—')}</strong>
-                  </div>
-
-                  <span class="auction-roster-price ${entry.queued ? 'queued' : ''}">
-                    ${entry.queued ? `Q${entry.position || ''} · ` : ''}${entry.price}
-                  </span>
-                </div>
-              `;
-            }).join('');
-
-      const teamKpisHtml = `
-        <section class="auction-team-card auction-middle-team-kpis">
+          <section class="auction-team-card">
 
             <div class="auction-team-card-head">
               <div>
@@ -7321,56 +7328,22 @@
               ${rolesHtml}
             </div>
 
-        </section>
-      `;
+          </section>
 
-      const teamStatusKpisHtml = `
-        <div class="auction-status-team-kpis" aria-label="Riepilogo squadra">
-          <strong>${esc(info.teamName)}</strong>
-          <span><small>Crediti</small><b>${info.remaining}</b></span>
-          <span><small>Max</small><b>${maxBid}</b></span>
-          <span><small>Rosa</small><b>${projectedRosterCount}/${info.rosterMax || info.rosterLimit || '—'}</b></span>
-          <span><small>Spesi</small><b>${info.spent}</b></span>
-        </div>
-      `;
 
-      const teamRosterHtml = `
-        <div class="auction-team-column">
           <section class="auction-team-roster">
 
             <div class="auction-team-roster-head">
-              <strong>Rosa · ${esc(info.teamName)}</strong>
-              <span class="badge">${projectedRosterCount}${info.rosterLimit ? `/${info.rosterLimit}` : ''}</span>
+              <strong>Giocatori acquistati</strong>
+              <span class="badge">${info.assignments.length}</span>
             </div>
 
-            <div
-              class="auction-team-roster-list"
-              style="--roster-row-count:${rosterRowCount}"
-            >
+            <div class="auction-team-roster-list">
               ${rosterHtml}
             </div>
 
           </section>
 
-        </div>
-      `;
-
-      if (part === 'kpis') {
-        return teamKpisHtml;
-      }
-
-      if (part === 'status-kpis') {
-        return teamStatusKpisHtml;
-      }
-
-      if (part === 'roster') {
-        return teamRosterHtml;
-      }
-
-      return `
-        <div class="auction-team-column">
-          ${teamKpisHtml}
-          ${teamRosterHtml}
         </div>
       `;
     }
@@ -7924,18 +7897,6 @@
       ) {
         return msg(
           'Il giocatore è già nella coda.',
-          'warning'
-        );
-      }
-
-      const capacity =
-        auctionQueueCapacityForPlayer(
-          player
-        );
-
-      if (!capacity.allowed) {
-        return msg(
-          capacity.message,
           'warning'
         );
       }
@@ -8586,7 +8547,7 @@
     }
 
 
-    function renderAuctionFixedFreeAgents(hasPlayer, callerControlsHtml = '') {
+    function renderAuctionFixedFreeAgents(hasPlayer) {
       const total =
         state.auction?.callCandidates?.length
         ||
@@ -8596,11 +8557,6 @@
         auctionCallMode()
         &&
         auctionHasPresidentRole();
-
-      const queueCapacity =
-        auctionQueueCapacityForPlayer(
-          player
-        );
 
       return `
         <aside class="auction-free-fixed">
@@ -8613,13 +8569,10 @@
             </div>
 
             <span class="small soft">
-              ricerca e chiamata
+              ricerca dalla fascia superiore
             </span>
 
           </div>
-
-
-          ${callerControlsHtml}
 
 
           <div>
@@ -9392,6 +9345,16 @@
         ||
         null;
 
+      const recentBids =
+        (data?.recentBids || [])
+          .slice(0, 12)
+          .map(item => [
+            item.id,
+            item.team_id,
+            item.amount,
+            item.source
+          ]);
+
       const vice =
         data?.viceSignal
           ? [
@@ -9428,6 +9391,7 @@
         nominationExpired:
           session?.nomination_expired_at || null,
 
+        recentBids,
         vice
       });
     }
@@ -9545,7 +9509,9 @@
     }
 
 
-    function patchAuctionTopSelection() {
+    function patchAuctionTopSelection({
+      preserveSearchText = null
+    } = {}) {
       const d =
         state.auction;
 
@@ -9573,9 +9539,15 @@
         !== search
       ) {
         search.value =
-          selected?.name
-          || state.auctionFilterSearch
-          || '';
+          preserveSearchText
+          ??
+          (
+            selected?.name
+            ||
+            state.auctionFilterSearch
+            ||
+            ''
+          );
       }
 
       const base =
@@ -9710,6 +9682,21 @@
           leaderName;
       }
 
+      const statusSub =
+        $('auction-status-sub-live');
+
+      if (statusSub) {
+        statusSub.textContent =
+          s.current_player_id
+            ? (
+                d.settings?.bid_mode === 'turn'
+                  ? `Turno: ${d.currentTurnTeam?.name || '—'}`
+                  : 'Rilanci liberi'
+              )
+            : `Chiama: ${d.currentNominationTeam?.name || '—'}`;
+      }
+
+
       document
         .querySelectorAll(
           '.quick-btn[data-offset]'
@@ -9759,7 +9746,7 @@
 
       if (presidentConfirm) {
         presidentConfirm.textContent =
-          `RILANCIA ${selectedBid}`;
+          `CONFERMA ${selectedBid}`;
       }
 
 
@@ -9772,6 +9759,22 @@
       }
 
 
+      const correctAmount =
+        $('auction-correct-amount');
+
+      if (
+        correctAmount
+        &&
+        document.activeElement
+        !== correctAmount
+      ) {
+        correctAmount.value =
+          String(selectedBid);
+      }
+
+
+      renderRecentBidChips();
+      patchAuctionTopSelection();
       renderAuctionTimer();
     }
 
@@ -10144,31 +10147,6 @@
         );
 
 
-      const quickStripHtml = `
-        <div class="auction-status-quick" aria-label="Console rialzi rapidi">
-          <span class="auction-status-quick-label">Rialzi</span>
-          ${quickOffsets.map(offset => {
-            const amount = currentBid + offset;
-            return `
-              <button
-                class="quick-btn ${selectedBid === amount ? 'selected' : ''}"
-                data-offset="${offset}"
-                data-amount="${amount}"
-                type="button"
-                ${canSelectBid ? '' : 'disabled'}
-              ><span>+${offset}</span><strong>${amount}</strong></button>
-            `;
-          }).join('')}
-          <button
-            id="president-bid"
-            class="auction-command-bid-confirm"
-            type="button"
-            ${canPresidentBid ? '' : 'disabled'}
-          >RILANCIA ${selectedBid ?? '—'}</button>
-        </div>
-      `;
-
-
       const topBarHtml = `
         <section class="auction-command-bar">
 
@@ -10192,51 +10170,66 @@
               ${esc(hasPlayer ? p?.name || 'Giocatore' : '—')}
             </strong>
 
+            <div class="auction-inline-roles">
+              ${
+                calledRoles.length
+                  ? calledRoles.map(role => `
+                      <span
+                        class="rolebadge"
+                        data-role="${esc(role)}"
+                      >
+                        ${esc(role)}
+                      </span>
+                    `).join('')
+                  : ''
+              }
+            </div>
+
             <small>
               ${
                 hasPlayer
-                  ? `${calledRoles.map(role => `
-                      <span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>
-                    `).join('')}
-                    <span>${esc(p?.serie_a_team || '')} · Slot ${esc(p?.slot ?? '—')}</span>`
+                  ? `${esc(p?.serie_a_team || '')} · Slot ${esc(p?.slot ?? '—')}`
                   : `Turno: ${esc(d.currentNominationTeam?.name || '—')}`
               }
             </small>
           </div>
 
-          <div class="auction-command-cell auction-command-offer">
+
+          <div class="auction-command-cell auction-command-best">
             <span class="auction-command-label">
-              Offerta migliore · miglior offerente
+              Offerta migliore
             </span>
 
             <strong id="auction-live-current-bid">
               ${hasPlayer ? currentBid || '—' : '—'}
             </strong>
 
-            <small id="auction-live-leader">
+            <b id="auction-live-leader">
               ${esc(hasPlayer ? d.currentBidderTeam?.name || 'Nessuno' : '—')}
-            </small>
+            </b>
           </div>
 
-        </section>
-      `;
 
+          <label class="auction-command-cell auction-command-search">
+            <span class="auction-command-label">
+              Ricerca giocatore
+            </span>
 
-      const callerControlsHtml = `
-        <section class="auction-caller-controls">
-          <label class="auction-command-search">
-            <span class="auction-command-label">Ricerca giocatore</span>
             <input
               id="auction-top-search"
               type="search"
               placeholder="Nome o squadra..."
               autocomplete="off"
-              value="${esc(selectedCall?.name || state.auctionFilterSearch)}"
+              value="${esc(state.auctionFilterSearch)}"
             >
           </label>
 
-          <label class="auction-command-base">
-            <span class="auction-command-label">Base</span>
+
+          <label class="auction-command-cell auction-command-base">
+            <span class="auction-command-label">
+              Base
+            </span>
+
             <input
               id="auction-top-base"
               type="number"
@@ -10246,13 +10239,115 @@
             >
           </label>
 
-          <button
-            id="auction-top-action"
-            type="button"
-            class="auction-command-action ${ownCallNow ? 'ok' : 'queue'}"
-            ${topActionDisabled ? 'disabled' : ''}
-          >${topActionLabel}</button>
+
+          <div class="auction-command-action-wrap">
+            <button
+              id="auction-top-action"
+              type="button"
+              class="auction-command-action ${ownCallNow ? 'ok' : 'queue'}"
+              ${topActionDisabled ? 'disabled' : ''}
+            >
+              ${topActionLabel}
+            </button>
+          </div>
+
         </section>
+      `;
+
+
+      const quickStripHtml = `
+        <div class="auction-quick-strip">
+
+          <section class="auction-quick-team-summary">
+
+            <div class="auction-team-mini-kpi">
+              <span>Squadra</span>
+              <strong>
+                ${esc(auctionMyTeamDashboardData()?.teamName || '—')}
+              </strong>
+            </div>
+
+            <div class="auction-team-mini-kpi">
+              <span>Crediti</span>
+              <strong>
+                ${auctionMyTeamDashboardData()?.remaining ?? '—'}
+              </strong>
+            </div>
+
+            <div class="auction-team-mini-kpi">
+              <span>Max offerta</span>
+              <strong>
+                ${auctionMyTeamDashboardData()?.maxBid ?? '—'}
+              </strong>
+            </div>
+
+            <div class="auction-team-mini-kpi">
+              <span>Rosa</span>
+              <strong>
+                ${
+                  auctionMyTeamDashboardData()?.rosterCount ?? 0
+                }${
+                  auctionMyTeamDashboardData()?.rosterLimit
+                    ? `/${auctionMyTeamDashboardData().rosterLimit}`
+                    : ''
+                }
+              </strong>
+            </div>
+
+          </section>
+
+
+          ${
+            hasPlayer
+            &&
+            auctionHasPresidentRole()
+              ? `
+                  <section class="auction-quick-bid-console">
+
+                    <span class="auction-command-label">
+                      La tua offerta
+                    </span>
+
+                    ${[1,2,3,5,10].map(offset => {
+                      const amount =
+                        currentBid + offset;
+
+                      return `
+                        <button
+                          type="button"
+                          class="quick-btn ${
+                            selectedBid === amount
+                              ? 'selected'
+                              : ''
+                          }"
+                          data-offset="${offset}"
+                          data-amount="${amount}"
+                        >
+                          +${offset}
+                        </button>
+                      `;
+                    }).join('')}
+
+                    <button
+                      id="president-bid"
+                      class="auction-mobile-confirm"
+                      type="button"
+                    >
+                      CONFERMA ${selectedBid}
+                    </button>
+
+                  </section>
+                `
+              : `
+                  <section class="auction-quick-bid-console">
+                    <span class="auction-command-label">
+                      Rilanci rapidi disponibili durante un lotto attivo.
+                    </span>
+                  </section>
+                `
+          }
+
+        </div>
       `;
 
 
@@ -11043,9 +11138,6 @@
             </div>
 
 
-            ${renderAuctionCockpitTeamPanel('status-kpis')}
-
-
             <div class="auction-status-phase">
 
               <span class="badge ${
@@ -11076,6 +11168,12 @@
 
 
           <div class="auction-cockpit-stage">
+
+            ${topBarHtml}
+
+            ${quickStripHtml}
+
+
             <div class="auction-lower-stage">
 
               ${renderAuctionAwardsDrawer()}
@@ -11083,20 +11181,24 @@
 
               <div class="auction-lower-main">
 
-                ${renderAuctionCockpitTeamPanel('roster')}
+                ${renderAuctionCockpitTeamPanel()}
 
 
                 <div class="auction-middle-column">
-                  ${topBarHtml}
-                  <section class="auction-middle-quick">
-                    ${quickStripHtml}
-                  </section>
-                  <div class="auction-middle-vice-slot">${viceHtml}</div>
+                  ${
+                    !auctionDualModeEnabled()
+                    &&
+                    hasPlayer
+                      ? actionHtml
+                      : ''
+                  }
+
+                  ${viceHtml}
                   ${recentBidsHtml}
                 </div>
 
 
-                ${renderAuctionFixedFreeAgents(hasPlayer, callerControlsHtml)}
+                ${renderAuctionFixedFreeAgents(hasPlayer)}
 
                 ${renderAuctionCallQueue()}
 
@@ -11162,7 +11264,16 @@
             }
 
             renderAuctionPlayers();
-            patchAuctionTopSelection();
+
+            /*
+             * Durante digitazione manteniamo il testo digitato,
+             * altrimenti patchAuctionTopSelection potrebbe ripristinare
+             * il nome del giocatore selezionato.
+             */
+            patchAuctionTopSelection({
+              preserveSearchText:
+                event.target.value
+            });
           }
         );
 
@@ -12273,6 +12384,11 @@
         &&
         auctionHasPresidentRole();
 
+      const queueCapacity =
+        auctionQueueCapacityForPlayer(
+          player
+        );
+
       const queueAction =
         queuedIndex >= 0
         &&
@@ -12549,6 +12665,11 @@
               state.auctionSelectedPlayerId =
                 player.id;
 
+              /*
+               * Il nome selezionato resta visibile nella ricerca alta,
+               * ma il filtro della lista viene azzerato subito:
+               * dopo la selezione tornano visibili tutti gli svincolati.
+               */
               state.auctionFilterSearch =
                 '';
 
@@ -12571,7 +12692,10 @@
               }
 
               renderAuctionPlayers();
-              patchAuctionTopSelection();
+              patchAuctionTopSelection({
+                preserveSearchText:
+                  player.name
+              });
             }
           );
         });
