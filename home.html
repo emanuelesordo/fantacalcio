@@ -4510,15 +4510,16 @@
       padding:3px;
       gap:1px;
       overflow:hidden!important;
-      grid-template-rows:repeat(32,minmax(0,1fr));
+      grid-template-rows:repeat(var(--roster-row-count,32),minmax(0,1fr));
     }
 
     .auction-roster-line{
       min-height:0!important;
-      height:auto;
-      padding:1px 4px;
+      height:100%;
+      padding:0 4px;
       gap:3px;
       border-radius:4px;
+      overflow:hidden;
     }
 
     .auction-roster-player-main{
@@ -4534,6 +4535,7 @@
       text-overflow:ellipsis;
       white-space:nowrap;
       font-size:8px;
+      line-height:1;
     }
 
     .auction-roster-mini-roles{
@@ -4543,11 +4545,13 @@
     }
 
     .auction-roster-mini-roles .rolebadge{
-      min-width:17px;
-      min-height:14px;
-      padding:1px 3px;
+      min-width:15px;
+      min-height:0;
+      height:12px;
+      padding:0 2px;
       border-radius:4px;
-      font-size:6px;
+      font-size:5px;
+      line-height:12px;
     }
 
     .auction-roster-price{
@@ -4560,6 +4564,7 @@
       font-size:7px;
       font-weight:900;
       white-space:nowrap;
+      line-height:1.2;
     }
 
     .auction-roster-line.is-queued{
@@ -4572,8 +4577,39 @@
       background:#5f7894;
     }
 
+    .auction-roster-line.is-empty{
+      border-color:rgba(40,89,142,.22);
+      background:rgba(8,29,50,.38);
+    }
+
+    .auction-roster-empty-index{
+      color:rgba(126,161,199,.34);
+      font-size:6px;
+      line-height:1;
+    }
+
     .auction-middle-column{
-      grid-template-rows:auto auto minmax(0,1fr)!important;
+      grid-template-rows:auto auto auto minmax(0,1fr)!important;
+    }
+
+    .auction-middle-team-kpis{
+      min-height:0;
+    }
+
+    .auction-middle-team-kpis .auction-team-card-head strong{
+      font-size:12px;
+    }
+
+    .auction-middle-team-kpis .auction-team-primary-kpis{
+      grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+
+    .auction-middle-team-kpis .auction-team-big-kpi{
+      min-height:38px;
+    }
+
+    .auction-middle-team-kpis .auction-team-big-kpi strong{
+      font-size:18px;
     }
 
     .auction-middle-column .auction-command-bar{
@@ -6776,11 +6812,15 @@
     }
 
 
-    function renderAuctionCockpitTeamPanel() {
+    function renderAuctionCockpitTeamPanel(part = 'all') {
       const info =
         auctionMyTeamDashboardData();
 
       if (!info) {
+        if (part === 'kpis') {
+          return '';
+        }
+
         const d = state.auction;
         const initialCredits =
           Number(
@@ -6951,9 +6991,20 @@
           .localeCompare(String(b.player?.name || ''), 'it')
       );
 
+      const rosterRowCount =
+        Math.max(
+          23,
+          Math.min(
+            32,
+            Number(info.rosterLimit || 32)
+          )
+        );
+
+      const visibleRosterEntries =
+        rosterEntries.slice(0, rosterRowCount);
+
       const rosterHtml =
-        rosterEntries.length
-          ? rosterEntries.map(entry => {
+        visibleRosterEntries.map(entry => {
               const roles =
                 playerRoles(
                   entry.player || {},
@@ -6977,15 +7028,28 @@
                 </div>
               `;
             }).join('')
-          : '<div class="my-team-roster-empty">Rosa ancora vuota.</div>';
+        +
+        Array.from({
+          length:
+            Math.max(
+              0,
+              rosterRowCount - visibleRosterEntries.length
+            )
+        })
+          .map((_, index) => `
+            <div class="auction-roster-line is-empty" aria-hidden="true">
+              <span class="auction-roster-empty-index">
+                ${visibleRosterEntries.length + index + 1}
+              </span>
+            </div>
+          `)
+          .join('');
 
       const projectedRosterCount =
         info.assignments.length + queueEntries.length;
 
-      return `
-        <div class="auction-team-column">
-
-          <section class="auction-team-card">
+      const teamKpisHtml = `
+        <section class="auction-team-card auction-middle-team-kpis">
 
             <div class="auction-team-card-head">
               <div>
@@ -7045,22 +7109,42 @@
               ${rolesHtml}
             </div>
 
-          </section>
+        </section>
+      `;
 
-
+      const teamRosterHtml = `
+        <div class="auction-team-column">
           <section class="auction-team-roster">
 
             <div class="auction-team-roster-head">
-              <strong>Rosa in creazione</strong>
+              <strong>Rosa · ${esc(info.teamName)}</strong>
               <span class="badge">${projectedRosterCount}${info.rosterLimit ? `/${info.rosterLimit}` : ''}</span>
             </div>
 
-            <div class="auction-team-roster-list">
+            <div
+              class="auction-team-roster-list"
+              style="--roster-row-count:${rosterRowCount}"
+            >
               ${rosterHtml}
             </div>
 
           </section>
 
+        </div>
+      `;
+
+      if (part === 'kpis') {
+        return teamKpisHtml;
+      }
+
+      if (part === 'roster') {
+        return teamRosterHtml;
+      }
+
+      return `
+        <div class="auction-team-column">
+          ${teamKpisHtml}
+          ${teamRosterHtml}
         </div>
       `;
     }
@@ -10652,11 +10736,12 @@
 
               <div class="auction-lower-main">
 
-                ${renderAuctionCockpitTeamPanel()}
+                ${renderAuctionCockpitTeamPanel('roster')}
 
 
                 <div class="auction-middle-column">
                   ${topBarHtml}
+                  ${renderAuctionCockpitTeamPanel('kpis')}
                   ${viceHtml}
                   ${recentBidsHtml}
                 </div>
