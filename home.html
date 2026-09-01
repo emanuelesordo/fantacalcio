@@ -4310,9 +4310,52 @@
     }
 
     /* V13: console rilanci nella fascia alta e riepiloghi compatti. */
+    .auction-statusbar{
+      grid-template-columns:auto minmax(150px,.65fr) minmax(430px,1.6fr) auto auto!important;
+    }
+
+    .auction-status-quick{
+      min-width:0;
+      display:grid;
+      grid-template-columns:auto repeat(5,minmax(42px,1fr)) minmax(105px,1.45fr);
+      align-items:center;
+      gap:4px;
+    }
+
+    .auction-status-quick-label{
+      color:var(--muted);
+      font-size:7px;
+      font-weight:950;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+    }
+
+    .auction-status-quick .quick-btn{
+      min-height:28px;
+      height:28px;
+      padding:1px 4px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:3px;
+      border-radius:6px;
+    }
+
+    .auction-status-quick .quick-btn span,
+    .auction-status-quick .quick-btn strong{
+      font-size:9px;
+      line-height:1;
+    }
+
+    .auction-status-quick .auction-command-bid-confirm{
+      min-height:28px;
+      height:28px;
+      white-space:nowrap;
+    }
+
     .auction-command-bar{
-      grid-template-columns:68px minmax(190px,1.15fr) minmax(115px,.62fr)
-        minmax(330px,1.65fr) minmax(155px,.82fr) 68px 74px!important;
+      grid-template-columns:68px minmax(240px,1.35fr) minmax(140px,.7fr)
+        minmax(220px,1.1fr) 68px 74px!important;
       min-height:72px!important;
     }
 
@@ -4343,26 +4386,6 @@
       font-weight:800;
     }
 
-    .auction-command-quick{
-      padding:4px 5px!important;
-    }
-
-    .auction-command-quick-row{
-      display:grid;
-      grid-template-columns:repeat(5,minmax(38px,1fr)) minmax(82px,1.45fr);
-      gap:3px;
-      min-width:0;
-    }
-
-    .auction-command-quick .quick-btn{
-      min-height:38px;
-      padding:2px;
-      border-radius:6px;
-    }
-
-    .auction-command-quick .quick-btn span{font-size:7px}
-    .auction-command-quick .quick-btn strong{font-size:12px}
-
     .auction-command-bid-confirm{
       min-width:0;
       padding:3px 5px;
@@ -4373,13 +4396,48 @@
     }
 
     .auction-lower-main{
-      grid-template-columns:minmax(250px,.9fr) minmax(175px,.58fr)
+      grid-template-columns:minmax(520px,1.2fr) minmax(155px,.36fr)
         minmax(430px,1.55fr) auto!important;
     }
 
+    .auction-lower-main>.auction-team-column{
+      grid-template-columns:minmax(240px,.82fr) minmax(270px,1.18fr)!important;
+      grid-template-rows:minmax(0,1fr)!important;
+    }
+
+    .auction-lower-main>.auction-team-column>.auction-team-card,
+    .auction-lower-main>.auction-team-column>.auction-team-roster,
+    .auction-lower-main>.auction-team-column>.auction-overview-card{
+      height:100%;
+      min-height:0;
+    }
+
+    .auction-call-queue-drawer-content{
+      display:flex;
+      min-height:0;
+      overflow:hidden!important;
+    }
+
+    .auction-call-queue-drawer .auction-call-queue{
+      flex:1 1 auto;
+      min-height:0;
+      overflow:hidden;
+    }
+
+    .auction-call-queue-drawer .auction-call-queue-list{
+      min-height:0;
+      max-height:100%;
+      overflow-y:auto!important;
+      overflow-x:hidden!important;
+      scrollbar-gutter:stable;
+    }
+
     @media(max-width:1280px){
+      .auction-statusbar{
+        grid-template-columns:auto minmax(125px,.55fr) minmax(360px,1.45fr) auto auto!important;
+      }
       .auction-command-bar{
-        grid-template-columns:62px minmax(180px,1fr) 105px minmax(290px,1.5fr)!important;
+        grid-template-columns:62px minmax(180px,1fr) 110px minmax(210px,1.15fr)!important;
         grid-auto-rows:minmax(42px,auto);
       }
       .auction-command-search{grid-column:1 / 3!important}
@@ -4388,15 +4446,13 @@
     }
 
     @media(max-width:760px){
+      .auction-statusbar{grid-template-columns:auto minmax(0,1fr) auto auto!important}
+      .auction-status-quick{display:none!important}
       .auction-command-bar{grid-template-columns:58px minmax(0,1fr)!important}
       .auction-command-offer{grid-column:1!important}
-      .auction-command-quick{grid-column:1 / -1!important}
       .auction-command-search{grid-column:1 / -1!important}
       .auction-command-base{grid-column:1!important}
       .auction-command-action-wrap{grid-column:2!important}
-      .auction-command-quick-row{
-        grid-template-columns:repeat(5,minmax(36px,1fr)) minmax(76px,1.35fr);
-      }
     }
   </style>
 </head>
@@ -8651,16 +8707,6 @@
         ||
         null;
 
-      const recentBids =
-        (data?.recentBids || [])
-          .slice(0, 12)
-          .map(item => [
-            item.id,
-            item.team_id,
-            item.amount,
-            item.source
-          ]);
-
       const vice =
         data?.viceSignal
           ? [
@@ -8697,7 +8743,6 @@
         nominationExpired:
           session?.nomination_expired_at || null,
 
-        recentBids,
         vice
       });
     }
@@ -8980,21 +9025,6 @@
           leaderName;
       }
 
-      const statusSub =
-        $('auction-status-sub-live');
-
-      if (statusSub) {
-        statusSub.textContent =
-          s.current_player_id
-            ? (
-                d.settings?.bid_mode === 'turn'
-                  ? `Turno: ${d.currentTurnTeam?.name || '—'}`
-                  : 'Rilanci liberi'
-              )
-            : `Chiama: ${d.currentNominationTeam?.name || '—'}`;
-      }
-
-
       document
         .querySelectorAll(
           '.quick-btn[data-offset]'
@@ -9044,7 +9074,7 @@
 
       if (presidentConfirm) {
         presidentConfirm.textContent =
-          `CONFERMA ${selectedBid}`;
+          `RILANCIA ${selectedBid}`;
       }
 
 
@@ -9057,22 +9087,6 @@
       }
 
 
-      const correctAmount =
-        $('auction-correct-amount');
-
-      if (
-        correctAmount
-        &&
-        document.activeElement
-        !== correctAmount
-      ) {
-        correctAmount.value =
-          String(selectedBid);
-      }
-
-
-      renderRecentBidChips();
-      patchAuctionTopSelection();
       renderAuctionTimer();
     }
 
@@ -9445,6 +9459,31 @@
         );
 
 
+      const quickStripHtml = `
+        <div class="auction-status-quick" aria-label="Console rialzi rapidi">
+          <span class="auction-status-quick-label">Rialzi</span>
+          ${quickOffsets.map(offset => {
+            const amount = currentBid + offset;
+            return `
+              <button
+                class="quick-btn ${selectedBid === amount ? 'selected' : ''}"
+                data-offset="${offset}"
+                data-amount="${amount}"
+                type="button"
+                ${canSelectBid ? '' : 'disabled'}
+              ><span>+${offset}</span><strong>${amount}</strong></button>
+            `;
+          }).join('')}
+          <button
+            id="president-bid"
+            class="auction-command-bid-confirm"
+            type="button"
+            ${canPresidentBid ? '' : 'disabled'}
+          >RILANCIA ${selectedBid ?? '—'}</button>
+        </div>
+      `;
+
+
       const topBarHtml = `
         <section class="auction-command-bar">
 
@@ -9492,31 +9531,6 @@
             <small id="auction-live-leader">
               ${esc(hasPlayer ? d.currentBidderTeam?.name || 'Nessuno' : '—')}
             </small>
-          </div>
-
-
-          <div class="auction-command-cell auction-command-quick">
-            <span class="auction-command-label">Rialzi rapidi</span>
-            <div class="auction-command-quick-row">
-              ${quickOffsets.map(offset => {
-                const amount = currentBid + offset;
-                return `
-                  <button
-                    class="quick-btn ${selectedBid === amount ? 'selected' : ''}"
-                    data-offset="${offset}"
-                    data-amount="${amount}"
-                    type="button"
-                    ${canSelectBid ? '' : 'disabled'}
-                  ><span>+${offset}</span><strong>${amount}</strong></button>
-                `;
-              }).join('')}
-              <button
-                id="president-bid"
-                class="auction-command-bid-confirm"
-                type="button"
-                ${canPresidentBid ? '' : 'disabled'}
-              >RILANCIA ${selectedBid}</button>
-            </div>
           </div>
 
 
@@ -10350,6 +10364,9 @@
               </div>
 
             </div>
+
+
+            ${quickStripHtml}
 
 
             <div class="auction-status-phase">
