@@ -3581,6 +3581,734 @@
       border-color:var(--primary);
     }
 
+
+    /* =====================================================
+       DESIGN SYSTEM 2026 · MODERN RESPONSIVE
+       ===================================================== */
+
+    :root{
+      --bg:#06111f;
+      --bg-soft:#0a1728;
+      --panel:#0d1d31;
+      --panel2:#112640;
+      --panel3:#173352;
+      --line:#203b5a;
+      --line2:#2b527b;
+      --primary:#397cf6;
+      --primary-soft:#183f75;
+      --accent:#63a0ff;
+      --good:#16916d;
+      --warning:#d99a2b;
+      --danger:#cc465b;
+      --text:#f6f9fd;
+      --soft:#b5c7da;
+      --muted:#7893ad;
+
+      --radius-xs:7px;
+      --radius-sm:10px;
+      --radius:14px;
+      --radius-lg:18px;
+
+      --shadow-sm:0 5px 15px rgba(0,0,0,.16);
+      --shadow:0 12px 34px rgba(0,0,0,.24);
+      --shadow-lg:0 22px 58px rgba(0,0,0,.32);
+
+      --tap:42px;
+      --content-max:1800px;
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
+    html{
+      background:var(--bg);
+      color-scheme:dark;
+      scroll-behavior:smooth;
+    }
+
+    body{
+      min-width:0;
+      min-height:100dvh;
+      margin:0;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 16% 0%,rgba(57,124,246,.14),transparent 32rem),
+        radial-gradient(circle at 92% 10%,rgba(40,94,166,.12),transparent 34rem),
+        linear-gradient(180deg,#071321 0%,#06111f 100%);
+      font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+    }
+
+    button,
+    input,
+    select,
+    textarea{
+      font:inherit;
+    }
+
+    button,
+    .nav-btn,
+    summary{
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    button,
+    select,
+    input{
+      min-height:var(--tap);
+      border-radius:var(--radius-sm);
+    }
+
+    input,
+    select,
+    textarea{
+      border:1px solid var(--line);
+      background:#09192a;
+      color:var(--text);
+      outline:none;
+      transition:
+        border-color .16s ease,
+        box-shadow .16s ease,
+        background .16s ease;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus{
+      border-color:var(--accent);
+      box-shadow:0 0 0 3px rgba(99,160,255,.14);
+      background:#0b1d31;
+    }
+
+    button{
+      border:1px solid transparent;
+      font-weight:850;
+      letter-spacing:.01em;
+      transition:
+        transform .12s ease,
+        filter .12s ease,
+        box-shadow .12s ease,
+        background .12s ease;
+    }
+
+    button:not(:disabled):active{
+      transform:translateY(1px) scale(.99);
+    }
+
+    button:not(:disabled):hover{
+      filter:brightness(1.06);
+    }
+
+    .app-header{
+      position:sticky;
+      top:0;
+      z-index:80;
+      min-height:58px;
+      padding:
+        max(8px,env(safe-area-inset-top))
+        max(12px,env(safe-area-inset-right))
+        8px
+        max(12px,env(safe-area-inset-left));
+      border-bottom:1px solid rgba(62,105,150,.34);
+      background:rgba(7,19,33,.86);
+      backdrop-filter:blur(18px) saturate(140%);
+      box-shadow:0 8px 30px rgba(0,0,0,.16);
+    }
+
+    .app-shell,
+    main{
+      width:min(100%,var(--content-max));
+      margin-inline:auto;
+    }
+
+    .main-nav{
+      position:sticky;
+      top:58px;
+      z-index:70;
+      display:flex;
+      gap:6px;
+      width:min(100%,var(--content-max));
+      margin:0 auto;
+      padding:7px 10px;
+      overflow-x:auto;
+      scrollbar-width:none;
+      background:rgba(7,19,33,.78);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid rgba(62,105,150,.26);
+    }
+
+    .main-nav::-webkit-scrollbar{
+      display:none;
+    }
+
+    .main-nav[hidden]{
+      display:none!important;
+    }
+
+    .main-nav .nav-btn{
+      flex:0 0 auto;
+      min-height:36px;
+      padding:7px 12px;
+      border:1px solid transparent;
+      border-radius:999px;
+      color:var(--soft);
+      background:transparent;
+      font-size:12px;
+      font-weight:800;
+      transition:.15s ease;
+    }
+
+    .main-nav .nav-btn:hover{
+      color:var(--text);
+      background:rgba(255,255,255,.05);
+    }
+
+    .main-nav .nav-btn.active,
+    .main-nav .nav-btn[aria-current="page"]{
+      color:#fff;
+      background:linear-gradient(135deg,#3377ed,#245ebd);
+      border-color:#5b93ef;
+      box-shadow:0 5px 16px rgba(39,105,217,.25);
+    }
+
+    .view{
+      min-width:0;
+      padding:
+        clamp(8px,1.2vw,16px)
+        max(8px,env(safe-area-inset-right))
+        calc(16px + env(safe-area-inset-bottom))
+        max(8px,env(safe-area-inset-left));
+    }
+
+    .view.active{
+      animation:view-in .16s ease-out;
+    }
+
+    @keyframes view-in{
+      from{
+        opacity:.72;
+        transform:translateY(3px);
+      }
+      to{
+        opacity:1;
+        transform:none;
+      }
+    }
+
+    .panel,
+    .card,
+    .auction-free-fixed,
+    .auction-team-column,
+    .auctioneer-console,
+    .auction-call-queue,
+    .auction-bid-history{
+      border:1px solid rgba(45,84,124,.78)!important;
+      border-radius:var(--radius)!important;
+      background:
+        linear-gradient(180deg,rgba(17,38,64,.94),rgba(10,27,47,.94))!important;
+      box-shadow:var(--shadow-sm);
+    }
+
+    .panel{
+      padding:clamp(10px,1.2vw,16px);
+    }
+
+    .badge{
+      min-height:22px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:3px 7px;
+      border-radius:999px!important;
+      font-size:10px;
+      font-weight:900;
+      line-height:1;
+    }
+
+    .rolebadge{
+      min-width:26px;
+      min-height:23px;
+      border-radius:7px!important;
+      padding:4px 6px!important;
+      font-size:10px!important;
+      font-weight:950!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+    }
+
+    .kpi-grid,
+    .dashboard-grid,
+    .setup-grid,
+    .management-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));
+      gap:10px;
+    }
+
+    .kpi,
+    .auction-team-mini-kpi{
+      border:1px solid rgba(44,80,118,.66);
+      border-radius:var(--radius-sm);
+      background:rgba(8,27,48,.76);
+    }
+
+    .table-wrap,
+    .drawer-table,
+    .rosters-table,
+    .list-table-wrap{
+      min-width:0;
+      overflow:auto;
+      overscroll-behavior:contain;
+      border-radius:var(--radius-sm);
+    }
+
+    table{
+      border-collapse:separate;
+      border-spacing:0;
+    }
+
+    .player-table{
+      width:100%!important;
+      min-width:0!important;
+      table-layout:auto!important;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .player-table th{
+      position:sticky;
+      top:0;
+      z-index:3;
+      background:#102943!important;
+      color:#c1d4e7;
+      border-bottom:1px solid var(--line2);
+      font-size:9px;
+      letter-spacing:.035em;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+
+    .player-table th:first-child,
+    .player-table td:first-child{
+      padding-left:8px;
+    }
+
+    .player-table th:last-child,
+    .player-table td:last-child{
+      padding-right:8px;
+    }
+
+    .player-table td{
+      height:36px;
+      border-bottom:1px solid rgba(35,69,104,.38);
+      vertical-align:middle;
+    }
+
+    .player-table tbody tr{
+      transition:background .1s ease;
+    }
+
+    .player-table tbody tr:hover{
+      background:rgba(64,126,209,.075);
+    }
+
+    .player-main{
+      display:flex;
+      align-items:center;
+      gap:5px;
+      min-width:0!important;
+    }
+
+    .player-name{
+      font-weight:800;
+    }
+
+    /* =====================================================
+       ASTA · LAYOUT AUTO RESPONSIVE
+       ===================================================== */
+
+    body.auction-live{
+      height:100dvh;
+      overflow:hidden;
+    }
+
+    body.auction-live .app-header,
+    body.auction-live #main-nav{
+      display:none!important;
+    }
+
+    body.auction-live #view-auction{
+      height:100dvh;
+      padding:
+        max(6px,env(safe-area-inset-top))
+        max(6px,env(safe-area-inset-right))
+        max(6px,env(safe-area-inset-bottom))
+        max(6px,env(safe-area-inset-left));
+      overflow:hidden;
+    }
+
+    .auction-root,
+    .auction-live-shell{
+      height:100%;
+      min-width:0;
+      min-height:0;
+    }
+
+    .auction-live-shell{
+      display:grid;
+      grid-template-rows:auto minmax(0,1fr) auto auto;
+      gap:7px;
+    }
+
+    .auction-live-statusbar{
+      min-height:38px;
+      border-radius:var(--radius-sm)!important;
+      background:rgba(11,32,55,.9)!important;
+      border:1px solid rgba(47,92,138,.75)!important;
+      box-shadow:var(--shadow-sm);
+    }
+
+    .auction-cockpit-stage{
+      min-height:0;
+      gap:7px!important;
+    }
+
+    .auction-command-bar{
+      min-height:90px!important;
+      padding:7px!important;
+      gap:6px!important;
+      border-radius:var(--radius)!important;
+      background:
+        radial-gradient(circle at 34% -20%,rgba(83,146,255,.19),transparent 38%),
+        linear-gradient(135deg,#0f2947,#091c31)!important;
+      box-shadow:var(--shadow);
+    }
+
+    .auction-command-cell{
+      border-radius:var(--radius-sm)!important;
+      background:rgba(8,27,48,.76)!important;
+      border-color:rgba(54,99,145,.74)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+    }
+
+    .auction-command-player strong{
+      font-size:clamp(24px,2.5vw,38px)!important;
+    }
+
+    .auction-command-offer strong{
+      font-size:clamp(30px,3vw,44px)!important;
+    }
+
+    .auction-lower-stage,
+    .auction-lower-main{
+      min-width:0;
+      min-height:0;
+    }
+
+    .auction-lower-main{
+      grid-template-columns:
+        minmax(210px,.8fr)
+        minmax(150px,.5fr)
+        minmax(430px,1.55fr)
+        auto!important;
+      gap:7px!important;
+    }
+
+    .auction-team-column,
+    .auction-middle-column,
+    .auction-free-fixed{
+      min-height:0;
+      overflow:hidden;
+    }
+
+    .auction-free-fixed{
+      display:grid!important;
+      grid-template-rows:auto auto minmax(0,1fr);
+      height:100%;
+      min-width:0;
+    }
+
+    .auction-free-fixed-head{
+      padding:7px 9px!important;
+      border-bottom:1px solid rgba(45,84,124,.7);
+    }
+
+    .auction-free-fixed .drawer-table{
+      min-height:0;
+      height:100%;
+    }
+
+    .auction-call-queue-drawer{
+      border-radius:var(--radius)!important;
+      border-color:rgba(52,98,145,.8)!important;
+      background:linear-gradient(180deg,#102c4c,#0a1f37)!important;
+      box-shadow:var(--shadow-sm);
+      transition:
+        width .18s ease,
+        min-width .18s ease,
+        max-width .18s ease;
+    }
+
+    .auction-call-queue-drawer[open]{
+      width:clamp(270px,22vw,360px)!important;
+      min-width:clamp(270px,22vw,360px)!important;
+      max-width:clamp(270px,22vw,360px)!important;
+    }
+
+    .auction-call-queue-drawer>summary{
+      background:linear-gradient(180deg,#235f9e,#194a7d)!important;
+    }
+
+    .auction-call-queue-row{
+      min-height:46px!important;
+      border-radius:9px!important;
+      background:rgba(8,30,53,.92)!important;
+    }
+
+    .auction-call-queue-row:hover{
+      border-color:#4b85bd!important;
+      background:#0d345b!important;
+    }
+
+    .auctioneer-console-drawer,
+    .auction-rosters-drawer{
+      border-radius:var(--radius)!important;
+      box-shadow:var(--shadow-sm);
+    }
+
+    .auctioneer-console-drawer>summary,
+    .auction-rosters-drawer>summary{
+      min-height:34px!important;
+      border-radius:var(--radius-sm)!important;
+    }
+
+    /* =====================================================
+       BREAKPOINTS FLUIDI
+       ===================================================== */
+
+    @media(max-width:1280px){
+      .auction-command-bar{
+        grid-template-columns:
+          66px
+          minmax(180px,1.15fr)
+          94px
+          92px
+          minmax(105px,.65fr)
+          minmax(160px,.95fr)
+          66px
+          72px!important;
+      }
+
+      .auction-lower-main{
+        grid-template-columns:
+          minmax(190px,.7fr)
+          minmax(135px,.4fr)
+          minmax(360px,1.35fr)
+          auto!important;
+      }
+    }
+
+    @media(max-width:1024px){
+      .view{
+        padding:8px;
+      }
+
+      .auction-command-bar{
+        grid-template-columns:
+          62px
+          minmax(180px,1fr)
+          90px
+          84px!important;
+        grid-auto-rows:minmax(42px,auto);
+      }
+
+      .auction-command-search{
+        grid-column:1 / 3!important;
+      }
+
+      .auction-command-base{
+        grid-column:3!important;
+      }
+
+      .auction-command-action-wrap{
+        grid-column:4!important;
+      }
+
+      .auction-lower-main{
+        grid-template-columns:
+          minmax(175px,.6fr)
+          minmax(0,1.4fr)
+          auto!important;
+      }
+
+      .auction-middle-column{
+        display:none!important;
+      }
+
+      .auction-free-fixed{
+        grid-column:2;
+      }
+
+      .auction-call-queue-drawer{
+        grid-column:3;
+      }
+
+      .auction-team-roster{
+        display:none;
+      }
+    }
+
+    @media(max-width:760px){
+      :root{
+        --tap:44px;
+        --radius:12px;
+      }
+
+      .app-header{
+        min-height:54px;
+        padding:7px 9px;
+      }
+
+      .main-nav{
+        top:54px;
+        padding:6px 8px;
+      }
+
+      .main-nav .nav-btn{
+        min-height:34px;
+        padding:6px 10px;
+        font-size:11px;
+      }
+
+      .panel{
+        padding:10px;
+      }
+
+      .kpi-grid,
+      .dashboard-grid,
+      .setup-grid,
+      .management-grid{
+        grid-template-columns:1fr 1fr;
+        gap:7px;
+      }
+
+      .player-table{
+        font-size:10px;
+      }
+
+      .player-table th,
+      .player-table td{
+        padding-inline:5px;
+      }
+
+      .auction-mobile-console{
+        gap:8px!important;
+        padding:8px!important;
+      }
+
+      .auction-mobile-console-top,
+      .auction-mobile-main{
+        border-radius:var(--radius)!important;
+        box-shadow:var(--shadow-sm);
+      }
+
+      .auction-mobile-player{
+        font-size:clamp(34px,11vw,58px)!important;
+      }
+
+      .auction-mobile-quick{
+        gap:6px!important;
+      }
+
+      .auction-mobile-quick .quick-btn{
+        min-height:56px!important;
+        border-radius:10px!important;
+      }
+
+      .auction-mobile-confirm{
+        min-height:58px!important;
+        border-radius:12px!important;
+      }
+    }
+
+    @media(max-width:480px){
+      .kpi-grid,
+      .dashboard-grid,
+      .setup-grid,
+      .management-grid{
+        grid-template-columns:1fr;
+      }
+
+      .main-nav .nav-btn{
+        font-size:10px;
+      }
+    }
+
+    @media(pointer:coarse){
+      button,
+      .nav-btn,
+      summary,
+      select,
+      input{
+        touch-action:manipulation;
+      }
+    }
+
+    @media(prefers-reduced-motion:reduce){
+      *,
+      *::before,
+      *::after{
+        animation-duration:.001ms!important;
+        transition-duration:.001ms!important;
+        scroll-behavior:auto!important;
+      }
+    }
+
+
+    /* =====================================================
+       CODA PRESIDENTE · VISIBILITÀ GARANTITA
+       ===================================================== */
+
+    .auction-call-queue-drawer{
+      display:block!important;
+      flex:0 0 auto;
+    }
+
+    .auction-call-queue-drawer>summary{
+      min-width:31px;
+      font-weight:950!important;
+      color:#fff!important;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.12),
+        0 5px 18px rgba(0,0,0,.2);
+    }
+
+    .auction-call-queue-drawer:not([open])>summary{
+      animation:queue-tab-pulse 2.6s ease-in-out infinite;
+    }
+
+    @keyframes queue-tab-pulse{
+      0%,100%{
+        filter:brightness(1);
+      }
+      50%{
+        filter:brightness(1.16);
+      }
+    }
+
+    @media(prefers-reduced-motion:reduce){
+      .auction-call-queue-drawer:not([open])>summary{
+        animation:none!important;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -5943,16 +6671,84 @@
 
 
     function auctionHasPresidentRole() {
-      return Boolean(
-        state.auction
-          ?.permissions
-          ?.isPresident
-        === true
+      const d =
+        state.auction;
+
+      /*
+       * Admin/Banditore e Presidente sono ruoli CUMULABILI.
+       *
+       * Alcune versioni precedenti dell'API restituivano myTeam.teamId
+       * correttamente ma non valorizzavano sempre isPresident/role.
+       * Se esiste una squadra personale e l'utente non è Vice,
+       * per l'asta va quindi considerato Presidente della propria squadra.
+       */
+      const auctionTeamId =
+        d?.myTeam?.teamId
         ||
-        state.auction
-          ?.myTeam
-          ?.role
-        === 'president'
+        null;
+
+      const auctionTeamRole =
+        d?.myTeam?.role
+        ||
+        null;
+
+      const dashboardTeamId =
+        state.dashboard?.myTeam?.team?.id
+        ||
+        state.dashboard?.myTeam?.teamId
+        ||
+        null;
+
+      const dashboardTeamRole =
+        state.dashboard?.myTeam?.role
+        ||
+        null;
+
+      return Boolean(
+        d?.permissions?.isPresident === true
+
+        ||
+        auctionTeamRole === 'president'
+
+        ||
+        (
+          auctionTeamId
+          &&
+          auctionTeamRole !== 'vice'
+          &&
+          d?.permissions?.isVice !== true
+        )
+
+        ||
+        state.dashboard?.permissions?.isPresident === true
+
+        ||
+        dashboardTeamRole === 'president'
+
+        ||
+        (
+          dashboardTeamId
+          &&
+          dashboardTeamRole !== 'vice'
+          &&
+          state.dashboard?.permissions?.isVice !== true
+        )
+      );
+    }
+
+
+    function auctionPresidentTeamId() {
+      const d =
+        state.auction;
+
+      return (
+        d?.myTeam?.teamId
+        ||
+        state.dashboard?.myTeam?.team?.id
+        ||
+        state.dashboard?.myTeam?.teamId
+        ||
+        null
       );
     }
 
@@ -6024,8 +6820,6 @@
       if (
         !s
         ||
-        !auctionDualModeEnabled()
-        ||
         !auctionCallMode()
         ||
         !auctionHasPresidentRole()
@@ -6072,8 +6866,6 @@
 
     function renderAuctionCallQueue() {
       if (
-        !auctionDualModeEnabled()
-        ||
         !auctionCallMode()
         ||
         !auctionHasPresidentRole()
@@ -6132,9 +6924,21 @@
                   </small>
                 </div>
 
-                <span class="badge primary">
-                  ${rows.length}
-                </span>
+                <div style="display:flex;align-items:center;gap:4px">
+                  ${
+                    (
+                      state.auction?.permissions?.isLeagueAdmin
+                      ||
+                      state.auction?.permissions?.isSuperAdmin
+                    )
+                      ? '<span class="badge">ADMIN + PRESIDENTE</span>'
+                      : ''
+                  }
+
+                  <span class="badge primary">
+                    ${rows.length}
+                  </span>
+                </div>
 
               </div>
 
@@ -6967,7 +7771,9 @@
         0;
 
       const showQueue =
-        auctionDualModeEnabled();
+        auctionCallMode()
+        &&
+        auctionHasPresidentRole();
 
       return `
         <aside class="auction-free-fixed">
@@ -8324,7 +9130,9 @@
 
     function auctionSession() { return state.auction?.auctionSession || null; }
     function auctionCanControl() { return state.auction?.permissions?.canControlAuction === true; }
-    function auctionMyTeamId() { return state.auction?.myTeam?.teamId || null; }
+    function auctionMyTeamId() {
+      return auctionPresidentTeamId();
+    }
 
     function renderAuction() {
       const root = $('auction-root');
@@ -10682,7 +11490,9 @@
           );
 
       const showQueue =
-        auctionDualModeEnabled();
+        auctionCallMode()
+        &&
+        auctionHasPresidentRole();
 
       const queueAction =
         queuedIndex >= 0
@@ -10871,7 +11681,9 @@
 
 
       const showQueue =
-        auctionDualModeEnabled();
+        auctionCallMode()
+        &&
+        auctionHasPresidentRole();
 
 
       body.innerHTML =
