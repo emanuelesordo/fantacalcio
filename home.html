@@ -5051,6 +5051,573 @@
       background:rgba(91,157,239,.36);
       color:#fff;
     }
+
+    /* =====================================================
+       ASTA COCKPIT V15 · PANNELLI COMPATTI E ADATTIVI
+       ===================================================== */
+    :root{
+      --auction-side-panel-width:clamp(255px,18vw,315px);
+      --auction-role-chip-height:15px;
+    }
+
+    .auction-statusbar{
+      grid-template-columns:
+        auto
+        minmax(145px,.7fr)
+        minmax(610px,2.25fr)
+        auto
+        auto!important;
+    }
+
+    .auction-status-team-kpis{
+      grid-template-columns:minmax(78px,1.1fr) repeat(6,minmax(48px,.68fr))!important;
+      gap:3px;
+    }
+
+    .auction-status-team-kpis>span{
+      height:28px;
+      padding:2px 5px;
+    }
+
+    .auction-status-team-kpis small{
+      font-size:5.5px;
+    }
+
+    .auction-status-team-kpis b{
+      font-size:9px;
+    }
+
+    .auction-status-phase .badge{
+      cursor:default;
+      white-space:nowrap;
+    }
+
+    .auction-lower-stage{
+      grid-template-columns:auto minmax(0,1fr)!important;
+      transition:grid-template-columns .18s ease;
+    }
+
+    .auction-lower-main{
+      grid-template-columns:
+        minmax(245px,var(--auction-side-panel-width))
+        minmax(205px,270px)
+        minmax(280px,1fr)
+        auto!important;
+      gap:6px!important;
+    }
+
+    .auction-lower-main>*{
+      min-width:0;
+    }
+
+    .auction-lower-main>.auction-team-column{
+      width:100%;
+    }
+
+    .auction-team-roster{
+      min-width:0;
+      display:grid;
+      grid-template-rows:auto minmax(0,1fr);
+    }
+
+    .auction-team-roster-head{
+      min-height:31px!important;
+      padding:4px 6px!important;
+    }
+
+    .auction-team-roster-head strong{
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-size:9px;
+    }
+
+    .auction-roster-head-actions{
+      flex:0 0 auto;
+      display:flex;
+      align-items:center;
+      gap:4px;
+    }
+
+    .auction-roster-remaining{
+      color:var(--soft);
+      font-size:6px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+
+    .auction-roster-queue-toggle{
+      min-height:21px;
+      padding:2px 5px;
+      display:flex;
+      align-items:center;
+      gap:3px;
+      border:1px solid rgba(157,199,239,.20);
+      border-radius:999px;
+      background:rgba(43,76,110,.45);
+      color:var(--soft);
+      cursor:pointer;
+      font-size:6px;
+      font-weight:900;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+
+    .auction-roster-queue-toggle input{
+      width:11px;
+      min-width:11px;
+      height:11px;
+      min-height:11px;
+      margin:0;
+      padding:0;
+      accent-color:var(--primary);
+    }
+
+    .auction-roster-line{
+      display:grid!important;
+      grid-template-columns:auto minmax(0,1fr) auto;
+      align-items:center;
+      column-gap:4px!important;
+    }
+
+    .auction-roster-player-name{
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-size:8px;
+      line-height:1;
+    }
+
+    .auction-roster-mini-roles{
+      min-width:0;
+      display:flex;
+      align-items:center;
+      gap:1px;
+      white-space:nowrap;
+    }
+
+    .auction-team-roster .rolebadge,
+    .auction-call-queue-drawer .rolebadge,
+    .auction-awards-drawer .rolebadge,
+    .auction-free-fixed .rolebadge,
+    .auction-free-fixed .rolebtn{
+      min-width:20px!important;
+      min-height:var(--auction-role-chip-height)!important;
+      height:var(--auction-role-chip-height)!important;
+      padding:0 3px!important;
+      border-radius:4px!important;
+      font-size:6px!important;
+      line-height:var(--auction-role-chip-height)!important;
+      font-weight:950!important;
+    }
+
+    .auction-free-fixed .rolebtn[data-role="all"]{
+      min-width:27px!important;
+    }
+
+    .auction-free-fixed{
+      container-type:inline-size;
+      container-name:free-agents;
+      grid-template-rows:auto auto minmax(0,1fr)!important;
+      gap:0!important;
+      padding:0!important;
+    }
+
+    .auction-caller-controls{
+      min-width:0;
+      display:grid!important;
+      grid-template-columns:minmax(96px,1fr) minmax(48px,64px) minmax(54px,74px)!important;
+      align-items:end!important;
+      gap:4px!important;
+      padding:5px 6px!important;
+    }
+
+    .auction-caller-controls label{
+      min-width:0;
+      display:grid;
+      grid-template-rows:auto 32px;
+      gap:2px;
+    }
+
+    .auction-caller-controls input,
+    .auction-caller-controls .auction-command-action{
+      width:100%!important;
+      min-width:0!important;
+      min-height:32px!important;
+      height:32px!important;
+      margin:0!important;
+    }
+
+    .auction-caller-controls .auction-command-action{
+      align-self:end;
+      font-size:9px;
+    }
+
+    .auction-free-fixed .rolebar{
+      gap:2px!important;
+      padding:4px 6px 2px!important;
+      flex-wrap:wrap;
+    }
+
+    .auction-free-fixed .drawer-filters{
+      grid-template-columns:minmax(78px,.8fr) minmax(58px,.6fr) minmax(95px,1.5fr)!important;
+      gap:3px!important;
+      padding:0 6px 4px!important;
+    }
+
+    .auction-free-fixed .drawer-table{
+      border-radius:0 0 10px 10px;
+    }
+
+    .auction-call-queue-drawer[open],
+    .auction-awards-drawer[open]{
+      width:var(--auction-side-panel-width)!important;
+      min-width:var(--auction-side-panel-width)!important;
+      max-width:var(--auction-side-panel-width)!important;
+    }
+
+    .auction-call-queue-drawer,
+    .auction-awards-drawer{
+      transition:
+        width .18s ease,
+        min-width .18s ease,
+        max-width .18s ease;
+    }
+
+    .auction-call-queue-drawer-content{
+      padding:4px!important;
+    }
+
+    .auction-call-queue-drawer .auction-call-queue{
+      grid-template-rows:auto minmax(0,1fr);
+      border-radius:8px!important;
+    }
+
+    .auction-call-queue-head{
+      min-height:31px!important;
+      padding:4px 6px!important;
+    }
+
+    .auction-call-queue-head small{
+      max-width:150px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-size:6px;
+    }
+
+    .auction-call-queue-list{
+      min-height:0;
+      padding:3px!important;
+      display:grid;
+      align-content:start;
+      gap:2px!important;
+      overflow-y:auto!important;
+      overflow-x:hidden!important;
+    }
+
+    .auction-call-queue-row{
+      min-height:29px!important;
+      padding:2px 3px!important;
+      display:grid!important;
+      grid-template-columns:auto minmax(0,1fr) 50px 23px!important;
+      gap:3px!important;
+      border-radius:5px!important;
+    }
+
+    .auction-queue-player{
+      min-width:0;
+      display:flex;
+      align-items:center;
+      gap:3px;
+    }
+
+    .auction-queue-player strong{
+      min-width:0;
+      font-size:8px;
+    }
+
+    .auction-queue-handle{
+      flex:0 0 auto;
+      font-size:9px;
+    }
+
+    .auction-call-queue-drawer .auction-queue-price::before{
+      display:none!important;
+      content:none!important;
+    }
+
+    .auction-queue-price input{
+      min-height:23px!important;
+      height:23px!important;
+      padding:1px 3px!important;
+      font-size:8px!important;
+    }
+
+    .auction-queue-remove{
+      width:23px!important;
+      min-width:23px!important;
+      min-height:23px!important;
+      height:23px!important;
+      border-radius:5px!important;
+      font-size:11px;
+    }
+
+    .auction-awards-content{
+      height:100%;
+      margin-right:31px;
+      padding:4px!important;
+      grid-template-rows:auto minmax(0,1fr)!important;
+      gap:3px!important;
+    }
+
+    .auction-awards-list{
+      gap:2px!important;
+    }
+
+    .auction-award-row{
+      min-height:27px;
+      padding:2px 4px!important;
+      display:grid!important;
+      grid-template-columns:auto minmax(0,1fr) minmax(52px,.7fr) auto!important;
+      align-items:center;
+      gap:4px!important;
+      border-radius:5px!important;
+      background:linear-gradient(145deg,rgba(34,64,96,.50),rgba(13,32,54,.42))!important;
+    }
+
+    .auction-award-player,
+    .auction-award-team{
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .auction-award-player{
+      font-size:8px!important;
+    }
+
+    .auction-award-team{
+      color:var(--soft);
+      font-size:7px;
+    }
+
+    .auction-award-price{
+      min-width:24px!important;
+      padding:1px 4px;
+      border-radius:4px;
+      background:var(--primary);
+      font-size:8px!important;
+    }
+
+    .auction-middle-quick .auction-status-quick{
+      grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    }
+
+    .auction-middle-quick .auction-status-quick-label{
+      grid-column:1 / -1;
+    }
+
+    .auction-free-bid-field{
+      grid-column:1 / 3;
+      min-width:0;
+      height:30px;
+      padding:2px 3px 2px 6px;
+      display:grid;
+      grid-template-columns:auto minmax(0,1fr);
+      align-items:center;
+      gap:4px;
+      border:1px solid rgba(149,192,233,.22);
+      border-radius:6px;
+      background:rgba(5,21,37,.58);
+    }
+
+    .auction-free-bid-field span,
+    .auction-mobile-free-bid span{
+      color:var(--muted);
+      font-size:6px;
+      font-weight:950;
+      text-transform:uppercase;
+    }
+
+    .auction-free-bid-field input{
+      width:100%;
+      min-width:0;
+      min-height:24px;
+      height:24px;
+      padding:1px 4px;
+      text-align:center;
+      font-size:9px;
+      font-weight:900;
+    }
+
+    .auction-middle-quick .auction-command-bid-confirm{
+      grid-column:3 / -1!important;
+      min-height:30px;
+      height:30px;
+    }
+
+    .auction-mobile-free-bid{
+      margin-top:6px;
+      padding:5px 7px;
+      display:grid;
+      grid-template-columns:auto minmax(90px,1fr);
+      align-items:center;
+      gap:8px;
+      border:1px solid var(--line);
+      border-radius:9px;
+      background:rgba(8,27,48,.76);
+    }
+
+    .auction-mobile-free-bid input{
+      min-height:38px;
+      text-align:center;
+      font-weight:900;
+    }
+
+    [data-auction-timer].timer-green,
+    .auction-command-timer:has([data-auction-timer].timer-green){
+      border-color:#49ff9b!important;
+      background:linear-gradient(145deg,#16df79,#00a951)!important;
+      color:#03180d!important;
+      box-shadow:0 0 22px rgba(22,223,121,.58),inset 0 1px 0 rgba(255,255,255,.38)!important;
+    }
+
+    [data-auction-timer].timer-yellow,
+    .auction-command-timer:has([data-auction-timer].timer-yellow){
+      border-color:#fff273!important;
+      background:linear-gradient(145deg,#ffe44d,#f6a900)!important;
+      color:#231900!important;
+      box-shadow:0 0 22px rgba(255,210,31,.62),inset 0 1px 0 rgba(255,255,255,.42)!important;
+    }
+
+    [data-auction-timer].timer-red,
+    .auction-command-timer:has([data-auction-timer].timer-red){
+      border-color:#ff8390!important;
+      background:linear-gradient(145deg,#ff5364,#d5142d)!important;
+      color:#fff!important;
+      box-shadow:0 0 24px rgba(255,49,72,.68),inset 0 1px 0 rgba(255,255,255,.30)!important;
+    }
+
+    .auction-command-timer:has([data-auction-timer].timer-green) .auction-command-label,
+    .auction-command-timer:has([data-auction-timer].timer-yellow) .auction-command-label{
+      color:rgba(3,24,13,.72)!important;
+    }
+
+    @container free-agents (max-width:700px){
+      .auction-free-fixed .player-table th:nth-child(7),
+      .auction-free-fixed .player-table td:nth-child(7),
+      .auction-free-fixed .player-table th:nth-child(8),
+      .auction-free-fixed .player-table td:nth-child(8),
+      .auction-free-fixed .player-table th:nth-child(9),
+      .auction-free-fixed .player-table td:nth-child(9){
+        display:none;
+      }
+    }
+
+    @container free-agents (max-width:560px){
+      .auction-free-fixed .drawer-filters{
+        grid-template-columns:1fr 1fr!important;
+      }
+
+      .auction-free-fixed .drawer-filters label:nth-child(3){
+        grid-column:1 / -1;
+      }
+
+      .auction-free-fixed .player-table th:nth-child(3),
+      .auction-free-fixed .player-table td:nth-child(3),
+      .auction-free-fixed .player-table th:nth-child(4),
+      .auction-free-fixed .player-table td:nth-child(4),
+      .auction-free-fixed .player-table th:nth-child(5),
+      .auction-free-fixed .player-table td:nth-child(5){
+        display:none;
+      }
+    }
+
+    @container free-agents (max-width:410px){
+      .auction-caller-controls{
+        grid-template-columns:minmax(82px,1fr) 48px 54px!important;
+        gap:3px!important;
+        padding-inline:4px!important;
+      }
+
+      .auction-caller-controls .auction-command-label{
+        font-size:5.5px;
+      }
+
+      .auction-free-fixed .drawer-filters{
+        grid-template-columns:1fr!important;
+      }
+
+      .auction-free-fixed .drawer-filters label:nth-child(3){
+        grid-column:auto;
+      }
+
+      .auction-free-fixed .player-table th:nth-child(6),
+      .auction-free-fixed .player-table td:nth-child(6){
+        display:none;
+      }
+    }
+
+    @media(max-width:1500px){
+      .auction-statusbar{
+        grid-template-columns:auto minmax(125px,.6fr) minmax(500px,1.9fr) auto auto!important;
+      }
+
+      .auction-status-team-kpis>strong{
+        display:none;
+      }
+
+      .auction-status-team-kpis{
+        grid-template-columns:repeat(6,minmax(46px,1fr))!important;
+      }
+    }
+
+    @media(max-width:1100px){
+      :root{
+        --auction-side-panel-width:clamp(225px,24vw,260px);
+      }
+
+      .auction-lower-main{
+        grid-template-columns:
+          minmax(215px,var(--auction-side-panel-width))
+          minmax(260px,1fr)
+          auto!important;
+      }
+
+      .auction-lower-main>.auction-team-column{
+        display:grid!important;
+        grid-column:1!important;
+      }
+
+      .auction-team-roster{
+        display:grid!important;
+      }
+
+      .auction-middle-column{
+        display:none!important;
+      }
+
+      .auction-free-fixed{
+        grid-column:2!important;
+      }
+
+      .auction-call-queue-drawer{
+        grid-column:3!important;
+      }
+
+      .auction-status-team-kpis>span:nth-of-type(5),
+      .auction-status-team-kpis>span:nth-of-type(6){
+        display:none;
+      }
+
+      .auction-status-team-kpis{
+        grid-template-columns:repeat(4,minmax(44px,1fr))!important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -5422,6 +5989,7 @@
       auctionRostersOpen: false,
       auctionAdminConsoleOpen: false,
       auctionQueueOpen: false,
+      auctionShowQueueInRoster: false,
 
       auctionAdminPlayerSearch: '',
       auctionAdminPlayerId: null,
@@ -7310,11 +7878,6 @@
           ? '—'
           : info.maxBid;
 
-      const roster =
-        info.rosterLimit
-          ? `${info.rosterCount}/${info.rosterLimit}`
-          : `${info.rosterCount}`;
-
       const rolesHtml =
         info.roleBadges
           .map(role => `
@@ -7328,7 +7891,7 @@
           `)
           .join('');
 
-      const queueEntries =
+      const allQueueEntries =
         auctionQueueRows()
           .filter(item => item.player)
           .map(item => ({
@@ -7337,6 +7900,11 @@
             queued: true,
             position: Number(item.position || 0)
           }));
+
+      const queueEntries =
+        state.auctionShowQueueInRoster
+          ? allQueueEntries
+          : [];
 
       const rosterEntries = [
         ...info.assignments.map(item => ({
@@ -7387,8 +7955,72 @@
           Math.min(32, Number(info.rosterMax || info.rosterLimit || 32))
         );
 
+      const acquiredRosterCount =
+        info.assignments.length;
+
+      const minimumRemaining =
+        Math.max(
+          0,
+          Number(info.rosterMin || 0)
+          - acquiredRosterCount
+        );
+
+      const maximumRemaining =
+        Math.max(
+          0,
+          Number(info.rosterMax || info.rosterLimit || 0)
+          - acquiredRosterCount
+        );
+
+      const purchaseTotal =
+        info.assignments.reduce(
+          (sum, item) =>
+            sum + Number(item.purchase_price || 0),
+          0
+        );
+
+      const averagePurchase =
+        acquiredRosterCount
+          ? purchaseTotal / acquiredRosterCount
+          : null;
+
+      const purchasePmaDeltas =
+        info.assignments
+          .map(item => {
+            const purchase =
+              Number(item.purchase_price);
+
+            const pmaSource =
+              item.player?.pma;
+
+            const pma =
+              Number(pmaSource);
+
+            return Number.isFinite(purchase)
+              && pmaSource !== null
+              && pmaSource !== undefined
+              && pmaSource !== ''
+              && Number.isFinite(pma)
+                ? purchase - pma
+                : null;
+          })
+          .filter(value => value !== null);
+
+      const averagePurchasePmaDelta =
+        purchasePmaDeltas.length
+          ? purchasePmaDeltas.reduce(
+              (sum, value) => sum + value,
+              0
+            ) / purchasePmaDeltas.length
+          : null;
+
+      const averagePurchasePmaDeltaLabel =
+        averagePurchasePmaDelta === null
+          ? '—'
+          : `${averagePurchasePmaDelta > 0 ? '+' : ''}${formatNumber(averagePurchasePmaDelta)}`;
+
       const projectedRosterCount =
-        info.assignments.length + queueEntries.length;
+        acquiredRosterCount + queueEntries.length;
 
       const rosterRowCount =
         Math.max(
@@ -7466,10 +8098,11 @@
                   <div class="auction-roster-line is-empty" aria-label="Slot rosa vuoto">
                     ${
                       entry.emptyRole
-                        ? `<span class="rolebadge" data-role="${esc(entry.emptyRole)}">${esc(entry.emptyRole)}</span>`
+                        ? `<span class="auction-roster-mini-roles"><span class="rolebadge" data-role="${esc(entry.emptyRole)}">${esc(entry.emptyRole)}</span></span>`
                         : '<span class="auction-roster-empty-index">—</span>'
                     }
                     <span class="auction-roster-empty-label">Slot disponibile</span>
+                    <span></span>
                   </div>
                 `;
               }
@@ -7482,14 +8115,15 @@
 
               return `
                 <div class="auction-roster-line ${entry.queued ? 'is-queued' : ''}">
-                  <div class="auction-roster-player-main">
-                    <span class="auction-roster-mini-roles">
-                      ${roles.map(role => `
-                        <span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>
-                      `).join('')}
-                    </span>
-                    <strong>${esc(entry.player?.name || '—')}</strong>
-                  </div>
+                  <span class="auction-roster-mini-roles">
+                    ${roles.map(role => `
+                      <span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>
+                    `).join('')}
+                  </span>
+
+                  <strong class="auction-roster-player-name">
+                    ${esc(entry.player?.name || '—')}
+                  </strong>
 
                   <span class="auction-roster-price ${entry.queued ? 'queued' : ''}">
                     ${entry.queued ? `Q${entry.position || ''} · ` : ''}${entry.price}
@@ -7531,25 +8165,23 @@
             <div class="auction-team-mini-kpis">
 
               <div class="auction-team-mini-kpi">
-                <span>Spesi</span>
-                <strong>${info.spent}</strong>
+                <span>Min rimasti</span>
+                <strong>${minimumRemaining}</strong>
               </div>
 
               <div class="auction-team-mini-kpi">
-                <span>Rosa</span>
-                <strong>${roster}</strong>
+                <span>Max rimasti</span>
+                <strong>${maximumRemaining}</strong>
               </div>
 
               <div class="auction-team-mini-kpi">
-                <span>Pass</span>
-                <strong>${info.passesUsed}/5</strong>
+                <span>Media acquisto</span>
+                <strong>${formatNumber(averagePurchase)}</strong>
               </div>
 
               <div class="auction-team-mini-kpi">
-                <span>Pen. chiamata</span>
-                <strong>
-                  ${info.nominationPenaltyCredits}
-                </strong>
+                <span>Δ medio vs PMA</span>
+                <strong>${averagePurchasePmaDeltaLabel}</strong>
               </div>
 
             </div>
@@ -7567,8 +8199,10 @@
           <strong>${esc(info.teamName)}</strong>
           <span><small>Crediti</small><b>${info.remaining}</b></span>
           <span><small>Max</small><b>${maxBid}</b></span>
-          <span><small>Rosa</small><b>${projectedRosterCount}/${info.rosterMax || info.rosterLimit || '—'}</b></span>
-          <span><small>Spesi</small><b>${info.spent}</b></span>
+          <span><small>Min rim.</small><b>${minimumRemaining}</b></span>
+          <span><small>Max rim.</small><b>${maximumRemaining}</b></span>
+          <span><small>Media</small><b>${formatNumber(averagePurchase)}</b></span>
+          <span><small>Δ PMA</small><b>${averagePurchasePmaDeltaLabel}</b></span>
         </div>
       `;
 
@@ -7578,7 +8212,24 @@
 
             <div class="auction-team-roster-head">
               <strong>Rosa · ${esc(info.teamName)}</strong>
-              <span class="badge">${projectedRosterCount}${info.rosterLimit ? `/${info.rosterLimit}` : ''}</span>
+
+              <div class="auction-roster-head-actions">
+                <span class="auction-roster-remaining">
+                  MIN ${minimumRemaining} · MAX ${maximumRemaining}
+                </span>
+
+                <label
+                  class="auction-roster-queue-toggle"
+                  title="Mostra o nasconde in rosa i potenziali acquisti presenti nella coda"
+                >
+                  <input
+                    id="auction-roster-queue-toggle"
+                    type="checkbox"
+                    ${state.auctionShowQueueInRoster ? 'checked' : ''}
+                  >
+                  <span>Coda</span>
+                </label>
+              </div>
             </div>
 
             <div
@@ -7929,15 +8580,6 @@
       const editable =
         auctionCanManageCallQueue();
 
-      const seconds =
-        Number(
-          state.auction
-            ?.settings
-            ?.nomination_timeout_seconds
-          ||
-          20
-        );
-
       return `
         <details
           id="auction-call-queue-drawer"
@@ -7950,43 +8592,15 @@
 
           <div class="auction-call-queue-drawer-content">
 
-            <section class="auction-call-queue">
+            <section class="auction-call-queue auction-team-roster">
 
-              <div class="auction-call-queue-head">
+              <div class="auction-call-queue-head auction-team-roster-head">
 
-                <div>
-                  <strong>
-                    Prossime chiamate
-                  </strong>
+                <strong>Prossime chiamate</strong>
 
-                  <small>
-                    ${
-                      editable
-                        ? (
-                            auctionSession()?.current_player_id
-                              ? `Modificabile durante il lotto · drag & drop`
-                              : `Drag & drop · ${seconds}s per chiamare`
-                          )
-                        : 'È il tuo turno: il primo elemento valido viene chiamato automaticamente'
-                    }
-                  </small>
-                </div>
-
-                <div style="display:flex;align-items:center;gap:4px">
-                  ${
-                    (
-                      state.auction?.permissions?.isLeagueAdmin
-                      ||
-                      state.auction?.permissions?.isSuperAdmin
-                    )
-                      ? '<span class="badge">ADMIN + PRESIDENTE</span>'
-                      : ''
-                  }
-
-                  <span class="badge primary">
-                    ${rows.length}
-                  </span>
-                </div>
+                <span class="badge primary">
+                  ${rows.length}
+                </span>
 
               </div>
 
@@ -8006,30 +8620,23 @@
                             draggable="${editable ? 'true' : 'false'}"
                           >
 
-                            <span class="auction-queue-handle">
-                              ⋮⋮
-                            </span>
-
-                            <span class="auction-queue-position">
-                              ${index + 1}
+                            <span class="auction-roster-mini-roles">
+                              ${playerRoles(
+                                item.player || {},
+                                state.auction?.settings?.fantasy_mode
+                              ).map(role => `
+                                <span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>
+                              `).join('') || '<span class="rolebadge">—</span>'}
                             </span>
 
                             <div class="auction-queue-player">
+                              <span class="auction-queue-handle" aria-hidden="true">
+                                ⋮⋮
+                              </span>
+
                               <strong>
                                 ${esc(item.player?.name || 'Giocatore')}
                               </strong>
-
-                              <small>
-                                ${esc(
-                                  playerRoles(
-                                    item.player || {},
-                                    state.auction?.settings?.fantasy_mode
-                                  )
-                                    .join('/')
-                                )}
-                                ·
-                                ${esc(item.player?.serie_a_team || '')}
-                              </small>
                             </div>
 
 
@@ -8042,7 +8649,8 @@
                                 step="1"
                                 value="${Number(item.opening_bid || 1)}"
                                 ${editable ? '' : 'disabled'}
-                                title="Base d'asta"
+                                title="Prezzo base di ${esc(item.player?.name || 'Giocatore')}"
+                                aria-label="Prezzo base di ${esc(item.player?.name || 'Giocatore')}"
                               >
                             </div>
 
@@ -8521,8 +9129,8 @@
             </div>
 
             <div
-              id="auction-timer-label"
               class="auction-mobile-timer"
+              data-auction-timer
             >
               —
             </div>
@@ -8670,6 +9278,20 @@
 
                     </div>
 
+                    <label class="auction-mobile-free-bid">
+                      <span>Rilancio libero</span>
+                      <input
+                        id="auction-mobile-free-bid"
+                        type="number"
+                        min="${Math.max(1, auctionBidDefault())}"
+                        step="1"
+                        inputmode="numeric"
+                        value="${selectedBid}"
+                        ${canBid ? '' : 'disabled'}
+                        aria-label="Importo libero del rilancio"
+                      >
+                    </label>
+
                     ${
                       d.viceSignal
                         ? `
@@ -8770,6 +9392,13 @@
         });
 
 
+      bindAuctionFreeBidInput(
+        'auction-mobile-free-bid',
+        'auction-mobile-confirm',
+        'RILANCIA A '
+      );
+
+
       $('auction-mobile-confirm')
         ?.addEventListener(
           'click',
@@ -8825,11 +9454,6 @@
 
 
     function renderAuctionFixedFreeAgents(hasPlayer, callerControlsHtml = '') {
-      const total =
-        state.auction?.callCandidates?.length
-        ||
-        0;
-
       const showQueue =
         auctionCallMode()
         &&
@@ -8837,20 +9461,6 @@
 
       return `
         <aside class="auction-free-fixed">
-
-          <div class="auction-free-fixed-head">
-
-            <div>
-              <strong>Svincolati</strong>
-              <span class="badge">${total}</span>
-            </div>
-
-            <span class="small soft">
-              ricerca e chiamata
-            </span>
-
-          </div>
-
 
           ${callerControlsHtml}
 
@@ -9021,13 +9631,8 @@
 
           <div class="auction-awards-content">
 
-            <div class="between">
-              <div>
-                <strong>Acquisti ufficiali</strong>
-                <div class="small soft">
-                  Ultime aggiudicazioni registrate
-                </div>
-              </div>
+            <div class="auction-team-roster-head">
+              <strong>Ultimi acquisti</strong>
 
               <span class="badge">
                 ${rows.length}
@@ -9039,32 +9644,37 @@
 
               ${
                 rows.length
-                  ? rows.map(item => `
-                      <div class="auction-award-row">
+                  ? rows.map(item => {
+                      const roles =
+                        playerRoles(
+                          item.player || {},
+                          state.auction?.settings?.fantasy_mode
+                        );
 
-                        <div>
-                          <strong>
-                            ${esc(item.player?.name || 'Giocatore')}
-                          </strong>
+                      return `
+                      <div class="auction-award-row" title="${esc(auctionTimeLabel(item.created_at))}">
 
-                          <small>
-                            ${esc(item.team?.name || 'Squadra')}
-                            ·
-                            ${auctionTimeLabel(item.created_at)}
-                            ${
-                              item.source === 'manual'
-                                ? ' · registrazione Banditore'
-                                : ''
-                            }
-                          </small>
-                        </div>
+                        <span class="auction-roster-mini-roles">
+                          ${roles.map(role => `
+                            <span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>
+                          `).join('') || '<span class="rolebadge">—</span>'}
+                        </span>
+
+                        <strong class="auction-award-player">
+                          ${esc(item.player?.name || 'Giocatore')}
+                        </strong>
+
+                        <span class="auction-award-team">
+                          ${esc(item.team?.name || 'Squadra')}
+                        </span>
 
                         <div class="auction-award-price">
                           ${Number(item.price || 0)}
                         </div>
 
                       </div>
-                    `).join('')
+                    `;
+                    }).join('')
                   : `
                       <div class="my-team-roster-empty">
                         Nessun acquisto ufficiale.
@@ -10005,6 +10615,30 @@
       }
 
 
+      [
+        $('auction-free-bid'),
+        $('auction-mobile-free-bid')
+      ]
+        .filter(Boolean)
+        .forEach(input => {
+          input.min =
+            String(
+              Math.max(
+                1,
+                auctionBidDefault()
+              )
+            );
+
+          if (
+            document.activeElement
+            !== input
+          ) {
+            input.value =
+              String(selectedBid);
+          }
+        });
+
+
       renderAuctionTimer();
     }
 
@@ -10392,6 +11026,21 @@
               ><span>+${offset}</span><strong>${amount}</strong></button>
             `;
           }).join('')}
+
+          <label class="auction-free-bid-field">
+            <span>Libero</span>
+            <input
+              id="auction-free-bid"
+              type="number"
+              min="${Math.max(1, auctionBidDefault())}"
+              step="1"
+              inputmode="numeric"
+              value="${selectedBid ?? ''}"
+              ${canSelectBid ? '' : 'disabled'}
+              aria-label="Importo libero del rilancio"
+            >
+          </label>
+
           <button
             id="president-bid"
             class="auction-command-bid-confirm"
@@ -10410,7 +11059,7 @@
               Timer
             </span>
 
-            <strong id="auction-timer-label">
+            <strong class="auction-timer-value" data-auction-timer>
               —
             </strong>
           </div>
@@ -11286,7 +11935,7 @@
                   ? 'good'
                   : 'warn'
               }">
-                ${phaseLabel}
+                FASE · ${phaseLabel}
               </span>
 
               ${
@@ -11299,8 +11948,8 @@
 
 
             <div
-              id="auction-timer-label"
               class="auction-status-timer"
+              data-auction-timer
             >
               —
             </div>
@@ -11353,6 +12002,18 @@
       renderAuctionPlayers();
       attachAuctionCallQueueEvents();
       renderAuctionAdminSearchResults();
+
+
+      $('auction-roster-queue-toggle')
+        ?.addEventListener(
+          'change',
+          event => {
+            state.auctionShowQueueInRoster =
+              event.currentTarget.checked;
+
+            renderAuctionLive();
+          }
+        );
 
 
       $('auction-call-queue-drawer')
@@ -11650,13 +12311,24 @@
         );
 
 
+      bindAuctionFreeBidInput(
+        'auction-free-bid',
+        'president-bid',
+        'RILANCIA '
+      );
+
+
       $('president-bid')
         ?.addEventListener(
           'click',
           () =>
             placeBid(
               auctionMyTeamId(),
-              selectedBid,
+              Number(
+                state.auctionBidSelection
+                ||
+                auctionBidDefault()
+              ),
               'APP'
             )
         );
@@ -11674,7 +12346,11 @@
                 () =>
                   placeBid(
                     button.dataset.team,
-                    selectedBid,
+                    Number(
+                      state.auctionBidSelection
+                      ||
+                      auctionBidDefault()
+                    ),
                     'VOCALE'
                   )
               );
@@ -12860,6 +13536,98 @@
       }
     }
 
+    function bindAuctionFreeBidInput(
+      inputId,
+      confirmId,
+      confirmPrefix
+    ) {
+      const input =
+        $(inputId);
+
+      if (!input) {
+        return;
+      }
+
+      const confirm =
+        $(confirmId);
+
+      const confirmInitiallyDisabled =
+        Boolean(confirm?.disabled);
+
+      const sync = clamp => {
+        if (input.value === '') {
+          if (confirm) {
+            confirm.disabled = true;
+          }
+
+          return;
+        }
+
+        const parsed =
+          Math.trunc(
+            Number(input.value)
+          );
+
+        if (!Number.isFinite(parsed)) {
+          if (confirm) {
+            confirm.disabled = true;
+          }
+
+          return;
+        }
+
+        const minimum =
+          Math.max(
+            1,
+            auctionBidDefault()
+          );
+
+        const amount =
+          Math.max(
+            minimum,
+            parsed
+          );
+
+        state.auctionBidSelection =
+          amount;
+
+        if (clamp) {
+          input.value =
+            String(amount);
+        }
+
+        if (confirm) {
+          confirm.textContent =
+            `${confirmPrefix}${amount}`;
+
+          confirm.disabled =
+            confirmInitiallyDisabled;
+        }
+
+        document
+          .querySelectorAll(
+            '.quick-btn[data-amount]'
+          )
+          .forEach(button => {
+            button.classList.toggle(
+              'selected',
+              Number(button.dataset.amount)
+                === amount
+            );
+          });
+      };
+
+      input.addEventListener(
+        'input',
+        () => sync(false)
+      );
+
+      input.addEventListener(
+        'change',
+        () => sync(true)
+      );
+    }
+
     async function placeBid(teamId,amount,source){
       if(!teamId)return msg('Squadra non disponibile.','error');
       try{await api(ENDPOINTS.auction,{action:'placeBid',sessionId:auctionSession().id,teamId,amount:Number(amount),source});await loadAuction()}catch(error){msg(error.message,'error')}
@@ -12916,18 +13684,37 @@
     }
 
     function renderAuctionTimer(){
-      const label =
-        $('auction-timer-label');
+      const labels =
+        [...document.querySelectorAll('[data-auction-timer]')];
 
-      if (!label) {
+      if (!labels.length) {
         return;
       }
+
+      const setTimer = (
+        text,
+        tone = ''
+      ) => {
+        labels.forEach(label => {
+          label.textContent = text;
+
+          label.classList.remove(
+            'timer-green',
+            'timer-yellow',
+            'timer-red'
+          );
+
+          if (tone) {
+            label.classList.add(tone);
+          }
+        });
+      };
 
       const s =
         auctionSession();
 
       if (!s) {
-        label.textContent = '—';
+        setTimer('—');
         return;
       }
 
@@ -12936,7 +13723,7 @@
         &&
         s.hold_active
       ) {
-        label.textContent = 'HOLD';
+        setTimer('HOLD');
         return;
       }
 
@@ -12974,7 +13761,7 @@
             );
 
       if (!deadline) {
-        label.textContent = '—';
+        setTimer('—');
         return;
       }
 
@@ -13003,8 +13790,22 @@
             )
           : remain;
 
-      label.textContent =
-        `${Math.ceil(visible / 1000)}s`;
+      const ratio =
+        configured > 0
+          ? visible / configured
+          : 1;
+
+      const tone =
+        ratio > (2 / 3)
+          ? 'timer-green'
+          : ratio > (1 / 3)
+            ? 'timer-yellow'
+            : 'timer-red';
+
+      setTimer(
+        `${Math.ceil(visible / 1000)}s`,
+        tone
+      );
     }
 
     /* =====================================================
