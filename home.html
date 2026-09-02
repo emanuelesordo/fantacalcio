@@ -11397,8 +11397,7 @@
     }
     function auctionCanUseAuctioneerConsole() {
       return Boolean(
-        auctionIsSuperAdmin()
-        || state.auction?.permissions?.isLeagueAdmin
+        state.auction?.permissions?.isLeagueAdmin
         || state.dashboard?.permissions?.isLeagueAdmin
       );
     }
