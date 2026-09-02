@@ -6595,6 +6595,110 @@
         min-height:46px!important;
       }
     }
+
+    /* ASTA V20 · regia Banditore e pannello rose ridimensionabile. */
+    .auction-rosters-drawer[open]{
+      top:var(--auction-rosters-top,120px)!important;
+    }
+
+    .auction-rosters-drawer>summary{
+      position:relative;
+    }
+
+    .auction-rosters-resize-handle{
+      position:absolute;
+      z-index:4;
+      top:-5px;
+      left:50%;
+      width:92px;
+      height:12px;
+      border-radius:99px;
+      background:linear-gradient(
+        180deg,
+        transparent 0 35%,
+        rgba(120,190,255,.92) 35% 65%,
+        transparent 65%
+      );
+      cursor:ns-resize;
+      touch-action:none;
+      transform:translateX(-50%);
+    }
+
+    .auction-roster-edit-row[draggable="true"]{
+      cursor:grab;
+    }
+
+    .auction-roster-edit-row.dragging{
+      opacity:.38;
+    }
+
+    .auction-roster-team-card.drop-target{
+      border-color:#67b9ff!important;
+      background:rgba(50,137,226,.18)!important;
+      box-shadow:0 0 0 2px rgba(73,159,255,.28)!important;
+    }
+
+    .auctioneer-head-actions{
+      grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    }
+
+    .auctioneer-head-actions button{
+      min-width:0!important;
+      min-height:30px!important;
+      padding:3px 5px!important;
+      font-size:6.5px!important;
+      white-space:normal!important;
+    }
+
+    .auctioneer-unified-player{
+      position:relative;
+      min-width:0;
+    }
+
+    .auctioneer-unified-player>label{
+      display:grid;
+      gap:3px;
+      margin:0;
+      font-size:6px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .auctioneer-unified-player input{
+      min-height:31px!important;
+    }
+
+    .auctioneer-unified-player .auctioneer-search-results{
+      top:calc(100% + 2px);
+      right:0;
+      left:0;
+    }
+
+    .auctioneer-selected-player.compact{
+      min-height:18px;
+      padding:2px 5px;
+      font-size:6px;
+    }
+
+    .auctioneer-pause-note{
+      grid-column:1 / -1;
+      padding:5px;
+      border:1px solid rgba(255,199,73,.34);
+      border-radius:6px;
+      background:rgba(154,105,18,.18);
+      color:#ffe09a;
+      font-size:6.5px;
+      font-weight:900;
+      text-align:center;
+      text-transform:uppercase;
+    }
+
+    @container auctioneer (max-width:355px){
+      .auctioneer-head-actions{
+        grid-template-columns:repeat(2,minmax(0,1fr))!important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -6820,6 +6924,14 @@
                 >
               </label>
 
+              <label id="setup-call-timer-enabled-wrap" class="checkbox-label">
+                <input
+                  id="setup-call-timer-enabled"
+                  type="checkbox"
+                >
+                Timer chiamata attivo
+              </label>
+
               <label id="setup-call-penalty-wrap">
                 Penalità chiamata mancata
                 <input
@@ -7009,6 +7121,7 @@
 
       auctionAwardsOpen: false,
       auctionRostersOpen: false,
+      auctionRostersTop: null,
       auctionAdminConsoleOpen: false,
       auctionQueueOpen: false,
       auctionShowQueueInRoster: false,
@@ -8118,6 +8231,10 @@
         s.nomination_timeout_seconds
         ?? 20;
 
+      $('setup-call-timer-enabled').checked =
+        s.nomination_timer_enabled
+        !== false;
+
       $('setup-call-penalty').value =
         s.nomination_timeout_penalty
         ?? 1;
@@ -8139,20 +8256,22 @@
         $('setup-nomination').value
         === 'call';
 
-      const dualMode =
+      const callTimerEnabled =
         callMode
         &&
-        $('setup-device-mode').value
-        === 'dual';
+        $('setup-call-timer-enabled').checked;
 
       $('setup-device-mode').disabled =
         !callMode;
 
       $('setup-call-timeout').disabled =
-        !dualMode;
+        !callTimerEnabled;
 
       $('setup-call-penalty').disabled =
-        !dualMode;
+        !callTimerEnabled;
+
+      $('setup-call-timer-enabled').disabled =
+        !callMode;
     }
 
     [
@@ -8161,7 +8280,8 @@
       'setup-bid-mode',
       'setup-nomination',
       'setup-timer-mode',
-      'setup-device-mode'
+      'setup-device-mode',
+      'setup-call-timer-enabled'
     ].forEach(
       id =>
         $(id)
@@ -8199,6 +8319,9 @@
 
         presidentDeviceMode:
           $('setup-device-mode').value,
+
+        nominationTimerEnabled:
+          $('setup-call-timer-enabled').checked,
 
         nominationTimeoutSeconds:
           Number(
@@ -11090,6 +11213,168 @@
     }
 
 
+    function auctionRostersStorageKey() {
+      return `fantacalcio:auction-rosters-top:${
+        state.selectedLeague?.id || 'league'
+      }:${auctionCanControl() ? 'controller' : 'president'}`;
+    }
+
+
+    function auctionRostersResolvedTop() {
+      if (
+        Number.isFinite(
+          state.auctionRostersTop
+        )
+      ) {
+        return Math.max(
+          0,
+          Number(state.auctionRostersTop)
+        );
+      }
+
+      const storedRaw =
+        localStorage.getItem(
+          auctionRostersStorageKey()
+        );
+
+      const stored =
+        storedRaw === null
+          ? Number.NaN
+          : Number(storedRaw);
+
+      if (Number.isFinite(stored)) {
+        state.auctionRostersTop =
+          Math.max(0, stored);
+
+        return state.auctionRostersTop;
+      }
+
+      state.auctionRostersTop =
+        auctionCanControl()
+          ? 0
+          : Math.round(
+              Math.max(
+                110,
+                window.innerHeight * .17
+              )
+            );
+
+      return state.auctionRostersTop;
+    }
+
+
+    function bindAuctionRostersDrawer() {
+      const drawer =
+        $('auction-rosters-drawer');
+
+      if (!drawer) {
+        return;
+      }
+
+      drawer.addEventListener(
+        'toggle',
+        event => {
+          state.auctionRostersOpen =
+            event.currentTarget.open;
+        }
+      );
+
+      const handle =
+        drawer.querySelector(
+          '.auction-rosters-resize-handle'
+        );
+
+      if (!handle) {
+        return;
+      }
+
+      handle.addEventListener(
+        'click',
+        event => {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+      );
+
+      handle.addEventListener(
+        'pointerdown',
+        event => {
+          if (!drawer.open) {
+            return;
+          }
+
+          event.preventDefault();
+          event.stopPropagation();
+          handle.setPointerCapture(
+            event.pointerId
+          );
+
+          const stage =
+            drawer.offsetParent;
+
+          const stageTop =
+            stage?.getBoundingClientRect()
+              .top || 0;
+
+          const maxTop =
+            Math.max(
+              0,
+              (stage?.clientHeight || window.innerHeight)
+              - 70
+            );
+
+          const move = moveEvent => {
+            const top =
+              Math.max(
+                0,
+                Math.min(
+                  maxTop,
+                  moveEvent.clientY - stageTop
+                )
+              );
+
+            state.auctionRostersTop =
+              Math.round(top);
+
+            drawer.style.setProperty(
+              '--auction-rosters-top',
+              `${state.auctionRostersTop}px`
+            );
+          };
+
+          const finish = () => {
+            handle.removeEventListener(
+              'pointermove',
+              move
+            );
+
+            localStorage.setItem(
+              auctionRostersStorageKey(),
+              String(state.auctionRostersTop)
+            );
+          };
+
+          handle.addEventListener(
+            'pointermove',
+            move
+          );
+
+          handle.addEventListener(
+            'pointerup',
+            finish,
+            { once: true }
+          );
+
+          handle.addEventListener(
+            'pointercancel',
+            finish,
+            { once: true }
+          );
+        }
+      );
+    }
+
+
     function renderAuctionAllRostersDrawer() {
       const canView =
         auctionHasPresidentRole()
@@ -11197,7 +11482,10 @@
             );
 
           return `
-            <section class="auction-roster-team-card">
+            <section
+              class="auction-roster-team-card"
+              data-roster-drop-team="${esc(team.id)}"
+            >
 
               <div class="auction-roster-team-head">
 
@@ -11230,7 +11518,12 @@
                           );
 
                         return `
-                          <div class="auction-roster-edit-row">
+                          <div
+                            class="auction-roster-edit-row"
+                            ${canEdit ? 'draggable="true"' : ''}
+                            data-roster-assignment="${esc(item.id)}"
+                            data-roster-source-team="${esc(team.id)}"
+                          >
 
                             <span class="auction-roster-mini-roles">
                               ${roles.map(role => `
@@ -11313,9 +11606,16 @@
         <details
           id="auction-rosters-drawer"
           class="auction-rosters-drawer"
+          data-controller="${auctionCanControl() ? 'true' : 'false'}"
+          style="--auction-rosters-top:${auctionRostersResolvedTop()}px"
           ${state.auctionRostersOpen ? 'open' : ''}
         >
           <summary>
+            <span
+              class="auction-rosters-resize-handle"
+              title="Trascina per ridimensionare"
+              aria-label="Ridimensiona pannello rose"
+            ></span>
             Rose di tutti
             <span class="badge">
               ${totalPlayers}
@@ -11650,6 +11950,9 @@
           data?.myTeam
             ?.abandonedCurrentLot === true,
 
+        pauseAfterAward:
+          session?.pause_after_award === true,
+
         nominationTeam:
           session?.current_nomination_team_id || null,
 
@@ -11906,10 +12209,7 @@
         );
 
       const adminBidMinimum =
-        Math.max(
-          1,
-          currentBid + 1
-        );
+        1;
 
       state.auctionAdminBidAmount =
         Math.max(
@@ -12233,10 +12533,7 @@
       );
     }
     function auctionCanUseAuctioneerConsole() {
-      return Boolean(
-        state.auction?.permissions?.isLeagueAdmin
-        || state.dashboard?.permissions?.isLeagueAdmin
-      );
+      return auctionCanControl();
     }
     function auctionMyTeamId() {
       return auctionPresidentTeamId();
@@ -12299,13 +12596,13 @@
         ],
         [
           'Tempo chiamata',
-          settings.president_device_mode === 'dual'
+          settings.nomination_timer_enabled !== false
             ? `${settings.nomination_timeout_seconds || 20}s`
-            : '—'
+            : 'Disattivato'
         ],
         [
           'Penalità',
-          settings.president_device_mode === 'dual'
+          settings.nomination_timer_enabled !== false
             ? `${settings.nomination_timeout_penalty || 0} crediti`
             : '—'
         ]
@@ -13019,10 +13316,7 @@
 
 
       const adminBidMinimum =
-        Math.max(
-          1,
-          currentBid + 1
-        );
+        1;
 
       const adminBidPlayerKey =
         String(
@@ -13038,10 +13332,14 @@
           adminBidPlayerKey;
 
         state.auctionAdminBidAmount =
-          adminBidMinimum;
+          Math.max(
+            1,
+            currentBid || 1
+          );
 
         state.auctionAdminBidTeamId =
-          null;
+          s.current_bidder_team_id
+          || null;
       } else {
         state.auctionAdminBidAmount =
           Math.max(
@@ -13063,6 +13361,141 @@
           )
         ||
         null;
+
+
+      const adminControlPanelHtml = `
+        <div class="auctioneer-bid-panel">
+
+          <div class="auctioneer-bid-section-title">
+            Seleziona la squadra
+          </div>
+
+          <div class="auctioneer-team-grid">
+            ${(d.teams || []).map(team => `
+              <button
+                type="button"
+                class="auctioneer-team-cube ${
+                  state.auctionAdminBidTeamId === team.id
+                    ? 'selected'
+                    : ''
+                }"
+                data-admin-bid-team="${esc(team.id)}"
+              >
+                <strong>${esc(team.name)}</strong>
+                <small>
+                  ${
+                    s.current_bidder_team_id === team.id
+                      ? 'LEADER'
+                      : 'SELEZIONA'
+                  }
+                </small>
+              </button>
+            `).join('')}
+          </div>
+
+          <div class="auctioneer-unified-player">
+            <label>
+              Giocatore
+              <input
+                id="auction-admin-player-search"
+                type="search"
+                placeholder="Cerca uno svincolato..."
+                autocomplete="off"
+                value="${esc(
+                  hasPlayer
+                    ? p?.name || ''
+                    : state.auctionAdminPlayerSearch
+                )}"
+                ${hasPlayer || !s.pause_after_award ? 'disabled' : ''}
+              >
+            </label>
+
+            <div
+              id="auction-admin-search-results"
+              class="auctioneer-search-results"
+            ></div>
+
+            <div
+              id="auction-admin-selected-player"
+              class="auctioneer-selected-player compact"
+            >
+              ${
+                hasPlayer
+                  ? `Chiamata: ${esc(p?.name || 'Giocatore')}`
+                  : adminSelectedPlayer
+                    ? `Selezionato: ${esc(adminSelectedPlayer.name)} · ${esc(adminSelectedPlayer.serie_a_team || '')}`
+                    : s.pause_after_award
+                      ? 'Cerca il giocatore da assegnare durante la pausa'
+                      : 'La ricerca manuale è disponibile quando l’asta è in pausa'
+              }
+            </div>
+          </div>
+
+          <div class="auctioneer-bid-tools">
+            <div class="auctioneer-bid-amount-editor">
+              <button
+                type="button"
+                data-admin-bid-step="-1"
+                title="Diminuisci di 1"
+              >−</button>
+
+              <input
+                id="auction-admin-bid-amount"
+                type="number"
+                min="1"
+                step="1"
+                value="${Number(state.auctionAdminBidAmount)}"
+                aria-label="Prezzo Banditore"
+              >
+
+              <button
+                type="button"
+                data-admin-bid-step="1"
+                title="Aumenta di 1"
+              >+</button>
+            </div>
+
+            <div class="auctioneer-bid-quick" aria-label="Rialzi rapidi Banditore">
+              ${quickOffsets.map(offset => `
+                <button
+                  type="button"
+                  data-admin-bid-offset="${offset}"
+                >+${offset}</button>
+              `).join('')}
+            </div>
+
+            ${
+              hasPlayer
+                ? `
+                    <button
+                      id="auction-admin-place-bid"
+                      type="button"
+                      class="auctioneer-place-bid good"
+                      ${state.auctionAdminBidTeamId ? '' : 'disabled'}
+                    >
+                      OK · CONFERMA RILANCIO
+                    </button>
+                  `
+                : ''
+            }
+          </div>
+
+          ${
+            s.pause_after_award
+              ? `
+                  <div class="auctioneer-pause-note">
+                    ${
+                      hasPlayer
+                        ? 'Pausa pronta: scatterà dopo questa aggiudicazione'
+                        : 'Asta in pausa · code modificabili e assegnazioni manuali abilitate'
+                    }
+                  </div>
+                `
+              : ''
+          }
+
+        </div>
+      `;
 
 
       const adminHtml =
@@ -13157,19 +13590,55 @@
                     </button>
 
                     <button
-                      id="auction-hold"
+                      id="auction-pause-cycle"
                       class="secondary"
+                      type="button"
+                    >
                       ${
-                        hasPlayer
+                        s.pause_after_award
+                          ? 'RIPRENDI ASTA'
+                          : hasPlayer
+                            ? 'PAUSA DOPO AGGIUD.'
+                            : 'PAUSA ASTA'
+                      }
+                    </button>
+
+                    <button
+                      id="auction-restart-timer"
+                      class="secondary"
+                      type="button"
+                      ${
+                        !hasPlayer
+                        && d.settings
+                          ?.nomination_timer_enabled === false
+                          ? 'disabled'
+                          : ''
+                      }
+                    >
+                      TIMER
+                    </button>
+
+                    <button
+                      id="auction-cancel-call"
+                      class="danger"
+                      type="button"
+                      ${hasPlayer ? '' : 'disabled'}
+                    >
+                      ANNULLA CHIAMATA
+                    </button>
+
+                    <button
+                      id="auction-pass-nomination"
+                      class="secondary"
+                      type="button"
+                      ${
+                        !hasPlayer
+                        && auctionCallMode()
                           ? ''
                           : 'disabled'
                       }
                     >
-                      ${
-                        s.hold_active
-                          ? 'RIPRENDI'
-                          : 'HOLD'
-                      }
+                      PASSA CHIAMATA
                     </button>
 
                     <button
@@ -13177,11 +13646,16 @@
                       class="good"
                       ${
                         hasPlayer
+                        || (
+                          s.pause_after_award
+                          && adminSelectedPlayer
+                          && state.auctionAdminBidTeamId
+                        )
                           ? ''
                           : 'disabled'
                       }
                     >
-                      AGGIUDICA
+                      ${hasPlayer ? 'AGGIUDICA' : 'ASSEGNA SVINCOLATO'}
                     </button>
 
                   </div>
@@ -13189,251 +13663,8 @@
                 </div>
 
 
-                ${
-                  hasPlayer
-                    ? `
-                        <div class="auctioneer-console-body">
-
-                          <div class="auctioneer-bid-panel">
-
-                            <div class="auctioneer-bid-section-title">
-                              Seleziona il miglior offerente
-                            </div>
-
-                            <div class="auctioneer-team-grid">
-
-                              ${
-                                (d.teams || [])
-                                  .map(team => `
-                                    <button
-                                      type="button"
-                                      class="auctioneer-team-cube ${
-                                        state.auctionAdminBidTeamId === team.id
-                                          ? 'selected'
-                                          : ''
-                                      }"
-                                      data-admin-bid-team="${esc(team.id)}"
-                                      ${
-                                        s.current_bidder_team_id === team.id
-                                          ? 'disabled title="Già miglior offerente"'
-                                          : ''
-                                      }
-                                    >
-                                      <strong>${esc(team.name)}</strong>
-                                      <small>
-                                        ${
-                                          s.current_bidder_team_id === team.id
-                                            ? 'LEADER'
-                                            : 'SELEZIONA'
-                                        }
-                                      </small>
-                                    </button>
-                                  `)
-                                  .join('')
-                              }
-
-                            </div>
-
-
-                            <div class="auctioneer-bid-tools">
-
-                              <div class="auctioneer-bid-amount-editor">
-                                <button
-                                  type="button"
-                                  data-admin-bid-step="-1"
-                                  title="Diminuisci di 1"
-                                >−</button>
-
-                                <input
-                                  id="auction-admin-bid-amount"
-                                  type="number"
-                                  min="${adminBidMinimum}"
-                                  step="1"
-                                  value="${Number(state.auctionAdminBidAmount)}"
-                                  aria-label="Importo offerta Banditore"
-                                >
-
-                                <button
-                                  type="button"
-                                  data-admin-bid-step="1"
-                                  title="Aumenta di 1"
-                                >+</button>
-                              </div>
-
-                              <div class="auctioneer-bid-quick" aria-label="Rialzi rapidi Banditore">
-                                ${quickOffsets.map(offset => `
-                                  <button
-                                    type="button"
-                                    data-admin-bid-offset="${offset}"
-                                  >+${offset}</button>
-                                `).join('')}
-                              </div>
-
-                              <button
-                                id="auction-admin-place-bid"
-                                type="button"
-                                class="auctioneer-place-bid good"
-                                ${state.auctionAdminBidTeamId ? '' : 'disabled'}
-                              >
-                                OK · CONFERMA RILANCIO
-                              </button>
-
-                            </div>
-
-                          </div>
-
-
-                          <div class="auctioneer-correction-line">
-
-                            <label>
-                              Correzione
-
-                              <input
-                                id="auction-correct-amount"
-                                type="number"
-                                min="1"
-                                value="${selectedBid}"
-                              >
-                            </label>
-
-                            <label>
-                              Squadra
-
-                              <select id="auction-correct-team">
-
-                                ${
-                                  (d.teams || [])
-                                    .map(team => `
-                                      <option
-                                        value="${esc(team.id)}"
-                                        ${
-                                          s.current_bidder_team_id === team.id
-                                            ? 'selected'
-                                            : ''
-                                        }
-                                      >
-                                        ${esc(team.name)}
-                                      </option>
-                                    `)
-                                    .join('')
-                                }
-
-                              </select>
-                            </label>
-
-                            <button
-                              id="auction-correct"
-                              class="secondary"
-                              type="button"
-                            >
-                              Correggi
-                            </button>
-
-                          </div>
-
-                        </div>
-                      `
-                    : `
-                        <div class="auctioneer-idle">
-                          Nessun lotto attivo: puoi comunque registrare un acquisto manuale qui sotto.
-                        </div>
-                      `
-                }
-
-
-                <div class="auctioneer-manual-award">
-
-                  <div class="auctioneer-manual-search">
-
-                    <label>
-                      Giocatore svincolato
-
-                      <input
-                        id="auction-admin-player-search"
-                        type="search"
-                        placeholder="Cerca per nome..."
-                        autocomplete="off"
-                        value="${esc(state.auctionAdminPlayerSearch)}"
-                      >
-                    </label>
-
-                    <div
-                      id="auction-admin-search-results"
-                      class="auctioneer-search-results"
-                    ></div>
-
-                    <div
-                      id="auction-admin-selected-player"
-                      class="auctioneer-selected-player"
-                    >
-                      ${
-                        adminSelectedPlayer
-                          ? `Selezionato: ${esc(adminSelectedPlayer.name)} · ${esc(adminSelectedPlayer.serie_a_team || '')}`
-                          : 'Nessun giocatore selezionato'
-                      }
-                    </div>
-
-                  </div>
-
-
-                  <label>
-                    Squadra acquirente
-
-                    <select id="auction-admin-team">
-
-                      <option value="">
-                        Seleziona...
-                      </option>
-
-                      ${
-                        (d.teams || [])
-                          .map(team => `
-                            <option
-                              value="${esc(team.id)}"
-                              ${
-                                state.auctionAdminTeamId === team.id
-                                  ? 'selected'
-                                  : ''
-                              }
-                            >
-                              ${esc(team.name)}
-                            </option>
-                          `)
-                          .join('')
-                      }
-
-                    </select>
-                  </label>
-
-
-                  <label>
-                    Prezzo finale
-
-                    <input
-                      id="auction-admin-price"
-                      type="number"
-                      min="1"
-                      step="1"
-                      value="${Math.max(1, Number(state.auctionAdminPrice || 1))}"
-                    >
-                  </label>
-
-
-                  <button
-                    id="auction-manual-award"
-                    class="manual-register-btn good"
-                    type="button"
-                    ${
-                      adminSelectedPlayer
-                      &&
-                      state.auctionAdminTeamId
-                        ? ''
-                        : 'disabled'
-                    }
-                  >
-                    REGISTRA ACQUISTO
-                  </button>
-
+                <div class="auctioneer-console-body">
+                  ${adminControlPanelHtml}
                 </div>
 
                 </section>
@@ -13495,8 +13726,10 @@
               </span>
 
               ${
-                s.hold_active
-                  ? '<span class="badge danger">HOLD</span>'
+                s.pause_after_award
+                  ? `<span class="badge danger">${hasPlayer ? 'PAUSA PROGRAMMATA' : 'PAUSA'}</span>`
+                  : s.hold_active
+                    ? '<span class="badge danger">HOLD</span>'
                   : ''
               }
 
@@ -13633,14 +13866,7 @@
         );
 
 
-      $('auction-rosters-drawer')
-        ?.addEventListener(
-          'toggle',
-          event => {
-            state.auctionRostersOpen =
-              event.currentTarget.open;
-          }
-        );
+      bindAuctionRostersDrawer();
 
 
       $('auctioneer-console-drawer')
@@ -13785,13 +14011,7 @@
 
       const syncAuctionAdminBidControls = () => {
         const liveAdminBidMinimum =
-          Math.max(
-            1,
-            Number(
-              auctionSession()?.current_bid
-              || 0
-            ) + 1
-          );
+          1;
 
         state.auctionAdminBidAmount =
           Math.max(
@@ -13834,6 +14054,8 @@
           confirmButton.disabled =
             !state.auctionAdminBidTeamId;
         }
+
+        updateAuctionManualAwardButton();
       };
 
 
@@ -13859,13 +14081,7 @@
           'input',
           event => {
             const liveAdminBidMinimum =
-              Math.max(
-                1,
-                Number(
-                  auctionSession()?.current_bid
-                  || 0
-                ) + 1
-              );
+              1;
 
             state.auctionAdminBidAmount =
               Math.max(
@@ -13888,13 +14104,7 @@
             'click',
             () => {
               const liveAdminBidMinimum =
-                Math.max(
-                  1,
-                  Number(
-                    auctionSession()?.current_bid
-                    || 0
-                  ) + 1
-                );
+                1;
 
               state.auctionAdminBidAmount =
                 Math.max(
@@ -13950,13 +14160,7 @@
           'click',
           async () => {
             const liveAdminBidMinimum =
-              Math.max(
-                1,
-                Number(
-                  auctionSession()?.current_bid
-                  || 0
-                ) + 1
-              );
+              1;
 
             const teamId =
               state.auctionAdminBidTeamId;
@@ -13977,70 +14181,234 @@
               );
             }
 
-            state.auctionAdminBidTeamId =
-              null;
+            await auctionAction(
+              {
+                action:
+                  'setControllerBid',
 
-            await placeBid(
-              teamId,
-              amount,
-              'VOCALE'
+                sessionId:
+                  s.id,
+
+                teamId,
+                amount
+              },
+              'Rilancio del Banditore confermato.'
             );
           }
         );
 
 
-      $('auction-hold')
+      $('auction-pause-cycle')
         ?.addEventListener(
           'click',
           () =>
-            auctionAction({
-              action:
-                'setHold',
+            auctionAction(
+              {
+                action:
+                  'setAuctionPause',
 
-              sessionId:
-                s.id,
+                sessionId:
+                  s.id,
 
-              hold:
-                !s.hold_active
-            })
+                paused:
+                  !s.pause_after_award
+              },
+              s.pause_after_award
+                ? 'Asta ripresa.'
+                : hasPlayer
+                  ? 'La pausa scatterà dopo l’aggiudicazione.'
+                  : 'Asta messa in pausa.'
+            )
+        );
+
+
+      $('auction-restart-timer')
+        ?.addEventListener(
+          'click',
+          () =>
+            auctionAction(
+              {
+                action:
+                  'restartPhaseTimer',
+
+                sessionId:
+                  s.id
+              },
+              'Timer ripristinato.'
+            )
+        );
+
+
+      $('auction-cancel-call')
+        ?.addEventListener(
+          'click',
+          async () => {
+            if (!confirm(
+              `Annullare la chiamata di ${p?.name || 'questo giocatore'}? Tornerà tra gli svincolati e il turno di chiamata non cambierà.`
+            )) {
+              return;
+            }
+
+            await auctionAction(
+              {
+                action:
+                  'cancelCall',
+
+                sessionId:
+                  s.id
+              },
+              'Chiamata annullata.'
+            );
+          }
+        );
+
+
+      $('auction-pass-nomination')
+        ?.addEventListener(
+          'click',
+          async () => {
+            if (!confirm(
+              'Passare il turno di chiamata alla squadra successiva?'
+            )) {
+              return;
+            }
+
+            await auctionAction(
+              {
+                action:
+                  'passNominationTurn',
+
+                sessionId:
+                  s.id
+              },
+              'Turno di chiamata passato.'
+            );
+          }
         );
 
 
       $('auction-award')
         ?.addEventListener(
           'click',
-          () =>
-            auctionAction({
-              action:
-                'awardPlayer',
+          async () => {
+            const teamId =
+              state.auctionAdminBidTeamId;
 
-              sessionId:
-                s.id
-            }, 'Giocatore aggiudicato.')
-        );
-
-
-      $('auction-correct')
-        ?.addEventListener(
-          'click',
-          () =>
-            auctionAction({
-              action:
-                'correctBid',
-
-              sessionId:
-                s.id,
-
-              teamId:
-                $('auction-correct-team')
-                  .value,
-
-              amount:
+            const amount =
+              Math.max(
+                1,
                 Number(
-                  $('auction-correct-amount')
-                    .value
+                  state.auctionAdminBidAmount
+                  || currentBid
+                  || 1
                 )
-            }, 'Offerta corretta.')
+              );
+
+            if (hasPlayer) {
+              try {
+                if (
+                  teamId
+                  && (
+                    teamId
+                    !== s.current_bidder_team_id
+                    || amount
+                    !== Number(s.current_bid || 0)
+                  )
+                ) {
+                  await api(
+                    ENDPOINTS.auction,
+                    {
+                      action:
+                        'setControllerBid',
+
+                      sessionId:
+                        s.id,
+
+                      teamId,
+                      amount
+                    }
+                  );
+                }
+
+                await auctionAction(
+                  {
+                    action:
+                      'awardPlayer',
+
+                    sessionId:
+                      s.id
+                  },
+                  'Giocatore aggiudicato.'
+                );
+
+              } catch (error) {
+                msg(error.message, 'error');
+              }
+
+              return;
+            }
+
+            const player =
+              (d.callCandidates || [])
+                .find(item =>
+                  item.id
+                  === state.auctionAdminPlayerId
+                );
+
+            const team =
+              (d.teams || [])
+                .find(item =>
+                  item.id === teamId
+                );
+
+            if (
+              !s.pause_after_award
+              || !player
+              || !team
+            ) {
+              return msg(
+                'Durante la pausa seleziona giocatore, squadra e prezzo.',
+                'error'
+              );
+            }
+
+            if (!confirm(
+              `Assegnare ${player.name} a ${team.name} per ${amount} crediti?`
+            )) {
+              return;
+            }
+
+            const assigned =
+              await auctionAction(
+                {
+                  action:
+                    'manualAward',
+
+                  sessionId:
+                    s.id,
+
+                  playerId:
+                    player.id,
+
+                  teamId:
+                    team.id,
+
+                  price:
+                    amount
+                },
+                `${player.name} assegnato a ${team.name}.`
+              );
+
+            if (assigned) {
+              state.auctionAdminPlayerSearch =
+                '';
+
+              state.auctionAdminPlayerId =
+                null;
+
+              renderAuctionLive();
+            }
+          }
         );
 
 
@@ -14129,117 +14497,6 @@
         );
 
 
-      $('auction-admin-team')
-        ?.addEventListener(
-          'change',
-          event => {
-            state.auctionAdminTeamId =
-              event.target.value
-              ||
-              null;
-
-            updateAuctionManualAwardButton();
-          }
-        );
-
-
-      $('auction-admin-price')
-        ?.addEventListener(
-          'input',
-          event => {
-            state.auctionAdminPrice =
-              Math.max(
-                1,
-                Number(
-                  event.target.value
-                  ||
-                  1
-                )
-              );
-          }
-        );
-
-
-      $('auction-manual-award')
-        ?.addEventListener(
-          'click',
-          async () => {
-            const player =
-              (d.callCandidates || [])
-                .find(
-                  item =>
-                    item.id
-                    === state.auctionAdminPlayerId
-                );
-
-            const team =
-              (d.teams || [])
-                .find(
-                  item =>
-                    item.id
-                    === state.auctionAdminTeamId
-                );
-
-            const price =
-              Math.max(
-                1,
-                Number(
-                  state.auctionAdminPrice
-                  ||
-                  1
-                )
-              );
-
-            if (
-              !player
-              ||
-              !team
-            ) {
-              return msg(
-                'Seleziona giocatore e squadra.',
-                'error'
-              );
-            }
-
-            if (
-              !confirm(
-                `Registrare ${player.name} a ${team.name} per ${price} crediti?`
-              )
-            ) {
-              return;
-            }
-
-            await auctionAction(
-              {
-                action:
-                  'manualAward',
-
-                sessionId:
-                  s.id,
-
-                playerId:
-                  player.id,
-
-                teamId:
-                  team.id,
-
-                price
-              },
-              `${player.name} assegnato a ${team.name}.`
-            );
-
-            state.auctionAdminPlayerSearch =
-              '';
-
-            state.auctionAdminPlayerId =
-              null;
-
-            state.auctionAdminPrice =
-              1;
-          }
-        );
-
-
       $('auction-undo-bid')
         ?.addEventListener(
           'click',
@@ -14285,6 +14542,138 @@
             );
           }
         );
+
+
+      document
+        .querySelectorAll(
+          '.auction-roster-edit-row[draggable="true"]'
+        )
+        .forEach(row => {
+          row.addEventListener(
+            'dragstart',
+            event => {
+              event.dataTransfer.effectAllowed =
+                'move';
+
+              event.dataTransfer.setData(
+                'text/plain',
+                row.dataset.rosterAssignment
+              );
+
+              row.classList.add(
+                'dragging'
+              );
+            }
+          );
+
+          row.addEventListener(
+            'dragend',
+            () => {
+              row.classList.remove(
+                'dragging'
+              );
+
+              document
+                .querySelectorAll(
+                  '.auction-roster-team-card.drop-target'
+                )
+                .forEach(card =>
+                  card.classList.remove(
+                    'drop-target'
+                  )
+                );
+            }
+          );
+        });
+
+
+      document
+        .querySelectorAll(
+          '[data-roster-drop-team]'
+        )
+        .forEach(card => {
+          card.addEventListener(
+            'dragover',
+            event => {
+              event.preventDefault();
+              event.dataTransfer.dropEffect =
+                'move';
+
+              card.classList.add(
+                'drop-target'
+              );
+            }
+          );
+
+          card.addEventListener(
+            'dragleave',
+            () =>
+              card.classList.remove(
+                'drop-target'
+              )
+          );
+
+          card.addEventListener(
+            'drop',
+            async event => {
+              event.preventDefault();
+              card.classList.remove(
+                'drop-target'
+              );
+
+              const assignmentId =
+                event.dataTransfer.getData(
+                  'text/plain'
+                );
+
+              const targetTeamId =
+                card.dataset.rosterDropTeam;
+
+              const assignment =
+                (state.auctionPersonalRoster
+                  ?.assignments || [])
+                  .find(item =>
+                    item.id === assignmentId
+                  );
+
+              const target =
+                (state.auctionPersonalRoster
+                  ?.teams || d.teams || [])
+                  .find(team =>
+                    team.id === targetTeamId
+                  );
+
+              if (
+                !assignment
+                || !target
+                || assignment.team_id
+                  === targetTeamId
+              ) {
+                return;
+              }
+
+              if (!confirm(
+                `Spostare ${assignment.player?.name || 'il giocatore'} nella rosa ${target.name}?`
+              )) {
+                return;
+              }
+
+              await auctionAction(
+                {
+                  action:
+                    'transferRosterPlayer',
+
+                  sessionId:
+                    s.id,
+
+                  assignmentId,
+                  targetTeamId
+                },
+                'Giocatore spostato nella nuova squadra.'
+              );
+            }
+          );
+        });
 
 
       document
@@ -14620,16 +15009,23 @@
 
     function updateAuctionManualAwardButton() {
       const button =
-        $('auction-manual-award');
+        $('auction-award');
 
       if (!button) {
         return;
       }
 
+      const session =
+        auctionSession();
+
       button.disabled =
-        !state.auctionAdminPlayerId
-        ||
-        !state.auctionAdminTeamId;
+        session?.current_player_id
+          ? false
+          : !(
+              session?.pause_after_award
+              && state.auctionAdminPlayerId
+              && state.auctionAdminBidTeamId
+            );
     }
 
 
@@ -15405,6 +15801,8 @@
           renderAuctionTimer();
         }
 
+        return true;
+
       }catch(error){
         if (smoothTimerTransition) {
           state.auctionTimerTransitionPending =
@@ -15423,6 +15821,8 @@
           error.message,
           'error'
         );
+
+        return false;
       }
     }
 
@@ -15481,6 +15881,29 @@
         state.auctionTimerDisplayKey = '';
         state.auctionTimerDisplayStartsAt = 0;
         setTimer('HOLD');
+        return;
+      }
+
+      if (
+        !s.current_player_id
+        &&
+        s.pause_after_award
+      ) {
+        state.auctionTimerDisplayKey = '';
+        state.auctionTimerDisplayStartsAt = 0;
+        setTimer('PAUSA');
+        return;
+      }
+
+      if (
+        !s.current_player_id
+        &&
+        state.auction?.settings
+          ?.nomination_timer_enabled === false
+      ) {
+        state.auctionTimerDisplayKey = '';
+        state.auctionTimerDisplayStartsAt = 0;
+        setTimer('—');
         return;
       }
 
@@ -15654,6 +16077,24 @@
         s.hold_active
       ) {
         $('tv-timer').textContent = 'HOLD';
+        return;
+      }
+
+      if (
+        !s.current_player_id
+        &&
+        s.pause_after_award
+      ) {
+        $('tv-timer').textContent = 'PAUSA';
+        return;
+      }
+
+      if (
+        !s.current_player_id
+        &&
+        d.settings?.nomination_timer_enabled === false
+      ) {
+        $('tv-timer').textContent = '—';
         return;
       }
 
