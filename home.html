@@ -5618,6 +5618,137 @@
         grid-template-columns:repeat(4,minmax(44px,1fr))!important;
       }
     }
+
+    /* ASTA COCKPIT V16 · azioni contestuali e tabella sempre leggibile */
+    .auction-caller-controls{
+      grid-template-columns:minmax(96px,1fr) minmax(48px,70px)!important;
+    }
+
+    .auction-free-fixed .drawer-filters{
+      grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    }
+
+    .auction-free-fixed .drawer-filters label:nth-child(3){
+      grid-column:auto!important;
+    }
+
+    .auction-free-fixed .player-table{
+      width:100%;
+      table-layout:fixed!important;
+    }
+
+    .auction-free-fixed .player-table th,
+    .auction-free-fixed .player-table td{
+      display:table-cell!important;
+      padding:4px 3px!important;
+    }
+
+    .auction-free-fixed .player-table th:nth-child(1),
+    .auction-free-fixed .player-table td:nth-child(1){width:58px}
+
+    .auction-free-fixed .player-table th:nth-child(2),
+    .auction-free-fixed .player-table td:nth-child(2){width:auto}
+
+    .auction-free-fixed .player-table th:nth-child(3),
+    .auction-free-fixed .player-table td:nth-child(3){width:72px;text-align:center}
+
+    .auction-free-fixed .player-table th:nth-child(4),
+    .auction-free-fixed .player-table td:nth-child(4),
+    .auction-free-fixed .player-table th:nth-child(5),
+    .auction-free-fixed .player-table td:nth-child(5){width:58px;text-align:right}
+
+    .auction-free-fixed .player-table th:nth-child(6),
+    .auction-free-fixed .player-table td:nth-child(6){width:68px;text-align:center}
+
+    .auction-signal-list{
+      min-width:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:2px;
+      white-space:nowrap;
+    }
+
+    .auction-signal-badge{
+      width:17px;
+      height:17px;
+      display:inline-grid;
+      place-items:center;
+      flex:0 0 auto;
+      border:1px solid rgba(149,192,233,.22);
+      border-radius:5px;
+      background:rgba(38,77,116,.62);
+      font-size:10px;
+      line-height:1;
+    }
+
+    .auction-signal-empty{
+      color:var(--muted);
+      font-size:7px;
+    }
+
+    .auction-queue-add.call-now{
+      border-color:rgba(73,255,155,.58)!important;
+      background:linear-gradient(145deg,rgba(31,191,123,.96),rgba(14,139,92,.96))!important;
+      color:#fff!important;
+    }
+
+    @container free-agents (max-width:480px){
+      .auction-caller-controls{
+        grid-template-columns:minmax(82px,1fr) 50px!important;
+        gap:3px!important;
+        padding-inline:4px!important;
+      }
+
+      .auction-free-fixed .drawer-filters{
+        grid-template-columns:repeat(3,minmax(0,1fr))!important;
+        gap:2px!important;
+        padding-inline:4px!important;
+      }
+
+      .auction-free-fixed .drawer-filters label{
+        min-width:0;
+        font-size:5.5px!important;
+      }
+
+      .auction-free-fixed .drawer-filters select{
+        min-width:0;
+        padding-inline:3px!important;
+        font-size:7px!important;
+      }
+
+      .auction-free-fixed .player-table th,
+      .auction-free-fixed .player-table td{
+        padding:3px 2px!important;
+        font-size:7px!important;
+      }
+
+      .auction-free-fixed .player-table th:nth-child(1),
+      .auction-free-fixed .player-table td:nth-child(1){width:44px}
+
+      .auction-free-fixed .player-table th:nth-child(3),
+      .auction-free-fixed .player-table td:nth-child(3){width:57px}
+
+      .auction-free-fixed .player-table th:nth-child(4),
+      .auction-free-fixed .player-table td:nth-child(4),
+      .auction-free-fixed .player-table th:nth-child(5),
+      .auction-free-fixed .player-table td:nth-child(5){width:43px}
+
+      .auction-free-fixed .player-table th:nth-child(6),
+      .auction-free-fixed .player-table td:nth-child(6){width:58px}
+
+      .auction-signal-badge{
+        width:14px;
+        height:14px;
+        font-size:8px;
+      }
+
+      .auction-queue-add{
+        min-width:50px!important;
+        padding-inline:3px!important;
+        font-size:6px!important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -6010,6 +6141,12 @@
       auctionRosterSignature: '',
 
       auctionQueueDragPlayerId: null,
+      auctionQueueMutationVersion: 0,
+      auctionQueueMutationPending: false,
+
+      auctionTimerDisplayKey: '',
+      auctionTimerDisplayStartsAt: 0,
+      auctionTimerTransitionPending: false,
 
       lastAuctionFetchAt: 0,
       serverOffsetMs: 0
@@ -7110,6 +7247,52 @@
       if (flag === 'penalties') return Number(player.penalty_probability || 0) > 0;
       if (flag === 'injury') return player.uncertain_return === true || (player.unavailable_until_round !== null && player.unavailable_until_round !== undefined && String(player.unavailable_until_round).trim() !== '');
       return true;
+    }
+
+    function auctionPlayerSignalBadges(player) {
+      const signals = [
+        {
+          key: 'market',
+          emoji: '🔄',
+          label: 'Mercato',
+          active: player?.market_flag === true
+        },
+        {
+          key: 'injury',
+          emoji: '🚑',
+          label: 'Indisponibile',
+          active:
+            player?.uncertain_return === true
+            || (
+              player?.unavailable_until_round !== null
+              && player?.unavailable_until_round !== undefined
+              && String(player.unavailable_until_round).trim() !== ''
+            )
+        },
+        {
+          key: 'new',
+          emoji: '🆕',
+          label: 'Nuovo arrivo',
+          active: player?.new_arrival === true
+        },
+        {
+          key: 'penalties',
+          emoji: '⚽',
+          label: 'Rigorista',
+          active: Number(player?.penalty_probability || 0) > 0
+        }
+      ].filter(signal => signal.active);
+
+      return signals.length
+        ? `<span class="auction-signal-list">${signals.map(signal => `
+            <span
+              class="auction-signal-badge"
+              data-signal="${signal.key}"
+              title="${signal.label}"
+              aria-label="${signal.label}"
+            >${signal.emoji}</span>
+          `).join('')}</span>`
+        : '<span class="auction-signal-empty">—</span>';
     }
 
     function filterPlayers(players, controls, selectedRoles, mode) {
@@ -8442,7 +8625,11 @@
 
     function auctionCanManageCallQueue() {
       return Boolean(
-        auctionQueueModeAvailable()
+        auctionSession()
+        &&
+        auctionCallMode()
+        &&
+        auctionHasPresidentRole()
         &&
         !auctionUseMobilePresidentConsole()
       );
@@ -8563,6 +8750,9 @@
     }
 
 
+    let auctionQueueSaveChain = Promise.resolve();
+
+
     function renderAuctionCallQueue() {
       if (
         !auctionCallMode()
@@ -8672,8 +8862,7 @@
                     : `
                         <div class="live-placeholder">
                           La coda è vuota.
-                          Usa [CODA] accanto a uno svincolato oppure
-                          la ricerca nella fascia superiore.
+                          Usa CHIAMA accanto a uno svincolato.
                         </div>
                       `
                 }
@@ -8688,6 +8877,130 @@
     }
 
 
+    function attachAuctionQueueDrawerToggle() {
+      $('auction-call-queue-drawer')
+        ?.addEventListener(
+          'toggle',
+          event => {
+            state.auctionQueueOpen =
+              event.currentTarget.open;
+          }
+        );
+    }
+
+
+    function attachAuctionRosterQueueToggle() {
+      $('auction-roster-queue-toggle')
+        ?.addEventListener(
+          'change',
+          event => {
+            state.auctionShowQueueInRoster =
+              event.currentTarget.checked;
+
+            renderAuctionLive();
+          }
+        );
+    }
+
+
+    function auctionOptimisticQueueRows(items) {
+      const currentRows =
+        auctionQueueRows();
+
+      const candidates =
+        state.auction?.callCandidates
+        || [];
+
+      return items.map((item, index) => {
+        const playerId =
+          item.playerId;
+
+        const existing =
+          currentRows.find(row =>
+            row.player_id === playerId
+          );
+
+        const player =
+          existing?.player
+          || candidates.find(candidate =>
+            candidate.id === playerId
+          )
+          || null;
+
+        return {
+          ...(existing || {}),
+          player_id: playerId,
+          player,
+          opening_bid: Math.max(1, Number(item.openingBid || 1)),
+          position: index + 1
+        };
+      });
+    }
+
+
+    function patchAuctionCallQueueUi() {
+      const currentDrawer =
+        $('auction-call-queue-drawer');
+
+      const currentList =
+        $('auction-call-queue-list');
+
+      const queueScrollTop =
+        currentList?.scrollTop
+        || 0;
+
+      if (currentDrawer) {
+        const holder =
+          document.createElement('div');
+
+        holder.innerHTML =
+          renderAuctionCallQueue().trim();
+
+        const nextDrawer =
+          holder.firstElementChild;
+
+        if (nextDrawer) {
+          currentDrawer.replaceWith(nextDrawer);
+        }
+      }
+
+      attachAuctionCallQueueEvents();
+      attachAuctionQueueDrawerToggle();
+
+      const nextList =
+        $('auction-call-queue-list');
+
+      if (nextList) {
+        nextList.scrollTop = queueScrollTop;
+      }
+
+      renderAuctionPlayers();
+
+      if (state.auctionShowQueueInRoster) {
+        const currentRoster =
+          document.querySelector(
+            '.auction-lower-main > .auction-team-column'
+          );
+
+        if (currentRoster) {
+          const holder =
+            document.createElement('div');
+
+          holder.innerHTML =
+            renderAuctionCockpitTeamPanel('roster').trim();
+
+          const nextRoster =
+            holder.firstElementChild;
+
+          if (nextRoster) {
+            currentRoster.replaceWith(nextRoster);
+            attachAuctionRosterQueueToggle();
+          }
+        }
+      }
+    }
+
+
     async function saveAuctionCallQueueItems(
       items,
       successText = ''
@@ -8699,40 +9012,86 @@
         return;
       }
 
-      try {
-        await api(
-          ENDPOINTS.auction,
-          {
-            action:
-              'saveCallQueue',
+      const previousRows =
+        [...auctionQueueRows()];
 
-            sessionId,
+      const mutationVersion =
+        ++state.auctionQueueMutationVersion;
 
-            items
+      state.auctionQueueMutationPending =
+        true;
+
+      state.auction.myCallQueue =
+        auctionOptimisticQueueRows(items);
+
+      patchAuctionCallQueueUi();
+
+      /* Lascia al browser un frame per mostrare subito il nuovo stato. */
+      await new Promise(resolve =>
+        requestAnimationFrame(resolve)
+      );
+
+      const save = async () => {
+        try {
+          await api(
+            ENDPOINTS.auction,
+            {
+              action:
+                'saveCallQueue',
+
+              sessionId,
+
+              items
+            }
+          );
+
+          if (
+            mutationVersion
+            === state.auctionQueueMutationVersion
+          ) {
+            state.auctionQueueMutationPending =
+              false;
+
+            if (successText) {
+              msg(
+                successText,
+                'success'
+              );
+            }
+
+            await loadAuction({
+              quiet: true
+            });
           }
-        );
 
-        if (successText) {
+        } catch (error) {
+          if (
+            mutationVersion
+            === state.auctionQueueMutationVersion
+          ) {
+            state.auctionQueueMutationPending =
+              false;
+
+            state.auction.myCallQueue =
+              previousRows;
+
+            patchAuctionCallQueueUi();
+          }
+
           msg(
-            successText,
-            'success'
+            `Coda non aggiornata: ${error.message}`,
+            'error'
           );
         }
+      };
 
-        /*
-         * Dopo un salvataggio esplicito vogliamo leggere
-         * la coda normalizzata dal server.
-         */
-        await loadAuction({
-          quiet: true
-        });
+      const queuedSave =
+        auctionQueueSaveChain.then(save, save);
 
-      } catch (error) {
-        msg(
-          error.message,
-          'error'
-        );
-      }
+      auctionQueueSaveChain =
+        queuedSave.catch(() => {});
+
+      await queuedSave;
     }
 
 
@@ -8818,8 +9177,7 @@
       ];
 
       await saveAuctionCallQueueItems(
-        items,
-        `${player.name} aggiunto alla coda.`
+        items
       );
     }
 
@@ -9528,21 +9886,7 @@
                   </th>
 
                   <th>
-                    <button data-auction-sort="team">
-                      Squadra <span>↕</span>
-                    </button>
-                  </th>
-
-                  <th class="num-head">
-                    <button data-auction-sort="slot">
-                      Slot <span>↕</span>
-                    </button>
-                  </th>
-
-                  <th class="num-head">
-                    <button data-auction-sort="pma">
-                      PMA <span>↕</span>
-                    </button>
+                    <span title="Segnalazioni">Badge</span>
                   </th>
 
                   <th class="num-head">
@@ -9552,20 +9896,8 @@
                   </th>
 
                   <th class="num-head">
-                    <button data-auction-sort="delta">
-                      Δ <span>↕</span>
-                    </button>
-                  </th>
-
-                  <th class="num-head">
-                    <button data-auction-sort="fm">
-                      FM <span>↕</span>
-                    </button>
-                  </th>
-
-                  <th class="num-head">
-                    <button data-auction-sort="tit">
-                      Tit. <span>↕</span>
+                    <button data-auction-sort="pma">
+                      PMA <span>↕</span>
                     </button>
                   </th>
 
@@ -9573,7 +9905,7 @@
                     showQueue
                       ? `
                           <th class="queue-head">
-                            CODA
+                            AZIONE
                           </th>
                         `
                       : ''
@@ -10442,50 +10774,6 @@
             )
           );
       }
-
-      const action =
-        $('auction-top-action');
-
-      if (!action) {
-        return;
-      }
-
-      const isPresident =
-        auctionHasPresidentRole();
-
-      const ownCall =
-        isPresident
-        &&
-        auctionOwnCallTurn();
-
-      const queueAllowed =
-        isPresident
-        &&
-        auctionCanManageCallQueue();
-
-      action.textContent =
-        ownCall
-          ? 'OK'
-          : 'CODA';
-
-      action.classList.toggle(
-        'ok',
-        ownCall
-      );
-
-      action.classList.toggle(
-        'queue',
-        !ownCall
-      );
-
-      action.disabled =
-        !selected
-        ||
-        (
-          !ownCall
-          &&
-          !queueAllowed
-        );
     }
 
 
@@ -10662,6 +10950,18 @@
 
       if (!data?.ok) {
         return;
+      }
+
+      /*
+       * Un refresh periodico non deve cancellare un aggiornamento
+       * ottimistico della coda mentre il salvataggio è ancora in volo.
+       */
+      if (
+        state.auctionQueueMutationPending
+        && state.auction?.myCallQueue
+      ) {
+        data.myCallQueue =
+          state.auction.myCallQueue;
       }
 
 
@@ -10983,34 +11283,6 @@
           : [];
 
 
-      const ownCallNow =
-        auctionHasPresidentRole()
-        &&
-        auctionOwnCallTurn();
-
-
-      const topActionLabel =
-        ownCallNow
-          ? 'OK'
-          : 'CODA';
-
-
-      const queueModeNow =
-        auctionHasPresidentRole()
-        &&
-        auctionQueueModeAvailable();
-
-
-      const topActionDisabled =
-        !selectedCall
-        ||
-        (
-          !ownCallNow
-          &&
-          !queueModeNow
-        );
-
-
       const quickStripHtml = `
         <div class="auction-status-quick" aria-label="Console rialzi rapidi">
           <span class="auction-status-quick-label">Rialzi</span>
@@ -11127,13 +11399,6 @@
               value="${Math.max(1, Number(state.auctionOpeningBid || 1))}"
             >
           </label>
-
-          <button
-            id="auction-top-action"
-            type="button"
-            class="auction-command-action ${ownCallNow ? 'ok' : 'queue'}"
-            ${topActionDisabled ? 'disabled' : ''}
-          >${topActionLabel}</button>
         </section>
       `;
 
@@ -12001,29 +12266,9 @@
       renderAuctionDrawerControls();
       renderAuctionPlayers();
       attachAuctionCallQueueEvents();
+      attachAuctionQueueDrawerToggle();
+      attachAuctionRosterQueueToggle();
       renderAuctionAdminSearchResults();
-
-
-      $('auction-roster-queue-toggle')
-        ?.addEventListener(
-          'change',
-          event => {
-            state.auctionShowQueueInRoster =
-              event.currentTarget.checked;
-
-            renderAuctionLive();
-          }
-        );
-
-
-      $('auction-call-queue-drawer')
-        ?.addEventListener(
-          'toggle',
-          event => {
-            state.auctionQueueOpen =
-              event.currentTarget.open;
-          }
-        );
 
 
       $('auction-top-search')
@@ -12074,99 +12319,6 @@
                   1
                 )
               );
-          }
-        );
-
-
-      $('auction-top-action')
-        ?.addEventListener(
-          'click',
-          async () => {
-            const selected =
-              (d.callCandidates || [])
-                .find(
-                  player =>
-                    player.id
-                    === state.auctionSelectedPlayerId
-                );
-
-            if (!selected) {
-              return;
-            }
-
-            const base =
-              Math.max(
-                1,
-                Number(
-                  state.auctionOpeningBid
-                  ||
-                  1
-                )
-              );
-
-
-            /*
-             * La chiamata dal selettore appartiene al ruolo Presidente.
-             * Un Admin che è anche Presidente mantiene quindi TUTTE
-             * le funzioni del Presidente per la propria squadra.
-             * Il solo ruolo Admin/Banditore non consente invece
-             * di chiamare al posto degli altri Presidenti.
-             */
-            if (
-              auctionHasPresidentRole()
-              &&
-              auctionOwnCallTurn()
-            ) {
-              try {
-                await api(
-                  ENDPOINTS.auction,
-                  {
-                    action:
-                      'callPlayer',
-
-                    sessionId:
-                      s.id,
-
-                    playerId:
-                      selected.id,
-
-                    openingBid:
-                      base
-                  }
-                );
-
-                state.auctionSelectedPlayerId =
-                  null;
-
-                state.auctionFilterSearch =
-                  '';
-
-                state.auctionOpeningBid =
-                  1;
-
-                await loadAuction();
-
-              } catch (error) {
-                msg(
-                  error.message,
-                  'error'
-                );
-              }
-
-              return;
-            }
-
-
-            if (
-              auctionHasPresidentRole()
-              &&
-              auctionQueueModeAvailable()
-            ) {
-              await addPlayerToAuctionQueue(
-                selected.id,
-                base
-              );
-            }
           }
         );
 
@@ -13164,11 +13316,6 @@
           mode
         );
 
-      const delta =
-        Number(
-          player.pfc_pma_delta
-        );
-
       const queuedIndex =
         auctionQueueRows()
           .findIndex(
@@ -13187,6 +13334,14 @@
           player
         );
 
+      const queueIsEmpty =
+        auctionQueueRows().length === 0;
+
+      const queueActionLabel =
+        queueIsEmpty
+          ? 'CHIAMA'
+          : 'CODA';
+
       const queueAction =
         queuedIndex >= 0
         &&
@@ -13202,7 +13357,7 @@
           : `
               <button
                 type="button"
-                class="auction-queue-add"
+                class="auction-queue-add ${queueIsEmpty ? 'call-now' : ''}"
                 data-queue-add="${esc(player.id)}"
                 ${
                   auctionCanManageCallQueue()
@@ -13215,14 +13370,14 @@
                     ? esc(queueCapacity.message)
                     : auctionHasPresidentRole()
                     ? (
-                        auctionQueueModeAvailable()
-                          ? 'Aggiungi subito in coda con base 1'
-                          : 'Nel tuo turno usa OK nella fascia superiore'
+                        queueIsEmpty
+                          ? 'Inserisci come prima chiamata: verrà elaborato automaticamente dalla coda'
+                          : 'Aggiungi subito alla coda'
                       )
                     : 'Solo il Presidente può usare la coda'
                 }"
               >
-                CODA
+                ${queueActionLabel}
               </button>
             `;
 
@@ -13257,26 +13412,12 @@
                 ${esc(player.name)}
               </span>
 
-              ${
-                flagEmoji(player.nationality_iso2)
-                  ? `<span>${flagEmoji(player.nationality_iso2)}</span>`
-                  : ''
-              }
-
             </div>
           </td>
 
 
-          <td>
-            ${esc(player.serie_a_team || '—')}
-          </td>
-
-          <td class="num">
-            ${esc(player.slot ?? '—')}
-          </td>
-
-          <td class="num">
-            ${formatNumber(player.pma)}
+          <td class="auction-signal-cell">
+            ${auctionPlayerSignalBadges(player)}
           </td>
 
           <td class="num">
@@ -13285,26 +13426,8 @@
             </strong>
           </td>
 
-          <td class="num ${
-            Number.isFinite(delta)
-              ? (
-                  delta > 0
-                    ? 'positive'
-                    : delta < 0
-                      ? 'negative'
-                      : ''
-                )
-              : ''
-          }">
-            ${formatNumber(player.pfc_pma_delta)}
-          </td>
-
           <td class="num">
-            ${formatNumber(player.expected_fantasy_avg)}
-          </td>
-
-          <td class="num">
-            ${formatNumber(player.expected_titolarity)}
+            ${formatNumber(player.pma)}
           </td>
 
 
@@ -13396,7 +13519,7 @@
         `
           <tr>
             <td
-              colspan="${showQueue ? 10 : 9}"
+              colspan="${showQueue ? 6 : 5}"
               class="soft"
               style="text-align:center;height:70px"
             >
@@ -13418,7 +13541,13 @@
 
               addPlayerToAuctionQueue(
                 button.dataset.queueAdd,
-                1
+                Math.max(
+                  1,
+                  Number(
+                    state.auctionOpeningBid
+                    || 1
+                  )
+                )
               );
             }
           );
@@ -13428,8 +13557,8 @@
       /*
        * La riga seleziona sempre il giocatore nella fascia superiore.
        * NON effettua mai una chiamata direttamente:
-       * - Presidente nel proprio turno -> pulsante OK
-       * - Presidente fuori turno     -> pulsante CODA
+       * - CHIAMA/CODA vive soltanto nella singola riga
+       * - anche CHIAMA inserisce prima il giocatore nella coda
        * - Vice/Admin                  -> sola selezione/ricerca
        */
       body
@@ -13637,7 +13766,40 @@
       try{await api(ENDPOINTS.auction,{action:'sendViceSignal',signalType:type,amount:type==='limit'?Number($('vice-limit').value):null});await loadAuction()}catch(error){msg(error.message,'error')}
     }
 
+    function beginAuctionTimerTransition() {
+      state.auctionTimerTransitionPending =
+        true;
+
+      state.auctionTimerDisplayKey =
+        '';
+
+      state.auctionTimerDisplayStartsAt =
+        0;
+
+      document
+        .querySelectorAll('[data-auction-timer]')
+        .forEach(label => {
+          label.textContent = '…';
+
+          label.classList.remove(
+            'timer-green',
+            'timer-yellow',
+            'timer-red'
+          );
+        });
+    }
+
     async function auctionAction(payload,successText=''){
+      const smoothTimerTransition =
+        [
+          'awardPlayer',
+          'manualAward'
+        ].includes(payload?.action);
+
+      if (smoothTimerTransition) {
+        beginAuctionTimerTransition();
+      }
+
       try{
         await api(
           ENDPOINTS.auction,
@@ -13670,7 +13832,33 @@
 
         await loadAuction();
 
+        if (smoothTimerTransition) {
+          state.auctionTimerTransitionPending =
+            false;
+
+          state.auctionTimerDisplayKey =
+            '';
+
+          state.auctionTimerDisplayStartsAt =
+            0;
+
+          renderAuctionTimer();
+        }
+
       }catch(error){
+        if (smoothTimerTransition) {
+          state.auctionTimerTransitionPending =
+            false;
+
+          state.auctionTimerDisplayKey =
+            '';
+
+          state.auctionTimerDisplayStartsAt =
+            0;
+
+          renderAuctionTimer();
+        }
+
         msg(
           error.message,
           'error'
@@ -13714,7 +13902,14 @@
         auctionSession();
 
       if (!s) {
+        state.auctionTimerDisplayKey = '';
+        state.auctionTimerDisplayStartsAt = 0;
         setTimer('—');
+        return;
+      }
+
+      if (state.auctionTimerTransitionPending) {
+        setTimer('…');
         return;
       }
 
@@ -13723,6 +13918,8 @@
         &&
         s.hold_active
       ) {
+        state.auctionTimerDisplayKey = '';
+        state.auctionTimerDisplayStartsAt = 0;
         setTimer('HOLD');
         return;
       }
@@ -13761,7 +13958,39 @@
             );
 
       if (!deadline) {
+        state.auctionTimerDisplayKey = '';
+        state.auctionTimerDisplayStartsAt = 0;
         setTimer('—');
+        return;
+      }
+
+      const serverNow =
+        Date.now()
+        + state.serverOffsetMs;
+
+      const displayKey = [
+        isBidTimer ? 'bid' : 'nomination',
+        s.current_player_id || '',
+        s.current_nomination_team_id || '',
+        deadline
+      ].join('|');
+
+      if (
+        state.auctionTimerDisplayKey
+        !== displayKey
+      ) {
+        state.auctionTimerDisplayKey =
+          displayKey;
+
+        state.auctionTimerDisplayStartsAt =
+          Math.ceil(serverNow / 1000) * 1000;
+      }
+
+      if (
+        serverNow
+        < state.auctionTimerDisplayStartsAt
+      ) {
+        setTimer('…');
         return;
       }
 
@@ -13769,12 +13998,7 @@
         Math.max(
           0,
           Date.parse(deadline)
-          -
-          (
-            Date.now()
-            +
-            state.serverOffsetMs
-          )
+          - serverNow
         );
 
       const configured =
@@ -13782,13 +14006,40 @@
         *
         1000;
 
-      const visible =
-        configured > 0
-          ? Math.min(
-              remain,
-              configured
+      const actualSeconds =
+        Math.max(
+          0,
+          Math.ceil(remain / 1000)
+        );
+
+      const cleanElapsedSeconds =
+        Math.max(
+          0,
+          Math.floor(
+            (
+              serverNow
+              - state.auctionTimerDisplayStartsAt
+            ) / 1000
+          )
+        );
+
+      const cleanSeconds =
+        configuredSeconds > 0
+          ? Math.max(
+              0,
+              configuredSeconds
+              - cleanElapsedSeconds
             )
-          : remain;
+          : actualSeconds;
+
+      const displaySeconds =
+        Math.min(
+          actualSeconds,
+          cleanSeconds
+        );
+
+      const visible =
+        displaySeconds * 1000;
 
       const ratio =
         configured > 0
@@ -13803,7 +14054,7 @@
             : 'timer-red';
 
       setTimer(
-        `${Math.ceil(visible / 1000)}s`,
+        `${displaySeconds}s`,
         tone
       );
     }
