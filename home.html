@@ -8835,11 +8835,6 @@
         &&
         auctionHasPresidentRole();
 
-      const queueCapacity =
-        auctionQueueCapacityForPlayer(
-          player
-        );
-
       return `
         <aside class="auction-free-fixed">
 
@@ -12510,6 +12505,11 @@
         auctionCallMode()
         &&
         auctionHasPresidentRole();
+
+      const queueCapacity =
+        auctionQueueCapacityForPlayer(
+          player
+        );
 
       const queueAction =
         queuedIndex >= 0
