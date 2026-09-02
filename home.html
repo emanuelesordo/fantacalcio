@@ -27,7 +27,7 @@
     - feature modules
     - polling live
 
-  index.html resta esclusivamente il login.
+  Login e applicazione convivono nello stesso home.html.
   ============================================================
 -->
 <head>
@@ -6042,12 +6042,490 @@
       min-width:max-content!important;
       white-space:nowrap!important;
     }
+
+    /* ASTA / AUTH V18 · login monolitico e console admin responsive */
+    .auth-gate{
+      position:fixed;
+      z-index:1000;
+      inset:0;
+      padding:20px;
+      display:grid;
+      place-items:center;
+      overflow:auto;
+      background:
+        radial-gradient(circle at 18% 12%,rgba(56,131,218,.24),transparent 32%),
+        radial-gradient(circle at 84% 18%,rgba(99,78,202,.18),transparent 30%),
+        linear-gradient(145deg,#06101d,#091a2c 52%,#06101c);
+    }
+
+    .auth-card{
+      width:min(420px,100%);
+      padding:clamp(20px,4vw,34px);
+      display:grid;
+      gap:16px;
+      border:1px solid rgba(153,196,237,.28);
+      border-radius:20px;
+      background:linear-gradient(145deg,rgba(24,50,79,.88),rgba(8,26,45,.80));
+      box-shadow:0 30px 80px rgba(0,7,18,.46),inset 0 1px 0 rgba(255,255,255,.07);
+      -webkit-backdrop-filter:blur(22px) saturate(135%);
+      backdrop-filter:blur(22px) saturate(135%);
+    }
+
+    .auth-brand-mark{
+      width:52px;
+      height:52px;
+      display:grid;
+      place-items:center;
+      border-radius:15px;
+      background:linear-gradient(145deg,#64a4ff,#326fc9);
+      box-shadow:0 14px 30px rgba(45,119,214,.30),inset 0 1px 0 rgba(255,255,255,.25);
+      font-size:25px;
+      font-weight:950;
+    }
+
+    .auth-kicker{
+      color:#83b8f4;
+      font-size:9px;
+      font-weight:950;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+
+    .auth-card h1{
+      margin:3px 0 0;
+      font-size:clamp(25px,6vw,34px);
+      letter-spacing:-.04em;
+    }
+
+    .auth-card p{
+      margin:7px 0 0;
+      color:var(--soft);
+      font-size:11px;
+    }
+
+    .auth-card code{
+      color:#dcecff;
+    }
+
+    .auth-form{
+      display:grid;
+      gap:10px;
+    }
+
+    .auth-form label{
+      display:grid;
+      gap:4px;
+      color:var(--soft);
+      font-size:9px;
+      font-weight:850;
+    }
+
+    .auth-form input{
+      min-height:46px;
+      padding:9px 12px;
+      border-radius:10px;
+      font-size:14px;
+    }
+
+    .auth-form button{
+      min-height:45px;
+      margin-top:3px;
+      font-size:11px;
+      letter-spacing:.08em;
+    }
+
+    .auth-message{
+      min-height:18px;
+      color:var(--soft);
+      font-size:9px;
+      text-align:center;
+    }
+
+    .auth-message.error{color:#ff9dac}
+    .auth-message.success{color:#72e6b8}
+
+    body.auth-locked{
+      overflow:hidden;
+    }
+
+    .auction-lower-main>.auctioneer-console-drawer>.auctioneer-console{
+      container-type:inline-size;
+      container-name:auctioneer;
+    }
+
+    .auctioneer-console-head{
+      display:grid!important;
+      grid-template-columns:minmax(0,1fr)!important;
+      align-items:start!important;
+      gap:4px!important;
+      margin-bottom:5px!important;
+    }
+
+    .auctioneer-console-title{
+      min-width:0;
+      flex-wrap:wrap;
+    }
+
+    .auctioneer-head-actions{
+      width:100%;
+      display:grid!important;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:3px!important;
+    }
+
+    .auctioneer-head-actions button{
+      width:100%;
+      min-width:0;
+      min-height:30px!important;
+      height:auto!important;
+      padding:3px 5px!important;
+      white-space:normal;
+      font-size:6.5px!important;
+      line-height:1.1;
+    }
+
+    .auctioneer-console-body{
+      display:grid!important;
+      grid-template-columns:minmax(0,1fr)!important;
+      gap:5px!important;
+    }
+
+    .auctioneer-bid-panel{
+      min-width:0;
+      display:grid;
+      gap:4px;
+      padding:5px;
+      border:1px solid rgba(149,192,233,.18);
+      border-radius:8px;
+      background:rgba(7,26,45,.52);
+    }
+
+    .auctioneer-bid-section-title{
+      color:var(--soft);
+      font-size:7px;
+      font-weight:950;
+      letter-spacing:.07em;
+      text-transform:uppercase;
+    }
+
+    .auctioneer-team-grid{
+      width:100%;
+      display:grid!important;
+      grid-template-columns:repeat(auto-fit,minmax(72px,1fr))!important;
+      grid-auto-rows:minmax(38px,auto);
+      gap:3px!important;
+    }
+
+    .auctioneer-team-cube{
+      width:100%;
+      min-width:0;
+      min-height:38px!important;
+      padding:4px 5px!important;
+      display:grid;
+      place-content:center;
+      gap:1px;
+      border-color:rgba(132,181,231,.25)!important;
+      background:rgba(31,65,100,.68)!important;
+      text-align:center;
+    }
+
+    .auctioneer-team-cube strong{
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-size:7.5px;
+    }
+
+    .auctioneer-team-cube small{
+      color:var(--muted);
+      font-size:5.5px;
+      font-weight:900;
+      letter-spacing:.04em;
+    }
+
+    .auctioneer-team-cube.selected{
+      border-color:#71adff!important;
+      background:linear-gradient(145deg,#397fdc,#245da9)!important;
+      box-shadow:0 0 0 2px rgba(102,169,255,.15)!important;
+    }
+
+    .auctioneer-bid-tools{
+      display:grid;
+      grid-template-columns:minmax(92px,.8fr) minmax(0,1.25fr);
+      gap:4px;
+      align-items:stretch;
+    }
+
+    .auctioneer-bid-amount-editor{
+      min-width:0;
+      display:grid;
+      grid-template-columns:27px minmax(38px,1fr) 27px;
+      gap:2px;
+    }
+
+    .auctioneer-bid-amount-editor button,
+    .auctioneer-bid-amount-editor input,
+    .auctioneer-bid-quick button{
+      min-width:0!important;
+      min-height:29px!important;
+      height:29px!important;
+      padding:2px!important;
+      text-align:center;
+      font-size:8px!important;
+      font-weight:950;
+    }
+
+    .auctioneer-bid-quick{
+      min-width:0;
+      display:grid;
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      gap:2px;
+    }
+
+    .auctioneer-place-bid{
+      grid-column:1 / -1;
+      min-height:31px!important;
+      font-size:8px!important;
+      letter-spacing:.05em;
+    }
+
+    .auctioneer-correction-line{
+      display:grid;
+      grid-template-columns:minmax(58px,.55fr) minmax(100px,1fr) auto;
+      gap:3px;
+      align-items:end;
+    }
+
+    .auctioneer-correction-line label{
+      min-width:0;
+      gap:2px;
+      font-size:6px;
+    }
+
+    .auctioneer-correction-line input,
+    .auctioneer-correction-line select,
+    .auctioneer-correction-line button{
+      width:100%;
+      min-width:0;
+      min-height:28px!important;
+      height:28px!important;
+      padding:2px 4px!important;
+      font-size:7px!important;
+    }
+
+    .auctioneer-manual-award{
+      grid-template-columns:minmax(0,1fr) 72px!important;
+      gap:4px!important;
+    }
+
+    .auctioneer-manual-search{
+      grid-column:1 / -1;
+    }
+
+    .auctioneer-manual-award>.manual-register-btn{
+      grid-column:1 / -1;
+      min-height:30px!important;
+      font-size:7px!important;
+    }
+
+    @container auctioneer (max-width:355px){
+      .auctioneer-bid-tools{
+        grid-template-columns:minmax(0,1fr);
+      }
+
+      .auctioneer-place-bid{
+        grid-column:auto;
+      }
+
+      .auctioneer-correction-line{
+        grid-template-columns:70px minmax(0,1fr);
+      }
+
+      .auctioneer-correction-line button{
+        grid-column:1 / -1;
+      }
+
+      .auctioneer-manual-award{
+        grid-template-columns:minmax(0,1fr)!important;
+      }
+
+      .auctioneer-manual-award>*{
+        grid-column:auto!important;
+      }
+    }
+
+    /* Rose di tutti: overlay compatto, senza coprire la chiamata corrente. */
+    .auction-cockpit{
+      position:relative;
+    }
+
+    .auction-rosters-drawer{
+      position:absolute!important;
+      z-index:145!important;
+      left:0!important;
+      right:0!important;
+      bottom:0!important;
+      top:auto!important;
+      width:100%!important;
+      height:29px!important;
+      min-height:29px!important;
+      max-height:none!important;
+      border-radius:9px 9px 0 0!important;
+      box-shadow:none!important;
+    }
+
+    .auction-rosters-drawer[open]{
+      top:clamp(112px,17dvh,150px)!important;
+      bottom:0!important;
+      height:auto!important;
+      min-height:0!important;
+      max-height:none!important;
+      box-shadow:0 -16px 36px rgba(0,8,20,.36)!important;
+    }
+
+    .auction-rosters-content{
+      height:calc(100% - 29px)!important;
+      min-height:0;
+      padding:4px!important;
+      overflow:auto!important;
+    }
+
+    .auction-all-rosters-grid{
+      grid-template-columns:repeat(auto-fit,minmax(205px,1fr))!important;
+      gap:3px!important;
+      align-items:start;
+    }
+
+    .auction-roster-team-card{
+      border-radius:6px!important;
+    }
+
+    .auction-roster-team-head{
+      min-height:27px!important;
+      padding:3px 5px!important;
+    }
+
+    .auction-roster-team-head strong{
+      font-size:8px!important;
+    }
+
+    .auction-roster-team-head small{
+      font-size:5.5px!important;
+    }
+
+    .auction-roster-team-list{
+      gap:1px!important;
+      padding:2px!important;
+    }
+
+    .auction-roster-edit-row{
+      min-height:19px!important;
+      padding:1px 3px!important;
+      display:grid!important;
+      grid-template-columns:auto minmax(0,1fr) auto auto!important;
+      gap:2px!important;
+      border-radius:4px!important;
+    }
+
+    .auction-roster-edit-row .rolebadge{
+      min-width:18px!important;
+      min-height:13px!important;
+      height:13px!important;
+      padding:0 2px!important;
+      border-radius:3px!important;
+      font-size:5.5px!important;
+      line-height:13px!important;
+    }
+
+    .auction-all-roster-player-name{
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-size:6.5px!important;
+    }
+
+    .auction-all-roster-price{
+      min-width:22px;
+      padding:1px 4px;
+      border-radius:4px;
+      background:var(--primary);
+      text-align:center;
+      font-size:6.5px;
+      font-weight:950;
+    }
+
+    .auction-roster-row-actions{
+      gap:1px!important;
+    }
+
+    .auction-roster-icon-btn{
+      width:17px!important;
+      min-width:17px!important;
+      min-height:17px!important;
+      height:17px!important;
+      padding:0!important;
+      border-radius:3px!important;
+      font-size:7px!important;
+    }
+
+    @media(max-width:760px){
+      .auction-rosters-drawer[open]{
+        top:104px!important;
+      }
+
+      .auction-all-rosters-grid{
+        grid-template-columns:repeat(auto-fit,minmax(175px,1fr))!important;
+      }
+    }
   </style>
 </head>
 <body>
   <div id="global-message" class="message" aria-live="polite"></div>
 
-  <div class="app">
+  <section id="auth-gate" class="auth-gate" hidden>
+    <div class="auth-card">
+      <div class="auth-brand-mark">F</div>
+      <div>
+        <div class="auth-kicker">Fantacalcio Live</div>
+        <h1>Accedi all’asta</h1>
+        <p>Accedi con le tue credenziali per gestire la lega e partecipare all’asta.</p>
+      </div>
+
+      <form id="auth-login-form" class="auth-form">
+        <label>
+          Username
+          <input
+            id="auth-username"
+            name="username"
+            type="text"
+            autocomplete="username"
+            minlength="2"
+            maxlength="30"
+            required
+          >
+        </label>
+
+        <label>
+          Password
+          <input
+            id="auth-password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            minlength="6"
+            required
+          >
+        </label>
+
+        <button id="auth-submit" type="submit">ENTRA</button>
+      </form>
+
+      <div id="auth-message" class="auth-message" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <div id="app-shell" class="app" hidden>
     <header class="app-head">
       <div class="brand-line">
         <div class="brand">Fantacalcio Live</div>
@@ -6061,7 +6539,7 @@
         <span id="user-label" class="user-label"></span>
         <button id="league-switch-btn" class="secondary" type="button">Leghe</button>
         <button id="reload-btn" class="secondary" type="button">↻</button>
-        <button id="exit-btn" class="secondary" type="button">Login</button>
+        <button id="exit-btn" class="secondary" type="button">Esci</button>
       </div>
     </header>
 
@@ -6373,6 +6851,9 @@
 
     const SUPABASE_URL = 'https://yyklmhzjxzkvycmxkegx.supabase.co';
 
+    const AUTH_URL =
+      `${SUPABASE_URL}/functions/v1/simple-auth`;
+
     const ENDPOINTS = {
       leagues: `${SUPABASE_URL}/functions/v1/leagues-api`,
       onboarding: `${SUPABASE_URL}/functions/v1/onboarding-api`,
@@ -6419,6 +6900,9 @@
       auctionAdminPlayerId: null,
       auctionAdminPrice: 1,
       auctionAdminTeamId: null,
+      auctionAdminBidAmount: 1,
+      auctionAdminBidTeamId: null,
+      auctionAdminBidPlayerKey: '',
 
       auctionTransferAssignmentId: null,
       auctionTransferTargetTeamId: null,
@@ -6460,6 +6944,160 @@
       localStorage.setItem(key, JSON.stringify(value));
     }
 
+    const SESSION_STORAGE_KEY =
+      'fantacalcio_session';
+
+    function showAuthMessage(text = '', type = '') {
+      const box =
+        $('auth-message');
+
+      if (!box) {
+        return;
+      }
+
+      box.textContent = text;
+      box.className =
+        `auth-message ${type}`;
+    }
+
+    function showLoginGate(message = '', type = '') {
+      $('app-shell').hidden = true;
+      $('auth-gate').hidden = false;
+      document.body.classList.add('auth-locked');
+      showAuthMessage(message, type);
+
+      requestAnimationFrame(() =>
+        $('auth-username')?.focus()
+      );
+    }
+
+    function showAuthenticatedShell() {
+      $('auth-gate').hidden = true;
+      $('app-shell').hidden = false;
+      document.body.classList.remove('auth-locked');
+      showAuthMessage('');
+    }
+
+    function clearLocalSession() {
+      localStorage.removeItem(
+        SESSION_STORAGE_KEY
+      );
+    }
+
+    function readLocalSession() {
+      const session =
+        getLocalJson(
+          SESSION_STORAGE_KEY
+        );
+
+      if (
+        !session
+        || typeof session !== 'object'
+        || !session.token
+      ) {
+        clearLocalSession();
+        return null;
+      }
+
+      if (session.expiresAt) {
+        const expiry =
+          Date.parse(
+            session.expiresAt
+          );
+
+        if (
+          Number.isFinite(expiry)
+          && expiry <= Date.now()
+        ) {
+          clearLocalSession();
+          return null;
+        }
+      }
+
+      return session;
+    }
+
+    async function callAuth(body) {
+      let response;
+
+      try {
+        response = await fetch(
+          AUTH_URL,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type':
+                'application/json'
+            },
+            body: JSON.stringify(body)
+          }
+        );
+      } catch {
+        throw new Error(
+          'Impossibile contattare il server.'
+        );
+      }
+
+      let data;
+
+      try {
+        data = await response.json();
+      } catch {
+        throw new Error(
+          'Risposta non valida dal server.'
+        );
+      }
+
+      return {
+        response,
+        data
+      };
+    }
+
+    async function validateAuthSession(sessionToken) {
+      const {
+        response,
+        data
+      } = await callAuth({
+        action: 'validate',
+        sessionToken
+      });
+
+      if (
+        !response.ok
+        || !data?.ok
+        || !data?.valid
+      ) {
+        return null;
+      }
+
+      return {
+        token: sessionToken,
+        expiresAt: data.expiresAt,
+        user: {
+          id: data.user.id,
+          username: data.user.username,
+          isSuperAdmin:
+            data.user.isSuperAdmin === true
+        }
+      };
+    }
+
+    function resetAuthenticatedState() {
+      state.session = null;
+      state.dashboard = null;
+      state.management = null;
+      state.setup = null;
+      state.list = null;
+      state.rosters = null;
+      state.auction = null;
+      state.routeReady = false;
+
+      document.body.classList.remove(
+        'auction-live'
+      );
+    }
+
     function esc(value) {
       return String(value ?? '')
         .replaceAll('&', '&amp;')
@@ -6494,7 +7132,10 @@
 
     async function api(endpoint, payload = {}, { league = true, quiet = false } = {}) {
       if (!state.session?.token) {
-        window.location.href = 'index.html';
+        showLoginGate(
+          'Accedi per continuare.',
+          'error'
+        );
         return null;
       }
 
@@ -6529,8 +7170,12 @@
       }
 
       if (response.status === 401) {
-        localStorage.removeItem('fantacalcio_session');
-        window.location.href = 'index.html';
+        clearLocalSession();
+        resetAuthenticatedState();
+        showLoginGate(
+          'Sessione scaduta. Accedi nuovamente.',
+          'error'
+        );
         return null;
       }
 
@@ -6865,9 +7510,29 @@
     $('exit-btn')
       .addEventListener(
         'click',
-        () => {
-          window.location.href =
-            'index.html';
+        async () => {
+          const sessionToken =
+            state.session?.token;
+
+          clearLocalSession();
+          resetAuthenticatedState();
+          showLoginGate();
+
+          $('auth-password').value = '';
+
+          if (sessionToken) {
+            try {
+              await callAuth({
+                action: 'logout',
+                sessionToken
+              });
+            } catch (error) {
+              console.error(
+                'LOGOUT SERVER:',
+                error
+              );
+            }
+          }
         }
       );
 
@@ -10328,6 +10993,14 @@
 
 
     function renderAuctionAllRostersDrawer() {
+      const canView =
+        auctionHasPresidentRole()
+        || auctionCanUseAuctioneerConsole();
+
+      if (!canView) {
+        return '';
+      }
+
       const rosterData =
         state.auctionPersonalRoster;
 
@@ -10355,6 +11028,13 @@
       const canEdit =
         auctionCanControl();
 
+      const mode =
+        state.auction?.settings?.fantasy_mode
+        || 'classic';
+
+      const roleSequence =
+        roleOrder(mode);
+
       const totalPlayers =
         assignments.length;
 
@@ -10367,12 +11047,36 @@
                   item.team_id === team.id
               )
               .sort(
-                (a, b) =>
-                  String(a.player?.name || '')
+                (a, b) => {
+                  const aRoles =
+                    playerRoles(a.player || {}, mode);
+
+                  const bRoles =
+                    playerRoles(b.player || {}, mode);
+
+                  const aRank =
+                    Math.min(
+                      ...aRoles
+                        .map(role => roleSequence.indexOf(role))
+                        .filter(index => index >= 0),
+                      roleSequence.length
+                    );
+
+                  const bRank =
+                    Math.min(
+                      ...bRoles
+                        .map(role => roleSequence.indexOf(role))
+                        .filter(index => index >= 0),
+                      roleSequence.length
+                    );
+
+                  return aRank - bRank
+                    || String(a.player?.name || '')
                     .localeCompare(
                       String(b.player?.name || ''),
                       'it'
-                    )
+                    );
+                }
               );
 
           const spent =
@@ -10424,26 +11128,24 @@
                         const roles =
                           playerRoles(
                             item.player || {},
-                            state.auction?.settings?.fantasy_mode
-                          )
-                            .join('/');
+                            mode
+                          );
 
                         return `
                           <div class="auction-roster-edit-row">
 
-                            <div>
-                              <strong>
-                                ${esc(item.player?.name || '—')}
-                              </strong>
+                            <span class="auction-roster-mini-roles">
+                              ${roles.map(role => `
+                                <span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>
+                              `).join('') || '<span class="rolebadge">—</span>'}
+                            </span>
 
-                              <small>
-                                ${esc(roles)}
-                                · ${esc(item.player?.serie_a_team || '')}
-                              </small>
-                            </div>
+                            <strong class="auction-all-roster-player-name">
+                              ${esc(item.player?.name || '—')}
+                            </strong>
 
 
-                            <span class="badge primary">
+                            <span class="auction-all-roster-price">
                               ${Number(item.purchase_price || 0)}
                             </span>
 
@@ -10516,7 +11218,7 @@
           ${state.auctionRostersOpen ? 'open' : ''}
         >
           <summary>
-            Rose
+            Rose di tutti
             <span class="badge">
               ${totalPlayers}
             </span>
@@ -11100,6 +11802,39 @@
           ||
           0
         );
+
+      const adminBidMinimum =
+        Math.max(
+          1,
+          currentBid + 1
+        );
+
+      state.auctionAdminBidAmount =
+        Math.max(
+          adminBidMinimum,
+          Number(
+            state.auctionAdminBidAmount
+            || adminBidMinimum
+          )
+        );
+
+      const adminBidInput =
+        $('auction-admin-bid-amount');
+
+      if (adminBidInput) {
+        adminBidInput.min =
+          String(adminBidMinimum);
+
+        if (
+          document.activeElement
+          !== adminBidInput
+        ) {
+          adminBidInput.value =
+            String(
+              state.auctionAdminBidAmount
+            );
+        }
+      }
 
       const selectedBid =
         Number(
@@ -12144,6 +12879,42 @@
       `;
 
 
+      const adminBidMinimum =
+        Math.max(
+          1,
+          currentBid + 1
+        );
+
+      const adminBidPlayerKey =
+        String(
+          s.current_player_id
+          || ''
+        );
+
+      if (
+        state.auctionAdminBidPlayerKey
+        !== adminBidPlayerKey
+      ) {
+        state.auctionAdminBidPlayerKey =
+          adminBidPlayerKey;
+
+        state.auctionAdminBidAmount =
+          adminBidMinimum;
+
+        state.auctionAdminBidTeamId =
+          null;
+      } else {
+        state.auctionAdminBidAmount =
+          Math.max(
+            adminBidMinimum,
+            Number(
+              state.auctionAdminBidAmount
+              || adminBidMinimum
+            )
+          );
+      }
+
+
       const adminSelectedPlayer =
         (d.callCandidates || [])
           .find(
@@ -12284,30 +13055,96 @@
                     ? `
                         <div class="auctioneer-console-body">
 
-                          <div class="auctioneer-team-grid">
+                          <div class="auctioneer-bid-panel">
 
-                            ${
-                              (d.teams || [])
-                                .map(team => `
+                            <div class="auctioneer-bid-section-title">
+                              Seleziona il miglior offerente
+                            </div>
+
+                            <div class="auctioneer-team-grid">
+
+                              ${
+                                (d.teams || [])
+                                  .map(team => `
+                                    <button
+                                      type="button"
+                                      class="auctioneer-team-cube ${
+                                        state.auctionAdminBidTeamId === team.id
+                                          ? 'selected'
+                                          : ''
+                                      }"
+                                      data-admin-bid-team="${esc(team.id)}"
+                                      ${
+                                        s.current_bidder_team_id === team.id
+                                          ? 'disabled title="Già miglior offerente"'
+                                          : ''
+                                      }
+                                    >
+                                      <strong>${esc(team.name)}</strong>
+                                      <small>
+                                        ${
+                                          s.current_bidder_team_id === team.id
+                                            ? 'LEADER'
+                                            : 'SELEZIONA'
+                                        }
+                                      </small>
+                                    </button>
+                                  `)
+                                  .join('')
+                              }
+
+                            </div>
+
+
+                            <div class="auctioneer-bid-tools">
+
+                              <div class="auctioneer-bid-amount-editor">
+                                <button
+                                  type="button"
+                                  data-admin-bid-step="-1"
+                                  title="Diminuisci di 1"
+                                >−</button>
+
+                                <input
+                                  id="auction-admin-bid-amount"
+                                  type="number"
+                                  min="${adminBidMinimum}"
+                                  step="1"
+                                  value="${Number(state.auctionAdminBidAmount)}"
+                                  aria-label="Importo offerta Banditore"
+                                >
+
+                                <button
+                                  type="button"
+                                  data-admin-bid-step="1"
+                                  title="Aumenta di 1"
+                                >+</button>
+                              </div>
+
+                              <div class="auctioneer-bid-quick" aria-label="Rialzi rapidi Banditore">
+                                ${quickOffsets.map(offset => `
                                   <button
-                                    class="auctioneer-team secondary"
-                                    data-team="${esc(team.id)}"
-                                    ${
-                                      s.current_bidder_team_id === team.id
-                                        ? 'disabled'
-                                        : ''
-                                    }
-                                  >
-                                    ${esc(team.name)}
-                                  </button>
-                                `)
-                                .join('')
-                            }
+                                    type="button"
+                                    data-admin-bid-offset="${offset}"
+                                  >+${offset}</button>
+                                `).join('')}
+                              </div>
+
+                              <button
+                                id="auction-admin-place-bid"
+                                type="button"
+                                class="auctioneer-place-bid good"
+                                ${state.auctionAdminBidTeamId ? '' : 'disabled'}
+                              >
+                                REGISTRA OFFERTA
+                              </button>
+
+                            </div>
 
                           </div>
 
 
-                          <div class="auctioneer-side-actions">
+                          <div class="auctioneer-correction-line">
 
                             <label>
                               Correzione
@@ -12348,11 +13185,10 @@
                             <button
                               id="auction-correct"
                               class="secondary"
+                              type="button"
                             >
                               Correggi
                             </button>
-
-                            <span></span>
 
                           </div>
 
@@ -12801,26 +13637,208 @@
         );
 
 
+      const syncAuctionAdminBidControls = () => {
+        const liveAdminBidMinimum =
+          Math.max(
+            1,
+            Number(
+              auctionSession()?.current_bid
+              || 0
+            ) + 1
+          );
+
+        state.auctionAdminBidAmount =
+          Math.max(
+            liveAdminBidMinimum,
+            Number(
+              state.auctionAdminBidAmount
+              || liveAdminBidMinimum
+            )
+          );
+
+        const amountInput =
+          $('auction-admin-bid-amount');
+
+        if (amountInput) {
+          amountInput.min =
+            String(liveAdminBidMinimum);
+
+          amountInput.value =
+            String(
+              state.auctionAdminBidAmount
+            );
+        }
+
+        document
+          .querySelectorAll(
+            '[data-admin-bid-team]'
+          )
+          .forEach(button => {
+            button.classList.toggle(
+              'selected',
+              button.dataset.adminBidTeam
+              === state.auctionAdminBidTeamId
+            );
+          });
+
+        const confirmButton =
+          $('auction-admin-place-bid');
+
+        if (confirmButton) {
+          confirmButton.disabled =
+            !state.auctionAdminBidTeamId;
+        }
+      };
+
+
       document
         .querySelectorAll(
-          '.auctioneer-team'
+          '[data-admin-bid-team]'
         )
-        .forEach(
-          button => {
-            button
-              .addEventListener(
-                'click',
-                () =>
-                  placeBid(
-                    button.dataset.team,
-                    Number(
-                      state.auctionBidSelection
-                      ||
-                      auctionBidDefault()
-                    ),
-                    'VOCALE'
-                  )
+        .forEach(button => {
+          button.addEventListener(
+            'click',
+            () => {
+              state.auctionAdminBidTeamId =
+                button.dataset.adminBidTeam;
+
+              syncAuctionAdminBidControls();
+            }
+          );
+        });
+
+
+      $('auction-admin-bid-amount')
+        ?.addEventListener(
+          'input',
+          event => {
+            const liveAdminBidMinimum =
+              Math.max(
+                1,
+                Number(
+                  auctionSession()?.current_bid
+                  || 0
+                ) + 1
               );
+
+            state.auctionAdminBidAmount =
+              Math.max(
+                liveAdminBidMinimum,
+                Number(
+                  event.target.value
+                  || liveAdminBidMinimum
+                )
+              );
+          }
+        );
+
+
+      document
+        .querySelectorAll(
+          '[data-admin-bid-step]'
+        )
+        .forEach(button => {
+          button.addEventListener(
+            'click',
+            () => {
+              const liveAdminBidMinimum =
+                Math.max(
+                  1,
+                  Number(
+                    auctionSession()?.current_bid
+                    || 0
+                  ) + 1
+                );
+
+              state.auctionAdminBidAmount =
+                Math.max(
+                  liveAdminBidMinimum,
+                  Number(
+                    state.auctionAdminBidAmount
+                    || liveAdminBidMinimum
+                  )
+                  + Number(
+                    button.dataset.adminBidStep
+                    || 0
+                  )
+                );
+
+              syncAuctionAdminBidControls();
+            }
+          );
+        });
+
+
+      document
+        .querySelectorAll(
+          '[data-admin-bid-offset]'
+        )
+        .forEach(button => {
+          button.addEventListener(
+            'click',
+            () => {
+              const liveCurrentBid =
+                Number(
+                  auctionSession()?.current_bid
+                  || 0
+                );
+
+              state.auctionAdminBidAmount =
+                Math.max(
+                  liveCurrentBid + 1,
+                  liveCurrentBid
+                  + Number(
+                    button.dataset.adminBidOffset
+                    || 1
+                  )
+                );
+
+              syncAuctionAdminBidControls();
+            }
+          );
+        });
+
+
+      $('auction-admin-place-bid')
+        ?.addEventListener(
+          'click',
+          async () => {
+            const liveAdminBidMinimum =
+              Math.max(
+                1,
+                Number(
+                  auctionSession()?.current_bid
+                  || 0
+                ) + 1
+              );
+
+            const teamId =
+              state.auctionAdminBidTeamId;
+
+            const amount =
+              Math.max(
+                liveAdminBidMinimum,
+                Number(
+                  state.auctionAdminBidAmount
+                  || liveAdminBidMinimum
+                )
+              );
+
+            if (!teamId) {
+              return msg(
+                'Seleziona la squadra miglior offerente.',
+                'warning'
+              );
+            }
+
+            state.auctionAdminBidTeamId =
+              null;
+
+            await placeBid(
+              teamId,
+              amount,
+              'VOCALE'
+            );
           }
         );
 
@@ -14492,7 +15510,11 @@
     let refreshBusy=false;
 
     async function loadCurrentView(force=false){
-      if(refreshBusy || document.hidden)return;
+      if(
+        !state.session?.token
+        || refreshBusy
+        || document.hidden
+      )return;
       refreshBusy=true;
       try{
         if(state.view==='leagues')await loadLeagues();
@@ -14646,19 +15668,7 @@
        BOOT / START
        ===================================================== */
 
-    async function start() {
-      state.session =
-        getLocalJson(
-          'fantacalcio_session'
-        );
-
-      if (!state.session?.token) {
-        window.location.href =
-          'index.html';
-
-        return;
-      }
-
+    async function startAuthenticatedApp() {
       state.selectedLeague =
         getLocalJson(
           'fantacalcio_selected_league'
@@ -14743,6 +15753,187 @@
 
       state.routeReady =
         true;
+    }
+
+
+    $('auth-login-form')
+      .addEventListener(
+        'submit',
+        async event => {
+          event.preventDefault();
+          showAuthMessage('');
+
+          const username =
+            String(
+              $('auth-username').value
+              || ''
+            ).trim();
+
+          const password =
+            String(
+              $('auth-password').value
+              || ''
+            );
+
+          if (
+            username.length < 2
+            || username.length > 30
+          ) {
+            showAuthMessage(
+              'Inserisci un username valido.',
+              'error'
+            );
+            return;
+          }
+
+          if (password.length < 6) {
+            showAuthMessage(
+              'La password deve avere almeno 6 caratteri.',
+              'error'
+            );
+            return;
+          }
+
+          const submit =
+            $('auth-submit');
+
+          submit.disabled = true;
+          submit.textContent = 'ACCESSO…';
+
+          try {
+            const {
+              response,
+              data
+            } = await callAuth({
+              action: 'login',
+              username,
+              password
+            });
+
+            if (
+              !response.ok
+              || !data?.ok
+            ) {
+              showAuthMessage(
+                data?.error
+                || 'Errore durante l’accesso.',
+                'error'
+              );
+              return;
+            }
+
+            const validatedSession =
+              await validateAuthSession(
+                data.sessionToken
+              );
+
+            if (!validatedSession) {
+              showAuthMessage(
+                'Sessione creata ma non validabile.',
+                'error'
+              );
+              return;
+            }
+
+            state.session =
+              validatedSession;
+
+            setLocalJson(
+              SESSION_STORAGE_KEY,
+              validatedSession
+            );
+
+            $('auth-password').value = '';
+            showAuthenticatedShell();
+
+            await startAuthenticatedApp();
+
+            if (data.isNew) {
+              msg(
+                'Account creato correttamente.',
+                'success'
+              );
+            }
+
+          } catch (error) {
+            console.error(
+              'LOGIN:',
+              error
+            );
+
+            const errorText =
+              error.message
+              || 'Impossibile accedere.';
+
+            if ($('auth-gate').hidden) {
+              msg(
+                errorText,
+                'error'
+              );
+            } else {
+              showAuthMessage(
+                errorText,
+                'error'
+              );
+            }
+
+          } finally {
+            submit.disabled = false;
+            submit.textContent = 'ENTRA';
+          }
+        }
+      );
+
+
+    async function start() {
+      $('app-shell').hidden = true;
+      $('auth-gate').hidden = true;
+
+      const localSession =
+        readLocalSession();
+
+      if (!localSession?.token) {
+        showLoginGate();
+        return;
+      }
+
+      try {
+        const validatedSession =
+          await validateAuthSession(
+            localSession.token
+          );
+
+        if (!validatedSession) {
+          clearLocalSession();
+          showLoginGate(
+            'Sessione scaduta. Accedi nuovamente.',
+            'error'
+          );
+          return;
+        }
+
+        state.session =
+          validatedSession;
+
+        setLocalJson(
+          SESSION_STORAGE_KEY,
+          validatedSession
+        );
+
+        showAuthenticatedShell();
+        await startAuthenticatedApp();
+
+      } catch (error) {
+        console.error(
+          'AUTH BOOT:',
+          error
+        );
+
+        showLoginGate(
+          'Impossibile verificare la sessione. Riprova.',
+          'error'
+        );
+      }
     }
 
 
