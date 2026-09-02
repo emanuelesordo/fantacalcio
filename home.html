@@ -6478,6 +6478,123 @@
         grid-template-columns:repeat(auto-fit,minmax(175px,1fr))!important;
       }
     }
+
+    /* ASTA V19 · console Presidente essenziale e conferme esplicite. */
+    .auction-mobile-bid-stepper{
+      margin-top:6px;
+      display:grid;
+      grid-template-columns:48px minmax(0,1fr) 48px;
+      gap:5px;
+      align-items:stretch;
+    }
+
+    .auction-mobile-bid-stepper>button{
+      min-width:0;
+      min-height:48px;
+      padding:0;
+      font-size:22px;
+      font-weight:950;
+    }
+
+    .auction-mobile-bid-stepper .auction-mobile-free-bid{
+      min-width:0;
+      margin:0;
+      padding:4px 7px;
+      grid-template-columns:auto minmax(56px,1fr);
+    }
+
+    .auction-mobile-bid-stepper .auction-mobile-free-bid input{
+      width:100%;
+      min-width:0;
+      min-height:38px;
+      padding:3px 5px;
+      font-size:17px;
+    }
+
+    .auction-mobile-final-actions{
+      margin-top:6px;
+      display:grid;
+      grid-template-columns:minmax(0,1.6fr) minmax(92px,.75fr);
+      gap:5px;
+    }
+
+    .auction-mobile-final-actions .auction-mobile-confirm,
+    .auction-mobile-final-actions .auction-mobile-leave{
+      width:100%;
+      min-width:0;
+      min-height:55px!important;
+      height:auto!important;
+      margin:0!important;
+      font-size:15px!important;
+    }
+
+    .auction-mobile-left-note,
+    .auction-left-note{
+      color:#ffb3bd;
+      font-size:7px;
+      font-weight:900;
+      letter-spacing:.04em;
+      text-align:center;
+      text-transform:uppercase;
+    }
+
+    .auction-mobile-left-note{
+      margin-top:5px;
+      padding:5px;
+      border:1px solid rgba(229,85,111,.28);
+      border-radius:6px;
+      background:rgba(112,30,48,.20);
+    }
+
+    .auction-middle-quick .auction-status-quick{
+      grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    }
+
+    .auction-middle-quick .auction-free-bid-field{
+      grid-column:1 / 3!important;
+    }
+
+    .auction-middle-quick .auction-command-bid-confirm{
+      grid-column:3 / 5!important;
+    }
+
+    .auction-middle-quick .auction-command-leave{
+      grid-column:5!important;
+      min-width:0;
+      min-height:30px;
+      height:30px;
+      padding:2px 5px;
+      font-size:7px;
+    }
+
+    .auction-middle-quick .auction-left-note{
+      grid-column:1 / -1;
+    }
+
+    @media(max-height:680px) and (max-width:720px){
+      .auction-mobile-console{
+        gap:4px!important;
+        padding:4px!important;
+      }
+
+      .auction-mobile-main{
+        gap:5px!important;
+        padding:6px!important;
+      }
+
+      .auction-mobile-bid-stat{
+        min-height:58px;
+      }
+
+      .auction-mobile-quick .quick-btn{
+        min-height:43px!important;
+      }
+
+      .auction-mobile-final-actions .auction-mobile-confirm,
+      .auction-mobile-final-actions .auction-mobile-leave{
+        min-height:46px!important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -6912,6 +7029,7 @@
       auctionSelectedPlayerId: null,
       auctionBidSelection: null,
       auctionBidSelectionKey: '',
+      auctionAbandonedPlayerKey: '',
 
       auctionRenderSignature: '',
       auctionLiveSignature: '',
@@ -9508,14 +9626,33 @@
 
     function auctionUseMobilePresidentConsole() {
       return Boolean(
-        auctionDualModeEnabled()
-        &&
         auctionHasPresidentRole()
         &&
         window.matchMedia(
           '(max-width: 720px)'
         )
           .matches
+      );
+    }
+
+
+    function auctionMyTeamLeftCurrentPlayer() {
+      const playerKey =
+        String(
+          auctionSession()?.current_player_id
+          || ''
+        );
+
+      return Boolean(
+        playerKey
+        &&
+        (
+          state.auction?.myTeam
+            ?.abandonedCurrentLot === true
+          ||
+          state.auctionAbandonedPlayerKey
+            === playerKey
+        )
       );
     }
 
@@ -10394,6 +10531,9 @@
           auctionBidDefault()
         );
 
+      const hasLeftCurrentPlayer =
+        auctionMyTeamLeftCurrentPlayer();
+
       const wildMode =
         d.settings?.bid_mode
         !== 'turn';
@@ -10409,12 +10549,9 @@
       const canBid =
         hasPlayer
         &&
-        myTurn;
-
-      const firstQueue =
-        d.myCallQueue?.[0]
-        ||
-        null;
+        myTurn
+        &&
+        !hasLeftCurrentPlayer;
 
       $('auction-root').innerHTML = `
         <div class="auction-mobile-console">
@@ -10498,28 +10635,6 @@
 
                     </div>
 
-
-                    <div class="auction-mobile-team-strip">
-
-                      <div class="auction-team-mini-kpi">
-                        <span>Crediti</span>
-                        <strong>${info?.remaining ?? '—'}</strong>
-                      </div>
-
-                      <div class="auction-team-mini-kpi">
-                        <span>Max bid</span>
-                        <strong>${info?.maxBid ?? '—'}</strong>
-                      </div>
-
-                      <div class="auction-team-mini-kpi">
-                        <span>Rosa</span>
-                        <strong>
-                          ${info?.rosterCount ?? 0}${info?.rosterLimit ? `/${info.rosterLimit}` : ''}
-                        </strong>
-                      </div>
-
-                    </div>
-
                   `
                 : `
                     <div class="auction-mobile-kicker">
@@ -10536,18 +10651,13 @@
                           ? `
                               <strong>È il tuo turno.</strong>
                               <span>
-                                La chiamata viene gestita dal PC.
-                                ${
-                                  firstQueue
-                                    ? `Prima coda: ${esc(firstQueue.player?.name || 'giocatore')}.`
-                                    : 'Nessun giocatore in coda.'
-                                }
+                                La chiamata viene gestita da PC o tablet.
                               </span>
                             `
                           : `
                               <strong>Attendi il tuo turno.</strong>
                               <span>
-                                Continua a gestire Listone e coda dal PC.
+                                Le chiamate vengono gestite da PC o tablet.
                               </span>
                             `
                       }
@@ -10589,82 +10699,68 @@
 
                     </div>
 
-                    <label class="auction-mobile-free-bid">
-                      <span>Rilancio libero</span>
-                      <input
-                        id="auction-mobile-free-bid"
-                        type="number"
-                        min="${Math.max(1, auctionBidDefault())}"
-                        step="1"
-                        inputmode="numeric"
-                        value="${selectedBid}"
+                    <div class="auction-mobile-bid-stepper">
+                      <button
+                        id="auction-mobile-bid-minus"
+                        class="secondary"
+                        type="button"
                         ${canBid ? '' : 'disabled'}
-                        aria-label="Importo libero del rilancio"
+                        aria-label="Riduci il rilancio di uno"
+                      >−</button>
+
+                      <label class="auction-mobile-free-bid">
+                        <span>Importo</span>
+                        <input
+                          id="auction-mobile-free-bid"
+                          type="number"
+                          min="${Math.max(1, auctionBidDefault())}"
+                          step="1"
+                          inputmode="numeric"
+                          value="${selectedBid}"
+                          ${canBid ? '' : 'disabled'}
+                          aria-label="Importo del rilancio"
+                        >
+                      </label>
+
+                      <button
+                        id="auction-mobile-bid-plus"
+                        class="secondary"
+                        type="button"
+                        ${canBid ? '' : 'disabled'}
+                        aria-label="Aumenta il rilancio di uno"
+                      >+</button>
+                    </div>
+
+                    <div class="auction-mobile-final-actions">
+                      <button
+                        id="auction-mobile-confirm"
+                        class="auction-mobile-confirm good"
+                        type="button"
+                        ${canBid ? '' : 'disabled'}
                       >
-                    </label>
+                        OK · ${selectedBid}
+                      </button>
+
+                      <button
+                        id="auction-mobile-abandon"
+                        class="auction-mobile-leave danger"
+                        type="button"
+                        ${
+                          !myTurn
+                          || hasLeftCurrentPlayer
+                            ? 'disabled'
+                            : ''
+                        }
+                      >
+                        ${hasLeftCurrentPlayer ? 'LASCIATO' : 'LASCIA'}
+                      </button>
+                    </div>
 
                     ${
-                      d.viceSignal
+                      hasLeftCurrentPlayer
                         ? `
-                            <div
-                              class="auction-vice-strip"
-                              style="margin-top:6px;justify-content:center"
-                            >
-                              <strong>
-                                ${esc(d.viceSignal.viceUsername || 'Vice')}
-                              </strong>
-
-                              <span class="badge ${
-                                d.viceSignal.type === 'stop'
-                                  ? 'danger'
-                                  : 'good'
-                              }">
-                                ${
-                                  esc(
-                                    d.viceSignal.type === 'limit'
-                                      ? `FINO A ${d.viceSignal.amount}`
-                                      : d.viceSignal.type === 'push'
-                                        ? 'RILANCIA'
-                                        : 'STOP'
-                                  )
-                                }
-                              </span>
-                            </div>
-                          `
-                        : ''
-                    }
-
-                    <button
-                      id="auction-mobile-confirm"
-                      class="auction-mobile-confirm"
-                      type="button"
-                      ${canBid ? '' : 'disabled'}
-                      style="margin-top:6px"
-                    >
-                      RILANCIA A ${selectedBid}
-                    </button>
-
-                    ${
-                      d.settings?.bid_mode === 'turn'
-                      &&
-                      canBid
-                        ? `
-                            <div class="auction-turn-actions">
-                              <button
-                                id="auction-mobile-pass"
-                                class="secondary"
-                                type="button"
-                              >
-                                PASSA
-                              </button>
-
-                              <button
-                                id="auction-mobile-abandon"
-                                class="danger"
-                                type="button"
-                              >
-                                ABBANDONA
-                              </button>
+                            <div class="auction-mobile-left-note">
+                              Console bloccata per questo giocatore.
                             </div>
                           `
                         : ''
@@ -10706,8 +10802,37 @@
       bindAuctionFreeBidInput(
         'auction-mobile-free-bid',
         'auction-mobile-confirm',
-        'RILANCIA A '
+        'OK · '
       );
+
+
+      const adjustMobileBid = delta => {
+        state.auctionBidSelection =
+          Math.max(
+            auctionBidDefault(),
+            Number(
+              state.auctionBidSelection
+              || auctionBidDefault()
+            ) + delta
+          );
+
+        renderAuctionMobilePresidentConsole();
+        renderAuctionTimer();
+      };
+
+
+      $('auction-mobile-bid-minus')
+        ?.addEventListener(
+          'click',
+          () => adjustMobileBid(-1)
+        );
+
+
+      $('auction-mobile-bid-plus')
+        ?.addEventListener(
+          'click',
+          () => adjustMobileBid(1)
+        );
 
 
       $('auction-mobile-confirm')
@@ -10726,37 +10851,10 @@
         );
 
 
-      $('auction-mobile-pass')
-        ?.addEventListener(
-          'click',
-          () =>
-            auctionAction({
-              action:
-                'passTurn',
-
-              sessionId:
-                s.id,
-
-              teamId:
-                auctionMyTeamId()
-            })
-        );
-
-
       $('auction-mobile-abandon')
         ?.addEventListener(
           'click',
-          () =>
-            auctionAction({
-              action:
-                'abandonTurn',
-
-              sessionId:
-                s.id,
-
-              teamId:
-                auctionMyTeamId()
-            })
+          () => leaveCurrentAuctionPlayer()
         );
 
 
@@ -11548,6 +11646,10 @@
         player:
           session?.current_player_id || null,
 
+        abandonedCurrentLot:
+          data?.myTeam
+            ?.abandonedCurrentLot === true,
+
         nominationTeam:
           session?.current_nomination_team_id || null,
 
@@ -11929,7 +12031,7 @@
 
       if (presidentConfirm) {
         presidentConfirm.textContent =
-          `RILANCIA ${selectedBid}`;
+          `OK · ${selectedBid}`;
       }
 
 
@@ -11938,7 +12040,7 @@
 
       if (mobileConfirm) {
         mobileConfirm.textContent =
-          `RILANCIA A ${selectedBid}`;
+          `OK · ${selectedBid}`;
       }
 
 
@@ -12281,6 +12383,17 @@
       const quickOffsets =
         [1, 2, 3, 5, 10];
 
+      const hasLeftCurrentPlayer =
+        auctionMyTeamLeftCurrentPlayer();
+
+      const isPresidentTurn =
+        d.settings?.bid_mode !== 'turn'
+        ||
+        !d.currentTurnTeam
+        ||
+        d.currentTurnTeam.id
+          === auctionMyTeamId();
+
       const canCall =
         !hasPlayer
         &&
@@ -12291,7 +12404,20 @@
       const canPresidentBid =
         hasPlayer
         &&
-        auctionHasPresidentRole();
+        auctionHasPresidentRole()
+        &&
+        isPresidentTurn
+        &&
+        !hasLeftCurrentPlayer;
+
+      const canPresidentLeave =
+        hasPlayer
+        &&
+        auctionHasPresidentRole()
+        &&
+        isPresidentTurn
+        &&
+        !hasLeftCurrentPlayer;
 
       const canSelectBid =
         hasPlayer
@@ -12369,7 +12495,20 @@
             class="auction-command-bid-confirm"
             type="button"
             ${canPresidentBid ? '' : 'disabled'}
-          >RILANCIA ${selectedBid ?? '—'}</button>
+          >OK · ${selectedBid ?? '—'}</button>
+
+          <button
+            id="auction-leave-player"
+            class="auction-command-leave danger"
+            type="button"
+            ${canPresidentLeave ? '' : 'disabled'}
+          >${hasLeftCurrentPlayer ? 'LASCIATO' : 'LASCIA'}</button>
+
+          ${
+            hasLeftCurrentPlayer
+              ? '<span class="auction-left-note">Console bloccata per questo giocatore.</span>'
+              : ''
+          }
         </div>
       `;
 
@@ -13136,7 +13275,7 @@
                                 class="auctioneer-place-bid good"
                                 ${state.auctionAdminBidTeamId ? '' : 'disabled'}
                               >
-                                REGISTRA OFFERTA
+                                OK · CONFERMA RILANCIO
                               </button>
 
                             </div>
@@ -13617,7 +13756,7 @@
       bindAuctionFreeBidInput(
         'auction-free-bid',
         'president-bid',
-        'RILANCIA '
+        'OK · '
       );
 
 
@@ -13634,6 +13773,13 @@
               ),
               'APP'
             )
+        );
+
+
+      $('auction-leave-player')
+        ?.addEventListener(
+          'click',
+          () => leaveCurrentAuctionPlayer()
         );
 
 
@@ -15119,6 +15265,63 @@
       try{await api(ENDPOINTS.auction,{action:'placeBid',sessionId:auctionSession().id,teamId,amount:Number(amount),source});await loadAuction()}catch(error){msg(error.message,'error')}
     }
 
+    async function leaveCurrentAuctionPlayer() {
+      const session =
+        auctionSession();
+
+      const teamId =
+        auctionMyTeamId();
+
+      const playerKey =
+        String(
+          session?.current_player_id
+          || ''
+        );
+
+      if (
+        !session?.id
+        || !teamId
+        || !playerKey
+        || auctionMyTeamLeftCurrentPlayer()
+      ) {
+        return;
+      }
+
+      state.auctionAbandonedPlayerKey =
+        playerKey;
+
+      renderAuctionLive();
+
+      try {
+        await api(
+          ENDPOINTS.auction,
+          {
+            action: 'abandonTurn',
+            sessionId: session.id,
+            teamId
+          }
+        );
+
+        await loadAuction();
+
+        msg(
+          'Console bloccata per questo giocatore.',
+          'success'
+        );
+
+      } catch (error) {
+        if (
+          state.auctionAbandonedPlayerKey
+          === playerKey
+        ) {
+          state.auctionAbandonedPlayerKey = '';
+        }
+
+        renderAuctionLive();
+        msg(error.message, 'error');
+      }
+    }
+
     async function sendViceSignal(type){
       try{await api(ENDPOINTS.auction,{action:'sendViceSignal',signalType:type,amount:type==='limit'?Number($('vice-limit').value):null});await loadAuction()}catch(error){msg(error.message,'error')}
     }
@@ -15617,7 +15820,7 @@
 
     setInterval(()=>{
       if(document.hidden||refreshBusy)return;
-      if(['home','manage','rosters'].includes(state.view))loadCurrentView(false);
+      if(['leagues','home','manage','rosters'].includes(state.view))loadCurrentView(false);
     },5000);
 
     /* Il Listone non viene più ricaricato automaticamente:
@@ -15653,8 +15856,6 @@
             state.view === 'auction'
             &&
             auctionSession()?.status === 'live'
-            &&
-            auctionDualModeEnabled()
             &&
             auctionHasPresidentRole()
           ) {
