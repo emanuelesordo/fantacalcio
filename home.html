@@ -6699,6 +6699,188 @@
         grid-template-columns:repeat(2,minmax(0,1fr))!important;
       }
     }
+
+    /* ASTA V21 · timer sincronizzati, riepilogo e drag rose robusto. */
+    .auction-rosters-drawer.resizing,
+    .auction-rosters-drawer.resizing *{
+      user-select:none!important;
+      cursor:ns-resize!important;
+    }
+
+    .auction-rosters-resize-handle{
+      top:0!important;
+      left:9px!important;
+      width:74px!important;
+      height:29px!important;
+      transform:none!important;
+      background:transparent!important;
+    }
+
+    .auction-rosters-resize-handle::before{
+      content:'↕';
+      position:absolute;
+      inset:4px 0;
+      display:grid;
+      place-items:center;
+      border:1px solid rgba(126,196,255,.42);
+      border-radius:99px;
+      background:rgba(5,29,54,.48);
+      color:#b9ddff;
+      font-size:13px;
+      font-weight:950;
+    }
+
+    .auction-review{
+      min-height:calc(100dvh - 24px);
+      padding:10px;
+      border:1px solid var(--line2);
+      border-radius:12px;
+      background:
+        radial-gradient(circle at 12% 0%,rgba(59,145,255,.15),transparent 35%),
+        #06162a;
+    }
+
+    .auction-review-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+    }
+
+    .auction-review-head h2{
+      margin:0 0 3px;
+      font-size:22px;
+    }
+
+    .auction-review-actions{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      gap:5px;
+    }
+
+    .auction-review-actions button{
+      min-height:34px;
+      padding:5px 10px;
+      font-size:8px;
+    }
+
+    .auction-review-kpis{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:6px;
+      margin-bottom:8px;
+    }
+
+    .auction-review-kpis .kpi{
+      min-height:54px;
+    }
+
+    .auction-review-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:7px;
+      align-items:start;
+    }
+
+    .auction-review-team{
+      min-width:0;
+      overflow:hidden;
+      border:1px solid var(--line2);
+      border-radius:9px;
+      background:rgba(11,36,64,.88);
+    }
+
+    .auction-review-team-head{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto auto;
+      gap:7px;
+      align-items:center;
+      min-height:42px;
+      padding:6px 8px;
+      border-bottom:1px solid var(--line);
+      background:rgba(35,91,145,.28);
+    }
+
+    .auction-review-team-head strong{
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-size:13px;
+    }
+
+    .auction-review-list{
+      display:grid;
+      gap:1px;
+      padding:4px;
+    }
+
+    .auction-review-player{
+      display:grid;
+      grid-template-columns:minmax(48px,auto) minmax(0,1fr) 38px;
+      gap:5px;
+      align-items:center;
+      min-height:23px;
+      padding:2px 4px;
+      border:1px solid rgba(74,137,196,.18);
+      border-radius:4px;
+      background:rgba(5,24,45,.74);
+    }
+
+    .auction-review-player-name{
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-size:8px;
+      font-weight:900;
+    }
+
+    .auction-review-player-copy{
+      display:grid;
+      min-width:0;
+      line-height:1.05;
+    }
+
+    .auction-review-player-copy small{
+      min-width:0;
+      overflow:hidden;
+      color:var(--soft);
+      font-size:6px;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .auction-review-price{
+      text-align:right;
+      color:#fff;
+      font-size:10px;
+      font-weight:950;
+    }
+
+    @media(max-width:720px){
+      .auction-review-head{
+        display:grid;
+      }
+
+      .auction-review-actions{
+        justify-content:stretch;
+      }
+
+      .auction-review-actions button{
+        flex:1 1 130px;
+      }
+
+      .auction-review-kpis{
+        grid-template-columns:repeat(3,minmax(0,1fr));
+      }
+
+      .auction-review-grid{
+        grid-template-columns:minmax(0,1fr);
+      }
+    }
   </style>
 </head>
 <body>
@@ -7157,7 +7339,8 @@
       auctionTimerTransitionPending: false,
 
       lastAuctionFetchAt: 0,
-      serverOffsetMs: 0
+      serverOffsetMs: 0,
+      serverOffsetReady: false
     };
 
     const $ = id => document.getElementById(id);
@@ -11299,15 +11482,25 @@
       handle.addEventListener(
         'pointerdown',
         event => {
-          if (!drawer.open) {
+          if (
+            !drawer.open
+            || (
+              event.pointerType === 'mouse'
+              && event.button !== 0
+            )
+          ) {
             return;
           }
 
           event.preventDefault();
           event.stopPropagation();
-          handle.setPointerCapture(
-            event.pointerId
+
+          drawer.classList.add(
+            'resizing'
           );
+
+          document.body.style.cursor =
+            'ns-resize';
 
           const stage =
             drawer.offsetParent;
@@ -11340,13 +11533,47 @@
               '--auction-rosters-top',
               `${state.auctionRostersTop}px`
             );
+
+            handle.setAttribute(
+              'aria-valuenow',
+              String(state.auctionRostersTop)
+            );
           };
 
-          const finish = () => {
-            handle.removeEventListener(
+          const finish = finishEvent => {
+            if (
+              finishEvent?.pointerId
+              !== undefined
+              && finishEvent.pointerId
+              !== event.pointerId
+            ) {
+              return;
+            }
+
+            document.removeEventListener(
               'pointermove',
-              move
+              move,
+              true
             );
+
+            document.removeEventListener(
+              'pointerup',
+              finish,
+              true
+            );
+
+            document.removeEventListener(
+              'pointercancel',
+              finish,
+              true
+            );
+
+            drawer.classList.remove(
+              'resizing'
+            );
+
+            document.body.style.cursor =
+              '';
 
             localStorage.setItem(
               auctionRostersStorageKey(),
@@ -11354,21 +11581,89 @@
             );
           };
 
-          handle.addEventListener(
+          document.addEventListener(
             'pointermove',
-            move
+            move,
+            true
           );
 
-          handle.addEventListener(
+          document.addEventListener(
             'pointerup',
             finish,
-            { once: true }
+            true
           );
 
-          handle.addEventListener(
+          document.addEventListener(
             'pointercancel',
             finish,
-            { once: true }
+            true
+          );
+
+          move(event);
+        }
+      );
+
+      handle.addEventListener(
+        'keydown',
+        event => {
+          if (
+            !drawer.open
+            || ![
+              'ArrowUp',
+              'ArrowDown',
+              'Home',
+              'End'
+            ].includes(event.key)
+          ) {
+            return;
+          }
+
+          event.preventDefault();
+          event.stopPropagation();
+
+          const stage =
+            drawer.offsetParent;
+
+          const maxTop =
+            Math.max(
+              0,
+              (stage?.clientHeight || window.innerHeight)
+              - 70
+            );
+
+          const current =
+            auctionRostersResolvedTop();
+
+          const next =
+            event.key === 'Home'
+              ? 0
+              : event.key === 'End'
+                ? maxTop
+                : current
+                  + (event.key === 'ArrowUp' ? -24 : 24);
+
+          state.auctionRostersTop =
+            Math.max(
+              0,
+              Math.min(
+                maxTop,
+                Math.round(next)
+              )
+            );
+
+          drawer.style.setProperty(
+            '--auction-rosters-top',
+            `${state.auctionRostersTop}px`
+          );
+
+          localStorage.setItem(
+            auctionRostersStorageKey(),
+            String(state.auctionRostersTop)
+          );
+
+          handle.setAttribute(
+            'aria-valuenow',
+            String(state.auctionRostersTop)
           );
         }
       );
@@ -11615,6 +11910,11 @@
               class="auction-rosters-resize-handle"
               title="Trascina per ridimensionare"
               aria-label="Ridimensiona pannello rose"
+              aria-orientation="vertical"
+              aria-valuemin="0"
+              aria-valuenow="${auctionRostersResolvedTop()}"
+              role="separator"
+              tabindex="0"
             ></span>
             Rose di tutti
             <span class="badge">
@@ -12005,11 +12305,17 @@
         timer:
           session?.timer_deadline || null,
 
+        timerStartsAt:
+          session?.timer_starts_at || null,
+
         timerExpired:
           session?.timer_expired_at || null,
 
         nominationTimer:
           session?.nomination_deadline || null,
+
+        nominationStartsAt:
+          session?.nomination_starts_at || null,
 
         nominationExpired:
           session?.nomination_expired_at || null,
@@ -12377,6 +12683,9 @@
       onlyIfChanged = false
     } = {}) {
 
+      const requestStartedAt =
+        Date.now();
+
       const data =
         await api(
           ENDPOINTS.auction,
@@ -12388,6 +12697,9 @@
             quiet
           }
         );
+
+      const responseReceivedAt =
+        Date.now();
 
       if (!data?.ok) {
         return;
@@ -12449,12 +12761,46 @@
 
 
       if (data.serverNow) {
-        state.serverOffsetMs =
+        const roundTripMs =
+          Math.max(
+            0,
+            responseReceivedAt
+            - requestStartedAt
+          );
+
+        const measuredOffset =
           Date.parse(
             data.serverNow
           )
-          -
-          Date.now();
+          - responseReceivedAt
+          + Math.min(
+              150,
+              roundTripMs / 2
+            );
+
+        if (Number.isFinite(measuredOffset)) {
+          if (
+            !state.serverOffsetReady
+            || Math.abs(
+              measuredOffset
+              - state.serverOffsetMs
+            ) > 2000
+          ) {
+            state.serverOffsetMs =
+              measuredOffset;
+          } else {
+            /*
+             * Una media progressiva evita che la latenza di una
+             * singola risposta faccia saltare il conto alla rovescia.
+             */
+            state.serverOffsetMs =
+              state.serverOffsetMs * .75
+              + measuredOffset * .25;
+          }
+
+          state.serverOffsetReady =
+            true;
+        }
       }
 
 
@@ -13642,6 +13988,14 @@
                     </button>
 
                     <button
+                      id="auction-finish"
+                      class="danger"
+                      type="button"
+                    >
+                      TERMINA ASTA
+                    </button>
+
+                    <button
                       id="auction-award"
                       class="good"
                       ${
@@ -14282,6 +14636,33 @@
                   s.id
               },
               'Turno di chiamata passato.'
+            );
+          }
+        );
+
+
+      $('auction-finish')
+        ?.addEventListener(
+          'click',
+          async () => {
+            const warning =
+              hasPlayer
+                ? `La chiamata di ${p?.name || 'questo giocatore'} non verrà assegnata. Terminare l’asta e aprire il riepilogo rose?`
+                : 'Terminare l’asta e aprire il riepilogo completo delle rose?';
+
+            if (!confirm(warning)) {
+              return;
+            }
+
+            await auctionAction(
+              {
+                action:
+                  'finishAuction',
+
+                sessionId:
+                  s.id
+              },
+              'Asta terminata. Riepilogo rose disponibile.'
             );
           }
         );
@@ -15749,7 +16130,8 @@
       const smoothTimerTransition =
         [
           'awardPlayer',
-          'manualAward'
+          'manualAward',
+          'finishAuction'
         ].includes(payload?.action);
 
       if (smoothTimerTransition) {
@@ -15769,7 +16151,8 @@
             'editRosterPrice',
             'removeRosterPlayer',
             'transferRosterPlayer',
-            'undoLastAssignment'
+            'undoLastAssignment',
+            'resetAuction'
           ].includes(
             payload?.action
           )
@@ -15826,10 +16209,978 @@
       }
     }
 
-    function renderAuctionReview(){
-      const review=state.auction?.rosterReview;
-      $('auction-root').innerHTML=`<section class="panel"><div class="panel-title"><div><h2>Revisione test</h2></div></div>${review?`<div class="kpis"><div class="kpi"><span>Assegnazioni</span><strong>${review.totalAssignments||0}</strong></div></div><div class="grid-auto" style="margin-top:6px">${(review.teams||[]).map(team=>`<div class="panel"><strong>${esc(team.name)}</strong><div class="small soft">Spesi ${team.spent} · Restanti ${team.remaining}</div></div>`).join('')}</div>`:'<div class="small soft">Nessun riepilogo.</div>'}</section>`;
+    function auctionReviewSortedPlayers(team) {
+      const mode =
+        state.auction?.settings?.fantasy_mode
+        || 'classic';
+
+      const sequence =
+        roleOrder(mode);
+
+      const rank = item => {
+        const indexes =
+          playerRoles(
+            item.player || {},
+            mode
+          )
+            .map(role => sequence.indexOf(role))
+            .filter(index => index >= 0);
+
+        return indexes.length
+          ? Math.min(...indexes)
+          : sequence.length;
+      };
+
+      return [...(team?.players || [])]
+        .sort((a, b) =>
+          rank(a) - rank(b)
+          || String(a.player?.name || '')
+            .localeCompare(
+              String(b.player?.name || ''),
+              'it'
+            )
+        );
     }
+
+
+    function auctionReviewFileBase() {
+      const league =
+        String(
+          state.auction?.league?.name
+          || state.selectedLeague?.name
+          || 'fantacalcio'
+        )
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9]+/gi, '-')
+          .replace(/^-+|-+$/g, '')
+          .toLowerCase()
+        || 'fantacalcio';
+
+      return `rose-${league}-${
+        new Date().toISOString().slice(0, 10)
+      }`;
+    }
+
+
+    function downloadAuctionFile(
+      blob,
+      fileName
+    ) {
+      const url =
+        URL.createObjectURL(blob);
+
+      const link =
+        document.createElement('a');
+
+      link.href = url;
+      link.download = fileName;
+      link.style.display = 'none';
+
+      document.body.append(link);
+      link.click();
+      link.remove();
+
+      setTimeout(
+        () => URL.revokeObjectURL(url),
+        1000
+      );
+    }
+
+
+    function auctionCsvCell(value) {
+      return `"${String(value ?? '')
+        .replace(/"/g, '""')}"`;
+    }
+
+
+    function downloadAuctionReviewCsv() {
+      const review =
+        state.auction?.rosterReview;
+
+      if (!review) {
+        return msg(
+          'Riepilogo rose non disponibile.',
+          'error'
+        );
+      }
+
+      const rows = [[
+        'Squadra',
+        'Giocatore',
+        'Ruolo',
+        'Squadra Serie A',
+        'Prezzo',
+        'Spesa squadra',
+        'Crediti residui'
+      ]];
+
+      (review.teams || [])
+        .forEach(team => {
+          const players =
+            auctionReviewSortedPlayers(team);
+
+          if (!players.length) {
+            rows.push([
+              team.name,
+              '',
+              '',
+              '',
+              '',
+              team.spent,
+              team.remaining
+            ]);
+          }
+
+          players.forEach(item => {
+            rows.push([
+              team.name,
+              item.player?.name || '',
+              playerRoles(
+                item.player || {},
+                state.auction?.settings?.fantasy_mode
+              ).join('/'),
+              item.player?.serie_a_team || '',
+              Number(item.purchase_price || 0),
+              Number(team.spent || 0),
+              Number(team.remaining || 0)
+            ]);
+          });
+        });
+
+      const csv =
+        '\ufeff'
+        + rows
+          .map(row =>
+            row.map(auctionCsvCell).join(';')
+          )
+          .join('\r\n');
+
+      downloadAuctionFile(
+        new Blob(
+          [csv],
+          {
+            type:
+              'text/csv;charset=utf-8'
+          }
+        ),
+        `${auctionReviewFileBase()}.csv`
+      );
+
+      msg(
+        'CSV delle rose salvato.',
+        'success'
+      );
+    }
+
+
+    function auctionReviewRoleColor(role) {
+      if (role === 'P' || role === 'Por') {
+        return '#f6c93c';
+      }
+
+      if (
+        role === 'D'
+        || ['B', 'Dc', 'Dd', 'Ds']
+          .includes(role)
+      ) {
+        return '#31a66c';
+      }
+
+      if (
+        role === 'C'
+        || ['E', 'M'].includes(role)
+      ) {
+        return '#347fd6';
+      }
+
+      if (['W', 'T'].includes(role)) {
+        return '#7755c8';
+      }
+
+      return '#d84b63';
+    }
+
+
+    function auctionCanvasText(
+      context,
+      value,
+      maxWidth
+    ) {
+      const text =
+        String(value || '');
+
+      if (
+        context.measureText(text).width
+        <= maxWidth
+      ) {
+        return text;
+      }
+
+      let fitted = text;
+
+      while (
+        fitted.length > 1
+        && context.measureText(
+          `${fitted}…`
+        ).width > maxWidth
+      ) {
+        fitted = fitted.slice(0, -1);
+      }
+
+      return `${fitted}…`;
+    }
+
+
+    async function downloadAuctionReviewPng() {
+      const review =
+        state.auction?.rosterReview;
+
+      const teams =
+        review?.teams || [];
+
+      if (!review || !teams.length) {
+        return msg(
+          'Riepilogo rose non disponibile.',
+          'error'
+        );
+      }
+
+      const columns =
+        teams.length >= 6
+          ? 3
+          : teams.length >= 2
+            ? 2
+            : 1;
+
+      const margin = 34;
+      const gap = 18;
+      const cardWidth = 520;
+      const rowHeight = 25;
+      const cardHeadHeight = 58;
+      const pageHeadHeight = 112;
+
+      const teamRows =
+        teams.map(auctionReviewSortedPlayers);
+
+      const gridRows =
+        Math.ceil(teams.length / columns);
+
+      const gridHeights =
+        Array.from(
+          { length: gridRows },
+          (_, rowIndex) => {
+            const counts =
+              teamRows
+                .slice(
+                  rowIndex * columns,
+                  rowIndex * columns + columns
+                )
+                .map(rows => Math.max(1, rows.length));
+
+            return cardHeadHeight
+              + Math.max(...counts, 1) * rowHeight
+              + 14;
+          }
+        );
+
+      const canvas =
+        document.createElement('canvas');
+
+      canvas.width =
+        margin * 2
+        + columns * cardWidth
+        + (columns - 1) * gap;
+
+      canvas.height =
+        pageHeadHeight
+        + margin
+        + gridHeights.reduce(
+            (sum, height) => sum + height,
+            0
+          )
+        + Math.max(0, gridRows - 1) * gap;
+
+      const context =
+        canvas.getContext('2d');
+
+      if (!context) {
+        throw new Error(
+          'Esportazione PNG non disponibile.'
+        );
+      }
+
+      context.fillStyle = '#06162a';
+      context.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+      context.fillStyle = '#102f52';
+      context.fillRect(
+        0,
+        0,
+        canvas.width,
+        pageHeadHeight
+      );
+
+      context.fillStyle = '#ffffff';
+      context.font =
+        '900 31px Arial, sans-serif';
+      context.fillText(
+        'RIEPILOGO ROSE',
+        margin,
+        46
+      );
+
+      context.fillStyle = '#a9c3dd';
+      context.font =
+        '600 17px Arial, sans-serif';
+      context.fillText(
+        `${
+          state.auction?.league?.name
+          || state.selectedLeague?.name
+          || 'Fantacalcio'
+        } · ${Number(review.totalAssignments || 0)} giocatori`,
+        margin,
+        78
+      );
+
+      const mode =
+        state.auction?.settings?.fantasy_mode
+        || 'classic';
+
+      const yOffsets = [];
+      let runningY =
+        pageHeadHeight + margin;
+
+      gridHeights.forEach(height => {
+        yOffsets.push(runningY);
+        runningY += height + gap;
+      });
+
+      teams.forEach((team, index) => {
+        const column =
+          index % columns;
+
+        const row =
+          Math.floor(index / columns);
+
+        const x =
+          margin
+          + column * (cardWidth + gap);
+
+        const y =
+          yOffsets[row];
+
+        const height =
+          gridHeights[row];
+
+        context.fillStyle = '#0b2440';
+        context.fillRect(
+          x,
+          y,
+          cardWidth,
+          height
+        );
+
+        context.strokeStyle = '#356c9f';
+        context.lineWidth = 2;
+        context.strokeRect(
+          x,
+          y,
+          cardWidth,
+          height
+        );
+
+        context.fillStyle = '#173f68';
+        context.fillRect(
+          x,
+          y,
+          cardWidth,
+          cardHeadHeight
+        );
+
+        context.fillStyle = '#ffffff';
+        context.font =
+          '900 19px Arial, sans-serif';
+        context.fillText(
+          auctionCanvasText(
+            context,
+            team.name,
+            cardWidth - 215
+          ),
+          x + 15,
+          y + 25
+        );
+
+        context.fillStyle = '#b8cee3';
+        context.font =
+          '600 13px Arial, sans-serif';
+        context.fillText(
+          `${teamRows[index].length} giocatori`,
+          x + 15,
+          y + 46
+        );
+
+        context.textAlign = 'right';
+        context.fillStyle = '#ffffff';
+        context.font =
+          '800 14px Arial, sans-serif';
+        context.fillText(
+          `Spesi ${Number(team.spent || 0)} · Residui ${Number(team.remaining || 0)}`,
+          x + cardWidth - 14,
+          y + 35
+        );
+        context.textAlign = 'left';
+
+        const players =
+          teamRows[index];
+
+        if (!players.length) {
+          context.fillStyle = '#7795b2';
+          context.font =
+            'italic 14px Arial, sans-serif';
+          context.fillText(
+            'Rosa vuota',
+            x + 15,
+            y + cardHeadHeight + 22
+          );
+        }
+
+        players.forEach((item, playerIndex) => {
+          const rowY =
+            y
+            + cardHeadHeight
+            + playerIndex * rowHeight;
+
+          if (playerIndex % 2 === 0) {
+            context.fillStyle =
+              'rgba(39, 84, 128, .24)';
+            context.fillRect(
+              x + 4,
+              rowY,
+              cardWidth - 8,
+              rowHeight
+            );
+          }
+
+          const roles =
+            playerRoles(
+              item.player || {},
+              mode
+            );
+
+          let roleX =
+            x + 10;
+
+          roles.slice(0, 3)
+            .forEach(role => {
+              context.font =
+                '900 10px Arial, sans-serif';
+
+              const chipWidth =
+                Math.max(
+                  25,
+                  context.measureText(role).width
+                  + 13
+                );
+
+              context.fillStyle =
+                auctionReviewRoleColor(role);
+              context.fillRect(
+                roleX,
+                rowY + 4,
+                chipWidth,
+                17
+              );
+
+              context.fillStyle =
+                role === 'P'
+                || role === 'Por'
+                  ? '#102036'
+                  : '#ffffff';
+
+              context.fillText(
+                role,
+                roleX + 6,
+                rowY + 16
+              );
+
+              roleX += chipWidth + 4;
+            });
+
+          const nameX =
+            x + 116;
+
+          context.fillStyle = '#f5f8fc';
+          context.font =
+            '800 13px Arial, sans-serif';
+          context.fillText(
+            auctionCanvasText(
+              context,
+              item.player?.name || '—',
+              cardWidth - 230
+            ),
+            nameX,
+            rowY + 17
+          );
+
+          context.textAlign = 'right';
+          context.fillStyle = '#91abc5';
+          context.font =
+            '600 11px Arial, sans-serif';
+          context.fillText(
+            auctionCanvasText(
+              context,
+              item.player?.serie_a_team || '',
+              80
+            ),
+            x + cardWidth - 62,
+            rowY + 17
+          );
+
+          context.fillStyle = '#ffffff';
+          context.font =
+            '900 14px Arial, sans-serif';
+          context.fillText(
+            String(
+              Number(item.purchase_price || 0)
+            ),
+            x + cardWidth - 13,
+            rowY + 17
+          );
+          context.textAlign = 'left';
+        });
+      });
+
+      const blob =
+        await new Promise(
+          (resolve, reject) =>
+            canvas.toBlob(
+              result =>
+                result
+                  ? resolve(result)
+                  : reject(
+                      new Error(
+                        'Creazione PNG non riuscita.'
+                      )
+                    ),
+              'image/png'
+            )
+        );
+
+      downloadAuctionFile(
+        blob,
+        `${auctionReviewFileBase()}.png`
+      );
+
+      msg(
+        'PNG delle rose salvato.',
+        'success'
+      );
+    }
+
+
+    function renderAuctionReview(){
+      const review =
+        state.auction?.rosterReview;
+
+      if (!review) {
+        $('auction-root').innerHTML = `
+          <section class="panel">
+            <strong>Riepilogo non disponibile.</strong>
+          </section>
+        `;
+
+        return;
+      }
+
+      const teams =
+        review.teams || [];
+
+      const totalSpent =
+        teams.reduce(
+          (sum, team) =>
+            sum + Number(team.spent || 0),
+          0
+        );
+
+      $('auction-root').innerHTML = `
+        <section class="auction-review">
+          <header class="auction-review-head">
+            <div>
+              <h2>Riepilogo rose</h2>
+              <div class="small soft">
+                ${esc(
+                  state.auction?.league?.name
+                  || state.selectedLeague?.name
+                  || 'Fantacalcio'
+                )}
+                · asta terminata
+              </div>
+            </div>
+
+            <div class="auction-review-actions">
+              <button
+                id="auction-review-png"
+                type="button"
+                class="secondary"
+              >
+                SALVA PNG
+              </button>
+
+              <button
+                id="auction-review-csv"
+                type="button"
+                class="secondary"
+              >
+                ESPORTA CSV
+              </button>
+
+              ${
+                auctionCanControl()
+                  ? `
+                      <button
+                        id="auction-review-reset"
+                        type="button"
+                        class="danger"
+                      >
+                        RESET ASTA
+                      </button>
+                    `
+                  : ''
+              }
+
+              <button
+                id="auction-review-back"
+                type="button"
+              >
+                TORNA ALLA LEGA
+              </button>
+            </div>
+          </header>
+
+          <div class="auction-review-kpis">
+            <div class="kpi">
+              <span>Squadre</span>
+              <strong>${teams.length}</strong>
+            </div>
+
+            <div class="kpi">
+              <span>Giocatori</span>
+              <strong>${Number(review.totalAssignments || 0)}</strong>
+            </div>
+
+            <div class="kpi">
+              <span>Crediti spesi</span>
+              <strong>${totalSpent}</strong>
+            </div>
+          </div>
+
+          <div class="auction-review-grid">
+            ${teams.map(team => {
+              const players =
+                auctionReviewSortedPlayers(team);
+
+              return `
+                <article class="auction-review-team">
+                  <header class="auction-review-team-head">
+                    <strong>${esc(team.name)}</strong>
+                    <span class="badge">
+                      ${players.length} giocatori
+                    </span>
+                    <span class="badge primary">
+                      ${Number(team.spent || 0)} / ${Number(review.initialCredits || 0)}
+                    </span>
+                  </header>
+
+                  <div class="auction-review-list">
+                    ${
+                      players.length
+                        ? players.map(item => {
+                            const roles =
+                              playerRoles(
+                                item.player || {},
+                                state.auction?.settings?.fantasy_mode
+                              );
+
+                            return `
+                              <div class="auction-review-player">
+                                <span class="auction-roster-mini-roles">
+                                  ${roles.map(role => `
+                                    <span
+                                      class="rolebadge"
+                                      data-role="${esc(role)}"
+                                    >${esc(role)}</span>
+                                  `).join('') || '<span class="rolebadge">—</span>'}
+                                </span>
+
+                                <span class="auction-review-player-copy">
+                                  <strong class="auction-review-player-name">
+                                    ${esc(item.player?.name || '—')}
+                                  </strong>
+                                  <small>
+                                    ${esc(item.player?.serie_a_team || '')}
+                                  </small>
+                                </span>
+
+                                <span class="auction-review-price">
+                                  ${Number(item.purchase_price || 0)}
+                                </span>
+                              </div>
+                            `;
+                          }).join('')
+                        : `
+                            <div class="small soft" style="padding:6px">
+                              Rosa vuota.
+                            </div>
+                          `
+                    }
+                  </div>
+                </article>
+              `;
+            }).join('')}
+          </div>
+        </section>
+      `;
+
+      $('auction-review-back')
+        ?.addEventListener(
+          'click',
+          () => switchView('home')
+        );
+
+      $('auction-review-csv')
+        ?.addEventListener(
+          'click',
+          downloadAuctionReviewCsv
+        );
+
+      $('auction-review-png')
+        ?.addEventListener(
+          'click',
+          async event => {
+            const button =
+              event.currentTarget;
+
+            button.disabled = true;
+            button.textContent =
+              'CREAZIONE PNG…';
+
+            try {
+              await downloadAuctionReviewPng();
+            } catch (error) {
+              msg(error.message, 'error');
+            } finally {
+              button.disabled = false;
+              button.textContent =
+                'SALVA PNG';
+            }
+          }
+        );
+
+      $('auction-review-reset')
+        ?.addEventListener(
+          'click',
+          async () => {
+            const confirmation =
+              prompt(
+                'Il reset elimina tutte le assegnazioni di questa asta e restituisce ogni giocatore agli svincolati. Digita RESET per continuare.'
+              );
+
+            if (confirmation !== 'RESET') {
+              return;
+            }
+
+            await auctionAction(
+              {
+                action: 'resetAuction',
+                sessionId:
+                  auctionSession()?.id
+              },
+              'Asta ripristinata completamente.'
+            );
+          }
+        );
+    }
+
+    function auctionTimerSnapshot() {
+      const d =
+        state.auction;
+
+      const s =
+        d?.auctionSession;
+
+      const idle = text => ({
+        text,
+        tone: '',
+        deadline: null,
+        startsAt: null
+      });
+
+      if (!s) {
+        return idle('—');
+      }
+
+      if (state.auctionTimerTransitionPending) {
+        return idle('…');
+      }
+
+      if (
+        s.current_player_id
+        && s.hold_active
+      ) {
+        return idle('HOLD');
+      }
+
+      if (
+        !s.current_player_id
+        && s.pause_after_award
+      ) {
+        return idle('PAUSA');
+      }
+
+      if (
+        !s.current_player_id
+        && d.settings
+          ?.nomination_timer_enabled === false
+      ) {
+        return idle('—');
+      }
+
+      const isBidTimer =
+        Boolean(
+          s.current_player_id
+          && s.timer_deadline
+        );
+
+      const deadline =
+        isBidTimer
+          ? s.timer_deadline
+          : !s.current_player_id
+            ? s.nomination_deadline
+            : null;
+
+      const startsAt =
+        isBidTimer
+          ? s.timer_starts_at
+          : s.nomination_starts_at;
+
+      const configuredSeconds =
+        isBidTimer
+          ? Number(
+              s.current_timer_seconds
+              || 0
+            )
+          : Number(
+              s.nomination_timer_seconds
+              || d.settings
+                ?.nomination_timeout_seconds
+              || 0
+            );
+
+      const deadlineMs =
+        Date.parse(deadline);
+
+      if (
+        !deadline
+        || !Number.isFinite(deadlineMs)
+      ) {
+        return idle('—');
+      }
+
+      const configuredMs =
+        Math.max(
+          0,
+          configuredSeconds * 1000
+        );
+
+      const parsedStartsAt =
+        Date.parse(startsAt);
+
+      const startsAtMs =
+        Number.isFinite(parsedStartsAt)
+          ? parsedStartsAt
+          : configuredMs > 0
+            ? deadlineMs - configuredMs
+            : 0;
+
+      const serverNow =
+        Date.now()
+        + state.serverOffsetMs;
+
+      state.auctionTimerDisplayKey = [
+        isBidTimer ? 'bid' : 'nomination',
+        s.current_player_id || '',
+        s.current_nomination_team_id || '',
+        startsAt || '',
+        deadline
+      ].join('|');
+
+      state.auctionTimerDisplayStartsAt =
+        startsAtMs;
+
+      /*
+       * Il server sceglie un secondo intero comune a tutti i
+       * dispositivi. Fino a quell'istante mostriamo l'attesa,
+       * poi il primo numero visibile è sempre il valore iniziale.
+       */
+      if (
+        startsAtMs > 0
+        && serverNow < startsAtMs
+      ) {
+        return {
+          text: '…',
+          tone: '',
+          deadline: deadlineMs,
+          startsAt: startsAtMs
+        };
+      }
+
+      const remainingMs =
+        Math.max(
+          0,
+          deadlineMs - serverNow
+        );
+
+      const actualSeconds =
+        Math.max(
+          0,
+          Math.ceil(
+            remainingMs / 1000
+          )
+        );
+
+      const displaySeconds =
+        configuredSeconds > 0
+          ? Math.min(
+              configuredSeconds,
+              actualSeconds
+            )
+          : actualSeconds;
+
+      const ratio =
+        configuredSeconds > 0
+          ? displaySeconds
+            / configuredSeconds
+          : 1;
+
+      return {
+        text: `${displaySeconds}s`,
+        tone:
+          ratio > (2 / 3)
+            ? 'timer-green'
+            : ratio > (1 / 3)
+              ? 'timer-yellow'
+              : 'timer-red',
+        deadline: deadlineMs,
+        startsAt: startsAtMs
+      };
+    }
+
 
     function renderAuctionTimer(){
       const labels =
@@ -15839,207 +17190,31 @@
         return;
       }
 
-      const setTimer = (
-        text,
-        tone = ''
-      ) => {
-        labels.forEach(label => {
-          label.textContent = text;
+      const snapshot =
+        auctionTimerSnapshot();
 
-          label.classList.remove(
-            'timer-green',
-            'timer-yellow',
-            'timer-red'
-          );
+      const tones = [
+        'timer-green',
+        'timer-yellow',
+        'timer-red'
+      ];
 
-          if (tone) {
-            label.classList.add(tone);
-          }
-        });
-      };
+      labels.forEach(label => {
+        if (
+          label.textContent
+          !== snapshot.text
+        ) {
+          label.textContent =
+            snapshot.text;
+        }
 
-      const s =
-        auctionSession();
-
-      if (!s) {
-        state.auctionTimerDisplayKey = '';
-        state.auctionTimerDisplayStartsAt = 0;
-        setTimer('—');
-        return;
-      }
-
-      if (state.auctionTimerTransitionPending) {
-        setTimer('…');
-        return;
-      }
-
-      if (
-        s.current_player_id
-        &&
-        s.hold_active
-      ) {
-        state.auctionTimerDisplayKey = '';
-        state.auctionTimerDisplayStartsAt = 0;
-        setTimer('HOLD');
-        return;
-      }
-
-      if (
-        !s.current_player_id
-        &&
-        s.pause_after_award
-      ) {
-        state.auctionTimerDisplayKey = '';
-        state.auctionTimerDisplayStartsAt = 0;
-        setTimer('PAUSA');
-        return;
-      }
-
-      if (
-        !s.current_player_id
-        &&
-        state.auction?.settings
-          ?.nomination_timer_enabled === false
-      ) {
-        state.auctionTimerDisplayKey = '';
-        state.auctionTimerDisplayStartsAt = 0;
-        setTimer('—');
-        return;
-      }
-
-      const isBidTimer =
-        Boolean(
-          s.current_player_id
-          &&
-          s.timer_deadline
-        );
-
-      const deadline =
-        isBidTimer
-          ? s.timer_deadline
-          : (
-              !s.current_player_id
-                ? s.nomination_deadline
-                : null
-            );
-
-      const configuredSeconds =
-        isBidTimer
-          ? Number(
-              s.current_timer_seconds
-              ||
-              0
-            )
-          : Number(
-              s.nomination_timer_seconds
-              ||
-              state.auction
-                ?.settings
-                ?.nomination_timeout_seconds
-              ||
-              0
-            );
-
-      if (!deadline) {
-        state.auctionTimerDisplayKey = '';
-        state.auctionTimerDisplayStartsAt = 0;
-        setTimer('—');
-        return;
-      }
-
-      const serverNow =
-        Date.now()
-        + state.serverOffsetMs;
-
-      const displayKey = [
-        isBidTimer ? 'bid' : 'nomination',
-        s.current_player_id || '',
-        s.current_nomination_team_id || '',
-        deadline
-      ].join('|');
-
-      if (
-        state.auctionTimerDisplayKey
-        !== displayKey
-      ) {
-        state.auctionTimerDisplayKey =
-          displayKey;
-
-        state.auctionTimerDisplayStartsAt =
-          Math.ceil(serverNow / 1000) * 1000;
-      }
-
-      if (
-        serverNow
-        < state.auctionTimerDisplayStartsAt
-      ) {
-        setTimer('…');
-        return;
-      }
-
-      const remain =
-        Math.max(
-          0,
-          Date.parse(deadline)
-          - serverNow
-        );
-
-      const configured =
-        configuredSeconds
-        *
-        1000;
-
-      const actualSeconds =
-        Math.max(
-          0,
-          Math.ceil(remain / 1000)
-        );
-
-      const cleanElapsedSeconds =
-        Math.max(
-          0,
-          Math.floor(
-            (
-              serverNow
-              - state.auctionTimerDisplayStartsAt
-            ) / 1000
+        tones.forEach(tone =>
+          label.classList.toggle(
+            tone,
+            tone === snapshot.tone
           )
         );
-
-      const cleanSeconds =
-        configuredSeconds > 0
-          ? Math.max(
-              0,
-              configuredSeconds
-              - cleanElapsedSeconds
-            )
-          : actualSeconds;
-
-      const displaySeconds =
-        Math.min(
-          actualSeconds,
-          cleanSeconds
-        );
-
-      const visible =
-        displaySeconds * 1000;
-
-      const ratio =
-        configured > 0
-          ? visible / configured
-          : 1;
-
-      const tone =
-        ratio > (2 / 3)
-          ? 'timer-green'
-          : ratio > (1 / 3)
-            ? 'timer-yellow'
-            : 'timer-red';
-
-      setTimer(
-        `${displaySeconds}s`,
-        tone
-      );
+      });
     }
 
     /* =====================================================
@@ -16060,87 +17235,19 @@
     }
 
     function renderTvTimer(){
-      const d =
-        state.auction;
+      const timer =
+        $('tv-timer');
 
-      const s =
-        d?.auctionSession;
-
-      if (!s) {
-        $('tv-timer').textContent = '—';
+      if (!timer) {
         return;
       }
 
-      if (
-        s.current_player_id
-        &&
-        s.hold_active
-      ) {
-        $('tv-timer').textContent = 'HOLD';
-        return;
+      const text =
+        auctionTimerSnapshot().text;
+
+      if (timer.textContent !== text) {
+        timer.textContent = text;
       }
-
-      if (
-        !s.current_player_id
-        &&
-        s.pause_after_award
-      ) {
-        $('tv-timer').textContent = 'PAUSA';
-        return;
-      }
-
-      if (
-        !s.current_player_id
-        &&
-        d.settings?.nomination_timer_enabled === false
-      ) {
-        $('tv-timer').textContent = '—';
-        return;
-      }
-
-      const deadline =
-        s.current_player_id
-          ? s.timer_deadline
-          : s.nomination_deadline;
-
-      if (!deadline) {
-        $('tv-timer').textContent = '—';
-        return;
-      }
-
-      const configuredSeconds =
-        s.current_player_id
-          ? Number(s.current_timer_seconds || 0)
-          : Number(
-              s.nomination_timer_seconds
-              ||
-              d.settings?.nomination_timeout_seconds
-              ||
-              0
-            );
-
-      const remain =
-        Math.max(
-          0,
-          Date.parse(deadline)
-          -
-          (
-            Date.now()
-            +
-            state.serverOffsetMs
-          )
-        );
-
-      const configured =
-        configuredSeconds * 1000;
-
-      const visible =
-        configured > 0
-          ? Math.min(remain, configured)
-          : remain;
-
-      $('tv-timer').textContent =
-        `${Math.ceil(visible / 1000)}s`;
     }
 
     $('tv-fullscreen').addEventListener('click',async()=>{
@@ -16152,6 +17259,24 @@
        ===================================================== */
 
     let refreshBusy=false;
+
+    /*
+     * Il timer è solo una proiezione locale di istanti server:
+     * lo ridisegniamo spesso, senza effettuare richieste di rete.
+     */
+    setInterval(() => {
+      if (document.hidden) {
+        return;
+      }
+
+      if (
+        state.view === 'auction'
+        || state.view === 'tv'
+      ) {
+        renderAuctionTimer();
+        renderTvTimer();
+      }
+    }, 100);
 
     async function loadCurrentView(force=false){
       if(
@@ -16173,9 +17298,6 @@
     }
 
     setInterval(async()=>{
-      renderAuctionTimer();
-      renderTvTimer();
-
       if(
         document.hidden
         ||
@@ -16208,7 +17330,7 @@
             -
             state.lastAuctionFetchAt
             >
-            650
+            500
           ){
             state.lastAuctionFetchAt=
               Date.now();
