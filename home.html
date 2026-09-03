@@ -7014,6 +7014,91 @@
         grid-template-columns:minmax(0,1fr) minmax(0,1fr) 34px;
       }
     }
+
+    /* ASTA V23 · regia fase separata, fasce centrali continue. */
+    .auction-middle-column{
+      grid-template-rows:
+        auto
+        auto
+        auto
+        minmax(105px,1fr)
+        auto
+        auto!important;
+      gap:0!important;
+    }
+
+    .auction-middle-column>.auction-command-bar,
+    .auction-middle-column>.auction-middle-quick,
+    .auction-middle-column>.auction-role-phase-president-action{
+      margin-bottom:5px;
+    }
+
+    .auction-middle-column>.auction-central-queue,
+    .auction-middle-column>.auction-bid-history{
+      margin:0!important;
+    }
+
+    .auction-middle-vice-slot:empty{
+      display:none!important;
+    }
+
+    .auction-middle-vice-slot:not(:empty){
+      margin-top:5px;
+    }
+
+    .auction-role-phase-president-action{
+      width:100%;
+      min-height:36px!important;
+      border-radius:9px!important;
+      font-size:9px!important;
+    }
+
+    .auction-role-phase-admin-card{
+      grid-column:1 / -1;
+      background:rgba(118,80,14,.22);
+    }
+
+    .auction-role-phase-admin-card .auction-role-phase-teams{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(92px,1fr));
+    }
+
+    .auction-role-phase-admin-card .auction-role-phase-teams .badge{
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .auction-free-fixed tr.outside-role-phase{
+      opacity:.48;
+    }
+
+    .auction-free-fixed tr.outside-role-phase .auction-queue-add{
+      cursor:not-allowed;
+      filter:grayscale(.45);
+    }
+
+    .auction-team-roster{
+      grid-template-rows:auto minmax(0,1fr)!important;
+    }
+
+    .auction-team-roster-list{
+      height:100%;
+      min-height:0;
+    }
+
+    .auction-cockpit{
+      padding-bottom:34px!important;
+    }
+
+    .auction-rosters-drawer{
+      bottom:2px!important;
+    }
+
+    .auction-rosters-drawer>summary{
+      min-height:29px;
+      overflow:visible!important;
+    }
   </style>
 </head>
 <body>
@@ -7449,6 +7534,7 @@
       listSort: { key: 'name', direction: 'asc' },
 
       auctionRoles: new Set(['all']),
+      auctionRolePhaseFilterKey: '',
       auctionSort: { key: 'name', direction: 'asc' },
       auctionFilterSearch: '',
       auctionFilterTeam: 'all',
@@ -10925,6 +11011,13 @@
         return;
       }
 
+      if (!auctionPlayerMatchesCurrentRolePhase(player)) {
+        return msg(
+          `Durante la fase ${auctionRolePhaseLabel(state.auction?.rolePhase?.key)} puoi consultare questo giocatore, ma non inserirlo in coda.`,
+          'warning'
+        );
+      }
+
       const existing =
         auctionQueueRows();
 
@@ -13290,6 +13383,27 @@
         data;
 
 
+      const nextRolePhaseFilterKey =
+        [
+          data.auctionSession?.id || 'no-session',
+          data.rolePhase?.index ?? 0,
+          data.rolePhase?.key || 'ALL'
+        ].join('|');
+
+      if (
+        state.auctionRolePhaseFilterKey
+        !== nextRolePhaseFilterKey
+      ) {
+        state.auctionRolePhaseFilterKey =
+          nextRolePhaseFilterKey;
+
+        state.auctionRoles =
+          auctionDefaultRoleFiltersForPhase(
+            data
+          );
+      }
+
+
       if (data.serverNow) {
         const roundTripMs =
           Math.max(
@@ -13531,6 +13645,34 @@
       })[key] || key || 'Libero';
     }
 
+    function auctionDefaultRoleFiltersForPhase(data = state.auction) {
+      const key = data?.rolePhase?.key || 'ALL';
+      const mode = data?.settings?.fantasy_mode || 'classic';
+
+      if (key === 'ALL') {
+        return new Set(['all']);
+      }
+
+      if (mode === 'classic') {
+        return key === 'OUTFIELD'
+          ? new Set(['D', 'C', 'A'])
+          : new Set([key]);
+      }
+
+      if (key === 'POR') {
+        return new Set(['Por']);
+      }
+
+      if (key === 'OUTFIELD') {
+        return new Set(
+          roleOrder('mantra')
+            .filter(role => role !== 'Por')
+        );
+      }
+
+      return new Set(['all']);
+    }
+
     function auctionPlayerMatchesCurrentRolePhase(player) {
       const key = state.auction?.rolePhase?.key || 'ALL';
       const mode = state.auction?.settings?.fantasy_mode || 'classic';
@@ -13551,37 +13693,63 @@
       return true;
     }
 
-    function renderAuctionRolePhaseCard() {
+    function auctionCurrentRolePhaseTeam() {
+      const phase = state.auction?.rolePhase;
+
+      return (phase?.teams || [])
+        .find(team => team.teamId === auctionMyTeamId()) || null;
+    }
+
+    function renderAuctionRolePhasePresidentControl() {
       const phase = state.auction?.rolePhase;
       const session = auctionSession();
 
-      if (!phase || !session || !auctionCallMode()) return '';
+      if (
+        !phase
+        || !session
+        || !auctionCallMode()
+        || !auctionHasPresidentRole()
+        || session.current_player_id
+      ) {
+        return '';
+      }
 
-      const myTeam = (phase.teams || [])
-        .find(team => team.teamId === auctionMyTeamId()) || null;
+      const myTeam = auctionCurrentRolePhaseTeam();
 
-      const myAction =
-        !session.current_player_id
-        && auctionHasPresidentRole()
-        && myTeam
-          ? myTeam.manualReady
-            ? `
-                <button id="auction-toggle-role-ready" class="auction-role-phase-action" type="button">
-                  RIAPRI · ${esc(auctionRolePhaseLabel(phase.key))}
-                </button>
-              `
-            : myTeam.canReady
-              ? `
-                  <button id="auction-toggle-role-ready" class="auction-role-phase-action" type="button">
-                    A POSTO · ${esc(auctionRolePhaseLabel(phase.key))}
-                  </button>
-                `
-              : `<span class="badge ${myTeam.ready ? 'good' : ''}">${myTeam.ready ? 'A POSTO' : `${myTeam.current}/${myTeam.minimum} MIN`}</span>`
-          : '';
+      if (!myTeam || (!myTeam.canReady && !myTeam.manualReady)) {
+        return '';
+      }
+
+      return `
+        <button
+          id="auction-toggle-role-ready"
+          class="auction-role-phase-action auction-role-phase-president-action"
+          type="button"
+        >
+          ${
+            myTeam.manualReady
+              ? `RIAPRI · ${esc(auctionRolePhaseLabel(phase.key))}`
+              : `A POSTO · ${esc(auctionRolePhaseLabel(phase.key))}`
+          }
+        </button>
+      `;
+    }
+
+    function renderAuctionRolePhaseAdminPanel() {
+      const phase = state.auction?.rolePhase;
+      const session = auctionSession();
+
+      if (
+        !phase
+        || !session
+        || !auctionCallMode()
+        || !auctionCanControl()
+      ) {
+        return '';
+      }
 
       const controllerAction =
-        auctionCanControl()
-        && phase.allReady
+        phase.allReady
         && !session.current_player_id
           ? phase.hasNext
             ? `
@@ -13593,10 +13761,10 @@
           : '';
 
       return `
-        <section class="auction-role-phase-card">
+        <section class="auction-role-phase-card auction-role-phase-admin-card">
           <div class="auction-role-phase-head">
             <div>
-              <div class="small soft">Fase ruoli ${Number(phase.index || 0) + 1}/${(phase.sequence || []).length || 1}</div>
+              <div class="small soft">Regia fase ruoli ${Number(phase.index || 0) + 1}/${(phase.sequence || []).length || 1}</div>
               <strong>${esc(auctionRolePhaseLabel(phase.key))}</strong>
             </div>
             <span class="badge ${phase.allReady ? 'good' : 'warn'}">
@@ -13612,7 +13780,6 @@
             `).join('')}
           </div>
 
-          ${myAction}
           ${controllerAction}
         </section>
       `;
@@ -14355,6 +14522,8 @@
       const adminControlPanelHtml = `
         <div class="auctioneer-bid-panel">
 
+          ${renderAuctionRolePhaseAdminPanel()}
+
           <div class="auctioneer-bid-section-title">
             Seleziona la squadra
           </div>
@@ -14773,7 +14942,7 @@
                   <section class="auction-middle-quick">
                     ${quickStripHtml}
                   </section>
-                  ${renderAuctionRolePhaseCard()}
+                  ${renderAuctionRolePhasePresidentControl()}
                   ${renderAuctionCallQueue()}
                   <div class="auction-middle-vice-slot">${viceHtml}</div>
                   ${recentBidsHtml}
@@ -16285,6 +16454,20 @@
           player
         );
 
+      const rolePhaseAllowed =
+        auctionPlayerMatchesCurrentRolePhase(
+          player
+        );
+
+      const queueAllowed =
+        queueCapacity.allowed
+        && rolePhaseAllowed;
+
+      const queueBlockedMessage =
+        !rolePhaseAllowed
+          ? `Giocatore fuori dalla fase ${auctionRolePhaseLabel(state.auction?.rolePhase?.key)}: puoi consultarlo, ma non accodarlo o chiamarlo.`
+          : queueCapacity.message;
+
       const queueIsEmpty =
         auctionQueueRows().length === 0;
 
@@ -16312,13 +16495,13 @@
                 data-queue-add="${esc(player.id)}"
                 ${
                   auctionCanManageCallQueue()
-                  && queueCapacity.allowed
+                  && queueAllowed
                     ? ''
                     : 'disabled'
                 }
                 title="${
-                  !queueCapacity.allowed
-                    ? esc(queueCapacity.message)
+                  !queueAllowed
+                    ? esc(queueBlockedMessage)
                     : auctionHasPresidentRole()
                     ? (
                         queueIsEmpty
@@ -16339,7 +16522,7 @@
             player.id === state.auctionSelectedPlayerId
               ? 'selected-player'
               : ''
-          }"
+          } ${rolePhaseAllowed ? '' : 'outside-role-phase'}"
         >
 
           <td class="player-role-cell auction-player-col-role">
@@ -16447,8 +16630,7 @@
 
       const filteredPlayers =
         filterPlayers(
-          (data.callCandidates || [])
-            .filter(auctionPlayerMatchesCurrentRolePhase),
+          data.callCandidates || [],
           controls,
           state.auctionRoles,
           mode
@@ -16528,7 +16710,7 @@
 
 
       /*
-       * La riga seleziona sempre il giocatore nella fascia superiore.
+       * Una riga compatibile con la fase seleziona il giocatore nella fascia superiore.
        * NON effettua mai una chiamata direttamente:
        * - CHIAMA/CODA vive soltanto nella singola riga
        * - anche CHIAMA inserisce prima il giocatore nella coda
@@ -16560,6 +16742,13 @@
 
               if (!player) {
                 return;
+              }
+
+              if (!auctionPlayerMatchesCurrentRolePhase(player)) {
+                return msg(
+                  `Durante la fase ${auctionRolePhaseLabel(state.auction?.rolePhase?.key)} puoi consultare questo giocatore, ma non inserirlo in coda.`,
+                  'warning'
+                );
               }
 
               state.auctionSelectedPlayerId =
@@ -16825,7 +17014,12 @@
       document
         .querySelectorAll('[data-auction-timer]')
         .forEach(label => {
-          label.textContent = '…';
+          label.textContent = '⏳';
+          label.title = 'Sincronizzazione timer';
+          label.setAttribute(
+            'aria-label',
+            'Sincronizzazione timer'
+          );
 
           label.classList.remove(
             'timer-green',
@@ -17723,11 +17917,12 @@
       const s =
         d?.auctionSession;
 
-      const idle = text => ({
+      const idle = (text, label = '') => ({
         text,
         tone: '',
         deadline: null,
-        startsAt: null
+        startsAt: null,
+        label
       });
 
       if (!s) {
@@ -17735,21 +17930,21 @@
       }
 
       if (state.auctionTimerTransitionPending) {
-        return idle('…');
+        return idle('⏳', 'Sincronizzazione timer');
       }
 
       if (
         s.current_player_id
         && s.hold_active
       ) {
-        return idle('HOLD');
+        return idle('🔒', 'Timer bloccato dal Banditore');
       }
 
       if (
         !s.current_player_id
         && s.pause_after_award
       ) {
-        return idle('PAUSA');
+        return idle('🔒', 'Asta in pausa');
       }
 
       if (
@@ -17842,10 +18037,11 @@
         && serverNow < startsAtMs
       ) {
         return {
-          text: '…',
+          text: '⏳',
           tone: '',
           deadline: deadlineMs,
-          startsAt: startsAtMs
+          startsAt: startsAtMs,
+          label: 'Timer in partenza al prossimo secondo intero'
         };
       }
 
@@ -17886,7 +18082,8 @@
               ? 'timer-yellow'
               : 'timer-red',
         deadline: deadlineMs,
-        startsAt: startsAtMs
+        startsAt: startsAtMs,
+        label: `${displaySeconds} secondi rimanenti`
       };
     }
 
@@ -17923,6 +18120,12 @@
             tone === snapshot.tone
           )
         );
+
+        label.title = snapshot.label || '';
+        label.setAttribute(
+          'aria-label',
+          snapshot.label || snapshot.text
+        );
       });
     }
 
@@ -17951,12 +18154,21 @@
         return;
       }
 
+      const snapshot =
+        auctionTimerSnapshot();
+
       const text =
-        auctionTimerSnapshot().text;
+        snapshot.text;
 
       if (timer.textContent !== text) {
         timer.textContent = text;
       }
+
+      timer.title = snapshot.label || '';
+      timer.setAttribute(
+        'aria-label',
+        snapshot.label || snapshot.text
+      );
     }
 
     $('tv-fullscreen').addEventListener('click',async()=>{
