@@ -403,7 +403,7 @@
     }
 
     @media(max-width:430px){
-      .head-actions .secondary:not(#league-switch-btn){display:none}
+      .head-actions .secondary:not(#league-switch-btn):not(#immersion-btn){display:none}
       .panel{padding:6px}.panel-title{margin-bottom:4px}
       .panel-title h2,.panel-title h3{font-size:13px}
       .filters{grid-template-columns:1fr 1fr}
@@ -788,6 +788,20 @@
       background:var(--panel3);
       border-color:var(--line);
       white-space:nowrap;
+    }
+
+    .auction-status-nav{
+      display:flex;
+      align-items:center;
+      gap:4px;
+    }
+
+    .auction-status-nav .auction-immersion-live{
+      min-width:32px;
+      min-height:30px;
+      padding:4px 7px;
+      background:var(--panel3);
+      border-color:var(--line);
     }
 
     .auction-status-main{
@@ -6881,6 +6895,125 @@
         grid-template-columns:minmax(0,1fr);
       }
     }
+
+    /* V22 · setup operativo, navigazione stabile e pannello rose trascinabile. */
+    .app{
+      grid-template-rows:auto auto minmax(0,1fr)!important;
+    }
+
+    .main-nav{
+      min-height:0!important;
+      overflow-x:auto!important;
+      overflow-y:hidden!important;
+      align-items:stretch;
+    }
+
+    .setup-dynamic-timer{
+      margin-top:8px;
+      padding:8px;
+      border:1px solid rgba(153,196,237,.20);
+      border-radius:10px;
+      background:rgba(7,26,46,.42);
+    }
+
+    .setup-dynamic-timer-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:7px;
+    }
+
+    .setup-dynamic-timer-bands{
+      display:grid;
+      gap:5px;
+    }
+
+    .setup-timer-band{
+      display:grid;
+      grid-template-columns:minmax(120px,1fr) minmax(90px,.7fr) 34px;
+      gap:5px;
+      align-items:end;
+      padding:5px;
+      border:1px solid rgba(153,196,237,.14);
+      border-radius:8px;
+      background:rgba(25,54,84,.34);
+    }
+
+    .setup-timer-band label{
+      display:grid;
+      gap:3px;
+      color:var(--soft);
+      font-size:8px;
+      font-weight:850;
+    }
+
+    .setup-timer-band button{
+      min-width:34px;
+      width:34px;
+      padding:0;
+    }
+
+    .setup-timer-band:last-child .setup-timer-percent{
+      opacity:.72;
+    }
+
+    .auction-rosters-drawer>summary{
+      touch-action:none!important;
+    }
+
+    .auction-rosters-drawer[open]>summary{
+      cursor:ns-resize!important;
+    }
+
+    .auction-rosters-resize-handle{
+      pointer-events:none!important;
+    }
+
+    .auction-role-phase-card{
+      display:grid;
+      gap:5px;
+      padding:6px;
+      border:1px solid rgba(255,199,73,.30);
+      border-radius:8px;
+      background:rgba(118,80,14,.16);
+    }
+
+    .auction-role-phase-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:6px;
+    }
+
+    .auction-role-phase-action{
+      min-height:30px!important;
+      background:linear-gradient(145deg,#e4ad37,#b87b12)!important;
+      border-color:rgba(255,220,126,.52)!important;
+      color:#191203!important;
+      font-size:8px!important;
+    }
+
+    .auction-role-phase-teams{
+      display:flex;
+      flex-wrap:wrap;
+      gap:3px;
+    }
+
+    .auction-role-phase-teams .badge{
+      font-size:6px;
+    }
+
+    @media(max-width:620px){
+      .setup-dynamic-timer-head{
+        align-items:stretch;
+        display:grid;
+      }
+
+      .setup-timer-band{
+        grid-template-columns:minmax(0,1fr) minmax(0,1fr) 34px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -6941,6 +7074,7 @@
       <div class="head-actions">
         <span id="user-label" class="user-label"></span>
         <button id="league-switch-btn" class="secondary" type="button">Leghe</button>
+        <button id="immersion-btn" class="secondary" type="button" title="Vista a schermo intero" aria-label="Vista a schermo intero">⛶</button>
         <button id="reload-btn" class="secondary" type="button">↻</button>
         <button id="exit-btn" class="secondary" type="button">Esci</button>
       </div>
@@ -7095,6 +7229,11 @@
                 </select>
               </label>
 
+              <label id="setup-role-order-wrap">
+                Ordine ruoli di chiamata
+                <select id="setup-role-order"></select>
+              </label>
+
               <label id="setup-call-timeout-wrap">
                 Tempo per chiamare (sec)
                 <input
@@ -7122,6 +7261,11 @@
                   min="0"
                   step="1"
                 >
+              </label>
+
+              <label id="setup-call-penalty-enabled-wrap" class="checkbox-label">
+                <input id="setup-call-penalty-enabled" type="checkbox">
+                Scala la penalità in crediti
               </label>
             </div>
           </section>
@@ -7157,10 +7301,21 @@
           </section>
 
           <section class="panel">
-            <div class="panel-title"><div><h2>Timer</h2></div></div>
+            <div class="panel-title"><div><h2>Timer rilanci</h2><p>Durata fissa oppure fasce calcolate sul rapporto offerta/crediti iniziali.</p></div></div>
             <div class="form-grid">
               <label>Modalità<select id="setup-timer-mode"><option value="dynamic">Dinamico</option><option value="fixed">Fisso</option></select></label>
               <label>Secondi fissi<input id="setup-fixed-timer" type="number" min="1"></label>
+            </div>
+
+            <div id="setup-dynamic-timer-wrap" class="setup-dynamic-timer">
+              <div class="setup-dynamic-timer-head">
+                <div>
+                  <strong>Fasce timer dinamico</strong>
+                  <div class="small soft">Ogni soglia indica fino a quale percentuale del budget si applicano i secondi scelti.</div>
+                </div>
+                <button id="setup-add-timer-band" class="secondary" type="button">+ Fascia</button>
+              </div>
+              <div id="setup-dynamic-timer-bands" class="setup-dynamic-timer-bands"></div>
             </div>
           </section>
 
@@ -7913,6 +8068,45 @@
       );
 
 
+    async function toggleImmersion() {
+      try {
+        if (document.fullscreenElement) {
+          await document.exitFullscreen();
+        } else {
+          await document.documentElement.requestFullscreen();
+        }
+      } catch (error) {
+        msg('La modalità schermo intero non è disponibile su questo dispositivo.', 'error');
+      }
+    }
+
+
+    $('immersion-btn')
+      .addEventListener(
+        'click',
+        toggleImmersion
+      );
+
+
+    document.addEventListener('fullscreenchange', () => {
+      const active = Boolean(document.fullscreenElement);
+      const title = active
+        ? 'Esci dalla vista a schermo intero'
+        : 'Vista a schermo intero';
+
+      [
+        $('immersion-btn'),
+        $('auction-immersion-live')
+      ]
+        .filter(Boolean)
+        .forEach(button => {
+          button.textContent = active ? '⤢' : '⛶';
+          button.title = title;
+          button.setAttribute('aria-label', title);
+        });
+    });
+
+
     $('reload-btn')
       .addEventListener(
         'click',
@@ -8379,6 +8573,161 @@
       }
     }
 
+    const DEFAULT_DYNAMIC_TIMER_BANDS = [
+      { max_percent: 2, seconds: 5 },
+      { max_percent: 5, seconds: 7 },
+      { max_percent: 10, seconds: 9 },
+      { max_percent: 20, seconds: 12 },
+      { max_percent: null, seconds: 15 }
+    ];
+
+    function normalizeDynamicTimerBands(value) {
+      const source =
+        Array.isArray(value?.bands)
+          ? value.bands
+          : Array.isArray(value)
+            ? value
+            : DEFAULT_DYNAMIC_TIMER_BANDS;
+
+      const bands = source
+        .map(item => ({
+          max_percent:
+            item?.max_percent === null
+            || item?.max_percent === ''
+              ? null
+              : Number(item?.max_percent),
+          seconds: Number(item?.seconds)
+        }))
+        .filter(item =>
+          Number.isFinite(item.seconds)
+          && item.seconds >= 1
+          && (
+            item.max_percent === null
+            || (
+              Number.isFinite(item.max_percent)
+              && item.max_percent > 0
+            )
+          )
+        );
+
+      const finite = bands
+        .filter(item => item.max_percent !== null)
+        .sort((a, b) => a.max_percent - b.max_percent);
+
+      const fallback =
+        bands.find(item => item.max_percent === null)
+        || { max_percent: null, seconds: finite.at(-1)?.seconds || 15 };
+
+      return [...finite, fallback].slice(0, 8);
+    }
+
+    function collectDynamicTimerBands() {
+      const rows = Array.from(
+        document.querySelectorAll('.setup-timer-band')
+      );
+
+      if (!rows.length) {
+        return normalizeDynamicTimerBands(null);
+      }
+
+      return normalizeDynamicTimerBands(
+        rows.map((row, index) => ({
+          max_percent:
+            index === rows.length - 1
+              ? null
+              : Number(row.querySelector('[data-timer-percent]')?.value),
+          seconds:
+            Number(row.querySelector('[data-timer-seconds]')?.value)
+        }))
+      );
+    }
+
+    function renderDynamicTimerBands(value) {
+      const container = $('setup-dynamic-timer-bands');
+      if (!container) return;
+
+      const bands = normalizeDynamicTimerBands(
+        value ?? state.setupDynamicTimerBands
+      );
+
+      state.setupDynamicTimerBands = bands;
+
+      container.innerHTML = bands.map((band, index) => {
+        const last = index === bands.length - 1;
+
+        return `
+          <div class="setup-timer-band" data-timer-band="${index}">
+            <label class="setup-timer-percent">
+              ${last ? 'Fascia finale' : 'Fino al % dei crediti'}
+              <input
+                data-timer-percent
+                type="number"
+                min="0.1"
+                max="999"
+                step="0.1"
+                value="${last ? '' : band.max_percent}"
+                placeholder="Oltre le soglie"
+                ${last ? 'disabled' : ''}
+              >
+            </label>
+
+            <label>
+              Secondi
+              <input
+                data-timer-seconds
+                type="number"
+                min="1"
+                max="120"
+                step="1"
+                value="${band.seconds}"
+              >
+            </label>
+
+            <button
+              class="secondary"
+              type="button"
+              data-remove-timer-band="${index}"
+              title="Rimuovi fascia"
+              ${last || bands.length <= 2 ? 'disabled' : ''}
+            >×</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function setupRoleOrderOptions(mode) {
+      return mode === 'mantra'
+        ? [
+            ['free', 'Libero'],
+            ['goalkeepers_first', 'Prima portieri']
+          ]
+        : [
+            ['free', 'Libero'],
+            ['pdca', 'PDCA'],
+            ['acdp', 'ACDP'],
+            ['p_free', 'P-libero']
+          ];
+    }
+
+    function populateSetupRoleOrder(selectedValue) {
+      const select = $('setup-role-order');
+      if (!select) return;
+
+      const options = setupRoleOrderOptions(
+        $('setup-fantasy-mode').value
+      );
+
+      select.innerHTML = options
+        .map(([value, label]) =>
+          `<option value="${value}">${label}</option>`
+        )
+        .join('');
+
+      select.value = options.some(([value]) => value === selectedValue)
+        ? selectedValue
+        : 'free';
+    }
+
     function populateSetup(s) {
       const roster = parseRosterConfig(s.roster_config);
 
@@ -8406,6 +8755,14 @@
       $('setup-timer-mode').value = s.timer_mode || 'dynamic';
       $('setup-fixed-timer').value = s.fixed_timer_seconds ?? 10;
 
+      populateSetupRoleOrder(
+        s.nomination_role_order || 'free'
+      );
+
+      renderDynamicTimerBands(
+        s.dynamic_timer_config
+      );
+
       $('setup-device-mode').value =
         s.president_device_mode
         || 'standard';
@@ -8422,11 +8779,17 @@
         s.nomination_timeout_penalty
         ?? 1;
 
+      $('setup-call-penalty-enabled').checked =
+        s.nomination_penalty_enabled
+        ?? Number(s.nomination_timeout_penalty || 0) > 0;
+
       updateSetupVisibility();
     }
 
     function updateSetupVisibility() {
       const mantra = $('setup-fantasy-mode').value === 'mantra';
+      const selectedRoleOrder = $('setup-role-order')?.value || 'free';
+      populateSetupRoleOrder(selectedRoleOrder);
       $('classic-setup').hidden = mantra;
       $('mantra-setup').hidden = !mantra;
       $('setup-under-min').disabled = !$('setup-under').checked;
@@ -8434,6 +8797,7 @@
       $('setup-list-sort').disabled = $('setup-nomination').value !== 'list';
       $('setup-list-dir').disabled = $('setup-nomination').value !== 'list';
       $('setup-fixed-timer').disabled = $('setup-timer-mode').value !== 'fixed';
+      $('setup-dynamic-timer-wrap').hidden = $('setup-timer-mode').value !== 'dynamic';
 
       const callMode =
         $('setup-nomination').value
@@ -8447,10 +8811,17 @@
       $('setup-device-mode').disabled =
         !callMode;
 
+      $('setup-role-order').disabled =
+        !callMode;
+
       $('setup-call-timeout').disabled =
         !callTimerEnabled;
 
       $('setup-call-penalty').disabled =
+        !callTimerEnabled
+        || !$('setup-call-penalty-enabled').checked;
+
+      $('setup-call-penalty-enabled').disabled =
         !callTimerEnabled;
 
       $('setup-call-timer-enabled').disabled =
@@ -8464,7 +8835,8 @@
       'setup-nomination',
       'setup-timer-mode',
       'setup-device-mode',
-      'setup-call-timer-enabled'
+      'setup-call-timer-enabled',
+      'setup-call-penalty-enabled'
     ].forEach(
       id =>
         $(id)
@@ -8473,6 +8845,33 @@
             updateSetupVisibility
           )
     );
+
+    $('setup-add-timer-band').addEventListener('click', () => {
+      const bands = collectDynamicTimerBands();
+      if (bands.length >= 8) {
+        return msg('Puoi configurare al massimo 8 fasce.', 'error');
+      }
+
+      const fallback = bands.pop();
+      const previous = bands.at(-1)?.max_percent || 0;
+      bands.push({
+        max_percent: Math.min(999, Math.max(1, previous + 5)),
+        seconds: fallback?.seconds || 15
+      });
+      bands.push(fallback || { max_percent: null, seconds: 15 });
+      renderDynamicTimerBands(bands);
+    });
+
+    $('setup-dynamic-timer-bands').addEventListener('click', event => {
+      const button = event.target.closest('[data-remove-timer-band]');
+      if (!button) return;
+
+      const index = Number(button.dataset.removeTimerBand);
+      const bands = collectDynamicTimerBands();
+      if (!Number.isInteger(index) || index < 0 || index >= bands.length - 1) return;
+      bands.splice(index, 1);
+      renderDynamicTimerBands(bands);
+    });
 
     $('setup-form').addEventListener('submit', async event => {
       event.preventDefault();
@@ -8499,6 +8898,12 @@
         turnDirection: $('setup-turn-direction').value,
         timerMode: $('setup-timer-mode').value,
         fixedTimerSeconds: Number($('setup-fixed-timer').value),
+        dynamicTimerConfig: {
+          bands: collectDynamicTimerBands()
+        },
+
+        nominationRoleOrder:
+          $('setup-role-order').value,
 
         presidentDeviceMode:
           $('setup-device-mode').value,
@@ -8516,7 +8921,10 @@
           Number(
             $('setup-call-penalty').value
             || 0
-          )
+          ),
+
+        nominationPenaltyEnabled:
+          $('setup-call-penalty-enabled').checked
       };
 
       try {
@@ -9512,12 +9920,14 @@
         || 'classic';
 
       const rosterMinSlots =
-        Math.max(23, Number(info.rosterMin || info.rosterLimit || 23));
+        mode === 'classic'
+          ? Math.max(1, Number(info.rosterLimit || info.rosterMin || 1))
+          : Math.max(1, Number(info.rosterMin || info.rosterLimit || 1));
 
       const rosterMaxSlots =
         Math.max(
           rosterMinSlots,
-          Math.min(32, Number(info.rosterMax || info.rosterLimit || 32))
+          Number(info.rosterMax || info.rosterLimit || rosterMinSlots)
         );
 
       const acquiredRosterCount =
@@ -9585,7 +9995,7 @@
           : `${averagePurchasePmaDelta > 0 ? '+' : ''}${formatNumber(averagePurchasePmaDelta)}`;
 
       const projectedRosterCount =
-        acquiredRosterCount + queueEntries.length;
+        acquiredRosterCount + allQueueEntries.length;
 
       const rosterRowCount =
         Math.max(
@@ -9933,6 +10343,8 @@
     function auctionUseMobilePresidentConsole() {
       return Boolean(
         auctionHasPresidentRole()
+        &&
+        auctionDualModeEnabled()
         &&
         window.matchMedia(
           '(max-width: 720px)'
@@ -11052,13 +11464,13 @@
                         class="auction-mobile-leave danger"
                         type="button"
                         ${
-                          !myTurn
-                          || hasLeftCurrentPlayer
+                          !hasLeftCurrentPlayer
+                          && !myTurn
                             ? 'disabled'
                             : ''
                         }
                       >
-                        ${hasLeftCurrentPlayer ? 'LASCIATO' : 'LASCIA'}
+                        ${hasLeftCurrentPlayer ? 'RILASCIA' : 'LASCIA'}
                       </button>
                     </div>
 
@@ -11446,7 +11858,7 @@
     }
 
 
-    function bindAuctionRostersDrawer() {
+    function bindAuctionRostersDrawerLegacy() {
       const drawer =
         $('auction-rosters-drawer');
 
@@ -11667,6 +12079,127 @@
           );
         }
       );
+    }
+
+
+    function bindAuctionRostersDrawer() {
+      const drawer = $('auction-rosters-drawer');
+      const summary = drawer?.querySelector(':scope > summary');
+
+      if (!drawer || !summary) return;
+
+      drawer.addEventListener('toggle', () => {
+        state.auctionRostersOpen = drawer.open;
+
+        if (drawer.open) {
+          drawer.style.setProperty(
+            '--auction-rosters-top',
+            `${auctionRostersResolvedTop()}px`
+          );
+        }
+      });
+
+      let gesture = null;
+      let suppressClick = false;
+
+      const finishGesture = event => {
+        if (!gesture) return;
+
+        if (
+          event?.pointerId !== undefined
+          && event.pointerId !== gesture.pointerId
+        ) {
+          return;
+        }
+
+        document.removeEventListener('pointermove', moveGesture, true);
+        document.removeEventListener('pointerup', finishGesture, true);
+        document.removeEventListener('pointercancel', finishGesture, true);
+
+        drawer.classList.remove('resizing');
+        document.body.style.cursor = '';
+
+        if (gesture.moved) {
+          suppressClick = true;
+          localStorage.setItem(
+            auctionRostersStorageKey(),
+            String(state.auctionRostersTop)
+          );
+
+          window.setTimeout(() => {
+            suppressClick = false;
+          }, 0);
+        }
+
+        gesture = null;
+      };
+
+      const moveGesture = event => {
+        if (!gesture || event.pointerId !== gesture.pointerId) return;
+
+        const delta = event.clientY - gesture.startY;
+
+        if (!gesture.moved && Math.abs(delta) < 4) return;
+
+        gesture.moved = true;
+        event.preventDefault();
+
+        drawer.classList.add('resizing');
+        document.body.style.cursor = 'ns-resize';
+
+        const top = Math.max(
+          0,
+          Math.min(
+            gesture.maxTop,
+            event.clientY - gesture.stageTop - gesture.grabOffset
+          )
+        );
+
+        state.auctionRostersTop = Math.round(top);
+
+        drawer.style.setProperty(
+          '--auction-rosters-top',
+          `${state.auctionRostersTop}px`
+        );
+      };
+
+      summary.addEventListener('pointerdown', event => {
+        if (
+          !drawer.open
+          || (event.pointerType === 'mouse' && event.button !== 0)
+        ) {
+          return;
+        }
+
+        const stage = drawer.offsetParent;
+        const stageRect = stage?.getBoundingClientRect();
+        const drawerRect = drawer.getBoundingClientRect();
+
+        gesture = {
+          pointerId: event.pointerId,
+          startY: event.clientY,
+          stageTop: stageRect?.top || 0,
+          grabOffset: event.clientY - drawerRect.top,
+          maxTop: Math.max(
+            0,
+            (stage?.clientHeight || window.innerHeight) - 70
+          ),
+          moved: false
+        };
+
+        document.addEventListener('pointermove', moveGesture, true);
+        document.addEventListener('pointerup', finishGesture, true);
+        document.addEventListener('pointercancel', finishGesture, true);
+      });
+
+      summary.addEventListener('click', event => {
+        event.preventDefault();
+
+        if (suppressClick) return;
+
+        drawer.open = !drawer.open;
+        state.auctionRostersOpen = drawer.open;
+      });
     }
 
 
@@ -11908,15 +12441,9 @@
           <summary>
             <span
               class="auction-rosters-resize-handle"
-              title="Trascina per ridimensionare"
-              aria-label="Ridimensiona pannello rose"
-              aria-orientation="vertical"
-              aria-valuemin="0"
-              aria-valuenow="${auctionRostersResolvedTop()}"
-              role="separator"
-              tabindex="0"
+              aria-hidden="true"
             ></span>
-            Rose di tutti
+            <span title="Clicca per aprire o chiudere; trascina verticalmente per ridimensionare">Rose di tutti</span>
             <span class="badge">
               ${totalPlayers}
             </span>
@@ -12259,6 +12786,9 @@
         awards,
         queue,
         teamPenalties,
+
+        rolePhase:
+          data?.rolePhase || null,
 
         deviceMode:
           session?.setup_snapshot
@@ -12927,6 +13457,14 @@
     }
 
     function auctionSettingsRows(settings={}) {
+      const roleOrderLabels = {
+        free: 'Libero',
+        goalkeepers_first: 'Prima portieri',
+        pdca: 'PDCA',
+        acdp: 'ACDP',
+        p_free: 'P-libero'
+      };
+
       const rows = [
         ['Modalità', settings.fantasy_mode],
         ['Crediti', settings.initial_credits],
@@ -12934,6 +13472,10 @@
         ['Base', settings.auction_base_mode],
         ['Rilanci', settings.bid_mode],
         ['Timer', settings.timer_mode],
+        [
+          'Ordine ruoli',
+          roleOrderLabels[settings.nomination_role_order || 'free']
+        ],
         [
           'Presidenti',
           settings.president_device_mode === 'dual'
@@ -12949,8 +13491,9 @@
         [
           'Penalità',
           settings.nomination_timer_enabled !== false
+          && settings.nomination_penalty_enabled !== false
             ? `${settings.nomination_timeout_penalty || 0} crediti`
-            : '—'
+            : 'Disattivata'
         ]
       ];
       return rows.map(([a,b])=>`<div class="compact-row"><strong>${esc(a)}</strong><span class="badge">${esc(b ?? '—')}</span></div>`).join('');
@@ -12974,6 +13517,105 @@
       }));
       $('save-order')?.addEventListener('click',()=>auctionAction({action:'saveTeamOrder',sessionId:session.id,teamIds:order.map(x=>x.team_id)},'Ordine salvato.'));
       $('start-auction')?.addEventListener('click',()=>auctionAction({action:'startAuction',sessionId:session.id},'Asta avviata.'));
+    }
+
+    function auctionRolePhaseLabel(key) {
+      return ({
+        ALL: 'Libero',
+        P: 'Portieri',
+        D: 'Difensori',
+        C: 'Centrocampisti',
+        A: 'Attaccanti',
+        POR: 'Portieri',
+        OUTFIELD: 'Movimento libero'
+      })[key] || key || 'Libero';
+    }
+
+    function auctionPlayerMatchesCurrentRolePhase(player) {
+      const key = state.auction?.rolePhase?.key || 'ALL';
+      const mode = state.auction?.settings?.fantasy_mode || 'classic';
+
+      if (!player || key === 'ALL') return true;
+
+      if (mode === 'classic') {
+        return key === 'OUTFIELD'
+          ? player.classic_role !== 'P'
+          : player.classic_role === key;
+      }
+
+      const goalkeeper = playerRoles(player, mode)
+        .some(role => ['P', 'Por'].includes(role));
+
+      if (key === 'POR') return goalkeeper;
+      if (key === 'OUTFIELD') return !goalkeeper;
+      return true;
+    }
+
+    function renderAuctionRolePhaseCard() {
+      const phase = state.auction?.rolePhase;
+      const session = auctionSession();
+
+      if (!phase || !session || !auctionCallMode()) return '';
+
+      const myTeam = (phase.teams || [])
+        .find(team => team.teamId === auctionMyTeamId()) || null;
+
+      const myAction =
+        !session.current_player_id
+        && auctionHasPresidentRole()
+        && myTeam
+          ? myTeam.manualReady
+            ? `
+                <button id="auction-toggle-role-ready" class="auction-role-phase-action" type="button">
+                  RIAPRI · ${esc(auctionRolePhaseLabel(phase.key))}
+                </button>
+              `
+            : myTeam.canReady
+              ? `
+                  <button id="auction-toggle-role-ready" class="auction-role-phase-action" type="button">
+                    A POSTO · ${esc(auctionRolePhaseLabel(phase.key))}
+                  </button>
+                `
+              : `<span class="badge ${myTeam.ready ? 'good' : ''}">${myTeam.ready ? 'A POSTO' : `${myTeam.current}/${myTeam.minimum} MIN`}</span>`
+          : '';
+
+      const controllerAction =
+        auctionCanControl()
+        && phase.allReady
+        && !session.current_player_id
+          ? phase.hasNext
+            ? `
+                <button id="auction-advance-role-phase" class="auction-role-phase-action" type="button">
+                  CONFERMA FASE SUCCESSIVA
+                </button>
+              `
+            : '<span class="badge good">ULTIMA FASE COMPLETA · PUOI TERMINARE L’ASTA</span>'
+          : '';
+
+      return `
+        <section class="auction-role-phase-card">
+          <div class="auction-role-phase-head">
+            <div>
+              <div class="small soft">Fase ruoli ${Number(phase.index || 0) + 1}/${(phase.sequence || []).length || 1}</div>
+              <strong>${esc(auctionRolePhaseLabel(phase.key))}</strong>
+            </div>
+            <span class="badge ${phase.allReady ? 'good' : 'warn'}">
+              ${phase.allReady ? 'TUTTI A POSTO · PAUSA' : 'IN CORSO'}
+            </span>
+          </div>
+
+          <div class="auction-role-phase-teams">
+            ${(phase.teams || []).map(team => `
+              <span class="badge ${team.ready ? 'good' : ''}" title="${esc(team.teamName)} · ${team.current}/${team.maximum}">
+                ${esc(team.teamName)} ${team.ready ? '✓' : `${team.current}/${team.minimum}`}
+              </span>
+            `).join('')}
+          </div>
+
+          ${myAction}
+          ${controllerAction}
+        </section>
+      `;
     }
 
     function renderAuctionLive() {
@@ -13058,9 +13700,10 @@
         &&
         auctionHasPresidentRole()
         &&
-        isPresidentTurn
-        &&
-        !hasLeftCurrentPlayer;
+        (
+          hasLeftCurrentPlayer
+          || isPresidentTurn
+        );
 
       const canSelectBid =
         hasPlayer
@@ -13145,7 +13788,7 @@
             class="auction-command-leave danger"
             type="button"
             ${canPresidentLeave ? '' : 'disabled'}
-          >${hasLeftCurrentPlayer ? 'LASCIATO' : 'LASCIA'}</button>
+          >${hasLeftCurrentPlayer ? 'RILASCIA' : 'LASCIA'}</button>
 
           ${
             hasLeftCurrentPlayer
@@ -14032,13 +14675,27 @@
 
           <header class="auction-statusbar">
 
-            <button
-              id="auction-cockpit-back"
-              class="back-live secondary"
-              type="button"
-            >
-              ← Lega
-            </button>
+            <div class="auction-status-nav">
+
+              <button
+                id="auction-cockpit-back"
+                class="back-live secondary"
+                type="button"
+              >
+                ← Lega
+              </button>
+
+              <button
+                id="auction-immersion-live"
+                class="auction-immersion-live secondary"
+                type="button"
+                title="Vista a schermo intero"
+                aria-label="Vista a schermo intero"
+              >
+                ${document.fullscreenElement ? '⤢' : '⛶'}
+              </button>
+
+            </div>
 
 
             <div class="auction-status-main">
@@ -14116,6 +14773,7 @@
                   <section class="auction-middle-quick">
                     ${quickStripHtml}
                   </section>
+                  ${renderAuctionRolePhaseCard()}
                   ${renderAuctionCallQueue()}
                   <div class="auction-middle-vice-slot">${viceHtml}</div>
                   ${recentBidsHtml}
@@ -14210,6 +14868,13 @@
         );
 
 
+      $('auction-immersion-live')
+        ?.addEventListener(
+          'click',
+          toggleImmersion
+        );
+
+
       $('auction-awards-drawer')
         ?.addEventListener(
           'toggle',
@@ -14221,6 +14886,33 @@
 
 
       bindAuctionRostersDrawer();
+
+
+      $('auction-toggle-role-ready')
+        ?.addEventListener(
+          'click',
+          () => auctionAction(
+            {
+              action: 'toggleRoleReady',
+              sessionId: s.id,
+              teamId: auctionMyTeamId()
+            },
+            'Stato della fase aggiornato.'
+          )
+        );
+
+
+      $('auction-advance-role-phase')
+        ?.addEventListener(
+          'click',
+          () => auctionAction(
+            {
+              action: 'advanceRolePhase',
+              sessionId: s.id
+            },
+            'Fase successiva pronta. Premi RIPRENDI per avviarla.'
+          )
+        );
 
 
       $('auctioneer-console-drawer')
@@ -15755,7 +16447,8 @@
 
       const filteredPlayers =
         filterPlayers(
-          data.callCandidates || [],
+          (data.callCandidates || [])
+            .filter(auctionPlayerMatchesCurrentRolePhase),
           controls,
           state.auctionRoles,
           mode
@@ -16059,13 +16752,24 @@
         !session?.id
         || !teamId
         || !playerKey
-        || auctionMyTeamLeftCurrentPlayer()
       ) {
         return;
       }
 
+      const wasLeft =
+        auctionMyTeamLeftCurrentPlayer();
+
+      const previousServerValue =
+        state.auction?.myTeam
+          ?.abandonedCurrentLot === true;
+
+      if (state.auction?.myTeam) {
+        state.auction.myTeam.abandonedCurrentLot =
+          !wasLeft;
+      }
+
       state.auctionAbandonedPlayerKey =
-        playerKey;
+        wasLeft ? '' : playerKey;
 
       renderAuctionLive();
 
@@ -16082,17 +16786,22 @@
         await loadAuction();
 
         msg(
-          'Console bloccata per questo giocatore.',
+          wasLeft
+            ? 'Console riabilitata per questo giocatore.'
+            : 'Console bloccata per questo giocatore.',
           'success'
         );
 
       } catch (error) {
-        if (
-          state.auctionAbandonedPlayerKey
-          === playerKey
-        ) {
-          state.auctionAbandonedPlayerKey = '';
+        if (state.auction?.myTeam) {
+          state.auction.myTeam.abandonedCurrentLot =
+            previousServerValue;
         }
+
+        state.auctionAbandonedPlayerKey =
+          previousServerValue
+            ? playerKey
+            : '';
 
         renderAuctionLive();
         msg(error.message, 'error');
