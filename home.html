@@ -9586,6 +9586,275 @@
       }
     }
 
+
+    /* =====================================================
+       V38 · gadget inferiori, slot Rose di tutti, overview e alias asta
+       ===================================================== */
+
+    /* Menu Squadre: alias asta amministrativo compatto. */
+    .manage-team-row{
+      min-width:0;
+    }
+
+    .manage-team-identity{
+      min-width:0;
+      display:grid;
+      gap:1px;
+    }
+
+    .manage-team-alias-readout{
+      color:#8ec5ff!important;
+      letter-spacing:.035em;
+    }
+
+    .manage-team-alias-control{
+      min-width:0;
+      display:grid;
+      grid-template-columns:minmax(62px,88px) 40px;
+      align-items:center;
+      gap:3px;
+    }
+
+    .manage-team-alias-control input{
+      width:100%!important;
+      min-width:0!important;
+      height:27px!important;
+      min-height:27px!important;
+      padding:2px 5px!important;
+      text-align:center;
+      font-size:7px!important;
+      font-weight:950;
+      letter-spacing:.055em;
+      text-transform:uppercase;
+    }
+
+    .manage-team-alias-control button{
+      width:40px!important;
+      min-width:40px!important;
+      height:27px!important;
+      min-height:27px!important;
+      padding:1px 3px!important;
+      font-size:5.5px!important;
+    }
+
+    /* Panoramica rapida: giallo = squadra che chiama/ha chiamato il lotto,
+       verde = riferimento personale. Se coincidono, verde interno + bordo giallo. */
+    .auction-team-summary-item.is-mine{
+      border-color:rgba(64,216,151,.78)!important;
+      background:linear-gradient(145deg,rgba(24,101,77,.72),rgba(13,60,50,.62))!important;
+      box-shadow:inset 0 0 0 1px rgba(64,216,151,.12)!important;
+      color:#effff8!important;
+    }
+
+    .auction-team-summary-item.is-caller:not(.is-mine){
+      border-color:rgba(255,199,73,.86)!important;
+      background:linear-gradient(145deg,rgba(132,91,19,.72),rgba(76,54,14,.62))!important;
+      box-shadow:inset 0 0 0 1px rgba(255,199,73,.12)!important;
+      color:#fff5d3!important;
+    }
+
+    .auction-team-summary-item.is-mine.is-caller{
+      border-color:rgba(255,199,73,.92)!important;
+      box-shadow:
+        inset 0 0 0 1px rgba(64,216,151,.22),
+        0 0 0 1px rgba(255,199,73,.24)!important;
+    }
+
+    /* La colonna centrale usa davvero tutta l'altezza disponibile. */
+    .auction-lower-main{
+      min-height:0!important;
+      height:100%!important;
+      align-items:stretch!important;
+    }
+
+    .auction-middle-column{
+      min-height:0!important;
+      height:100%!important;
+      display:flex!important;
+      flex-direction:column!important;
+      gap:4px!important;
+      overflow:hidden!important;
+    }
+
+    .auction-middle-column>.auction-command-bar,
+    .auction-middle-column>.auction-middle-quick,
+    .auction-middle-column>.auction-role-phase-president-action{
+      flex:0 0 auto!important;
+      margin:0!important;
+    }
+
+    .auction-middle-lower-zone{
+      flex:1 1 0!important;
+      min-height:0!important;
+      height:100%!important;
+      display:grid!important;
+      gap:4px!important;
+      overflow:hidden!important;
+    }
+
+    .auction-middle-lower-zone.has-queue{
+      grid-template-rows:minmax(124px,1fr) auto minmax(124px,1fr)!important;
+    }
+
+    .auction-middle-lower-zone.no-queue{
+      grid-template-rows:auto minmax(124px,1fr)!important;
+    }
+
+    .auction-middle-lower-zone.has-queue>.auction-central-queue{
+      grid-row:1!important;
+    }
+
+    .auction-middle-lower-zone.has-queue>.auction-middle-vice-slot{
+      grid-row:2!important;
+    }
+
+    .auction-middle-lower-zone.has-queue>.auction-bid-history{
+      grid-row:3!important;
+    }
+
+    .auction-middle-lower-zone.no-queue>.auction-middle-vice-slot{
+      grid-row:1!important;
+    }
+
+    .auction-middle-lower-zone.no-queue>.auction-bid-history{
+      grid-row:2!important;
+    }
+
+    .auction-middle-lower-zone.no-queue:not(:has(.auction-middle-vice-slot:not(:empty))){
+      grid-template-rows:minmax(124px,1fr)!important;
+    }
+
+    .auction-middle-lower-zone.no-queue:not(:has(.auction-middle-vice-slot:not(:empty)))>.auction-bid-history{
+      grid-row:1!important;
+    }
+
+    .auction-middle-lower-zone>.auction-central-queue,
+    .auction-middle-lower-zone>.auction-bid-history{
+      min-height:0!important;
+      height:100%!important;
+      max-height:none!important;
+      margin:0!important;
+      align-self:stretch!important;
+      overflow:hidden!important;
+    }
+
+    .auction-middle-lower-zone>.auction-bid-history{
+      align-self:end!important;
+      display:grid!important;
+      grid-template-rows:auto minmax(0,1fr)!important;
+    }
+
+    .auction-middle-lower-zone .auction-bid-history-title{
+      min-height:31px!important;
+      padding:4px 7px!important;
+    }
+
+    .auction-middle-lower-zone .auction-bid-history-title strong{
+      color:#f7fbff!important;
+      font-size:9px!important;
+      font-weight:950!important;
+      letter-spacing:.01em;
+    }
+
+    .auction-middle-lower-zone .auction-bid-history-title .small{
+      font-size:7px!important;
+    }
+
+    .auction-middle-lower-zone .auction-bid-chips{
+      min-height:0!important;
+      height:100%!important;
+      overflow-y:auto!important;
+      overflow-x:hidden!important;
+      align-content:start!important;
+      gap:3px!important;
+      padding:4px!important;
+      scrollbar-gutter:stable;
+    }
+
+    .auction-middle-lower-zone .auction-bid-chip{
+      min-height:29px!important;
+      padding:3px 6px!important;
+    }
+
+    .auction-middle-lower-zone .auction-bid-team-name{
+      color:#f7fbff!important;
+      font-size:clamp(8px,.72vw,10px)!important;
+      font-weight:950!important;
+      letter-spacing:.018em;
+    }
+
+    .auction-middle-lower-zone .auction-bid-chip strong{
+      min-width:34px!important;
+      min-height:21px!important;
+      display:grid!important;
+      place-items:center!important;
+      font-size:9px!important;
+      border-radius:4px!important;
+    }
+
+    .auction-middle-vice-slot:empty{
+      display:none!important;
+    }
+
+    /* Rose di tutti: ogni card è un viewport autonomo. Gli slot vuoti
+       rimangono sempre righe reali, come nella propria Rosa, e scorrono
+       assieme agli acquisti all'interno della singola squadra. */
+    .auction-roster-team-card{
+      min-height:0!important;
+      height:100%!important;
+      overflow:hidden!important;
+    }
+
+    .auction-roster-team-list{
+      flex:1 1 0!important;
+      min-height:0!important;
+      height:100%!important;
+      display:grid!important;
+      grid-auto-rows:minmax(25px,auto)!important;
+      align-content:start!important;
+      overflow-y:auto!important;
+      overflow-x:hidden!important;
+      padding:3px!important;
+      gap:2px!important;
+      scrollbar-gutter:stable;
+    }
+
+    .auction-roster-team-list .auction-roster-edit-row{
+      min-height:25px!important;
+      flex:none!important;
+    }
+
+    .auction-roster-team-list .auction-roster-edit-row.is-empty{
+      min-height:25px!important;
+      display:grid!important;
+      opacity:.48!important;
+    }
+
+    .auction-all-roster-empty-label{
+      display:block!important;
+      visibility:visible!important;
+    }
+
+    @media(max-height:760px){
+      .auction-middle-lower-zone.has-queue{
+        grid-template-rows:minmax(112px,1fr) auto minmax(112px,1fr)!important;
+      }
+
+      .auction-middle-lower-zone.no-queue{
+        grid-template-rows:auto minmax(112px,1fr)!important;
+      }
+    }
+
+    @media(max-width:760px){
+      .manage-team-alias-control{
+        grid-template-columns:minmax(58px,78px) 37px;
+      }
+
+      .auction-middle-lower-zone.has-queue{
+        grid-template-rows:minmax(120px,1fr) auto minmax(120px,1fr)!important;
+      }
+    }
+
 </style>
 </head>
 <body>
@@ -11048,12 +11317,31 @@
 
         return `
           <div class="compact-row manage-team-row">
-            <div>
+            <div class="manage-team-identity">
               <strong>${esc(team.name)}</strong>
               <small>${president ? `Presidente: ${esc(president.username)}` : 'Presidente non assegnato'}</small>
+              ${team.auction_alias ? `<small class="manage-team-alias-readout">Alias asta: <b>${esc(team.auction_alias)}</b></small>` : ''}
             </div>
 
             <div class="manage-team-actions">
+              ${data.permissions?.isLeagueAdmin ? `
+                <div class="manage-team-alias-control">
+                  <input
+                    class="team-alias-input"
+                    data-team="${esc(team.id)}"
+                    maxlength="10"
+                    placeholder="ALIAS"
+                    value="${esc(team.auction_alias || '')}"
+                    aria-label="Alias asta di ${esc(team.name)}"
+                  >
+                  <button
+                    class="secondary set-team-alias"
+                    data-team="${esc(team.id)}"
+                    type="button"
+                    title="Salva alias asta"
+                  >ALIAS</button>
+                </div>
+              ` : ''}
               ${data.permissions?.canAssignPresident && !president ? `
                 <select class="president-select" data-team="${esc(team.id)}" style="width:138px">
                   <option value="">Presidente...</option>
@@ -11097,6 +11385,61 @@
             msg('Presidente assegnato.', 'success');
             await Promise.all([loadManagement(), loadDashboard()]);
           } catch (error) { msg(error.message, 'error'); }
+        });
+      });
+
+      $('manage-teams').querySelectorAll('.set-team-alias').forEach(button => {
+        button.addEventListener('click', async () => {
+          const input =
+            $('manage-teams')
+              .querySelector(
+                `.team-alias-input[data-team="${CSS.escape(button.dataset.team)}"]`
+              );
+
+          const alias =
+            String(input?.value || '')
+              .trim()
+              .toLocaleUpperCase('it-IT');
+
+          if (alias.length > 10) {
+            return msg('L’alias asta può contenere al massimo 10 caratteri.', 'error');
+          }
+
+          if (input) {
+            input.value = alias;
+          }
+
+          try {
+            await api(ENDPOINTS.league, {
+              action: 'setTeamAlias',
+              teamId: button.dataset.team,
+              alias
+            });
+            msg(alias ? `Alias asta salvato: ${alias}` : 'Alias asta rimosso.', 'success');
+            await Promise.all([loadManagement(), loadDashboard()]);
+          } catch (error) {
+            msg(error.message, 'error');
+          }
+        });
+      });
+
+      $('manage-teams').querySelectorAll('.team-alias-input').forEach(input => {
+        input.addEventListener('input', () => {
+          const caret = input.selectionStart;
+          input.value = input.value.toLocaleUpperCase('it-IT').slice(0, 10);
+          if (caret !== null) {
+            input.setSelectionRange(Math.min(caret, input.value.length), Math.min(caret, input.value.length));
+          }
+        });
+        input.addEventListener('keydown', event => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            $('manage-teams')
+              .querySelector(
+                `.set-team-alias[data-team="${CSS.escape(input.dataset.team)}"]`
+              )
+              ?.click();
+          }
         });
       });
 
@@ -12643,9 +12986,10 @@
       return {
         teamId,
         teamName:
-          team?.name
-          ||
-          'La mia squadra',
+          auctionTeamReference(
+            team,
+            team?.name || 'La mia squadra'
+          ),
         initialCredits,
         spent,
         creditAdjustment,
@@ -12738,7 +13082,7 @@
               return `
                 <div class="compact-row">
                   <div>
-                    <strong>${esc(item.team?.name || 'Squadra')}</strong>
+                    <strong>${esc(auctionTeamReference(item.team, item.team?.name || 'Squadra'))}</strong>
                     <small>
                       ${remaining} crediti
                       · ${spent} spesi
@@ -13430,11 +13774,17 @@
         }
       }
 
-      const presidentName =
+      const presidentFallback =
         currentTeam?.president?.username
         || currentTeam?.presidentUsername
         || currentTeam?.name
         || 'In attesa';
+
+      const presidentName =
+        auctionTeamReference(
+          currentTeam,
+          presidentFallback
+        );
 
       return {
         currentTeam,
@@ -13464,7 +13814,8 @@
             <span>CHIAMA</span>
             <strong>${esc(info.presidentName)}</strong>
             ${
-              info.currentTeam?.name
+              !info.currentTeam?.auction_alias
+              && info.currentTeam?.name
               && info.currentTeam.name !== info.presidentName
                 ? `<small>${esc(info.currentTeam.name)}</small>`
                 : ''
@@ -14871,7 +15222,7 @@
                           id="auction-mobile-leader"
                           class="auction-mobile-leader"
                         >
-                          ${esc(d.currentBidderTeam?.name || 'Nessuno')}
+                          ${esc(auctionTeamReference(d.currentBidderTeam, d.currentBidderTeam?.name || 'Nessuno'))}
                         </strong>
                       </div>
 
@@ -14884,7 +15235,7 @@
                     </div>
 
                     <div class="auction-mobile-player">
-                      ${esc(d.currentNominationTeam?.name || 'In attesa')}
+                      ${esc(auctionTeamReference(d.currentNominationTeam, d.currentNominationTeam?.name || 'In attesa'))}
                     </div>
 
                     <div class="auction-mobile-call-wait">
@@ -15287,7 +15638,7 @@
 
       const operationText = event => {
         const payload = event.payload || {};
-        const teamName = event.team?.name || 'SQUADRA';
+        const teamName = auctionTeamReference(event.team, event.team?.name || 'SQUADRA');
         const playerName = event.player?.name || 'GIOCATORE';
         const reason = String(payload.reason || '').trim();
 
@@ -15312,7 +15663,7 @@
         }
 
         if (['ROSTER_TEAM_TRANSFERRED','ROSTER_PLAYER_TRANSFERRED'].includes(event.event_type)) {
-          return `CAMBIO SQUADRA · ${playerName} · ${event.fromTeam?.name || '—'} → ${event.toTeam?.name || teamName}`;
+          return `CAMBIO SQUADRA · ${playerName} · ${auctionTeamReference(event.fromTeam, event.fromTeam?.name || '—')} → ${auctionTeamReference(event.toTeam, event.toTeam?.name || teamName)}`;
         }
 
         return `${event.event_type} · ${teamName}`;
@@ -15363,7 +15714,7 @@
                     </strong>
 
                     <span class="auction-award-team">
-                      ${esc(event.team?.name || fallbackAward?.team?.name || 'Squadra')}
+                      ${esc(auctionTeamReference(event.team || fallbackAward?.team, event.team?.name || fallbackAward?.team?.name || 'Squadra'))}
                     </span>
 
                     <div class="auction-award-price">
@@ -15431,7 +15782,7 @@
                   </strong>
 
                   <span class="auction-award-team">
-                    ${esc(item.team?.name || 'Squadra')}
+                    ${esc(auctionTeamReference(item.team, item.team?.name || 'Squadra'))}
                   </span>
 
                   <div class="auction-award-price">
@@ -15978,10 +16329,17 @@
               })
             );
 
+            const roleLimit =
+              limits?.[role];
+
             const required =
               Math.max(
                 0,
-                Number(limits?.[role] || 0)
+                Number(
+                  typeof roleLimit === 'object'
+                    ? roleLimit?.min ?? roleLimit?.max ?? 0
+                    : roleLimit || 0
+                )
               );
 
             for (
@@ -16157,6 +16515,12 @@
             || team.president?.username
             || '—';
 
+          const teamReference =
+            auctionTeamReference(
+              team,
+              team.name || presidentUsername || 'Squadra'
+            );
+
           const rows =
             assignments
               .filter(
@@ -16252,8 +16616,8 @@
               <div class="auction-roster-team-head">
 
                 <div class="auction-roster-team-identity">
-                  <strong>${esc(team.name)}</strong>
-                  <small>${esc(presidentUsername)}</small>
+                  <strong>${esc(teamReference)}</strong>
+                  ${team.auction_alias ? '' : `<small>${esc(presidentUsername)}</small>`}
                 </div>
 
                 <div class="auction-roster-team-credit">
@@ -16617,7 +16981,7 @@
               <h3>Cambia squadra</h3>
               <p>
                 ${esc(assignment.player?.name || 'Giocatore')}
-                · ${esc(currentTeam?.name || 'squadra corrente')}
+                · ${esc(auctionTeamReference(currentTeam, currentTeam?.name || 'squadra corrente'))}
                 · prezzo ${Number(assignment.purchase_price || 0)}
               </p>
             </div>
@@ -16630,7 +16994,7 @@
                     value="${esc(team.id)}"
                     ${team.id === state.auctionTransferTargetTeamId ? 'selected' : ''}
                   >
-                    ${esc(team.name)}
+                    ${esc(auctionTeamReference(team, team.name))}
                   </option>
                 `).join('')}
               </select>
@@ -17070,7 +17434,7 @@
           .map(bid => `
             <div class="auction-bid-chip">
               <span>
-                ${esc(bid.team?.name || 'Squadra')}
+                ${esc(auctionTeamReference(bid.team, bid.team?.name || 'Squadra'))}
               </span>
 
               <strong>
@@ -17215,9 +17579,10 @@
       }
 
       const leaderName =
-        d.currentBidderTeam?.name
-        ||
-        'Nessuno';
+        auctionTeamReference(
+          d.currentBidderTeam,
+          d.currentBidderTeam?.name || 'Nessuno'
+        );
 
       const leader =
         $('auction-live-leader');
@@ -17559,6 +17924,30 @@
     }
     function auctionMyTeamId() {
       return auctionPresidentTeamId();
+    }
+
+    function auctionTeamReference(team, fallback = 'Squadra') {
+      const alias =
+        String(
+          team?.auction_alias
+          || team?.auctionAlias
+          || ''
+        )
+          .trim();
+
+      if (alias) {
+        return alias
+          .toLocaleUpperCase('it-IT')
+          .slice(0, 10);
+      }
+
+      return String(
+        fallback
+        || team?.name
+        || team?.president?.username
+        || team?.presidentUsername
+        || 'Squadra'
+      );
     }
 
     function renderAuction() {
@@ -18200,10 +18589,6 @@
         return '';
       }
 
-      const currentBidderId =
-        d.auctionSession?.current_bidder_team_id
-        || null;
-
       const currentNominationId =
         d.auctionSession?.current_nomination_team_id
         || null;
@@ -18258,18 +18643,24 @@
               ? 'per raggiungere il massimo'
               : 'rosa completa';
 
+        const teamReference =
+          auctionTeamReference(
+            team,
+            team.name || 'Squadra'
+          );
+
         const classes = [
           'auction-team-summary-item',
-          currentBidderId === team.id ? 'is-leader' : '',
-          currentNominationId === team.id ? 'is-nomination' : ''
+          auctionMyTeamId() === team.id ? 'is-mine' : '',
+          currentNominationId === team.id ? 'is-caller' : ''
         ].filter(Boolean).join(' ');
 
         return `
           <div
             class="${classes}"
-            title="${esc(team.name)} · offerta massima ${maxBid} · ${remainingPlayers} giocatori rimasti ${targetLabel}"
+            title="${esc(teamReference)} · offerta massima ${maxBid} · ${remainingPlayers} giocatori rimasti ${targetLabel}"
           >
-            <strong>${esc(team.name)}</strong>
+            <strong>${esc(teamReference)}</strong>
             <span class="auction-team-summary-values">
               <b>${maxBid}</b>
               <i>|</i>
@@ -18328,9 +18719,9 @@
                   type="button"
                   class="auctioneer-team-cube auctioneer-team-cube-unified ${selected ? 'selected' : ''} ${leader ? 'is-leader' : ''} ${nomination ? 'is-nomination' : ''}"
                   data-admin-team="${esc(team.id)}"
-                  title="Seleziona ${esc(team.name)} come squadra operativa del Banditore"
+                  title="Seleziona ${esc(auctionTeamReference(team, team.name))} come squadra operativa del Banditore"
                 >
-                  <strong>${esc(team.name)}</strong>
+                  <strong>${esc(auctionTeamReference(team, team.name))}</strong>
                 </button>
               `;
             }).join('')}
@@ -18492,7 +18883,7 @@
                 ? `Turno: ${d.currentTurnTeam?.name || '—'}`
                 : 'Rilanci liberi'
             )
-          : `Chiama: ${d.currentNominationTeam?.name || '—'}`;
+          : `Chiama: ${auctionTeamReference(d.currentNominationTeam, d.currentNominationTeam?.name || '—')}`;
 
 
       if (
@@ -18600,7 +18991,7 @@
                       <span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>
                     `).join('')}
                     <span>${esc(p?.serie_a_team || '')} · Slot ${esc(p?.slot ?? '—')}</span>`
-                  : `Turno: ${esc(d.currentNominationTeam?.name || '—')}`
+                  : `Turno: ${esc(auctionTeamReference(d.currentNominationTeam, d.currentNominationTeam?.name || '—'))}`
               }
             </small>
           </div>
@@ -18615,7 +19006,7 @@
             </strong>
 
             <small id="auction-live-leader">
-              ${esc(hasPlayer ? d.currentBidderTeam?.name || 'Nessuno' : '—')}
+              ${esc(hasPlayer ? auctionTeamReference(d.currentBidderTeam, d.currentBidderTeam?.name || 'Nessuno') : '—')}
             </small>
           </div>
 
@@ -18693,7 +19084,7 @@
                   <div class="auction-current-leader">
                     Leader:
                     <b id="auction-live-leader">
-                      ${esc(d.currentBidderTeam?.name || 'Nessuno')}
+                      ${esc(auctionTeamReference(d.currentBidderTeam, d.currentBidderTeam?.name || 'Nessuno'))}
                     </b>
                   </div>
 
@@ -18711,7 +19102,7 @@
                   </div>
 
                   <div class="auction-player-name-live">
-                    ${esc(d.currentNominationTeam?.name || 'Squadra')}
+                    ${esc(auctionTeamReference(d.currentNominationTeam, d.currentNominationTeam?.name || 'Squadra'))}
                   </div>
 
                   <div class="auction-player-meta-live">
@@ -18860,7 +19251,7 @@
                   <strong>Chiamata</strong>
 
                   <span class="badge primary">
-                    ${esc(d.currentNominationTeam?.name || '—')}
+                    ${esc(auctionTeamReference(d.currentNominationTeam, d.currentNominationTeam?.name || '—'))}
                   </span>
                 </div>
 
@@ -19048,7 +19439,7 @@
                 .slice(0, 10)
                 .map(bid => `
                   <div class="auction-bid-chip">
-                    <span>${esc(bid.team?.name || 'Squadra')}</span>
+                    <span class="auction-bid-team-name">${esc(auctionTeamReference(bid.team, bid.team?.name || 'Squadra'))}</span>
                     <strong>${bid.amount}</strong>
                   </div>
                 `)
@@ -19559,9 +19950,11 @@
                   <section class="auction-middle-quick">
                     ${quickStripHtml}
                   </section>
-                  ${renderAuctionCallQueue()}
-                  <div class="auction-middle-vice-slot">${viceHtml}</div>
-                  ${recentBidsHtml}
+                  <div class="auction-middle-lower-zone ${auctionCallMode() ? 'has-queue' : 'no-queue'}">
+                    ${renderAuctionCallQueue()}
+                    <div class="auction-middle-vice-slot">${viceHtml}</div>
+                    ${recentBidsHtml}
+                  </div>
                 </div>
 
 
@@ -19677,7 +20070,10 @@
           () => confirmAuctionRoleReady(
             auctionMyTeamId(),
             state.auction?.currentNominationTeam?.id === auctionMyTeamId()
-              ? state.auction?.currentNominationTeam?.name || ''
+              ? auctionTeamReference(
+                  state.auction?.currentNominationTeam,
+                  state.auction?.currentNominationTeam?.name || ''
+                )
               : auctionCurrentRolePhaseTeam()?.teamName || ''
           )
         );
@@ -21177,7 +21573,7 @@
                     callMeta.textContent = allowed
                       ? player.name
                       : state.auctionAdminTeamId !== nominationTeamId
-                        ? `TURNO: ${state.auction?.currentNominationTeam?.name || 'altra squadra'}`
+                        ? `TURNO: ${auctionTeamReference(state.auction?.currentNominationTeam, state.auction?.currentNominationTeam?.name || 'altra squadra')}`
                         : 'NON CHIAMABILE';
                   }
                 }
@@ -23097,9 +23493,9 @@
       $('tv-player-name').textContent=p?.name||'In attesa';
       $('tv-player-meta').textContent=p?`${playerRoles(p,d.settings?.fantasy_mode).join('/')} · ${p.serie_a_team||''}`:'';
       $('tv-bid').textContent=s?.current_bid||'—';
-      $('tv-leader').textContent=d.currentBidderTeam?.name?`Leader: ${d.currentBidderTeam.name}`:'Nessun leader';
-      $('tv-teams').innerHTML=(d.teamOrder||[]).map(item=>`<div class="compact-row"><div><strong>${esc(item.team?.name||'Squadra')}</strong><small>Spesi ${item.credits_spent||0} · Pass ${item.passes_used||0}/5</small></div><span class="badge">${item.position}</span></div>`).join('');
-      $('tv-bids').innerHTML=(d.recentBids||[]).map(b=>`<div class="compact-row"><strong>${esc(b.team?.name||'Squadra')}</strong><span class="badge primary">${b.amount}</span></div>`).join('');
+      $('tv-leader').textContent=d.currentBidderTeam?`Leader: ${auctionTeamReference(d.currentBidderTeam, d.currentBidderTeam?.name || 'Squadra')}`:'Nessun leader';
+      $('tv-teams').innerHTML=(d.teamOrder||[]).map(item=>`<div class="compact-row"><div><strong>${esc(auctionTeamReference(item.team, item.team?.name || 'Squadra'))}</strong><small>Spesi ${item.credits_spent||0} · Pass ${item.passes_used||0}/5</small></div><span class="badge">${item.position}</span></div>`).join('');
+      $('tv-bids').innerHTML=(d.recentBids||[]).map(b=>`<div class="compact-row"><strong>${esc(auctionTeamReference(b.team, b.team?.name || 'Squadra'))}</strong><span class="badge primary">${b.amount}</span></div>`).join('');
       renderTvTimer();
     }
 
