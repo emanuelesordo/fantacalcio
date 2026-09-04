@@ -7099,6 +7099,437 @@
       min-height:29px;
       overflow:visible!important;
     }
+
+
+    /* ASTA V24 · A POSTO definitivo, turni, coda controllabile e KPI leggibili. */
+    .auction-statusbar{
+      grid-template-columns:auto minmax(145px,.7fr) minmax(560px,2.2fr) minmax(208px,auto)!important;
+    }
+
+    .rolebtn[data-role]:not([data-role="all"]){
+      opacity:.40!important;
+      filter:saturate(.48) brightness(.76);
+      transition:opacity .16s ease,filter .16s ease,transform .16s ease,box-shadow .16s ease;
+    }
+
+    .rolebtn[data-role]:not([data-role="all"]).active{
+      opacity:1!important;
+      filter:saturate(1.38) brightness(1.12);
+      box-shadow:0 0 0 2px rgba(255,255,255,.24),0 5px 16px rgba(0,0,0,.26)!important;
+    }
+
+    .auction-status-team-kpis{
+      grid-template-columns:minmax(84px,1.1fr) repeat(7,minmax(52px,.68fr))!important;
+    }
+
+    .auction-status-team-kpis small{
+      font-size:6.8px!important;
+      letter-spacing:.015em;
+    }
+
+    .auction-status-team-kpis b{
+      font-size:11px!important;
+    }
+
+    .auction-team-mini-kpis{
+      grid-template-columns:repeat(5,minmax(0,1fr));
+    }
+
+    .auction-team-mini-kpi span{
+      font-size:7px!important;
+    }
+
+    .auction-team-mini-kpi strong{
+      font-size:11px!important;
+    }
+
+    .auction-status-turn-wrap{
+      min-width:0;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:5px;
+    }
+
+    .auction-turn-indicator{
+      min-width:208px;
+      max-width:320px;
+      display:grid;
+      grid-template-columns:minmax(126px,1fr) auto;
+      align-items:stretch;
+      border:1px solid rgba(117,183,246,.42);
+      border-radius:9px;
+      overflow:hidden;
+      box-shadow:0 7px 20px rgba(0,8,20,.22),inset 0 1px 0 rgba(255,255,255,.08);
+    }
+
+    .auction-turn-current{
+      min-width:0;
+      padding:4px 8px;
+      display:grid;
+      align-content:center;
+      background:linear-gradient(145deg,#2f77be,#174e86);
+    }
+
+    .auction-turn-current.is-mine{
+      background:linear-gradient(145deg,#e65061,#b81f38);
+      border-color:#ff8090;
+    }
+
+    .auction-turn-current span{
+      color:rgba(255,255,255,.70);
+      font-size:5.8px;
+      font-weight:950;
+      letter-spacing:.09em;
+    }
+
+    .auction-turn-current strong{
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      color:#fff;
+      font-size:11px;
+      line-height:1.05;
+    }
+
+    .auction-turn-current small{
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      color:rgba(255,255,255,.72);
+      font-size:6px;
+    }
+
+    .auction-turn-personal{
+      min-width:76px;
+      padding:4px 7px;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      font-size:7px;
+      font-weight:950;
+      letter-spacing:.04em;
+      color:#07111f;
+    }
+
+    .auction-turn-personal.is-next{
+      background:linear-gradient(145deg,#ffe35d,#e7a918);
+    }
+
+    .auction-turn-personal.is-waiting{
+      background:linear-gradient(145deg,#49d89d,#219069);
+      color:#052015;
+    }
+
+    .auction-turn-personal.is-mine{
+      background:linear-gradient(145deg,#ff6b7b,#d82843);
+      color:#fff;
+    }
+
+    .auction-mobile-turn-row{
+      grid-column:1 / -1;
+      min-width:0;
+    }
+
+    .auction-turn-indicator.is-mobile{
+      min-width:0;
+      width:100%;
+      max-width:none;
+      grid-template-columns:minmax(90px,1fr) auto;
+    }
+
+    .auction-turn-indicator.is-mobile .auction-turn-current{
+      padding:4px 6px;
+    }
+
+    .auction-turn-indicator.is-mobile .auction-turn-current strong{
+      font-size:9px;
+    }
+
+    .auction-turn-indicator.is-mobile .auction-turn-personal{
+      min-width:62px;
+      padding:3px 5px;
+      font-size:6px;
+    }
+
+    .auction-role-phase-president-action.is-confirmed{
+      display:grid;
+      place-items:center;
+      border:1px solid rgba(82,228,168,.48)!important;
+      background:linear-gradient(145deg,rgba(35,164,116,.92),rgba(18,112,82,.92))!important;
+      color:#fff!important;
+      cursor:default;
+    }
+
+    .auction-role-phase-president-action:disabled{
+      opacity:.48;
+      filter:saturate(.5);
+      cursor:not-allowed;
+    }
+
+    .auction-role-ready-controller{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 78px;
+      align-items:end;
+      gap:5px;
+      padding-top:2px;
+    }
+
+    .auction-role-ready-controller label{
+      min-width:0;
+      display:grid;
+      gap:3px;
+      color:var(--soft);
+      font-size:6px;
+      font-weight:900;
+      text-transform:uppercase;
+    }
+
+    .auction-role-ready-controller select{
+      width:100%;
+      min-width:0;
+      min-height:30px;
+      padding:4px 6px;
+      font-size:8px;
+    }
+
+    .auction-call-queue-head{
+      min-height:42px!important;
+      display:grid!important;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:5px!important;
+      align-items:center!important;
+    }
+
+    .auction-call-queue-title{
+      min-width:0;
+      display:flex;
+      align-items:center;
+      gap:5px;
+    }
+
+    .auction-call-queue-head-actions{
+      display:flex;
+      align-items:center;
+      gap:4px;
+    }
+
+    .auction-call-queue-head-actions button{
+      min-height:27px!important;
+      padding:3px 7px!important;
+      font-size:6.5px!important;
+    }
+
+    .auction-queue-private-toggle{
+      min-height:27px;
+      padding:3px 6px;
+      display:flex;
+      align-items:center;
+      gap:4px;
+      border:1px solid rgba(128,180,229,.28);
+      border-radius:6px;
+      background:rgba(21,55,88,.64);
+      color:#cfe6fb;
+      font-size:6px;
+      font-weight:950;
+      cursor:pointer;
+    }
+
+    .auction-queue-private-toggle.is-private{
+      border-color:rgba(220,175,74,.48);
+      background:rgba(122,83,19,.42);
+      color:#ffe1a0;
+    }
+
+    .auction-queue-private-toggle input{
+      width:12px;
+      height:12px;
+      margin:0;
+    }
+
+    .auction-queue-mode-note{
+      padding:3px 6px;
+      border-bottom:1px solid rgba(153,196,237,.12);
+      color:#ffe09a;
+      background:rgba(132,89,18,.13);
+      font-size:6px;
+      font-weight:850;
+      text-align:center;
+    }
+
+    .auction-queue-mode-note.is-auto{
+      color:#a9f1d4;
+      background:rgba(24,119,86,.12);
+    }
+
+    .auction-call-queue-row{
+      grid-template-columns:minmax(30px,auto) minmax(88px,1fr) minmax(48px,62px) 27px 27px!important;
+      gap:4px!important;
+    }
+
+    .auction-queue-call,
+    .auction-queue-call-placeholder{
+      width:27px;
+      min-width:27px;
+      min-height:27px;
+    }
+
+    .auction-queue-call{
+      padding:0!important;
+      border-color:rgba(85,231,174,.62)!important;
+      background:linear-gradient(145deg,#30bd86,#16805d)!important;
+      color:#fff!important;
+      font-size:14px!important;
+      font-weight:950!important;
+    }
+
+    .auction-queue-call:disabled{
+      opacity:.28;
+      filter:grayscale(.5);
+    }
+
+    .auction-all-roster-queue-preview{
+      margin:4px;
+      padding:4px;
+      border:1px dashed rgba(116,177,232,.28);
+      border-radius:7px;
+      background:rgba(8,29,49,.42);
+    }
+
+    .auction-all-roster-queue-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:4px;
+      margin-bottom:3px;
+    }
+
+    .auction-all-roster-queue-head small{
+      color:var(--muted);
+      font-size:6px;
+      font-weight:900;
+      text-transform:uppercase;
+    }
+
+    .auction-all-roster-queue-list{
+      display:grid;
+      gap:2px;
+    }
+
+    .auction-all-roster-queue-row{
+      min-height:20px;
+      display:grid;
+      grid-template-columns:auto minmax(0,1fr) 30px;
+      align-items:center;
+      gap:4px;
+      padding:2px 3px;
+      border-radius:4px;
+      background:rgba(37,67,96,.34);
+    }
+
+    .auction-all-roster-queue-name{
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-size:7px;
+    }
+
+    .auction-all-roster-queue-price{
+      text-align:right;
+      font-size:7px;
+      font-weight:950;
+    }
+
+    .auction-queue-blur{
+      display:inline-block;
+      filter:blur(3.4px);
+      user-select:none;
+      opacity:.72;
+    }
+
+    .auction-all-roster-queue-row.is-masked{
+      border:1px solid rgba(204,165,75,.12);
+    }
+
+    .auction-rosters-drawer:not([open]){
+      height:34px!important;
+      min-height:34px!important;
+    }
+
+    .auction-rosters-drawer>summary{
+      height:34px!important;
+      min-height:34px!important;
+      overflow:visible!important;
+    }
+
+    .auction-rosters-content{
+      height:calc(100% - 34px)!important;
+    }
+
+    .auction-cockpit{
+      padding-bottom:40px!important;
+    }
+
+    @media(max-width:1500px){
+      .auction-statusbar{
+        grid-template-columns:auto minmax(125px,.55fr) minmax(500px,1.9fr) minmax(190px,auto)!important;
+      }
+
+      .auction-status-team-kpis{
+        grid-template-columns:repeat(7,minmax(47px,1fr))!important;
+      }
+    }
+
+    @media(max-width:1100px){
+      .auction-statusbar{
+        grid-template-columns:auto minmax(110px,.55fr) minmax(330px,1.55fr) minmax(180px,auto)!important;
+      }
+
+      .auction-status-team-kpis>span:nth-of-type(5){
+        display:flex!important;
+      }
+
+      .auction-status-team-kpis>span:nth-of-type(6),
+      .auction-status-team-kpis>span:nth-of-type(7){
+        display:none!important;
+      }
+
+      .auction-status-team-kpis{
+        grid-template-columns:repeat(5,minmax(46px,1fr))!important;
+      }
+
+      .auction-turn-indicator{
+        min-width:180px;
+      }
+    }
+
+    @media(max-width:760px){
+      .auction-statusbar{
+        grid-template-columns:auto minmax(0,1fr) minmax(150px,auto)!important;
+      }
+
+      .auction-status-turn-wrap{
+        min-width:0;
+      }
+
+      .auction-turn-indicator{
+        min-width:0;
+        width:min(55vw,220px);
+      }
+    }
+
+    @media(max-width:430px){
+      .head-actions #exit-btn{
+        display:inline-flex!important;
+        min-width:42px;
+        padding-inline:6px;
+        font-size:7px;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -7631,6 +8062,7 @@
       $('app-shell').hidden = false;
       document.body.classList.remove('auth-locked');
       showAuthMessage('');
+      updateHeader();
     }
 
     function clearLocalSession() {
@@ -7928,7 +8360,9 @@
       }
 
       const username =
-        state.dashboard?.currentUser?.username;
+        state.dashboard?.currentUser?.username
+        || state.session?.user?.username
+        || '';
 
       $('user-label').textContent =
         username || '';
@@ -10045,6 +10479,11 @@
           ? purchaseTotal / acquiredRosterCount
           : null;
 
+      const averageAvailablePerRemaining =
+        minimumRemaining > 0
+          ? info.remaining / minimumRemaining
+          : null;
+
       const purchasePmaDeltas =
         info.assignments
           .map(item => {
@@ -10241,6 +10680,11 @@
               </div>
 
               <div class="auction-team-mini-kpi">
+                <span>Media disp./rim.</span>
+                <strong>${formatNumber(averageAvailablePerRemaining)}</strong>
+              </div>
+
+              <div class="auction-team-mini-kpi">
                 <span>Δ medio vs PMA</span>
                 <strong>${averagePurchasePmaDeltaLabel}</strong>
               </div>
@@ -10263,6 +10707,7 @@
           <span><small>Min rim.</small><b>${minimumRemaining}</b></span>
           <span><small>Max rim.</small><b>${maximumRemaining}</b></span>
           <span><small>Media</small><b>${formatNumber(averagePurchase)}</b></span>
+          <span><small>Disp./rim.</small><b>${formatNumber(averageAvailablePerRemaining)}</b></span>
           <span><small>Δ PMA</small><b>${averagePurchasePmaDeltaLabel}</b></span>
         </div>
       `;
@@ -10490,6 +10935,102 @@
     }
 
 
+    function auctionNominationTurnInfo() {
+      const d = state.auction || {};
+      const session = auctionSession();
+      const currentTeam = d.currentNominationTeam || null;
+      const myTeamId = auctionMyTeamId();
+      const order = (d.teamOrder || [])
+        .filter(item => item?.team_id);
+
+      const currentTeamId =
+        session?.current_nomination_team_id
+        || currentTeam?.id
+        || null;
+
+      let personalState = '';
+
+      if (myTeamId && currentTeamId) {
+        if (myTeamId === currentTeamId) {
+          personalState = 'mine';
+        } else if (order.length > 1) {
+          const currentIndex = order.findIndex(
+            item => item.team_id === currentTeamId
+          );
+
+          if (currentIndex >= 0) {
+            const direction =
+              session?.setup_snapshot?.turn_direction
+              || d.settings?.turn_direction
+              || 'clockwise';
+
+            const delta =
+              direction === 'counterclockwise'
+                ? -1
+                : 1;
+
+            const nextIndex =
+              (currentIndex + delta + order.length)
+              % order.length;
+
+            personalState =
+              order[nextIndex]?.team_id === myTeamId
+                ? 'next'
+                : 'waiting';
+          }
+        }
+      }
+
+      const presidentName =
+        currentTeam?.president?.username
+        || currentTeam?.presidentUsername
+        || currentTeam?.name
+        || 'In attesa';
+
+      return {
+        currentTeam,
+        currentTeamId,
+        presidentName,
+        personalState
+      };
+    }
+
+
+    function renderAuctionTurnIndicator({ mobile = false } = {}) {
+      const info = auctionNominationTurnInfo();
+      const personalState = info.personalState;
+
+      const stateLabel =
+        personalState === 'mine'
+          ? 'TOCCA A TE'
+          : personalState === 'next'
+            ? 'PREPARATI'
+            : personalState === 'waiting'
+              ? 'C’È ANCORA TEMPO'
+              : '';
+
+      return `
+        <div class="auction-turn-indicator ${mobile ? 'is-mobile' : ''}" aria-label="Turno di chiamata">
+          <div class="auction-turn-current ${personalState === 'mine' ? 'is-mine' : ''}">
+            <span>CHIAMA</span>
+            <strong>${esc(info.presidentName)}</strong>
+            ${
+              info.currentTeam?.name
+              && info.currentTeam.name !== info.presidentName
+                ? `<small>${esc(info.currentTeam.name)}</small>`
+                : ''
+            }
+          </div>
+          ${
+            stateLabel
+              ? `<div class="auction-turn-personal is-${personalState}">${stateLabel}</div>`
+              : ''
+          }
+        </div>
+      `;
+    }
+
+
     function auctionQueueModeAvailable() {
       const s =
         auctionSession();
@@ -10669,6 +11210,21 @@
       const editable =
         auctionCanManageCallQueue();
 
+      const queueSettings =
+        state.auction?.callQueueSettings
+        || {};
+
+      const autoPaused =
+        queueSettings.autoPaused === true;
+
+      const isPrivate =
+        queueSettings.private === true;
+
+      const manualCallAvailable =
+        autoPaused
+        && auctionOwnCallTurn()
+        && !auctionSession()?.current_player_id;
+
       return `
         <section
           id="auction-call-queue-drawer"
@@ -10680,14 +11236,43 @@
 
               <div class="auction-call-queue-head auction-team-roster-head">
 
-                <strong>Prossime chiamate</strong>
+                <div class="auction-call-queue-title">
+                  <strong>Prossime chiamate</strong>
+                  <span class="badge primary">${rows.length}</span>
+                </div>
 
-                <span class="badge primary">
-                  ${rows.length}
-                </span>
+                <div class="auction-call-queue-head-actions">
+                  <button
+                    id="auction-queue-autoplay"
+                    type="button"
+                    class="${autoPaused ? 'good' : 'warn'}"
+                    ${editable ? '' : 'disabled'}
+                    title="${autoPaused ? 'Riprende le chiamate automatiche dalla prima voce valida' : 'Mette in pausa le chiamate automatiche per scegliere manualmente'}"
+                  >
+                    ${autoPaused ? 'RIPRENDI' : 'PAUSA'}
+                  </button>
+
+                  <label
+                    class="auction-queue-private-toggle ${isPrivate ? 'is-private' : ''}"
+                    title="${isPrivate ? 'Nomi e prezzi della coda sono offuscati agli altri' : 'Nomi e prezzi della coda sono visibili agli altri'}"
+                  >
+                    <input
+                      id="auction-queue-private"
+                      type="checkbox"
+                      ${isPrivate ? 'checked' : ''}
+                      ${editable ? '' : 'disabled'}
+                    >
+                    <span>${isPrivate ? 'PRIVATA' : 'VISIBILE'}</span>
+                  </label>
+                </div>
 
               </div>
 
+              ${
+                autoPaused
+                  ? `<div class="auction-queue-mode-note">Coda in pausa · al tuo turno usa ✓ per scegliere la chiamata.</div>`
+                  : `<div class="auction-queue-mode-note is-auto">Autoplay attivo · al tuo turno parte la prima voce valida.</div>`
+              }
 
               <div
                 id="auction-call-queue-list"
@@ -10697,7 +11282,7 @@
                 ${
                   rows.length
                     ? rows.map(
-                        (item, index) => `
+                        item => `
                           <div
                             class="auction-call-queue-row"
                             data-queue-player="${esc(item.player_id)}"
@@ -10714,15 +11299,9 @@
                             </span>
 
                             <div class="auction-queue-player">
-                              <span class="auction-queue-handle" aria-hidden="true">
-                                ⋮⋮
-                              </span>
-
-                              <strong>
-                                ${esc(item.player?.name || 'Giocatore')}
-                              </strong>
+                              <span class="auction-queue-handle" aria-hidden="true">⋮⋮</span>
+                              <strong>${esc(item.player?.name || 'Giocatore')}</strong>
                             </div>
-
 
                             <div class="auction-queue-price">
                               <input
@@ -10738,21 +11317,32 @@
                               >
                             </div>
 
-
                             <button
                               type="button"
                               class="auction-queue-remove"
                               data-queue-remove="${esc(item.player_id)}"
                               ${editable ? '' : 'disabled'}
                               title="Rimuovi dalla coda"
-                            >
-                              ×
-                            </button>
+                            >×</button>
+
+                            ${
+                              autoPaused
+                                ? `
+                                    <button
+                                      type="button"
+                                      class="auction-queue-call"
+                                      data-queue-call="${esc(item.id || '')}"
+                                      ${manualCallAvailable && item.id ? '' : 'disabled'}
+                                      title="${manualCallAvailable ? 'Chiama questo giocatore adesso' : 'Disponibile al tuo turno quando la coda è in pausa'}"
+                                      aria-label="Chiama ${esc(item.player?.name || 'questo giocatore')}"
+                                    >✓</button>
+                                  `
+                                : '<span class="auction-queue-call-placeholder" aria-hidden="true"></span>'
+                            }
 
                           </div>
                         `
-                      )
-                        .join('')
+                      ).join('')
                     : `
                         <div class="live-placeholder">
                           La coda è vuota.
@@ -11091,6 +11681,110 @@
         return;
       }
 
+      $('auction-queue-autoplay')
+        ?.addEventListener(
+          'click',
+          async () => {
+            const sessionId = auctionSession()?.id;
+            if (!sessionId) return;
+
+            const previous =
+              state.auction?.callQueueSettings?.autoPaused === true;
+            const next = !previous;
+
+            state.auction.callQueueSettings = {
+              ...(state.auction.callQueueSettings || {}),
+              autoPaused: next
+            };
+            patchAuctionCallQueueUi();
+
+            try {
+              await api(
+                ENDPOINTS.auction,
+                {
+                  action: 'setCallQueuePaused',
+                  sessionId,
+                  paused: next
+                }
+              );
+              await loadAuction({ quiet: true });
+            } catch (error) {
+              state.auction.callQueueSettings = {
+                ...(state.auction.callQueueSettings || {}),
+                autoPaused: previous
+              };
+              patchAuctionCallQueueUi();
+              msg(error.message, 'error');
+            }
+          }
+        );
+
+      $('auction-queue-private')
+        ?.addEventListener(
+          'change',
+          async event => {
+            const sessionId = auctionSession()?.id;
+            if (!sessionId) return;
+
+            const previous =
+              state.auction?.callQueueSettings?.private === true;
+            const next = event.currentTarget.checked === true;
+
+            state.auction.callQueueSettings = {
+              ...(state.auction.callQueueSettings || {}),
+              private: next
+            };
+            patchAuctionCallQueueUi();
+
+            try {
+              await api(
+                ENDPOINTS.auction,
+                {
+                  action: 'setCallQueuePrivate',
+                  sessionId,
+                  private: next
+                }
+              );
+              await loadAuction({ quiet: true });
+            } catch (error) {
+              state.auction.callQueueSettings = {
+                ...(state.auction.callQueueSettings || {}),
+                private: previous
+              };
+              patchAuctionCallQueueUi();
+              msg(error.message, 'error');
+            }
+          }
+        );
+
+      list
+        .querySelectorAll('[data-queue-call]')
+        .forEach(button => {
+          button.addEventListener(
+            'click',
+            async () => {
+              const queueId = button.dataset.queueCall;
+              const sessionId = auctionSession()?.id;
+
+              if (!queueId || !sessionId) return;
+
+              try {
+                await api(
+                  ENDPOINTS.auction,
+                  {
+                    action: 'callQueuedPlayer',
+                    sessionId,
+                    queueId
+                  }
+                );
+                await loadAuction();
+              } catch (error) {
+                msg(error.message, 'error');
+              }
+            }
+          );
+        });
+
       list
         .querySelectorAll(
           '[data-queue-remove]'
@@ -11375,15 +12069,7 @@
               </strong>
 
               <small id="auction-status-sub-live">
-                ${
-                  hasPlayer
-                    ? (
-                        d.settings?.bid_mode === 'turn'
-                          ? `Turno: ${d.currentTurnTeam?.name || '—'}`
-                          : 'Rilanci liberi'
-                      )
-                    : `Chiama: ${d.currentNominationTeam?.name || '—'}`
-                }
+                ${hasPlayer ? 'Rilanci in corso' : 'Turno di chiamata'}
               </small>
             </div>
 
@@ -11392,6 +12078,10 @@
               data-auction-timer
             >
               —
+            </div>
+
+            <div class="auction-mobile-turn-row">
+              ${renderAuctionTurnIndicator({ mobile: true })}
             </div>
 
           </header>
@@ -11475,6 +12165,8 @@
                     </div>
                   `
             }
+
+            ${renderAuctionRolePhasePresidentControl()}
 
           </main>
 
@@ -11666,6 +12358,16 @@
         ?.addEventListener(
           'click',
           () => leaveCurrentAuctionPlayer()
+        );
+
+
+      $('auction-toggle-role-ready')
+        ?.addEventListener(
+          'click',
+          () => confirmAuctionRoleReady(
+            auctionMyTeamId(),
+            auctionCurrentRolePhaseTeam()?.teamName || ''
+          )
         );
 
 
@@ -12402,6 +13104,11 @@
               initialCredits - spent
             );
 
+          const queuePreview =
+            (state.auction?.teamCallQueues || [])
+              .find(item => item.teamId === team.id)
+            || null;
+
           return `
             <section
               class="auction-roster-team-card"
@@ -12518,6 +13225,39 @@
                 }
 
               </div>
+
+              ${
+                queuePreview?.items?.length
+                  ? `
+                      <div class="auction-all-roster-queue-preview ${queuePreview.private && queuePreview.owner !== true ? 'is-private' : ''}">
+                        <div class="auction-all-roster-queue-head">
+                          <small>Prossime chiamate</small>
+                          <span class="badge">${queuePreview.items.length}</span>
+                        </div>
+
+                        <div class="auction-all-roster-queue-list">
+                          ${queuePreview.items.map(queueItem => `
+                            <div class="auction-all-roster-queue-row ${queueItem.masked ? 'is-masked' : ''}">
+                              <span class="auction-roster-mini-roles">
+                                ${playerRoles(queueItem.player || {}, mode).map(role => `
+                                  <span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>
+                                `).join('') || '<span class="rolebadge">—</span>'}
+                              </span>
+
+                              <strong class="auction-all-roster-queue-name">
+                                ${queueItem.masked ? '<span class="auction-queue-blur">NOME RISERVATO</span>' : esc(queueItem.player?.name || 'Giocatore')}
+                              </strong>
+
+                              <span class="auction-all-roster-queue-price">
+                                ${queueItem.masked ? '<span class="auction-queue-blur">000</span>' : Number(queueItem.opening_bid || 1)}
+                              </span>
+                            </div>
+                          `).join('')}
+                        </div>
+                      </div>
+                    `
+                  : ''
+              }
 
             </section>
           `;
@@ -12853,7 +13593,25 @@
           .map(item => [
             item.team_id,
             item.nomination_penalty_credits || 0,
-            item.missed_nominations || 0
+            item.missed_nominations || 0,
+            item.call_queue_auto_paused === true,
+            item.call_queue_private === true
+          ]);
+
+      const teamCallQueues =
+        (data?.teamCallQueues || [])
+          .map(team => [
+            team.teamId,
+            team.private === true,
+            team.owner === true,
+            (team.items || []).map(item => [
+              item.id,
+              item.position,
+              item.masked === true,
+              item.player_id || null,
+              item.opening_bid ?? null,
+              item.player?.name || null
+            ])
           ]);
 
       return JSON.stringify({
@@ -12879,6 +13637,9 @@
         awards,
         queue,
         teamPenalties,
+        teamCallQueues,
+        callQueueSettings:
+          data?.callQueueSettings || null,
 
         rolePhase:
           data?.rolePhase || null,
@@ -13709,31 +14470,80 @@
         || !session
         || !auctionCallMode()
         || !auctionHasPresidentRole()
-        || session.current_player_id
       ) {
         return '';
       }
 
       const myTeam = auctionCurrentRolePhaseTeam();
+      if (!myTeam) return '';
 
-      if (!myTeam || (!myTeam.canReady && !myTeam.manualReady)) {
-        return '';
+      const label =
+        auctionRolePhaseLabel(phase.key);
+
+      if (myTeam.ready) {
+        return `
+          <div class="auction-role-phase-action auction-role-phase-president-action is-confirmed">
+            A POSTO · ${esc(label)} ✓
+          </div>
+        `;
       }
+
+      const canConfirm =
+        myTeam.canReady === true;
+
+      const title =
+        myTeam.canReady !== true
+          ? `Disponibile al raggiungimento del minimo: ${myTeam.current}/${myTeam.minimum}.`
+          : 'Conferma definitiva: non sarà possibile revocarla.';
 
       return `
         <button
           id="auction-toggle-role-ready"
           class="auction-role-phase-action auction-role-phase-president-action"
           type="button"
+          ${canConfirm ? '' : 'disabled'}
+          title="${esc(title)}"
         >
-          ${
-            myTeam.manualReady
-              ? `RIAPRI · ${esc(auctionRolePhaseLabel(phase.key))}`
-              : `A POSTO · ${esc(auctionRolePhaseLabel(phase.key))}`
-          }
+          A POSTO · ${esc(label)}
         </button>
       `;
     }
+
+
+    async function confirmAuctionRoleReady(teamId, teamName = '') {
+      const phase = state.auction?.rolePhase;
+      const session = auctionSession();
+
+      if (!phase || !session?.id || !teamId) {
+        return;
+      }
+
+      const phaseLabel =
+        auctionRolePhaseLabel(phase.key);
+
+      const subject =
+        teamName
+          ? `${teamName} · ${phaseLabel}`
+          : phaseLabel;
+
+      if (
+        !confirm(
+          `Confermi A POSTO per ${subject}? Questa scelta è definitiva e non potrà essere revocata.`
+        )
+      ) {
+        return;
+      }
+
+      await auctionAction(
+        {
+          action: 'confirmRoleReady',
+          sessionId: session.id,
+          teamId
+        },
+        `${teamName ? `${teamName}: ` : ''}A POSTO confermato.`
+      );
+    }
+
 
     function renderAuctionRolePhaseAdminPanel() {
       const phase = state.auction?.rolePhase;
@@ -13747,6 +14557,10 @@
       ) {
         return '';
       }
+
+      const readyCandidates =
+        (phase.teams || [])
+          .filter(team => !team.ready);
 
       const controllerAction =
         phase.allReady
@@ -13780,10 +14594,41 @@
             `).join('')}
           </div>
 
+          ${
+            !phase.allReady
+              ? `
+                  <div class="auction-role-ready-controller">
+                    <label>
+                      <span>Segna A POSTO</span>
+                      <select id="auction-role-ready-team">
+                        <option value="">Seleziona squadra…</option>
+                        ${readyCandidates.map(team => `
+                          <option
+                            value="${esc(team.teamId)}"
+                            ${team.canReady ? '' : 'disabled'}
+                          >
+                            ${esc(team.teamName)} · ${team.current}/${team.minimum}${team.canReady ? '' : ' · minimo non raggiunto'}
+                          </option>
+                        `).join('')}
+                      </select>
+                    </label>
+
+                    <button
+                      id="auction-admin-confirm-role-ready"
+                      class="auction-role-phase-action"
+                      type="button"
+                      disabled
+                    >A POSTO</button>
+                  </div>
+                `
+              : ''
+          }
+
           ${controllerAction}
         </section>
       `;
     }
+
 
     function renderAuctionLive() {
       ensureBidSelection();
@@ -14895,32 +15740,15 @@
             ${renderAuctionCockpitTeamPanel('status-kpis')}
 
 
-            <div class="auction-status-phase">
-
-              <span class="badge ${
-                hasPlayer
-                  ? 'good'
-                  : 'warn'
-              }">
-                FASE · ${phaseLabel}
-              </span>
-
+            <div class="auction-status-turn-wrap">
+              ${renderAuctionTurnIndicator()}
               ${
                 s.pause_after_award
                   ? `<span class="badge danger">${hasPlayer ? 'PAUSA PROGRAMMATA' : 'PAUSA'}</span>`
                   : s.hold_active
                     ? '<span class="badge danger">HOLD</span>'
-                  : ''
+                    : ''
               }
-
-            </div>
-
-
-            <div
-              class="auction-status-timer"
-              data-auction-timer
-            >
-              —
             </div>
 
           </header>
@@ -15060,15 +15888,60 @@
       $('auction-toggle-role-ready')
         ?.addEventListener(
           'click',
-          () => auctionAction(
-            {
-              action: 'toggleRoleReady',
-              sessionId: s.id,
-              teamId: auctionMyTeamId()
-            },
-            'Stato della fase aggiornato.'
+          () => confirmAuctionRoleReady(
+            auctionMyTeamId(),
+            state.auction?.currentNominationTeam?.id === auctionMyTeamId()
+              ? state.auction?.currentNominationTeam?.name || ''
+              : auctionCurrentRolePhaseTeam()?.teamName || ''
           )
         );
+
+
+      const adminReadySelect =
+        $('auction-role-ready-team');
+
+      const adminReadyButton =
+        $('auction-admin-confirm-role-ready');
+
+      const syncAdminReadyButton = () => {
+        if (!adminReadyButton) return;
+
+        const team =
+          (state.auction?.rolePhase?.teams || [])
+            .find(item => item.teamId === adminReadySelect?.value);
+
+        adminReadyButton.disabled =
+          !team
+          || team.ready === true
+          || team.canReady !== true;
+      };
+
+      adminReadySelect
+        ?.addEventListener(
+          'change',
+          syncAdminReadyButton
+        );
+
+      adminReadyButton
+        ?.addEventListener(
+          'click',
+          async () => {
+            const team =
+              (state.auction?.rolePhase?.teams || [])
+                .find(item => item.teamId === adminReadySelect?.value);
+
+            if (!team || team.canReady !== true || team.ready === true) {
+              return;
+            }
+
+            await confirmAuctionRoleReady(
+              team.teamId,
+              team.teamName || ''
+            );
+          }
+        );
+
+      syncAdminReadyButton();
 
 
       $('auction-advance-role-phase')
