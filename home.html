@@ -15876,6 +15876,7 @@
 
             ${auctionCanControl() ? `
               <div class="auction-team-selection-actions">
+                <button id="cancel-prepared-auction" class="secondary">Annulla preparazione</button>
                 <button id="save-order" class="secondary" ${canSave ? '' : 'disabled'}>Salva composizione</button>
                 <button id="start-auction" ${canSave ? '' : 'disabled'}>Salva e avvia asta</button>
               </div>
@@ -15884,6 +15885,33 @@
         </div>`;
 
       bindAuctionPreparedDnD();
+
+      $('cancel-prepared-auction')?.addEventListener('click', async () => {
+        if (
+          !confirm(
+            'Annullare la preparazione dell’asta? Composizione e ordine impostati in questa preparazione verranno scartati. Il Setup e il Listone restano invariati.'
+          )
+        ) {
+          return;
+        }
+
+        try {
+          await api(ENDPOINTS.auction, {
+            action: 'cancelPreparedAuction',
+            sessionId: session.id
+          });
+
+          state.auctionPreparedDraftSessionId = null;
+          state.auctionPreparedIncludedTeamIds = [];
+          state.auctionPreparedExcludedTeamIds = [];
+          state.auctionPreparedDragTeamId = null;
+
+          msg('Preparazione annullata.', 'success');
+          await loadAuction();
+        } catch (error) {
+          msg(error.message, 'error');
+        }
+      });
 
       $('save-order')?.addEventListener('click', async () => {
         if (!canSave) return;
