@@ -8563,6 +8563,149 @@
       #view-manage .member-role-controls{flex-wrap:wrap;gap:3px}
     }
 
+
+
+    /* V33 · Banditore, crediti e storico operativo */
+    .auctioneer-team-grid-unified{
+      grid-template-columns:repeat(var(--auctioneer-team-cols,3),minmax(0,1fr))!important;
+    }
+
+    .auctioneer-team-cube-unified.is-nomination:not(.selected){
+      border-color:rgba(240,197,65,.55)!important;
+    }
+
+    .auctioneer-credit-control{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:5px;
+      align-items:end;
+      margin-top:5px;
+      padding-top:5px;
+      border-top:1px solid rgba(149,185,215,.12);
+    }
+
+    .auctioneer-credit-control label{
+      display:grid;
+      gap:3px;
+      min-width:0;
+      color:#9db4c8;
+      font-size:7px;
+      font-weight:850;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+
+    .auctioneer-credit-control input{
+      min-width:0;
+      height:30px;
+      padding:4px 7px;
+      font-size:12px;
+      font-weight:900;
+    }
+
+    .auctioneer-credit-control button{
+      min-height:30px!important;
+      padding:4px 9px!important;
+      font-size:7px!important;
+      white-space:nowrap;
+    }
+
+    .auction-activity-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:6px;
+      flex-wrap:wrap;
+    }
+
+    .auction-activity-filter{
+      display:flex;
+      align-items:center;
+      gap:4px;
+      font-size:6.5px;
+      font-weight:800;
+      color:#aabfd1;
+      white-space:nowrap;
+    }
+
+    .auction-activity-filter input{
+      margin:0;
+      width:13px;
+      height:13px;
+    }
+
+    .auction-activity-list{
+      display:grid;
+      gap:3px;
+      margin-top:4px;
+      max-height:126px;
+      overflow:auto;
+      scrollbar-width:thin;
+    }
+
+    .auction-activity-row{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      align-items:center;
+      gap:5px;
+      min-height:24px;
+      padding:3px 5px;
+      border:1px solid rgba(139,177,207,.12);
+      border-radius:6px;
+      background:rgba(255,255,255,.025);
+      font-size:7px;
+      line-height:1.15;
+    }
+
+    .auction-activity-row .auction-activity-main,
+    .auction-activity-row .auction-activity-text{
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .auction-activity-row .auction-activity-main strong,
+    .auction-activity-row .auction-activity-text strong{
+      color:#f5f8fb;
+      font-size:7.5px;
+    }
+
+    .auction-activity-row.is-credit{
+      border-color:rgba(235,86,86,.26);
+      background:rgba(170,34,34,.10);
+      color:#ff9b9b;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+    }
+
+    .auction-activity-row.is-credit strong{
+      color:#ffb1b1!important;
+      font-family:inherit;
+    }
+
+    .auction-activity-row.is-undone{
+      opacity:.38;
+      text-decoration:line-through;
+    }
+
+    .auction-operation-undo,
+    .auction-activity-undo{
+      width:22px!important;
+      min-width:22px!important;
+      height:20px!important;
+      min-height:20px!important;
+      padding:0!important;
+      border-radius:5px!important;
+      font-size:12px!important;
+      line-height:1!important;
+    }
+
+    @media(max-width:900px){
+      .auctioneer-credit-control{
+        grid-template-columns:minmax(0,1fr) auto;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -8816,6 +8959,28 @@
                 <input id="setup-call-penalty-enabled" type="checkbox">
                 Scala la penalità in crediti
               </label>
+
+              <label id="setup-call-penalty-step-every-wrap">
+                Incrementa dopo X turni saltati
+                <input
+                  id="setup-call-penalty-step-every"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="1"
+                  title="0 = nessun incremento progressivo"
+                >
+              </label>
+
+              <label id="setup-call-penalty-step-amount-wrap">
+                Incremento penalità
+                <input
+                  id="setup-call-penalty-step-amount"
+                  type="number"
+                  min="0"
+                  step="1"
+                >
+              </label>
             </div>
           </section>
 
@@ -9026,6 +9191,8 @@
       auctionAdminBidTeamId: null,
       auctionAdminBidPlayerKey: '',
       auctionAdminReadyTeamId: null,
+      auctionAdminDefaultTeamKey: '',
+      auctionHideCreditEvents: false,
 
       auctionTransferAssignmentId: null,
       auctionTransferTargetTeamId: null,
@@ -10426,6 +10593,14 @@
         s.nomination_timeout_penalty
         ?? 1;
 
+      $('setup-call-penalty-step-every').value =
+        s.nomination_penalty_step_every
+        ?? 0;
+
+      $('setup-call-penalty-step-amount').value =
+        s.nomination_penalty_step_amount
+        ?? 0;
+
       $('setup-call-penalty-enabled').checked =
         s.nomination_penalty_enabled
         ?? Number(s.nomination_timeout_penalty || 0) > 0;
@@ -10470,6 +10645,16 @@
 
       $('setup-call-penalty-enabled').disabled =
         !callTimerEnabled;
+
+      const penaltyProgressiveEnabled =
+        callTimerEnabled
+        && $('setup-call-penalty-enabled').checked;
+
+      $('setup-call-penalty-step-every').disabled =
+        !penaltyProgressiveEnabled;
+
+      $('setup-call-penalty-step-amount').disabled =
+        !penaltyProgressiveEnabled;
 
       $('setup-call-timer-enabled').disabled =
         !callMode;
@@ -10567,6 +10752,18 @@
         nominationTimeoutPenalty:
           Number(
             $('setup-call-penalty').value
+            || 0
+          ),
+
+        nominationPenaltyStepEvery:
+          Number(
+            $('setup-call-penalty-step-every').value
+            || 0
+          ),
+
+        nominationPenaltyStepAmount:
+          Number(
+            $('setup-call-penalty-step-amount').value
             || 0
           ),
 
@@ -11230,20 +11427,36 @@
       if (!data) return;
       const initial = Number(data.settings?.initial_credits || 0);
       const assignments = data.assignments || [];
+      const creditStates = data.creditStates || [];
+      const creditStateByTeam = Object.fromEntries(
+        creditStates.map(item => [item.team_id, item])
+      );
       const spent = assignments.reduce((sum,item)=>sum+Number(item.purchase_price||0),0);
+      const penalties = creditStates.reduce(
+        (sum,item)=>sum+Number(item.nomination_penalty_credits||0),
+        0
+      );
 
       $('roster-kpis').innerHTML = `
         <div class="kpi"><span>Squadre</span><strong>${(data.teams||[]).length}</strong></div>
         <div class="kpi"><span>Giocatori</span><strong>${assignments.length}</strong></div>
-        <div class="kpi"><span>Spesa</span><strong>${spent}</strong></div>
+        <div class="kpi"><span>Spesa acquisti</span><strong>${spent}</strong></div>
+        <div class="kpi"><span>Penalità</span><strong>${penalties}</strong></div>
       `;
 
       $('rosters-grid').innerHTML = (data.teams || []).map(team => {
         const rows = assignments.filter(item => item.team_id === team.id);
         const teamSpent = rows.reduce((sum,item)=>sum+Number(item.purchase_price||0),0);
+        const creditState = creditStateByTeam[team.id] || null;
+        const remaining = creditState
+          ? Number(creditState.remaining_credits || 0)
+          : Math.max(0, initial - teamSpent);
+        const penalty = Number(creditState?.nomination_penalty_credits || 0);
+        const adjustment = Number(creditState?.credit_adjustment || 0);
         return `
           <details class="team-card" open>
-            <summary><div><strong>${esc(team.name)}</strong><span class="small soft"> · ${esc(team.presidentUsername || 'senza Presidente')}</span></div><span class="badge">${rows.length} · ${teamSpent}/${initial}</span></summary>
+            <summary><div><strong>${esc(team.name)}</strong><span class="small soft"> · ${esc(team.presidentUsername || 'senza Presidente')}</span></div><span class="badge">${rows.length} · ${remaining} CR</span></summary>
+            <div class="small soft" style="padding:4px 10px 0">Acquisti ${teamSpent} · Penalità ${penalty}${adjustment ? ` · Rettifica ${adjustment > 0 ? '+' : ''}${adjustment}` : ''}</div>
             <div class="roster-body">
               ${rows.map(item => `<div class="roster-player"><div><strong>${esc(item.player?.name || '—')}</strong><span class="small soft"> · ${esc((item.player?.mantra_roles || [item.player?.classic_role]).filter(Boolean).join('/'))} · ${esc(item.player?.serie_a_team || '')}</span></div><span class="badge primary">${Number(item.purchase_price||0)}</span></div>`).join('') || '<div class="small soft">Rosa vuota.</div>'}
             </div>
@@ -11322,7 +11535,16 @@
 
       const initialCredits =
         Number(
+          d.auctionSession?.setup_snapshot?.initial_credits
+          ??
           d.settings?.initial_credits
+          ??
+          0
+        );
+
+      const creditAdjustment =
+        Number(
+          teamState?.credit_adjustment
           ||
           0
         );
@@ -11339,7 +11561,9 @@
       const remaining =
         Math.max(
           0,
-          initialCredits - spent
+          initialCredits
+          + creditAdjustment
+          - spent
         );
 
       const assignments =
@@ -11543,6 +11767,7 @@
           'La mia squadra',
         initialCredits,
         spent,
+        creditAdjustment,
         remaining,
 
         nominationPenaltyCredits:
@@ -11615,10 +11840,18 @@
                   0
                 );
 
+              const adjustment =
+                Number(
+                  item.credit_adjustment
+                  || 0
+                );
+
               const remaining =
                 Math.max(
                   0,
-                  initialCredits - spent
+                  initialCredits
+                  + adjustment
+                  - spent
                 );
 
               return `
@@ -14466,10 +14699,30 @@
               0
             );
 
+          const teamState =
+            (state.auction?.teamOrder || [])
+              .find(item => item.team_id === team.id)
+            || null;
+
+          const effectiveDebits =
+            Number(
+              teamState?.credits_spent
+              ?? spent
+              ?? 0
+            );
+
+          const adjustment =
+            Number(
+              teamState?.credit_adjustment
+              || 0
+            );
+
           const remaining =
             Math.max(
               0,
-              initialCredits - spent
+              initialCredits
+              + adjustment
+              - effectiveDebits
             );
 
           return `
@@ -14931,10 +15184,23 @@
         (data?.teamOrder || [])
           .map(item => [
             item.team_id,
+            item.credits_spent || 0,
+            item.credit_adjustment || 0,
             item.nomination_penalty_credits || 0,
             item.missed_nominations || 0,
             item.call_queue_auto_paused === true,
             item.call_queue_private === true
+          ]);
+
+      const operations =
+        (data?.recentOperations || [])
+          .map(item => [
+            item.id,
+            item.event_type,
+            item.team_id,
+            item.player_id,
+            item.undone_at || null,
+            item.payload || null
           ]);
 
       return JSON.stringify({
@@ -14960,6 +15226,7 @@
         awards,
         queue,
         teamPenalties,
+        operations,
         callQueueSettings:
           data?.callQueueSettings || null,
 
@@ -16139,6 +16406,7 @@
     function auctionControllerTeamMetrics(teamId) {
       const d = state.auction || {};
       const team = (d.teams || []).find(item => item.id === teamId) || null;
+      const teamState = (d.teamOrder || []).find(item => item.team_id === teamId) || null;
       const capacity = (d.bidCapacities || []).find(item => item.team_id === teamId) || null;
       const assignments = (state.auctionPersonalRoster?.assignments || [])
         .filter(item => item.team_id === teamId);
@@ -16160,6 +16428,18 @@
         rosterMin = Number(mantra?.total?.min ?? capacity?.roster_limit ?? 0);
         rosterMax = Number(mantra?.total?.max ?? capacity?.roster_limit ?? rosterMin);
       }
+
+      const initialCredits = Number(
+        d.auctionSession?.setup_snapshot?.initial_credits
+        ?? d.settings?.initial_credits
+        ?? 0
+      );
+      const debits = Number(teamState?.credits_spent || 0);
+      const creditAdjustment = Number(teamState?.credit_adjustment || 0);
+      const remainingCredits = Math.max(
+        0,
+        initialCredits + creditAdjustment - debits
+      );
 
       const rosterCount = Number(capacity?.roster_count ?? assignments.length ?? 0);
       const rosterTarget = rosterCount <= rosterMin
@@ -16198,6 +16478,11 @@
 
       return {
         team,
+        teamState,
+        initialCredits,
+        debits,
+        creditAdjustment,
+        remainingCredits,
         maxBid: capacity?.max_bid ?? null,
         rosterCount,
         rosterMin,
@@ -16228,6 +16513,18 @@
     function renderAuctionControllerTeamSelector() {
       const d = state.auction || {};
       const participatingTeams = auctionParticipatingTeams(d);
+      const teamCount = participatingTeams.length;
+      const columns =
+        teamCount <= 6
+          ? 2
+          : teamCount <= 12
+            ? 3
+            : 4;
+
+      const selectedMetrics =
+        state.auctionAdminTeamId
+          ? auctionControllerTeamMetrics(state.auctionAdminTeamId)
+          : null;
 
       return `
         <div class="auctioneer-section auctioneer-team-section">
@@ -16235,15 +16532,19 @@
             Squadra operativa
           </div>
 
-          <div class="auctioneer-team-grid auctioneer-team-grid-unified">
+          <div
+            class="auctioneer-team-grid auctioneer-team-grid-unified"
+            style="--auctioneer-team-cols:${columns}"
+          >
             ${participatingTeams.map(team => {
               const selected = state.auctionAdminTeamId === team.id;
               const leader = d.auctionSession?.current_bidder_team_id === team.id;
+              const nomination = d.auctionSession?.current_nomination_team_id === team.id;
 
               return `
                 <button
                   type="button"
-                  class="auctioneer-team-cube auctioneer-team-cube-unified ${selected ? 'selected' : ''} ${leader ? 'is-leader' : ''}"
+                  class="auctioneer-team-cube auctioneer-team-cube-unified ${selected ? 'selected' : ''} ${leader ? 'is-leader' : ''} ${nomination ? 'is-nomination' : ''}"
                   data-admin-team="${esc(team.id)}"
                   title="Seleziona ${esc(team.name)} come squadra operativa del Banditore"
                 >
@@ -16252,10 +16553,31 @@
               `;
             }).join('')}
           </div>
+
+          <div class="auctioneer-credit-control">
+            <label>
+              <span id="auction-admin-credit-label">Crediti residui${selectedMetrics?.team?.name ? ` · ${esc(selectedMetrics.team.name)}` : ''}</span>
+              <input
+                id="auction-admin-remaining-credits"
+                type="number"
+                min="0"
+                max="999999"
+                step="1"
+                inputmode="numeric"
+                value="${selectedMetrics ? Number(selectedMetrics.remainingCredits || 0) : ''}"
+                ${selectedMetrics ? '' : 'disabled'}
+              >
+            </label>
+            <button
+              id="auction-admin-set-credits"
+              type="button"
+              class="secondary"
+              ${selectedMetrics ? '' : 'disabled'}
+            >IMPOSTA CREDITI</button>
+          </div>
         </div>
       `;
     }
-
 
 
     function renderAuctionRolePhaseAdminPanel() {
@@ -16944,47 +17266,182 @@
           : '';
 
 
-      const recentBidsHtml = `
-        <section class="auction-bid-history">
+      const recentBidsHtml = (() => {
+        if (!auctionCanControl()) {
+          return `
+            <section class="auction-bid-history">
 
-          <div class="auction-bid-history-title">
-            <strong>Ultimi rilanci</strong>
+              <div class="auction-bid-history-title">
+                <strong>Ultimi rilanci</strong>
 
-            <span class="small soft">
-              ${(d.recentBids || []).length} registrati
-            </span>
-          </div>
+                <span class="small soft">
+                  ${(d.recentBids || []).length} registrati
+                </span>
+              </div>
 
-          <div
-            id="auction-live-recent-bids"
-            class="auction-bid-chips"
-          >
+              <div
+                id="auction-live-recent-bids"
+                class="auction-bid-chips"
+              >
 
-            ${
-              (d.recentBids || [])
-                .slice(0, 10)
-                .map(bid => `
-                  <div class="auction-bid-chip">
+                ${
+                  (d.recentBids || [])
+                    .slice(0, 10)
+                    .map(bid => `
+                      <div class="auction-bid-chip">
+                        <span>${esc(bid.team?.name || 'Squadra')}</span>
+                        <strong>${bid.amount}</strong>
+                      </div>
+                    `)
+                    .join('')
+                  ||
+                  '<span class="small soft">Nessun rilancio.</span>'
+                }
 
-                    <span>
-                      ${esc(bid.team?.name || 'Squadra')}
-                    </span>
+              </div>
 
-                    <strong>
-                      ${bid.amount}
-                    </strong>
+            </section>
+          `;
+        }
 
-                  </div>
-                `)
-                .join('')
-              ||
-              '<span class="small soft">Nessun rilancio.</span>'
-            }
+        const bidItems =
+          (d.recentBids || [])
+            .map(bid => ({
+              kind: 'bid',
+              id: `bid-${bid.id}`,
+              createdAt: bid.created_at,
+              bid
+            }));
 
-          </div>
+        const operationItems =
+          (d.recentOperations || [])
+            .filter(event =>
+              !(
+                state.auctionHideCreditEvents
+                && ['CREDITS_ADJUSTED','NOMINATION_TIMEOUT'].includes(event.event_type)
+              )
+            )
+            .map(event => ({
+              kind: 'operation',
+              id: `op-${event.id}`,
+              createdAt: event.created_at,
+              event
+            }));
 
-        </section>
-      `;
+        const activityItems =
+          [...bidItems, ...operationItems]
+            .sort((a, b) =>
+              new Date(b.createdAt || 0).getTime()
+              - new Date(a.createdAt || 0).getTime()
+            )
+            .slice(0, 24);
+
+        const operationText = event => {
+          const payload = event.payload || {};
+          const teamName = event.team?.name || 'SQUADRA';
+          const playerName = event.player?.name || 'GIOCATORE';
+
+          if (event.event_type === 'CREDITS_ADJUSTED') {
+            const before = Number(payload.before_remaining ?? payload.previous_remaining ?? payload.old_remaining ?? 0);
+            const after = Number(payload.after_remaining ?? payload.new_remaining ?? payload.remaining ?? 0);
+            const delta = Number(payload.delta ?? (after - before));
+            return `${teamName} · CREDITI ${before} → ${after} (${delta >= 0 ? '+' : ''}${delta})`;
+          }
+
+
+          if (event.event_type === 'NOMINATION_TIMEOUT') {
+            const applied = Number(payload.applied_penalty || 0);
+            return `PENALITÀ CHIAMATA · ${teamName} · -${applied} CR`;
+          }
+
+          if (
+            event.event_type === 'PLAYER_AWARDED'
+            || event.event_type === 'MANUAL_AWARD'
+          ) {
+            return `ACQUISTO · ${teamName} · ${playerName} · ${Number(payload.price || 0)} CR`;
+          }
+
+          if (event.event_type === 'ROSTER_PRICE_EDITED') {
+            return `PREZZO · ${playerName} · ${Number(payload.old_price || 0)} → ${Number(payload.new_price || 0)} CR`;
+          }
+
+          if (event.event_type === 'ROSTER_PLAYER_REMOVED') {
+            return `RIMOSSO · ${playerName} · ${teamName}`;
+          }
+
+          if (['ROSTER_TEAM_TRANSFERRED','ROSTER_PLAYER_TRANSFERRED'].includes(event.event_type)) {
+            return `CAMBIO SQUADRA · ${playerName} · ${event.fromTeam?.name || '—'} → ${event.toTeam?.name || teamName}`;
+          }
+
+          return `${event.event_type} · ${teamName}`;
+        };
+
+        return `
+          <section class="auction-bid-history auction-activity-history">
+
+            <div class="auction-bid-history-title auction-activity-head">
+              <strong>Ultime offerte / operazioni</strong>
+
+              <label class="auction-activity-filter">
+                <input
+                  id="auction-hide-credit-events"
+                  type="checkbox"
+                  ${state.auctionHideCreditEvents ? 'checked' : ''}
+                >
+                <span>Nascondi rettifiche crediti</span>
+              </label>
+            </div>
+
+            <div id="auction-live-recent-bids" class="auction-activity-list">
+              ${
+                activityItems
+                  .map(item => {
+                    if (item.kind === 'bid') {
+                      const bid = item.bid;
+                      return `
+                        <div class="auction-activity-row is-bid">
+                          <span>RILANCIO · ${esc(bid.team?.name || 'Squadra')}</span>
+                          <strong>${Number(bid.amount || 0)} CR</strong>
+                        </div>
+                      `;
+                    }
+
+                    const event = item.event;
+                    const isCredit = ['CREDITS_ADJUSTED','NOMINATION_TIMEOUT'].includes(event.event_type);
+                    const undone = Boolean(event.undone_at);
+
+                    return `
+                      <div class="auction-activity-row ${isCredit ? 'is-credit' : ''} ${undone ? 'is-undone' : ''}">
+                        <span class="auction-activity-text">
+                          ${esc(operationText(event))}
+                          ${event.actorUsername ? `<small> · ${esc(event.actorUsername)}</small>` : ''}
+                          ${undone ? '<small> · ANNULLATA</small>' : ''}
+                        </span>
+
+                        ${
+                          !undone && event.reversible !== false
+                            ? `
+                                <button
+                                  type="button"
+                                  class="auction-activity-undo"
+                                  data-undo-operation="${Number(event.id)}"
+                                  title="Annulla questa operazione"
+                                  aria-label="Annulla questa operazione"
+                                >×</button>
+                              `
+                            : ''
+                        }
+                      </div>
+                    `;
+                  })
+                  .join('')
+                || '<span class="small soft">Nessuna operazione recente.</span>'
+              }
+            </div>
+
+          </section>
+        `;
+      })();
 
 
       const adminBidMinimum =
@@ -17002,14 +17459,33 @@
       const adminTeamIds =
         new Set(participatingTeams.map(team => team.id));
 
+      const preferredAdminTeamId =
+        hasPlayer
+          ? s.current_bidder_team_id
+          : (
+              s.current_nomination_team_id
+              || d.currentNominationTeam?.id
+            );
+
+      const adminDefaultTeamKey =
+        `${s.current_player_id || 'CALL'}|${preferredAdminTeamId || ''}`;
+
       if (
+        preferredAdminTeamId
+        && adminTeamIds.has(preferredAdminTeamId)
+        && state.auctionAdminDefaultTeamKey !== adminDefaultTeamKey
+      ) {
+        state.auctionAdminDefaultTeamKey =
+          adminDefaultTeamKey;
+
+        state.auctionAdminTeamId =
+          preferredAdminTeamId;
+      } else if (
         !state.auctionAdminTeamId
         || !adminTeamIds.has(state.auctionAdminTeamId)
       ) {
         state.auctionAdminTeamId =
-          s.current_bidder_team_id
-          || s.current_nomination_team_id
-          || d.currentNominationTeam?.id
+          preferredAdminTeamId
           || participatingTeams[0]?.id
           || null;
       }
@@ -17778,6 +18254,29 @@
             ? auctionControllerTeamMetrics(selectedTeam.id)
             : null;
 
+        const creditInput = $('auction-admin-remaining-credits');
+        const creditButton = $('auction-admin-set-credits');
+        const creditLabel = $('auction-admin-credit-label');
+
+        if (creditInput) {
+          creditInput.disabled = !selectedMetrics;
+          creditInput.max = '999999';
+          if (selectedMetrics) {
+            creditInput.value = String(
+              Number(selectedMetrics.remainingCredits || 0)
+            );
+          }
+        }
+
+        if (creditButton) {
+          creditButton.disabled = !selectedMetrics;
+        }
+
+        if (creditLabel) {
+          creditLabel.textContent =
+            `Crediti residui${selectedTeam?.name ? ` · ${selectedTeam.name}` : ''}`;
+        }
+
         const selectedPhaseTeam =
           (state.auction?.rolePhase?.teams || [])
             .find(team => team.teamId === state.auctionAdminTeamId)
@@ -17931,6 +18430,116 @@
         });
 
       syncAuctionAdminBidControls();
+
+
+      $('auction-admin-set-credits')
+        ?.addEventListener(
+          'click',
+          async () => {
+            const teamId = state.auctionAdminTeamId;
+            const metrics = teamId
+              ? auctionControllerTeamMetrics(teamId)
+              : null;
+            const input = $('auction-admin-remaining-credits');
+            const remaining = Number(input?.value);
+
+            if (!teamId || !metrics) {
+              return msg('Seleziona una squadra.', 'warning');
+            }
+
+            if (
+              !Number.isInteger(remaining)
+              || remaining < 0
+              || remaining > 999999
+            ) {
+              return msg(
+                'Inserisci un valore tra 0 e 999999 crediti.',
+                'warning'
+              );
+            }
+
+            if (remaining === Number(metrics.remainingCredits || 0)) {
+              return;
+            }
+
+            if (!confirm(
+              `Impostare i crediti residui di ${metrics.team?.name || 'questa squadra'} da ${Number(metrics.remainingCredits || 0)} a ${remaining}?`
+            )) {
+              return;
+            }
+
+            try {
+              await api(
+                ENDPOINTS.auction,
+                {
+                  action: 'setTeamCredits',
+                  sessionId: s.id,
+                  teamId,
+                  remaining
+                }
+              );
+
+              msg('Crediti residui aggiornati.', 'success');
+              await loadAuction();
+            } catch (error) {
+              msg(error.message, 'error');
+            }
+          }
+        );
+
+
+      $('auction-hide-credit-events')
+        ?.addEventListener(
+          'change',
+          event => {
+            state.auctionHideCreditEvents =
+              event.target.checked === true;
+            renderAuctionLive();
+          }
+        );
+
+
+      document
+        .querySelectorAll('[data-undo-operation]')
+        .forEach(button => {
+          button.addEventListener(
+            'click',
+            async () => {
+              const eventId =
+                Number(button.dataset.undoOperation);
+
+              if (!Number.isInteger(eventId) || eventId < 1) {
+                return;
+              }
+
+              if (!confirm(
+                'Annullare questa operazione? Verranno ripristinati giocatore, squadra e crediti allo stato precedente quando previsto.'
+              )) {
+                return;
+              }
+
+              button.disabled = true;
+
+              try {
+                await api(
+                  ENDPOINTS.auction,
+                  {
+                    action: 'undoOperation',
+                    sessionId: s.id,
+                    eventId
+                  }
+                );
+
+                msg('Operazione annullata.', 'success');
+                await loadAuctionPersonalRoster(true);
+                await loadAuction();
+              } catch (error) {
+                button.disabled = false;
+                msg(error.message, 'error');
+              }
+            }
+          );
+        });
 
 
       $('auction-admin-bid-amount')
