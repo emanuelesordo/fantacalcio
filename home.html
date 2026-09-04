@@ -8408,6 +8408,161 @@
     }
 
 
+
+
+    /* =====================================================
+       ASTA / GESTIONE V28 · squadre flessibili e coda in rosa
+       ===================================================== */
+    #view-manage .compact-list{gap:3px}
+    #view-manage .compact-row{
+      min-height:38px;
+      padding:4px 6px;
+      border-radius:7px;
+    }
+    #view-manage .compact-row strong{font-size:10px;line-height:1.05}
+    #view-manage .compact-row small{font-size:7px;line-height:1.05}
+    #view-manage .compact-row button,
+    #view-manage .compact-row select{
+      min-height:28px;
+      height:28px;
+      padding:2px 7px;
+      font-size:8px;
+    }
+    #view-manage .member-role-controls{gap:8px;flex-wrap:nowrap}
+    #view-manage .member-role-controls .check-line{
+      min-height:26px;
+      gap:4px;
+      padding:2px 3px;
+      font-size:8px;
+      white-space:nowrap;
+    }
+    #view-manage .member-role-controls input{
+      width:15px;
+      min-width:15px;
+      height:15px;
+      min-height:15px;
+      margin:0;
+    }
+    .manage-team-actions{display:flex;align-items:center;gap:3px;flex-wrap:nowrap}
+    .manage-team-actions .team-icon-btn{
+      width:28px!important;
+      min-width:28px!important;
+      padding:0!important;
+      font-size:12px!important;
+    }
+    .manage-team-actions .team-icon-btn.danger{background:var(--danger)!important}
+
+    .auction-roster-queue-toggle{
+      min-height:21px;
+      padding:2px 5px;
+      display:flex;
+      align-items:center;
+      gap:3px;
+      border:1px solid rgba(157,199,239,.20);
+      border-radius:999px;
+      background:rgba(43,76,110,.45);
+      color:var(--soft);
+      cursor:pointer;
+      font-size:6px;
+      font-weight:900;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+    .auction-roster-queue-toggle input{
+      width:11px;
+      min-width:11px;
+      height:11px;
+      min-height:11px;
+      margin:0;
+      padding:0;
+      accent-color:var(--primary);
+    }
+    .auction-roster-line.is-queued{
+      opacity:.48!important;
+      border-style:dashed!important;
+    }
+    .auction-roster-line.is-queued.is-private .auction-roster-mini-roles,
+    .auction-roster-line.is-queued.is-private .auction-roster-player-name,
+    .auction-roster-line.is-queued.is-private .auction-roster-price{
+      filter:blur(4px)!important;
+      user-select:none;
+    }
+
+    .auction-team-selection{
+      min-height:0;
+      display:grid;
+      grid-template-columns:minmax(0,1.25fr) minmax(230px,.75fr);
+      gap:8px;
+    }
+    .auction-team-selection-column{
+      min-height:220px;
+      padding:6px;
+      display:flex;
+      flex-direction:column;
+      gap:5px;
+      border:1px solid var(--line2);
+      border-radius:9px;
+      background:rgba(6,25,44,.58);
+    }
+    .auction-team-selection-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:6px;
+      min-height:28px;
+    }
+    .auction-team-dropzone{
+      flex:1 1 auto;
+      min-height:150px;
+      display:grid;
+      align-content:start;
+      gap:4px;
+      padding:3px;
+      border-radius:7px;
+      transition:background .14s ease,box-shadow .14s ease;
+    }
+    .auction-team-dropzone.is-over{
+      background:rgba(72,145,230,.10);
+      box-shadow:inset 0 0 0 1px rgba(92,168,248,.38);
+    }
+    .auction-team-dnd-row{
+      min-width:0;
+      min-height:38px;
+      display:grid;
+      grid-template-columns:22px minmax(0,1fr) auto;
+      align-items:center;
+      gap:6px;
+      padding:4px 6px;
+      border:1px solid var(--line);
+      border-radius:7px;
+      background:rgba(31,65,100,.62);
+      cursor:grab;
+    }
+    .auction-team-dnd-row:active{cursor:grabbing}
+    .auction-team-dnd-row.is-disabled{opacity:.45;cursor:not-allowed}
+    .auction-team-dnd-row.is-dragging{opacity:.30}
+    .auction-team-dnd-row .drag-handle{color:var(--muted);font-size:13px;text-align:center}
+    .auction-team-dnd-row strong{
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-size:10px;
+    }
+    .auction-team-dnd-row small{display:block;color:var(--soft);font-size:6.5px}
+    .auction-team-selection-actions{
+      margin-top:7px;
+      display:flex;
+      justify-content:flex-end;
+      gap:5px;
+      flex-wrap:wrap;
+    }
+    @media(max-width:760px){
+      .auction-team-selection{grid-template-columns:1fr}
+      .auction-team-selection-column{min-height:150px}
+      #view-manage .member-role-controls{flex-wrap:wrap;gap:3px}
+    }
+
   </style>
 </head>
 <body>
@@ -8856,6 +9011,12 @@
       auctionRostersTop: null,
       auctionAdminConsoleOpen: false,
       auctionQueueOpen: false,
+      auctionShowQueueInRoster: false,
+
+      auctionPreparedDraftSessionId: null,
+      auctionPreparedIncludedTeamIds: [],
+      auctionPreparedExcludedTeamIds: [],
+      auctionPreparedDragTeamId: null,
 
       auctionAdminPlayerSearch: '',
       auctionAdminPlayerId: null,
@@ -9816,22 +9977,65 @@
 
       $('create-team-form').hidden = !data.permissions?.canCreateTeam;
 
-      const membersWithoutTeam = (data.members || []).filter(member => !member.team);
+      const membersWithoutTeam =
+        (data.members || [])
+          .filter(member =>
+            !member.team
+            && member.canBePresident !== false
+          );
 
       $('manage-teams').innerHTML = (data.teams || []).map(team => {
-        const president = (data.members || []).find(member => member.team?.teamId === team.id && member.team?.role === 'president' && member.team?.status === 'active');
+        const president = (data.members || []).find(member =>
+          member.team?.teamId === team.id
+          && member.team?.role === 'president'
+          && member.team?.status === 'active'
+        );
+
+        const canRename = Boolean(
+          data.permissions?.isLeagueAdmin
+          || data.permissions?.myPresidentTeamId === team.id
+        );
+
+        const canDelete = data.permissions?.isLeagueAdmin === true;
+
         return `
-          <div class="compact-row">
-            <div><strong>${esc(team.name)}</strong><small>${president ? `Presidente: ${esc(president.username)}` : 'Presidente non assegnato'}</small></div>
-            ${data.permissions?.canAssignPresident && !president ? `
-              <div class="row">
-                <select class="president-select" data-team="${esc(team.id)}" style="width:145px">
+          <div class="compact-row manage-team-row">
+            <div>
+              <strong>${esc(team.name)}</strong>
+              <small>${president ? `Presidente: ${esc(president.username)}` : 'Presidente non assegnato'}</small>
+            </div>
+
+            <div class="manage-team-actions">
+              ${data.permissions?.canAssignPresident && !president ? `
+                <select class="president-select" data-team="${esc(team.id)}" style="width:138px">
                   <option value="">Presidente...</option>
                   ${membersWithoutTeam.map(member => `<option value="${esc(member.userId)}">${esc(member.username)}</option>`).join('')}
                 </select>
                 <button class="assign-president" data-team="${esc(team.id)}" type="button">Assegna</button>
-              </div>
-            ` : '<span class="badge good">OK</span>'}
+              ` : '<span class="badge good">OK</span>'}
+
+              ${canRename ? `
+                <button
+                  class="secondary team-icon-btn rename-team"
+                  data-team="${esc(team.id)}"
+                  data-name="${esc(team.name)}"
+                  type="button"
+                  title="Rinomina squadra"
+                  aria-label="Rinomina ${esc(team.name)}"
+                >✎</button>
+              ` : ''}
+
+              ${canDelete ? `
+                <button
+                  class="danger team-icon-btn delete-team"
+                  data-team="${esc(team.id)}"
+                  data-name="${esc(team.name)}"
+                  type="button"
+                  title="Elimina squadra"
+                  aria-label="Elimina ${esc(team.name)}"
+                >×</button>
+              ` : ''}
+            </div>
           </div>
         `;
       }).join('') || '<div class="small soft">Nessuna squadra.</div>';
@@ -9845,6 +10049,50 @@
             msg('Presidente assegnato.', 'success');
             await Promise.all([loadManagement(), loadDashboard()]);
           } catch (error) { msg(error.message, 'error'); }
+        });
+      });
+
+      $('manage-teams').querySelectorAll('.rename-team').forEach(button => {
+        button.addEventListener('click', async () => {
+          const currentName = button.dataset.name || '';
+          const raw = prompt('Nuovo nome squadra', currentName);
+          if (raw === null) return;
+          const teamName = raw.trim();
+          if (teamName.length < 2 || teamName.length > 60) {
+            return msg('Il nome della squadra deve avere tra 2 e 60 caratteri.', 'error');
+          }
+          if (teamName === currentName) return;
+
+          try {
+            await api(ENDPOINTS.league, {
+              action: 'renameTeam',
+              teamId: button.dataset.team,
+              teamName
+            });
+            msg('Squadra rinominata.', 'success');
+            await Promise.all([loadManagement(), loadDashboard()]);
+          } catch (error) {
+            msg(error.message, 'error');
+          }
+        });
+      });
+
+      $('manage-teams').querySelectorAll('.delete-team').forEach(button => {
+        button.addEventListener('click', async () => {
+          const teamName = button.dataset.name || 'questa squadra';
+          if (!confirm(`Eliminare ${teamName}? La squadra verrà rimossa dalle squadre attive, mantenendo lo storico già registrato.`)) {
+            return;
+          }
+          try {
+            await api(ENDPOINTS.league, {
+              action: 'deleteTeam',
+              teamId: button.dataset.team
+            });
+            msg('Squadra eliminata.', 'success');
+            await Promise.all([loadManagement(), loadDashboard()]);
+          } catch (error) {
+            msg(error.message, 'error');
+          }
         });
       });
 
@@ -9878,6 +10126,7 @@
               enabled: input.checked
             });
             msg('Ruolo aggiornato.', 'success');
+            await loadManagement();
           } catch (error) {
             input.checked = !input.checked;
             msg(error.message, 'error');
@@ -11262,13 +11511,32 @@
           `)
           .join('');
 
+      const allQueueEntries =
+        auctionQueueRows()
+          .filter(item => item.player)
+          .map(item => ({
+            player: item.player,
+            price: Number(item.opening_bid || 1),
+            queued: true,
+            position: Number(item.position || 0)
+          }));
+
+      const queueEntries =
+        state.auctionShowQueueInRoster
+          ? allQueueEntries
+          : [];
+
+      const queuePrivate =
+        state.auction?.callQueueSettings?.private === true;
+
       const rosterEntries = [
         ...info.assignments.map(item => ({
           player: item.player || {},
           price: Number(item.purchase_price || 0),
           queued: false,
           position: 0
-        }))
+        })),
+        ...queueEntries
       ];
 
       const roleSequence =
@@ -11382,7 +11650,7 @@
           : `${averagePurchasePmaDelta > 0 ? '+' : ''}${formatNumber(averagePurchasePmaDelta)}`;
 
       const projectedRosterCount =
-        acquiredRosterCount;
+        acquiredRosterCount + queueEntries.length;
 
       const rosterRowCount =
         Math.max(
@@ -11476,7 +11744,7 @@
                 );
 
               return `
-                <div class="auction-roster-line ${entry.queued ? 'is-queued' : ''}">
+                <div class="auction-roster-line ${entry.queued ? 'is-queued' : ''} ${entry.queued && queuePrivate ? 'is-private' : ''}">
                   <span class="auction-roster-mini-roles">
                     ${roles.map(role => `
                       <span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>
@@ -11585,6 +11853,18 @@
                 <span class="auction-roster-remaining">
                   MIN ${minimumRemaining} · MAX ${maximumRemaining}
                 </span>
+
+                <label
+                  class="auction-roster-queue-toggle"
+                  title="Mostra o nasconde in rosa i potenziali acquisti presenti nella coda"
+                >
+                  <input
+                    id="auction-roster-queue-toggle"
+                    type="checkbox"
+                    ${state.auctionShowQueueInRoster ? 'checked' : ''}
+                  >
+                  <span>Coda</span>
+                </label>
               </div>
             </div>
 
@@ -12224,6 +12504,20 @@
     }
 
 
+    function attachAuctionRosterQueueToggle() {
+      $('auction-roster-queue-toggle')
+        ?.addEventListener(
+          'change',
+          event => {
+            state.auctionShowQueueInRoster =
+              event.currentTarget.checked;
+
+            renderAuctionLive();
+          }
+        );
+    }
+
+
 
     function auctionOptimisticQueueRows(items) {
       const currentRows =
@@ -12288,6 +12582,7 @@
 
       attachAuctionCallQueueEvents();
       attachAuctionQueueDrawerToggle();
+      attachAuctionRosterQueueToggle();
 
       const nextList =
         $('auction-call-queue-list');
@@ -12297,6 +12592,29 @@
       }
 
       renderAuctionPlayers();
+
+      if (state.auctionShowQueueInRoster) {
+        const currentRoster =
+          document.querySelector(
+            '.auction-lower-main > .auction-team-column'
+          );
+
+        if (currentRoster) {
+          const holder =
+            document.createElement('div');
+
+          holder.innerHTML =
+            renderAuctionCockpitTeamPanel('roster').trim();
+
+          const nextRoster =
+            holder.firstElementChild;
+
+          if (nextRoster) {
+            currentRoster.replaceWith(nextRoster);
+            attachAuctionRosterQueueToggle();
+          }
+        }
+      }
 
     }
 
@@ -13844,12 +14162,23 @@
       const rosterData =
         state.auctionPersonalRoster;
 
-      const teams =
+      const allTeams =
         rosterData?.teams
         ||
         state.auction?.teams
         ||
         [];
+
+      const participatingIds =
+        new Set(
+          (state.auction?.teamOrder || [])
+            .map(item => item.team_id)
+        );
+
+      const teams =
+        participatingIds.size
+          ? allTeams.filter(team => participatingIds.has(team.id))
+          : allTeams;
 
       const assignments =
         rosterData?.assignments
@@ -14134,7 +14463,12 @@
         return '';
       }
 
-      const teams = data?.teams || state.auction?.teams || [];
+      const allTeams = data?.teams || state.auction?.teams || [];
+      const participatingIds =
+        new Set((state.auction?.teamOrder || []).map(item => item.team_id));
+      const teams = participatingIds.size
+        ? allTeams.filter(team => participatingIds.has(team.id))
+        : allTeams;
       const currentTeam =
         teams.find(team => team.id === assignment.team_id) || null;
       const targets =
@@ -15157,24 +15491,229 @@
       return rows.map(([a,b])=>`<div class="compact-row"><strong>${esc(a)}</strong><span class="badge">${esc(b ?? '—')}</span></div>`).join('');
     }
 
+    function ensureAuctionPreparedTeamDraft(data = state.auction) {
+      const session = data?.auctionSession;
+      if (!session?.id) return;
+
+      if (state.auctionPreparedDraftSessionId === session.id) {
+        return;
+      }
+
+      const teams = data.teams || [];
+      const expected = Math.max(1, Number(session.setup_snapshot?.team_count || data.settings?.team_count || teams.length || 1));
+      const allIds = teams.map(team => team.id);
+      const saved = (data.teamOrder || [])
+        .map(item => item.team_id)
+        .filter(id => allIds.includes(id));
+
+      const eligible = teams.filter(team => team.president).map(team => team.id);
+      const included = saved.length
+        ? saved
+        : eligible.slice(0, expected);
+
+      state.auctionPreparedDraftSessionId = session.id;
+      state.auctionPreparedIncludedTeamIds = [...included];
+      state.auctionPreparedExcludedTeamIds = allIds.filter(id => !included.includes(id));
+      state.auctionPreparedDragTeamId = null;
+    }
+
+    function auctionPreparedMoveTeam(teamId, target, beforeTeamId = null) {
+      const included = [...state.auctionPreparedIncludedTeamIds];
+      const excluded = [...state.auctionPreparedExcludedTeamIds];
+
+      const remove = list => {
+        const index = list.indexOf(teamId);
+        if (index >= 0) list.splice(index, 1);
+      };
+
+      remove(included);
+      remove(excluded);
+
+      const destination = target === 'included' ? included : excluded;
+      if (beforeTeamId) {
+        const before = destination.indexOf(beforeTeamId);
+        if (before >= 0) destination.splice(before, 0, teamId);
+        else destination.push(teamId);
+      } else {
+        destination.push(teamId);
+      }
+
+      state.auctionPreparedIncludedTeamIds = included;
+      state.auctionPreparedExcludedTeamIds = excluded;
+      renderAuctionPrepared();
+    }
+
+    function bindAuctionPreparedDnD() {
+      document.querySelectorAll('.auction-team-dnd-row[draggable="true"]').forEach(row => {
+        row.addEventListener('dragstart', event => {
+          state.auctionPreparedDragTeamId = row.dataset.team;
+          row.classList.add('is-dragging');
+          event.dataTransfer.effectAllowed = 'move';
+        });
+
+        row.addEventListener('dragend', () => {
+          state.auctionPreparedDragTeamId = null;
+          row.classList.remove('is-dragging');
+          document.querySelectorAll('.auction-team-dropzone').forEach(zone => zone.classList.remove('is-over'));
+        });
+
+        row.addEventListener('dragover', event => {
+          event.preventDefault();
+          event.stopPropagation();
+          event.dataTransfer.dropEffect = 'move';
+        });
+
+        row.addEventListener('drop', event => {
+          event.preventDefault();
+          event.stopPropagation();
+          const dragged = state.auctionPreparedDragTeamId;
+          if (!dragged || dragged === row.dataset.team) return;
+          const target = row.closest('.auction-team-dropzone')?.dataset.dropzone;
+          if (!target) return;
+          auctionPreparedMoveTeam(dragged, target, row.dataset.team);
+        });
+      });
+
+      document.querySelectorAll('.auction-team-dropzone').forEach(zone => {
+        zone.addEventListener('dragover', event => {
+          event.preventDefault();
+          zone.classList.add('is-over');
+          event.dataTransfer.dropEffect = 'move';
+        });
+        zone.addEventListener('dragleave', event => {
+          if (!zone.contains(event.relatedTarget)) zone.classList.remove('is-over');
+        });
+        zone.addEventListener('drop', event => {
+          event.preventDefault();
+          zone.classList.remove('is-over');
+          if (event.target.closest('.auction-team-dnd-row')) return;
+          const dragged = state.auctionPreparedDragTeamId;
+          if (!dragged) return;
+          auctionPreparedMoveTeam(dragged, zone.dataset.dropzone);
+        });
+      });
+    }
+
     function renderAuctionPrepared() {
-      const data=state.auction, session=data.auctionSession;
+      const data = state.auction;
+      const session = data.auctionSession;
+      ensureAuctionPreparedTeamDraft(data);
+
+      const expected = Math.max(1, Number(session.setup_snapshot?.team_count || data.settings?.team_count || 0));
+      const teamsById = Object.fromEntries((data.teams || []).map(team => [team.id, team]));
+      const included = state.auctionPreparedIncludedTeamIds
+        .map(id => teamsById[id])
+        .filter(Boolean);
+      const excluded = state.auctionPreparedExcludedTeamIds
+        .map(id => teamsById[id])
+        .filter(Boolean);
+
+      const validCount = included.length === expected;
+      const allIncludedHavePresident = included.every(team => team.president);
+      const canSave = auctionCanControl() && validCount && allIncludedHavePresident;
+
+      const teamRow = (team, index, includedList) => `
+        <div
+          class="auction-team-dnd-row ${team.president ? '' : 'is-disabled'}"
+          data-team="${esc(team.id)}"
+          draggable="${team.president ? 'true' : 'false'}"
+          title="${team.president ? 'Trascina per spostare o riordinare' : 'Assegna prima un Presidente'}"
+        >
+          <span class="drag-handle">⋮⋮</span>
+          <div>
+            <strong>${esc(team.name)}</strong>
+            <small>${team.president ? `Presidente: ${esc(team.president.username)}` : 'Nessun Presidente'}</small>
+          </div>
+          ${includedList ? `<span class="badge primary">${index + 1}</span>` : `<span class="badge ${team.president ? '' : 'warn'}">${team.president ? 'ESCLUSA' : 'NO PRES.'}</span>`}
+        </div>
+      `;
+
       $('auction-root').innerHTML = `
         <div class="auction-lobby">
-          <section class="panel"><div class="between"><div><strong>Asta preparata</strong><div class="small soft">Controlla l'ordine e avvia.</div></div><span class="badge good">PREPARED</span></div></section>
-          <section class="panel inner-scroll"><div id="auction-order" class="team-order">${(data.teamOrder||[]).map((item,index)=>`<div class="order-row" data-team="${esc(item.team_id)}"><span class="badge">${index+1}</span><strong>${esc(item.team?.name||'Squadra')}</strong>${auctionCanControl()?`<div class="row"><button class="secondary order-up" data-i="${index}">↑</button><button class="secondary order-down" data-i="${index}">↓</button></div>`:''}</div>`).join('')}</div>${auctionCanControl()?`<div class="row" style="margin-top:6px"><button id="save-order" class="secondary">Salva ordine</button><button id="start-auction">Avvia asta</button></div>`:''}</section>
+          <section class="panel">
+            <div class="between">
+              <div>
+                <strong>Asta preparata</strong>
+                <div class="small soft">Trascina le squadre tra Iscritte ed Escluse e ordina le iscritte dall'alto verso il basso.</div>
+              </div>
+              <div class="row">
+                <span class="badge good">PREPARED</span>
+                <span class="badge ${validCount ? 'good' : 'warn'}">${included.length}/${expected} iscritte</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel inner-scroll">
+            <div class="auction-team-selection">
+              <div class="auction-team-selection-column">
+                <div class="auction-team-selection-head">
+                  <strong>Squadre iscritte</strong>
+                  <span class="badge ${validCount ? 'good' : 'warn'}">${included.length}/${expected}</span>
+                </div>
+                <div class="auction-team-dropzone" data-dropzone="included">
+                  ${included.map((team,index) => teamRow(team,index,true)).join('') || '<div class="small soft">Trascina qui le squadre partecipanti.</div>'}
+                </div>
+              </div>
+
+              <div class="auction-team-selection-column">
+                <div class="auction-team-selection-head">
+                  <strong>Squadre escluse</strong>
+                  <span class="badge">${excluded.length}</span>
+                </div>
+                <div class="auction-team-dropzone" data-dropzone="excluded">
+                  ${excluded.map((team,index) => teamRow(team,index,false)).join('') || '<div class="small soft">Nessuna squadra esclusa.</div>'}
+                </div>
+              </div>
+            </div>
+
+            ${!validCount ? `<div class="small soft" style="margin-top:6px">Seleziona esattamente ${expected} squadre.</div>` : ''}
+            ${validCount && !allIncludedHavePresident ? '<div class="small soft" style="margin-top:6px">Tutte le squadre iscritte devono avere un Presidente.</div>' : ''}
+
+            ${auctionCanControl() ? `
+              <div class="auction-team-selection-actions">
+                <button id="save-order" class="secondary" ${canSave ? '' : 'disabled'}>Salva composizione</button>
+                <button id="start-auction" ${canSave ? '' : 'disabled'}>Salva e avvia asta</button>
+              </div>
+            ` : ''}
+          </section>
         </div>`;
 
-      const order = [...(data.teamOrder||[])];
-      document.querySelectorAll('.order-up,.order-down').forEach(button=>button.addEventListener('click',()=>{
-        const i=Number(button.dataset.i), delta=button.classList.contains('order-up')?-1:1, j=i+delta;
-        if(j<0||j>=order.length)return;
-        [order[i],order[j]]=[order[j],order[i]];
-        state.auction.teamOrder=order;
-        renderAuctionPrepared();
-      }));
-      $('save-order')?.addEventListener('click',()=>auctionAction({action:'saveTeamOrder',sessionId:session.id,teamIds:order.map(x=>x.team_id)},'Ordine salvato.'));
-      $('start-auction')?.addEventListener('click',()=>auctionAction({action:'startAuction',sessionId:session.id},'Asta avviata.'));
+      bindAuctionPreparedDnD();
+
+      $('save-order')?.addEventListener('click', async () => {
+        if (!canSave) return;
+        try {
+          await api(ENDPOINTS.auction, {
+            action: 'saveTeamOrder',
+            sessionId: session.id,
+            teamIds: [...state.auctionPreparedIncludedTeamIds]
+          });
+          msg('Composizione e ordine salvati.', 'success');
+          await loadAuction();
+        } catch (error) {
+          msg(error.message, 'error');
+        }
+      });
+
+      $('start-auction')?.addEventListener('click', async () => {
+        if (!canSave) return;
+        try {
+          await api(ENDPOINTS.auction, {
+            action: 'saveTeamOrder',
+            sessionId: session.id,
+            teamIds: [...state.auctionPreparedIncludedTeamIds]
+          });
+          await api(ENDPOINTS.auction, {
+            action: 'startAuction',
+            sessionId: session.id
+          });
+          msg('Asta avviata.', 'success');
+          state.auctionPreparedDraftSessionId = null;
+          await loadAuction();
+        } catch (error) {
+          msg(error.message, 'error');
+        }
+      });
     }
 
     function auctionRolePhaseLabel(key) {
@@ -15410,8 +15949,22 @@
     }
 
 
+    function auctionParticipatingTeams(data = state.auction) {
+      const d = data || {};
+      const byId = Object.fromEntries((d.teams || []).map(team => [team.id, team]));
+      const ordered = (d.teamOrder || [])
+        .map(item => byId[item.team_id])
+        .filter(Boolean);
+
+      return ordered.length
+        ? ordered
+        : (d.teams || []);
+    }
+
+
     function renderAuctionControllerTeamSelector() {
       const d = state.auction || {};
+      const participatingTeams = auctionParticipatingTeams(d);
 
       return `
         <div class="auctioneer-section auctioneer-team-section">
@@ -15420,7 +15973,7 @@
           </div>
 
           <div class="auctioneer-team-grid auctioneer-team-grid-unified">
-            ${(d.teams || []).map(team => {
+            ${participatingTeams.map(team => {
               const selected = state.auctionAdminTeamId === team.id;
               const leader = d.auctionSession?.current_bidder_team_id === team.id;
 
@@ -16180,8 +16733,11 @@
           || ''
         );
 
+      const participatingTeams =
+        auctionParticipatingTeams(d);
+
       const adminTeamIds =
-        new Set((d.teams || []).map(team => team.id));
+        new Set(participatingTeams.map(team => team.id));
 
       if (
         !state.auctionAdminTeamId
@@ -16191,7 +16747,7 @@
           s.current_bidder_team_id
           || s.current_nomination_team_id
           || d.currentNominationTeam?.id
-          || d.teams?.[0]?.id
+          || participatingTeams[0]?.id
           || null;
       }
 
@@ -16650,6 +17206,7 @@
       renderAuctionPlayers();
       attachAuctionCallQueueEvents();
       attachAuctionQueueDrawerToggle();
+      attachAuctionRosterQueueToggle();
       renderAuctionAdminSearchResults();
 
 
@@ -16952,7 +17509,7 @@
           });
 
         const selectedTeam =
-          (state.auction?.teams || [])
+          auctionParticipatingTeams(state.auction)
             .find(team => team.id === state.auctionAdminTeamId)
           || null;
 
