@@ -9973,6 +9973,245 @@
       }
     }
 
+
+
+    /* =====================================================
+       V40 · interessi Vice + Ultimi rilanci top 3 senza scroll
+       ===================================================== */
+
+    .auction-player-name-line{
+      min-width:0;
+      width:100%;
+      display:flex;
+      align-items:center;
+      gap:4px;
+    }
+
+    .auction-player-name-line>.player-name{
+      min-width:0;
+      flex:1 1 auto;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .auction-vice-interest-readout{
+      min-width:0;
+      display:inline-flex;
+      align-items:center;
+      gap:2px;
+      flex:0 0 auto;
+    }
+
+    .auction-vice-interest-badge{
+      min-width:20px;
+      min-height:18px;
+      padding:1px 3px;
+      display:inline-grid;
+      place-items:center;
+      border:1px solid rgba(109,161,210,.40);
+      border-radius:4px;
+      background:rgba(24,56,85,.72);
+      color:#fff;
+      font-size:9px;
+      font-weight:950;
+      line-height:1;
+      white-space:nowrap;
+    }
+
+    .auction-vice-interest-badge.is-price{
+      min-width:34px;
+      color:#bff5ff;
+      font-size:6.5px;
+      letter-spacing:.025em;
+    }
+
+    .auction-vice-interest-editor{
+      min-width:0;
+      display:inline-flex;
+      align-items:center;
+      gap:2px;
+      flex:0 0 auto;
+      white-space:nowrap;
+    }
+
+    .auction-vice-interest-editor button,
+    .auction-vice-interest-editor input{
+      margin:0!important;
+      box-sizing:border-box!important;
+    }
+
+    .auction-vice-interest-emoji,
+    .auction-vice-interest-price-send,
+    .auction-vice-interest-clear{
+      width:20px!important;
+      min-width:20px!important;
+      height:20px!important;
+      min-height:20px!important;
+      padding:0!important;
+      border-radius:4px!important;
+      display:inline-grid!important;
+      place-items:center!important;
+      font-size:9px!important;
+      line-height:1!important;
+    }
+
+    .auction-vice-interest-emoji.is-active,
+    .auction-vice-interest-price-send.is-active{
+      border-color:rgba(78,215,156,.80)!important;
+      background:rgba(26,126,91,.72)!important;
+      box-shadow:inset 0 0 0 1px rgba(82,233,168,.14)!important;
+    }
+
+    .auction-vice-interest-price{
+      width:38px!important;
+      min-width:38px!important;
+      height:20px!important;
+      min-height:20px!important;
+      padding:1px 3px!important;
+      text-align:center!important;
+      font-size:7px!important;
+      font-weight:900!important;
+    }
+
+    .auction-vice-interest-clear{
+      color:#ffabb3!important;
+    }
+
+    .auction-vice-interest-clear:disabled{
+      opacity:.25!important;
+    }
+
+    .auction-free-fixed .player-main{
+      min-width:0;
+    }
+
+    .auction-free-fixed .auction-player-col-name{
+      min-width:0;
+    }
+
+    .auction-queue-price-with-vice{
+      min-width:0!important;
+      display:flex!important;
+      align-items:center!important;
+      gap:3px!important;
+      overflow:visible!important;
+    }
+
+    .auction-queue-price-with-vice>.auction-queue-price-input{
+      width:42px!important;
+      min-width:42px!important;
+      flex:0 0 42px!important;
+    }
+
+    .auction-call-queue-row:has(.auction-vice-interest-editor){
+      grid-template-columns:
+        10px
+        minmax(21px,auto)
+        minmax(72px,1fr)
+        minmax(165px,auto)
+        0
+        0!important;
+    }
+
+    .auction-call-queue-row:has(.auction-vice-interest-readout){
+      grid-template-columns:
+        10px
+        minmax(21px,auto)
+        minmax(0,1fr)
+        minmax(78px,auto)
+        22px
+        22px!important;
+    }
+
+    .auction-queue-action-placeholder{
+      width:0!important;
+      min-width:0!important;
+      height:1px!important;
+      overflow:hidden!important;
+    }
+
+    /* Il vecchio strip Vice non fa più parte del cockpit. */
+    .auction-middle-vice-slot,
+    .auction-vice-strip{
+      display:none!important;
+    }
+
+    /* Ultimi rilanci: il server consegna già solo i 3 record più recenti.
+       Il gadget non ha quindi più nessun overflow/scroll interno. */
+    .auction-middle-lower-zone.has-queue{
+      grid-template-rows:minmax(124px,1fr) auto!important;
+    }
+
+    .auction-middle-lower-zone.no-queue{
+      grid-template-rows:auto!important;
+    }
+
+    .auction-middle-lower-zone>.auction-central-queue{
+      grid-row:1!important;
+    }
+
+    .auction-middle-lower-zone>.auction-bid-history{
+      grid-row:2!important;
+      min-height:0!important;
+      height:auto!important;
+      max-height:none!important;
+      overflow:visible!important;
+      align-self:end!important;
+      display:grid!important;
+      grid-template-rows:auto auto!important;
+    }
+
+    .auction-middle-lower-zone.no-queue>.auction-bid-history{
+      grid-row:1!important;
+    }
+
+    .auction-middle-lower-zone .auction-bid-chips,
+    #auction-live-recent-bids{
+      min-height:0!important;
+      height:auto!important;
+      max-height:none!important;
+      overflow:visible!important;
+      overscroll-behavior:auto!important;
+      scrollbar-gutter:auto!important;
+      display:grid!important;
+      grid-template-columns:minmax(0,1fr)!important;
+      align-content:start!important;
+    }
+
+    @media(max-width:760px){
+      .auction-vice-interest-editor{
+        gap:1px;
+      }
+
+      .auction-vice-interest-emoji,
+      .auction-vice-interest-price-send,
+      .auction-vice-interest-clear{
+        width:18px!important;
+        min-width:18px!important;
+        height:18px!important;
+        min-height:18px!important;
+        font-size:8px!important;
+      }
+
+      .auction-vice-interest-price{
+        width:34px!important;
+        min-width:34px!important;
+        height:18px!important;
+        min-height:18px!important;
+      }
+
+      .auction-call-queue-row:has(.auction-vice-interest-editor){
+        grid-template-columns:
+          8px
+          minmax(19px,auto)
+          minmax(62px,1fr)
+          minmax(148px,auto)
+          0
+          0!important;
+      }
+    }
+
 </style>
 </head>
 <body>
@@ -11544,7 +11783,7 @@
       $('manage-teams').querySelectorAll('.team-alias-input').forEach(input => {
         input.addEventListener('input', () => {
           const caret = input.selectionStart;
-          input.value = input.value.toLocaleUpperCase('it-IT').slice(0, 10);
+          input.value = input.value.toLocaleUpperCase('it-IT').slice(0, 3);
           if (caret !== null) {
             input.setSelectionRange(Math.min(caret, input.value.length), Math.min(caret, input.value.length));
           }
@@ -12270,6 +12509,301 @@
           `).join('')}</span>`
         : '<span class="auction-signal-empty">—</span>';
     }
+
+    const AUCTION_VICE_INTERESTS = {
+      strong: {
+        emoji: '💪',
+        label: 'Punta forte'
+      },
+      like: {
+        emoji: '👍',
+        label: 'Mi piace · proviamo'
+      },
+      dislike: {
+        emoji: '👎',
+        label: 'Non mi piace · non lo voglio'
+      },
+      watch: {
+        emoji: '👀',
+        label: 'Vediamo che succede'
+      }
+    };
+
+
+    function auctionViceInterestsFor(playerId) {
+      return (
+        state.auction?.viceInterests
+          ?.[String(playerId)]
+        || []
+      );
+    }
+
+
+    function auctionOwnViceInterest(playerId) {
+      return auctionViceInterestsFor(playerId)
+        .find(item => item?.mine === true)
+        || null;
+    }
+
+
+    function auctionPlayerIsQueued(playerId) {
+      return auctionQueueRows()
+        .some(item => item.player_id === playerId);
+    }
+
+
+    function auctionViceInterestTitle(item) {
+      if (!item) {
+        return '';
+      }
+
+      if (item.type === 'price') {
+        return `${item.viceUsername || 'Vice'} · prezzo desiderato ${Number(item.amount || 0)}`;
+      }
+
+      const meta = AUCTION_VICE_INTERESTS[item.type];
+      return `${item.viceUsername || 'Vice'} · ${meta?.label || item.type || 'segnale'}`;
+    }
+
+
+    function renderAuctionViceInterestReadout(
+      playerId,
+      { compact = false } = {}
+    ) {
+      if (!auctionHasPresidentRole()) {
+        return '';
+      }
+
+      const interests =
+        auctionViceInterestsFor(playerId);
+
+      if (!interests.length) {
+        return '';
+      }
+
+      return `
+        <span class="auction-vice-interest-readout ${compact ? 'is-compact' : ''}">
+          ${interests.map(item => {
+            if (item.type === 'price') {
+              return `
+                <span
+                  class="auction-vice-interest-badge is-price"
+                  title="${esc(auctionViceInterestTitle(item))}"
+                >V ${Number(item.amount || 0)}</span>
+              `;
+            }
+
+            const meta =
+              AUCTION_VICE_INTERESTS[item.type]
+              || { emoji: '•', label: item.type || 'Segnale' };
+
+            return `
+              <span
+                class="auction-vice-interest-badge"
+                title="${esc(auctionViceInterestTitle(item))}"
+              >${meta.emoji}</span>
+            `;
+          }).join('')}
+        </span>
+      `;
+    }
+
+
+    function renderAuctionViceInterestEditor(
+      playerId,
+      { compact = false } = {}
+    ) {
+      if (!auctionHasViceRole()) {
+        return '';
+      }
+
+      const own =
+        auctionOwnViceInterest(playerId);
+
+      return `
+        <span
+          class="auction-vice-interest-editor ${compact ? 'is-compact' : ''}"
+          data-vice-interest-player="${esc(playerId)}"
+          title="Comunica al Presidente il tuo interesse"
+        >
+          ${Object.entries(AUCTION_VICE_INTERESTS).map(([type, meta]) => `
+            <button
+              type="button"
+              class="auction-vice-interest-emoji ${own?.type === type ? 'is-active' : ''}"
+              data-vice-interest-type="${type}"
+              data-player-id="${esc(playerId)}"
+              title="${esc(meta.label)}"
+              aria-label="${esc(meta.label)}"
+            >${meta.emoji}</button>
+          `).join('')}
+
+          <input
+            class="auction-vice-interest-price"
+            data-vice-interest-price="${esc(playerId)}"
+            type="number"
+            min="1"
+            max="999999"
+            step="1"
+            inputmode="numeric"
+            placeholder="€"
+            value="${own?.type === 'price' ? Number(own.amount || '') : ''}"
+            title="Prezzo desiderato"
+            aria-label="Prezzo desiderato"
+          >
+
+          <button
+            type="button"
+            class="auction-vice-interest-price-send ${own?.type === 'price' ? 'is-active' : ''}"
+            data-vice-interest-price-send="${esc(playerId)}"
+            title="Invia prezzo desiderato"
+            aria-label="Invia prezzo desiderato"
+          >✓</button>
+
+          <button
+            type="button"
+            class="auction-vice-interest-clear"
+            data-vice-interest-clear="${esc(playerId)}"
+            ${own ? '' : 'disabled'}
+            title="Cancella indicazione"
+            aria-label="Cancella indicazione"
+          >×</button>
+        </span>
+      `;
+    }
+
+
+    async function sendViceInterest(
+      playerId,
+      type,
+      amount = null
+    ) {
+      if (!auctionHasViceRole()) {
+        return;
+      }
+
+      const own =
+        auctionOwnViceInterest(playerId);
+
+      const nextType =
+        own?.type === type
+        && type !== 'price'
+          ? 'clear'
+          : type;
+
+      if (
+        nextType === 'price'
+        && (
+          !Number.isInteger(Number(amount))
+          || Number(amount) < 1
+        )
+      ) {
+        return msg(
+          'Inserisci un prezzo desiderato valido.',
+          'warning'
+        );
+      }
+
+      try {
+        await api(
+          ENDPOINTS.auction,
+          {
+            action: 'sendViceSignal',
+            playerId,
+            signalType: nextType,
+            amount:
+              nextType === 'price'
+                ? Number(amount)
+                : null
+          }
+        );
+
+        await loadAuction({ quiet: true });
+      } catch (error) {
+        msg(error.message, 'error');
+      }
+    }
+
+
+    function bindAuctionViceInterestControls(root = document) {
+      if (!auctionHasViceRole()) {
+        return;
+      }
+
+      root
+        .querySelectorAll('[data-vice-interest-type]')
+        .forEach(button => {
+          button.addEventListener('click', event => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            void sendViceInterest(
+              button.dataset.playerId,
+              button.dataset.viceInterestType
+            );
+          });
+        });
+
+      root
+        .querySelectorAll('[data-vice-interest-price-send]')
+        .forEach(button => {
+          button.addEventListener('click', event => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const playerId =
+              button.dataset.viceInterestPriceSend;
+
+            const input =
+              root.querySelector(
+                `[data-vice-interest-price="${CSS.escape(playerId)}"]`
+              );
+
+            void sendViceInterest(
+              playerId,
+              'price',
+              Number(input?.value)
+            );
+          });
+        });
+
+      root
+        .querySelectorAll('[data-vice-interest-price]')
+        .forEach(input => {
+          input.addEventListener('click', event => {
+            event.stopPropagation();
+          });
+
+          input.addEventListener('keydown', event => {
+            if (event.key !== 'Enter') {
+              return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            void sendViceInterest(
+              input.dataset.viceInterestPrice,
+              'price',
+              Number(input.value)
+            );
+          });
+        });
+
+      root
+        .querySelectorAll('[data-vice-interest-clear]')
+        .forEach(button => {
+          button.addEventListener('click', event => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            void sendViceInterest(
+              button.dataset.viceInterestClear,
+              'clear'
+            );
+          });
+        });
+    }
+
 
     function normalizePlayerSearchText(value) {
       return String(value || '')
@@ -13749,6 +14283,18 @@
     }
 
 
+    function auctionHasViceRole() {
+      const d = state.auction;
+
+      return Boolean(
+        d?.permissions?.isVice === true
+        || d?.myTeam?.role === 'vice'
+        || state.dashboard?.permissions?.isVice === true
+        || state.dashboard?.myTeam?.role === 'vice'
+      );
+    }
+
+
     function auctionPresidentTeamId() {
       const d =
         state.auction;
@@ -13958,7 +14504,7 @@
         ||
         !auctionCallMode()
         ||
-        !auctionHasPresidentRole()
+        !(auctionHasPresidentRole() || auctionHasViceRole())
       ) {
         return false;
       }
@@ -14390,7 +14936,7 @@
       if (
         !auctionCallMode()
         ||
-        !auctionHasPresidentRole()
+        !(auctionHasPresidentRole() || auctionHasViceRole())
       ) {
         return '';
       }
@@ -14400,6 +14946,10 @@
 
       const editable =
         auctionCanManageCallQueue();
+
+      const viceView =
+        auctionHasViceRole()
+        && !auctionHasPresidentRole();
 
       const queueSettings =
         state.auction?.callQueueSettings
@@ -14423,46 +14973,54 @@
         >
           <div class="auction-call-queue-drawer-content">
 
-            <section class="auction-call-queue auction-team-roster ${isPrivate ? 'is-private' : ''}">
+            <section class="auction-call-queue auction-team-roster ${isPrivate && !viceView ? 'is-private' : ''}">
 
               <div class="auction-call-queue-head auction-team-roster-head">
 
                 <div class="auction-call-queue-title">
-                  <strong>Prossime chiamate</strong>
+                  <strong>${viceView ? 'Coda del Presidente' : 'Prossime chiamate'}</strong>
                   <span class="badge primary">${rows.length}</span>
                 </div>
 
-                <div class="auction-call-queue-head-actions">
-                  <button
-                    id="auction-queue-autoplay"
-                    type="button"
-                    class="${autoPaused ? 'good' : 'warn'}"
-                    ${editable ? '' : 'disabled'}
-                    title="${autoPaused ? 'Riprende le chiamate automatiche dalla prima voce valida' : 'Mette in pausa le chiamate automatiche per scegliere manualmente'}"
-                  >
-                    ${autoPaused ? 'RIPRENDI' : 'PAUSA'}
-                  </button>
+                ${
+                  viceView
+                    ? `<span class="badge">VICE · sola lettura</span>`
+                    : `
+                        <div class="auction-call-queue-head-actions">
+                          <button
+                            id="auction-queue-autoplay"
+                            type="button"
+                            class="${autoPaused ? 'good' : 'warn'}"
+                            ${editable ? '' : 'disabled'}
+                            title="${autoPaused ? 'Riprende le chiamate automatiche dalla prima voce valida' : 'Mette in pausa le chiamate automatiche per scegliere manualmente'}"
+                          >
+                            ${autoPaused ? 'RIPRENDI' : 'PAUSA'}
+                          </button>
 
-                  <label
-                    class="auction-queue-private-toggle ${isPrivate ? 'is-private' : ''}"
-                    title="${isPrivate ? 'La coda è offuscata sullo schermo' : 'Offusca nome, ruolo e prezzo della coda sullo schermo'}"
-                  >
-                    <input
-                      id="auction-queue-private"
-                      type="checkbox"
-                      ${isPrivate ? 'checked' : ''}
-                      ${editable ? '' : 'disabled'}
-                    >
-                    <span>${isPrivate ? 'OFFUSCATA' : 'OFFUSCA'}</span>
-                  </label>
-                </div>
+                          <label
+                            class="auction-queue-private-toggle ${isPrivate ? 'is-private' : ''}"
+                            title="${isPrivate ? 'La coda è offuscata sullo schermo' : 'Offusca nome, ruolo e prezzo della coda sullo schermo'}"
+                          >
+                            <input
+                              id="auction-queue-private"
+                              type="checkbox"
+                              ${isPrivate ? 'checked' : ''}
+                              ${editable ? '' : 'disabled'}
+                            >
+                            <span>${isPrivate ? 'OFFUSCATA' : 'OFFUSCA'}</span>
+                          </label>
+                        </div>
+                      `
+                }
 
               </div>
 
               ${
-                autoPaused
-                  ? `<div class="auction-queue-mode-note">Coda in pausa · al tuo turno usa ✓ per scegliere la chiamata.</div>`
-                  : `<div class="auction-queue-mode-note is-auto">Autoplay attivo · al tuo turno parte la prima voce valida.</div>`
+                viceView
+                  ? `<div class="auction-queue-mode-note is-auto">Indica interesse o prezzo desiderato: il Presidente lo vede in tempo reale.</div>`
+                  : autoPaused
+                    ? `<div class="auction-queue-mode-note">Coda in pausa · al tuo turno usa ✓ per scegliere la chiamata.</div>`
+                    : `<div class="auction-queue-mode-note is-auto">Autoplay attivo · al tuo turno parte la prima voce valida.</div>`
               }
 
               <div
@@ -14495,7 +15053,7 @@
                               <strong>${esc(item.player?.name || 'Giocatore')}</strong>
                             </div>
 
-                            <div class="auction-queue-price">
+                            <div class="auction-queue-price auction-queue-price-with-vice">
                               <input
                                 class="auction-queue-price-input"
                                 data-queue-price="${esc(item.player_id)}"
@@ -14507,29 +15065,43 @@
                                 title="Prezzo base di ${esc(item.player?.name || 'Giocatore')}"
                                 aria-label="Prezzo base di ${esc(item.player?.name || 'Giocatore')}"
                               >
+
+                              ${
+                                viceView
+                                  ? renderAuctionViceInterestEditor(item.player_id, { compact: true })
+                                  : renderAuctionViceInterestReadout(item.player_id, { compact: true })
+                              }
                             </div>
 
-                            <button
-                              type="button"
-                              class="auction-queue-remove"
-                              data-queue-remove="${esc(item.player_id)}"
-                              ${editable ? '' : 'disabled'}
-                              title="Rimuovi dalla coda"
-                            >×</button>
-
                             ${
-                              autoPaused
-                                ? `
+                              viceView
+                                ? '<span class="auction-queue-action-placeholder" aria-hidden="true"></span>'
+                                : `
                                     <button
                                       type="button"
-                                      class="auction-queue-call"
-                                      data-queue-call="${esc(item.id || '')}"
-                                      ${manualCallAvailable && item.id ? '' : 'disabled'}
-                                      title="${manualCallAvailable ? 'Chiama questo giocatore adesso' : 'Disponibile al tuo turno quando la coda è in pausa'}"
-                                      aria-label="Chiama ${esc(item.player?.name || 'questo giocatore')}"
-                                    >✓</button>
+                                      class="auction-queue-remove"
+                                      data-queue-remove="${esc(item.player_id)}"
+                                      ${editable ? '' : 'disabled'}
+                                      title="Rimuovi dalla coda"
+                                    >×</button>
                                   `
-                                : '<span class="auction-queue-call-placeholder" aria-hidden="true"></span>'
+                            }
+
+                            ${
+                              viceView
+                                ? '<span class="auction-queue-action-placeholder" aria-hidden="true"></span>'
+                                : autoPaused
+                                  ? `
+                                      <button
+                                        type="button"
+                                        class="auction-queue-call"
+                                        data-queue-call="${esc(item.id || '')}"
+                                        ${manualCallAvailable && item.id ? '' : 'disabled'}
+                                        title="${manualCallAvailable ? 'Chiama questo giocatore adesso' : 'Disponibile al tuo turno quando la coda è in pausa'}"
+                                        aria-label="Chiama ${esc(item.player?.name || 'questo giocatore')}"
+                                      >✓</button>
+                                    `
+                                  : '<span class="auction-queue-call-placeholder" aria-hidden="true"></span>'
                             }
 
                           </div>
@@ -14537,8 +15109,10 @@
                       ).join('')
                     : `
                         <div class="live-placeholder">
-                          La coda è vuota.
-                          Usa CHIAMA accanto a uno svincolato.
+                          ${viceView
+                            ? 'La coda del Presidente è vuota.'
+                            : 'La coda è vuota. Usa CHIAMA accanto a uno svincolato.'
+                          }
                         </div>
                       `
                 }
@@ -14642,6 +15216,7 @@
       }
 
       attachAuctionCallQueueEvents();
+      bindAuctionViceInterestControls($('auction-call-queue-drawer') || document);
       attachAuctionQueueDrawerToggle();
       attachAuctionRosterQueueToggle();
 
@@ -17387,6 +17962,18 @@
         rolePhase:
           data?.rolePhase || null,
 
+        viceInterests:
+          Object.entries(data?.viceInterests || {})
+            .flatMap(([playerId, items]) =>
+              (items || []).map(item => [
+                playerId,
+                item.id,
+                item.type,
+                item.amount,
+                item.viceUserId
+              ])
+            ),
+
         deviceMode:
           session?.setup_snapshot
             ?.president_device_mode
@@ -17405,16 +17992,7 @@
         ||
         null;
 
-      const vice =
-        data?.viceSignal
-          ? [
-              data.viceSignal.id,
-              data.viceSignal.signal_type,
-              data.viceSignal.type,
-              data.viceSignal.amount,
-              data.viceSignal.created_at
-            ]
-          : null;
+
 
       return JSON.stringify({
         bid:
@@ -17446,8 +18024,6 @@
 
         nominationExpired:
           session?.nomination_expired_at || null,
-
-        vice
       });
     }
 
@@ -17546,7 +18122,7 @@
 
       box.innerHTML =
         (state.auction?.recentBids || [])
-          .slice(0, 10)
+          .slice(0, 3)
           .map(bid => `
             <div class="auction-bid-chip">
               <span>
@@ -19454,96 +20030,13 @@
             `;
 
 
-      const viceHtml =
-        hasPlayer
-        &&
-        (
-          d.permissions?.isVice
-          ||
-          d.viceSignal
-        )
-          ? `
-              <section class="auction-vice-strip">
-
-                ${
-                  d.permissions?.isVice
-                    ? `
-                        <strong>Vice:</strong>
-
-                        <button
-                          class="vice-signal"
-                          data-type="push"
-                        >
-                          RILANCIA
-                        </button>
-
-                        <button
-                          class="vice-signal warn"
-                          data-type="stop"
-                        >
-                          STOP
-                        </button>
-
-                        <input
-                          id="vice-limit"
-                          type="number"
-                          min="1"
-                          value="${selectedBid}"
-                          style="width:80px"
-                        >
-
-                        <button
-                          class="vice-signal secondary"
-                          data-type="limit"
-                        >
-                          FINO A
-                        </button>
-
-                        <button
-                          class="vice-signal secondary"
-                          data-type="clear"
-                        >
-                          Pulisci
-                        </button>
-                      `
-                    : ''
-                }
-
-
-                ${
-                  d.viceSignal
-                    ? `
-                        <span class="badge ${
-                          d.viceSignal.type === 'stop'
-                            ? 'danger'
-                            : 'good'
-                        }">
-                          ${esc(d.viceSignal.viceUsername || 'Vice')}
-                          ·
-                          ${
-                            esc(
-                              d.viceSignal.type === 'limit'
-                                ? `FINO A ${d.viceSignal.amount}`
-                                : d.viceSignal.type === 'push'
-                                  ? 'RILANCIA'
-                                  : 'STOP'
-                            )
-                          }
-                        </span>
-                      `
-                    : ''
-                }
-
-              </section>
-            `
-          : '';
 
 
       const recentBidsHtml = `
         <section class="auction-bid-history">
           <div class="auction-bid-history-title">
             <strong>Ultimi rilanci</strong>
-            <span class="small soft">${(d.recentBids || []).length} registrati</span>
+            <span class="small soft">${Math.min(3, (d.recentBids || []).length)} visualizzati</span>
           </div>
 
           <div
@@ -19552,7 +20045,7 @@
           >
             ${
               (d.recentBids || [])
-                .slice(0, 10)
+                .slice(0, 3)
                 .map(bid => `
                   <div class="auction-bid-chip">
                     <span class="auction-bid-team-name">${esc(auctionTeamReference(bid.team, bid.team?.name || 'Squadra'))}</span>
@@ -20071,7 +20564,6 @@
                   </section>
                   <div class="auction-middle-lower-zone ${callQueueHtml.trim() ? 'has-queue' : 'no-queue'}">
                     ${callQueueHtml}
-                    <div class="auction-middle-vice-slot">${viceHtml}</div>
                     ${recentBidsHtml}
                   </div>
                 </div>
@@ -20097,6 +20589,8 @@
 
       renderAuctionDrawerControls();
       renderAuctionPlayers();
+      bindAuctionViceInterestControls($('auction-root'));
+
       attachAuctionCallQueueEvents();
       attachAuctionQueueDrawerToggle();
       attachAuctionRosterQueueToggle();
@@ -21101,22 +21595,6 @@
         );
 
 
-      document
-        .querySelectorAll(
-          '.vice-signal'
-        )
-        .forEach(
-          button => {
-            button
-              .addEventListener(
-                'click',
-                () =>
-                  sendViceSignal(
-                    button.dataset.type
-                  )
-              );
-          }
-        );
 
 
       $('auction-admin-player-search')
@@ -21995,8 +22473,20 @@
           <td class="auction-player-col-name">
             <div class="player-main">
 
-              <span class="player-name">
-                ${esc(player.name)}
+              <span class="auction-player-name-line">
+                <span class="player-name">
+                  ${esc(player.name)}
+                </span>
+
+                ${
+                  auctionHasViceRole()
+                    ? renderAuctionViceInterestEditor(player.id, { compact: true })
+                    : (
+                        queuedIndex < 0
+                          ? renderAuctionViceInterestReadout(player.id, { compact: true })
+                          : ''
+                      )
+                }
               </span>
 
               <small class="auction-player-team-small">
@@ -22198,7 +22688,7 @@
             event => {
               if (
                 event.target.closest(
-                  '[data-queue-add]'
+                  '[data-queue-add], .auction-vice-interest-editor'
                 )
               ) {
                 return;
@@ -22252,6 +22742,8 @@
             }
           );
         });
+
+      bindAuctionViceInterestControls(body);
 
     }
 
@@ -22467,10 +22959,6 @@
         renderAuctionLive();
         msg(error.message, 'error');
       }
-    }
-
-    async function sendViceSignal(type){
-      try{await api(ENDPOINTS.auction,{action:'sendViceSignal',signalType:type,amount:type==='limit'?Number($('vice-limit').value):null});await loadAuction()}catch(error){msg(error.message,'error')}
     }
 
     function beginAuctionTimerTransition() {
