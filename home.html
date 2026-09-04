@@ -8706,7 +8706,246 @@
       }
     }
 
-  </style>
+  
+
+    /* =====================================================
+       V34 · PRE-AVVIO, BANDITORE COMPATTO, ROSE BILANCIATE
+       ===================================================== */
+
+    .auctioneer-console{
+      max-height:min(62dvh,440px)!important;
+      overflow:auto!important;
+      overscroll-behavior:contain;
+      scrollbar-width:thin;
+    }
+
+    .auctioneer-bid-panel{
+      gap:3px!important;
+      padding:4px!important;
+    }
+
+    .auctioneer-team-grid-unified{
+      grid-auto-rows:auto!important;
+      gap:2px!important;
+    }
+
+    .auctioneer-team-cube-unified{
+      min-height:clamp(24px,3.2dvh,31px)!important;
+      height:auto!important;
+      padding:2px 4px!important;
+      border-radius:6px!important;
+    }
+
+    .auctioneer-team-cube-unified strong{
+      font-size:clamp(6px,.56vw,7.3px)!important;
+      line-height:1.05!important;
+    }
+
+    .auctioneer-section{
+      min-width:0;
+    }
+
+    .auctioneer-prestart-panel{
+      min-height:112px;
+      display:grid;
+      place-items:center;
+      padding:8px;
+    }
+
+    .auctioneer-prestart-start{
+      width:min(100%,420px)!important;
+      min-height:72px!important;
+      display:grid!important;
+      place-content:center!important;
+      gap:4px!important;
+      border-radius:12px!important;
+      font-size:12px!important;
+      letter-spacing:.08em;
+    }
+
+    .auctioneer-prestart-start strong{
+      font-size:20px;
+      line-height:1;
+    }
+
+    .auctioneer-prestart-start small{
+      font-size:7px;
+      font-weight:850;
+      letter-spacing:.04em;
+      opacity:.9;
+    }
+
+    .auction-rosters-content{
+      overflow:hidden!important;
+      display:grid!important;
+      grid-template-rows:auto minmax(0,1fr)!important;
+      gap:4px!important;
+    }
+
+    .auction-all-rosters-grid{
+      min-height:0!important;
+      height:100%!important;
+      overflow:hidden!important;
+      grid-template-columns:repeat(var(--auction-roster-cols,4),minmax(0,1fr))!important;
+      grid-template-rows:repeat(var(--auction-roster-rows,1),minmax(0,1fr))!important;
+      grid-auto-rows:minmax(0,1fr)!important;
+      gap:4px!important;
+      align-items:stretch!important;
+    }
+
+    .auction-roster-team-card{
+      min-width:0!important;
+      min-height:0!important;
+      height:100%!important;
+      display:flex!important;
+      flex-direction:column!important;
+      overflow:hidden!important;
+    }
+
+    .auction-roster-team-head{
+      flex:0 0 auto;
+      min-height:31px!important;
+      padding:3px 5px!important;
+      display:grid!important;
+      grid-template-columns:minmax(0,1fr) auto!important;
+      align-items:center!important;
+      gap:5px!important;
+    }
+
+    .auction-roster-team-identity{
+      min-width:0;
+    }
+
+    .auction-roster-team-identity strong,
+    .auction-roster-team-identity small{
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .auction-roster-team-identity strong{
+      font-size:7.8px!important;
+    }
+
+    .auction-roster-team-identity small{
+      margin-top:1px;
+      font-size:5.5px!important;
+    }
+
+    .auction-roster-team-credit{
+      display:flex;
+      align-items:center;
+      gap:3px;
+      white-space:nowrap;
+    }
+
+    .auction-roster-team-credit>span{
+      display:flex;
+      align-items:baseline;
+      gap:3px;
+    }
+
+    .auction-roster-team-credit small{
+      font-size:5px!important;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+
+    .auction-roster-team-credit strong{
+      font-size:9px!important;
+      color:#fff;
+    }
+
+    .auction-roster-credit-edit{
+      width:19px!important;
+      min-width:19px!important;
+      height:19px!important;
+      min-height:19px!important;
+      padding:0!important;
+      border-radius:4px!important;
+      font-size:8px!important;
+      line-height:1!important;
+    }
+
+    .auction-roster-team-list{
+      flex:1 1 auto!important;
+      min-height:0!important;
+      overflow:auto!important;
+      overscroll-behavior:contain;
+      scrollbar-width:thin;
+      align-content:start!important;
+      padding:2px!important;
+      gap:1px!important;
+    }
+
+    .auction-awards-log-head{
+      min-width:0;
+      gap:4px!important;
+    }
+
+    .auction-awards-log-list{
+      min-height:0;
+      overflow:auto;
+      scrollbar-width:thin;
+    }
+
+    .auction-award-row.has-undo{
+      grid-template-columns:auto minmax(0,1fr) minmax(52px,.7fr) auto 22px!important;
+    }
+
+    .auction-award-operation-row{
+      min-width:0;
+      min-height:24px;
+      padding:3px 4px;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      align-items:center;
+      gap:4px;
+      border:1px solid rgba(139,177,207,.12);
+      border-radius:5px;
+      background:rgba(255,255,255,.025);
+      font-size:6.7px;
+      line-height:1.15;
+    }
+
+    .auction-award-operation-row .auction-activity-text{
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .auction-award-operation-row.is-credit{
+      border-color:rgba(235,86,86,.26);
+      background:rgba(170,34,34,.10);
+      color:#ff9b9b;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+    }
+
+    .auction-award-operation-row.is-undone,
+    .auction-award-row.is-undone{
+      opacity:.38;
+      text-decoration:line-through;
+    }
+
+    @media(max-width:760px){
+      .auctioneer-console{
+        max-height:58dvh!important;
+      }
+
+      .auctioneer-team-cube-unified{
+        min-height:24px!important;
+      }
+
+      .auction-all-rosters-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr))!important;
+        grid-template-rows:none!important;
+        grid-auto-rows:minmax(145px,1fr)!important;
+        overflow:auto!important;
+      }
+    }
+</style>
 </head>
 <body>
   <div id="global-message" class="message" aria-live="polite"></div>
@@ -9192,7 +9431,7 @@
       auctionAdminBidPlayerKey: '',
       auctionAdminReadyTeamId: null,
       auctionAdminDefaultTeamKey: '',
-      auctionHideCreditEvents: false,
+      auctionOnlyConfirmedAwards: false,
 
       auctionTransferAssignmentId: null,
       auctionTransferTargetTeamId: null,
@@ -14101,10 +14340,179 @@
 
 
     function renderAuctionAwardsDrawer() {
-      const rows =
+      const canControl =
+        auctionCanControl();
+
+      const awardRows =
         state.auction?.recentAwards
-        ||
-        [];
+        || [];
+
+      const operations =
+        canControl
+          ? (state.auction?.recentOperations || [])
+          : [];
+
+      const purchaseTypes =
+        new Set([
+          'PLAYER_AWARDED',
+          'MANUAL_AWARD'
+        ]);
+
+      const operationText = event => {
+        const payload = event.payload || {};
+        const teamName = event.team?.name || 'SQUADRA';
+        const playerName = event.player?.name || 'GIOCATORE';
+        const reason = String(payload.reason || '').trim();
+
+        if (event.event_type === 'CREDITS_ADJUSTED') {
+          const before = Number(payload.before_remaining ?? payload.previous_remaining ?? payload.old_remaining ?? 0);
+          const after = Number(payload.after_remaining ?? payload.new_remaining ?? payload.remaining ?? 0);
+          const delta = Number(payload.delta ?? (after - before));
+          return `${teamName} · CREDITI ${before} → ${after} (${delta >= 0 ? '+' : ''}${delta})${reason ? ` · ${reason}` : ''}`;
+        }
+
+        if (event.event_type === 'NOMINATION_TIMEOUT') {
+          const applied = Number(payload.applied_penalty || 0);
+          return `PENALITÀ CHIAMATA · ${teamName} · -${applied} CR`;
+        }
+
+        if (event.event_type === 'ROSTER_PRICE_EDITED') {
+          return `PREZZO · ${playerName} · ${Number(payload.old_price || 0)} → ${Number(payload.new_price || 0)} CR`;
+        }
+
+        if (event.event_type === 'ROSTER_PLAYER_REMOVED') {
+          return `RIMOSSO · ${playerName} · ${teamName}`;
+        }
+
+        if (['ROSTER_TEAM_TRANSFERRED','ROSTER_PLAYER_TRANSFERRED'].includes(event.event_type)) {
+          return `CAMBIO SQUADRA · ${playerName} · ${event.fromTeam?.name || '—'} → ${event.toTeam?.name || teamName}`;
+        }
+
+        return `${event.event_type} · ${teamName}`;
+      };
+
+      const items =
+        canControl
+          ? operations
+              .filter(event =>
+                state.auctionOnlyConfirmedAwards
+                  ? purchaseTypes.has(event.event_type) && !event.undone_at
+                  : true
+              )
+              .slice(0, 35)
+          : awardRows;
+
+      const content =
+        canControl
+          ? items.map(event => {
+              const isPurchase = purchaseTypes.has(event.event_type);
+              const isCredit = ['CREDITS_ADJUSTED','NOMINATION_TIMEOUT'].includes(event.event_type);
+              const undone = Boolean(event.undone_at);
+
+              if (isPurchase) {
+                const fallbackAward =
+                  awardRows.find(item =>
+                    item.player_id === event.player_id
+                    && item.team_id === event.team_id
+                  ) || null;
+
+                const player = event.player || fallbackAward?.player || {};
+                const roles = playerRoles(
+                  player,
+                  state.auction?.settings?.fantasy_mode
+                );
+                const price = Number(event.payload?.price ?? fallbackAward?.price ?? 0);
+
+                return `
+                  <div class="auction-award-row ${!undone && event.reversible !== false ? 'has-undo' : ''} ${undone ? 'is-undone' : ''}" title="${esc(auctionTimeLabel(event.created_at))}">
+                    <span class="auction-roster-mini-roles">
+                      ${roles.map(role => `
+                        <span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>
+                      `).join('') || '<span class="rolebadge">—</span>'}
+                    </span>
+
+                    <strong class="auction-award-player">
+                      ${esc(player?.name || 'Giocatore')}
+                    </strong>
+
+                    <span class="auction-award-team">
+                      ${esc(event.team?.name || fallbackAward?.team?.name || 'Squadra')}
+                    </span>
+
+                    <div class="auction-award-price">
+                      ${price}
+                    </div>
+
+                    ${
+                      !undone && event.reversible !== false
+                        ? `
+                            <button
+                              type="button"
+                              class="auction-activity-undo"
+                              data-undo-operation="${Number(event.id)}"
+                              title="Annulla questa operazione"
+                              aria-label="Annulla questa operazione"
+                            >×</button>
+                          `
+                        : ''
+                    }
+                  </div>
+                `;
+              }
+
+              return `
+                <div class="auction-award-operation-row ${isCredit ? 'is-credit' : ''} ${undone ? 'is-undone' : ''}">
+                  <span class="auction-activity-text">
+                    ${esc(operationText(event))}
+                    ${event.actorUsername ? `<small> · ${esc(event.actorUsername)}</small>` : ''}
+                    ${undone ? '<small> · ANNULLATA</small>' : ''}
+                  </span>
+
+                  ${
+                    !undone && event.reversible !== false
+                      ? `
+                          <button
+                            type="button"
+                            class="auction-activity-undo"
+                            data-undo-operation="${Number(event.id)}"
+                            title="Annulla questa operazione"
+                            aria-label="Annulla questa operazione"
+                          >×</button>
+                        `
+                      : ''
+                  }
+                </div>
+              `;
+            }).join('')
+          : awardRows.map(item => {
+              const roles =
+                playerRoles(
+                  item.player || {},
+                  state.auction?.settings?.fantasy_mode
+                );
+
+              return `
+                <div class="auction-award-row" title="${esc(auctionTimeLabel(item.created_at))}">
+                  <span class="auction-roster-mini-roles">
+                    ${roles.map(role => `
+                      <span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>
+                    `).join('') || '<span class="rolebadge">—</span>'}
+                  </span>
+
+                  <strong class="auction-award-player">
+                    ${esc(item.player?.name || 'Giocatore')}
+                  </strong>
+
+                  <span class="auction-award-team">
+                    ${esc(item.team?.name || 'Squadra')}
+                  </span>
+
+                  <div class="auction-award-price">
+                    ${Number(item.price || 0)}
+                  </div>
+                </div>
+              `;
+            }).join('');
 
       return `
         <details
@@ -14117,62 +14525,36 @@
           </summary>
 
           <div class="auction-awards-content">
-
-            <div class="auction-team-roster-head">
-              <strong>Ultimi acquisti</strong>
-
-              <span class="badge">
-                ${rows.length}
-              </span>
-            </div>
-
-
-            <div class="auction-awards-list">
+            <div class="auction-team-roster-head auction-awards-log-head">
+              <strong>${canControl ? 'Ultimi acquisti / operazioni' : 'Ultimi acquisti'}</strong>
 
               ${
-                rows.length
-                  ? rows.map(item => {
-                      const roles =
-                        playerRoles(
-                          item.player || {},
-                          state.auction?.settings?.fantasy_mode
-                        );
-
-                      return `
-                      <div class="auction-award-row" title="${esc(auctionTimeLabel(item.created_at))}">
-
-                        <span class="auction-roster-mini-roles">
-                          ${roles.map(role => `
-                            <span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>
-                          `).join('') || '<span class="rolebadge">—</span>'}
-                        </span>
-
-                        <strong class="auction-award-player">
-                          ${esc(item.player?.name || 'Giocatore')}
-                        </strong>
-
-                        <span class="auction-award-team">
-                          ${esc(item.team?.name || 'Squadra')}
-                        </span>
-
-                        <div class="auction-award-price">
-                          ${Number(item.price || 0)}
-                        </div>
-
-                      </div>
-                    `;
-                    }).join('')
-                  : `
-                      <div class="my-team-roster-empty">
-                        Nessun acquisto ufficiale.
-                      </div>
+                canControl
+                  ? `
+                      <label class="auction-activity-filter">
+                        <input
+                          id="auction-only-confirmed-awards"
+                          type="checkbox"
+                          ${state.auctionOnlyConfirmedAwards ? 'checked' : ''}
+                        >
+                        <span>Solo acquisti confermati</span>
+                      </label>
                     `
+                  : `<span class="badge">${awardRows.length}</span>`
               }
-
             </div>
 
+            <div class="auction-awards-list auction-awards-log-list">
+              ${
+                content
+                || `
+                    <div class="my-team-roster-empty">
+                      ${state.auctionOnlyConfirmedAwards ? 'Nessun acquisto confermato.' : 'Nessuna operazione registrata.'}
+                    </div>
+                  `
+              }
+            </div>
           </div>
-
         </details>
       `;
     }
@@ -14588,6 +14970,60 @@
 
 
 
+    function auctionRosterGridLayout(teamCount) {
+      const count =
+        Math.max(1, Number(teamCount || 0));
+
+      const maxColumns =
+        Math.min(5, count);
+
+      const minimumRows =
+        Math.max(
+          1,
+          Math.ceil(count / 5)
+        );
+
+      /*
+       * Privilegiamo righe perfettamente uguali quando basta al massimo
+       * una riga in più rispetto alla disposizione più compatta.
+       * Esempi: 12 -> 4x3, 9 -> 3x3, 8 -> 4x2.
+       * Evitiamo però casi patologici come 14 -> 2x7: in quel caso
+       * teniamo 5+5+4, molto più leggibile nel viewport.
+       */
+      let columns = 0;
+
+      for (let candidate = maxColumns; candidate >= 2; candidate -= 1) {
+        if (
+          count % candidate === 0
+          && count / candidate <= minimumRows + 1
+        ) {
+          columns = candidate;
+          break;
+        }
+      }
+
+      if (!columns) {
+        columns =
+          Math.min(
+            5,
+            Math.max(
+              1,
+              Math.ceil(count / minimumRows)
+            )
+          );
+      }
+
+      return {
+        columns,
+        rows:
+          Math.max(
+            1,
+            Math.ceil(count / columns)
+          )
+      };
+    }
+
+
     function renderAuctionAllRostersDrawer() {
       const canView =
         auctionHasPresidentRole()
@@ -14618,6 +15054,9 @@
           ? allTeams.filter(team => participatingIds.has(team.id))
           : allTeams;
 
+      const rosterGrid =
+        auctionRosterGridLayout(teams.length);
+
       const assignments =
         rosterData?.assignments
         ||
@@ -14647,6 +15086,11 @@
 
       const cards =
         teams.map(team => {
+          const presidentUsername =
+            team.presidentUsername
+            || team.president?.username
+            || '—';
+
           const rows =
             assignments
               .filter(
@@ -14702,6 +15146,8 @@
           const teamState =
             (state.auction?.teamOrder || [])
               .find(item => item.team_id === team.id)
+            || (rosterData?.creditStates || [])
+              .find(item => item.team_id === team.id)
             || null;
 
           const effectiveDebits =
@@ -14733,19 +15179,33 @@
 
               <div class="auction-roster-team-head">
 
-                <div>
+                <div class="auction-roster-team-identity">
                   <strong>${esc(team.name)}</strong>
-
-                  <small>
-                    ${rows.length} giocatori
-                    · ${spent} spesi
-                    · ${remaining} residui
-                  </small>
+                  <small>${esc(presidentUsername)}</small>
                 </div>
 
-                <span class="badge">
-                  ${rows.length}
-                </span>
+                <div class="auction-roster-team-credit">
+                  <span>
+                    <small>Crediti</small>
+                    <strong>${remaining}</strong>
+                  </span>
+
+                  ${
+                    canEdit
+                      ? `
+                          <button
+                            type="button"
+                            class="auction-roster-credit-edit"
+                            data-edit-roster-credits="${esc(team.id)}"
+                            data-team-name="${esc(team.name)}"
+                            data-current-credits="${remaining}"
+                            title="Modifica crediti residui"
+                            aria-label="Modifica crediti residui di ${esc(team.name)}"
+                          >✎</button>
+                        `
+                      : ''
+                  }
+                </div>
 
               </div>
 
@@ -14890,7 +15350,10 @@
             </div>
 
 
-            <div class="auction-all-rosters-grid">
+            <div
+              class="auction-all-rosters-grid"
+              style="--auction-roster-cols:${rosterGrid.columns};--auction-roster-rows:${rosterGrid.rows}"
+            >
               ${
                 cards
                 ||
@@ -14902,6 +15365,123 @@
 
         </details>
       `;
+    }
+
+
+    function bindAuctionRosterCreditEditors() {
+      if (!auctionCanControl()) {
+        return;
+      }
+
+      document
+        .querySelectorAll('[data-edit-roster-credits]')
+        .forEach(button => {
+          button.addEventListener(
+            'click',
+            async event => {
+              event.preventDefault();
+              event.stopPropagation();
+
+              const teamId =
+                button.dataset.editRosterCredits;
+
+              const teamName =
+                button.dataset.teamName
+                || 'questa squadra';
+
+              const current =
+                Number(
+                  button.dataset.currentCredits
+                  || 0
+                );
+
+              const raw =
+                prompt(
+                  `Crediti residui di ${teamName}:`,
+                  String(current)
+                );
+
+              if (raw === null) {
+                return;
+              }
+
+              const remaining =
+                Number(raw);
+
+              if (
+                !Number.isInteger(remaining)
+                || remaining < 0
+                || remaining > 999999
+              ) {
+                return msg(
+                  'Inserisci un valore intero tra 0 e 999999 crediti.',
+                  'warning'
+                );
+              }
+
+              if (remaining === current) {
+                return;
+              }
+
+              const reasonRaw =
+                prompt(
+                  'Motivazione della modifica crediti (obbligatoria):',
+                  ''
+                );
+
+              if (reasonRaw === null) {
+                return;
+              }
+
+              const reason =
+                String(reasonRaw)
+                  .trim();
+
+              if (reason.length < 3) {
+                return msg(
+                  'Inserisci una motivazione di almeno 3 caratteri.',
+                  'warning'
+                );
+              }
+
+              const sessionId =
+                auctionSession()?.id;
+
+              if (!sessionId || !teamId) {
+                return msg(
+                  'Sessione o squadra non disponibile.',
+                  'error'
+                );
+              }
+
+              button.disabled = true;
+
+              try {
+                await api(
+                  ENDPOINTS.auction,
+                  {
+                    action: 'setTeamCredits',
+                    sessionId,
+                    teamId,
+                    remaining,
+                    reason
+                  }
+                );
+
+                msg(
+                  `Crediti di ${teamName} aggiornati: ${remaining}.`,
+                  'success'
+                );
+
+                await loadAuctionPersonalRoster(true);
+                await loadAuction();
+              } catch (error) {
+                button.disabled = false;
+                msg(error.message, 'error');
+              }
+            }
+          );
+        });
     }
 
 
@@ -15219,6 +15799,9 @@
 
         pauseAfterAward:
           session?.pause_after_award === true,
+
+        prestartHold:
+          session?.prestart_hold === true,
 
         nominationTeam:
           session?.current_nomination_team_id || null,
@@ -16237,7 +16820,7 @@
             action: 'startAuction',
             sessionId: session.id
           });
-          msg('Asta avviata.', 'success');
+          msg('Asta preparata: attendi AVVIA del Banditore/Admin.', 'success');
           state.auctionPreparedDraftSessionId = null;
           await loadAuction();
         } catch (error) {
@@ -16521,11 +17104,6 @@
             ? 3
             : 4;
 
-      const selectedMetrics =
-        state.auctionAdminTeamId
-          ? auctionControllerTeamMetrics(state.auctionAdminTeamId)
-          : null;
-
       return `
         <div class="auctioneer-section auctioneer-team-section">
           <div class="auctioneer-bid-section-title">
@@ -16554,27 +17132,6 @@
             }).join('')}
           </div>
 
-          <div class="auctioneer-credit-control">
-            <label>
-              <span id="auction-admin-credit-label">Crediti residui${selectedMetrics?.team?.name ? ` · ${esc(selectedMetrics.team.name)}` : ''}</span>
-              <input
-                id="auction-admin-remaining-credits"
-                type="number"
-                min="0"
-                max="999999"
-                step="1"
-                inputmode="numeric"
-                value="${selectedMetrics ? Number(selectedMetrics.remainingCredits || 0) : ''}"
-                ${selectedMetrics ? '' : 'disabled'}
-              >
-            </label>
-            <button
-              id="auction-admin-set-credits"
-              type="button"
-              class="secondary"
-              ${selectedMetrics ? '' : 'disabled'}
-            >IMPOSTA CREDITI</button>
-          </div>
         </div>
       `;
     }
@@ -16626,6 +17183,9 @@
 
       const s =
         d.auctionSession;
+
+      const prestartHold =
+        s?.prestart_hold === true;
 
       const hasPlayer =
         Boolean(
@@ -16680,6 +17240,8 @@
           === auctionMyTeamId();
 
       const canCall =
+        !prestartHold
+        &&
         !hasPlayer
         &&
         auctionHasPresidentRole()
@@ -17266,182 +17828,32 @@
           : '';
 
 
-      const recentBidsHtml = (() => {
-        if (!auctionCanControl()) {
-          return `
-            <section class="auction-bid-history">
+      const recentBidsHtml = `
+        <section class="auction-bid-history">
+          <div class="auction-bid-history-title">
+            <strong>Ultimi rilanci</strong>
+            <span class="small soft">${(d.recentBids || []).length} registrati</span>
+          </div>
 
-              <div class="auction-bid-history-title">
-                <strong>Ultimi rilanci</strong>
-
-                <span class="small soft">
-                  ${(d.recentBids || []).length} registrati
-                </span>
-              </div>
-
-              <div
-                id="auction-live-recent-bids"
-                class="auction-bid-chips"
-              >
-
-                ${
-                  (d.recentBids || [])
-                    .slice(0, 10)
-                    .map(bid => `
-                      <div class="auction-bid-chip">
-                        <span>${esc(bid.team?.name || 'Squadra')}</span>
-                        <strong>${bid.amount}</strong>
-                      </div>
-                    `)
-                    .join('')
-                  ||
-                  '<span class="small soft">Nessun rilancio.</span>'
-                }
-
-              </div>
-
-            </section>
-          `;
-        }
-
-        const bidItems =
-          (d.recentBids || [])
-            .map(bid => ({
-              kind: 'bid',
-              id: `bid-${bid.id}`,
-              createdAt: bid.created_at,
-              bid
-            }));
-
-        const operationItems =
-          (d.recentOperations || [])
-            .filter(event =>
-              !(
-                state.auctionHideCreditEvents
-                && ['CREDITS_ADJUSTED','NOMINATION_TIMEOUT'].includes(event.event_type)
-              )
-            )
-            .map(event => ({
-              kind: 'operation',
-              id: `op-${event.id}`,
-              createdAt: event.created_at,
-              event
-            }));
-
-        const activityItems =
-          [...bidItems, ...operationItems]
-            .sort((a, b) =>
-              new Date(b.createdAt || 0).getTime()
-              - new Date(a.createdAt || 0).getTime()
-            )
-            .slice(0, 24);
-
-        const operationText = event => {
-          const payload = event.payload || {};
-          const teamName = event.team?.name || 'SQUADRA';
-          const playerName = event.player?.name || 'GIOCATORE';
-
-          if (event.event_type === 'CREDITS_ADJUSTED') {
-            const before = Number(payload.before_remaining ?? payload.previous_remaining ?? payload.old_remaining ?? 0);
-            const after = Number(payload.after_remaining ?? payload.new_remaining ?? payload.remaining ?? 0);
-            const delta = Number(payload.delta ?? (after - before));
-            return `${teamName} · CREDITI ${before} → ${after} (${delta >= 0 ? '+' : ''}${delta})`;
-          }
-
-
-          if (event.event_type === 'NOMINATION_TIMEOUT') {
-            const applied = Number(payload.applied_penalty || 0);
-            return `PENALITÀ CHIAMATA · ${teamName} · -${applied} CR`;
-          }
-
-          if (
-            event.event_type === 'PLAYER_AWARDED'
-            || event.event_type === 'MANUAL_AWARD'
-          ) {
-            return `ACQUISTO · ${teamName} · ${playerName} · ${Number(payload.price || 0)} CR`;
-          }
-
-          if (event.event_type === 'ROSTER_PRICE_EDITED') {
-            return `PREZZO · ${playerName} · ${Number(payload.old_price || 0)} → ${Number(payload.new_price || 0)} CR`;
-          }
-
-          if (event.event_type === 'ROSTER_PLAYER_REMOVED') {
-            return `RIMOSSO · ${playerName} · ${teamName}`;
-          }
-
-          if (['ROSTER_TEAM_TRANSFERRED','ROSTER_PLAYER_TRANSFERRED'].includes(event.event_type)) {
-            return `CAMBIO SQUADRA · ${playerName} · ${event.fromTeam?.name || '—'} → ${event.toTeam?.name || teamName}`;
-          }
-
-          return `${event.event_type} · ${teamName}`;
-        };
-
-        return `
-          <section class="auction-bid-history auction-activity-history">
-
-            <div class="auction-bid-history-title auction-activity-head">
-              <strong>Ultime offerte / operazioni</strong>
-
-              <label class="auction-activity-filter">
-                <input
-                  id="auction-hide-credit-events"
-                  type="checkbox"
-                  ${state.auctionHideCreditEvents ? 'checked' : ''}
-                >
-                <span>Nascondi rettifiche crediti</span>
-              </label>
-            </div>
-
-            <div id="auction-live-recent-bids" class="auction-activity-list">
-              ${
-                activityItems
-                  .map(item => {
-                    if (item.kind === 'bid') {
-                      const bid = item.bid;
-                      return `
-                        <div class="auction-activity-row is-bid">
-                          <span>RILANCIO · ${esc(bid.team?.name || 'Squadra')}</span>
-                          <strong>${Number(bid.amount || 0)} CR</strong>
-                        </div>
-                      `;
-                    }
-
-                    const event = item.event;
-                    const isCredit = ['CREDITS_ADJUSTED','NOMINATION_TIMEOUT'].includes(event.event_type);
-                    const undone = Boolean(event.undone_at);
-
-                    return `
-                      <div class="auction-activity-row ${isCredit ? 'is-credit' : ''} ${undone ? 'is-undone' : ''}">
-                        <span class="auction-activity-text">
-                          ${esc(operationText(event))}
-                          ${event.actorUsername ? `<small> · ${esc(event.actorUsername)}</small>` : ''}
-                          ${undone ? '<small> · ANNULLATA</small>' : ''}
-                        </span>
-
-                        ${
-                          !undone && event.reversible !== false
-                            ? `
-                                <button
-                                  type="button"
-                                  class="auction-activity-undo"
-                                  data-undo-operation="${Number(event.id)}"
-                                  title="Annulla questa operazione"
-                                  aria-label="Annulla questa operazione"
-                                >×</button>
-                              `
-                            : ''
-                        }
-                      </div>
-                    `;
-                  })
-                  .join('')
-                || '<span class="small soft">Nessuna operazione recente.</span>'
-              }
-            </div>
-
-          </section>
-        `;
-      })();
+          <div
+            id="auction-live-recent-bids"
+            class="auction-bid-chips"
+          >
+            ${
+              (d.recentBids || [])
+                .slice(0, 10)
+                .map(bid => `
+                  <div class="auction-bid-chip">
+                    <span>${esc(bid.team?.name || 'Squadra')}</span>
+                    <strong>${bid.amount}</strong>
+                  </div>
+                `)
+                .join('')
+              || '<span class="small soft">Nessun rilancio.</span>'
+            }
+          </div>
+        </section>
+      `;
 
 
       const adminBidMinimum =
@@ -17638,7 +18050,7 @@
       `;
 
 
-      const adminControlPanelHtml = `
+      const normalAdminControlPanelHtml = `
         <div class="auctioneer-bid-panel">
 
           ${renderAuctionControllerTeamSelector()}
@@ -17774,13 +18186,30 @@
       `;
 
 
+      const adminControlPanelHtml =
+        prestartHold
+          ? `
+              <div class="auctioneer-prestart-panel">
+                <button
+                  id="auction-release-start"
+                  type="button"
+                  class="auctioneer-prestart-start good"
+                >
+                  <strong>AVVIA</strong>
+                  <small>Inizia definitivamente l’asta</small>
+                </button>
+              </div>
+            `
+          : normalAdminControlPanelHtml;
+
+
       const adminHtml =
         auctionCanUseAuctioneerConsole()
           ? `
               <details
                 id="auctioneer-console-drawer"
                 class="auctioneer-console-drawer"
-                ${state.auctionAdminConsoleOpen ? 'open' : ''}
+                ${prestartHold || state.auctionAdminConsoleOpen ? 'open' : ''}
               >
                 <summary>
 
@@ -17797,9 +18226,11 @@
                   <div class="auctioneer-console-summary-side">
                     <span class="auctioneer-console-state">
                       ${
-                        hasPlayer
-                          ? `Lotto attivo · ${selectedBid}`
-                          : 'Nessun lotto attivo'
+                        prestartHold
+                          ? 'PRE-AVVIO'
+                          : hasPlayer
+                            ? `Lotto attivo · ${selectedBid}`
+                            : 'Nessun lotto attivo'
                       }
                     </span>
 
@@ -17890,9 +18321,11 @@
             <div class="auction-status-turn-wrap">
               ${renderAuctionTurnIndicator()}
               ${
-                s.pause_after_award
-                  ? `<span class="badge danger">${hasPlayer ? 'PAUSA PROGRAMMATA' : 'PAUSA'}</span>`
-                  : s.hold_active
+                prestartHold
+                  ? '<span class="badge good">PRE-AVVIO · IN ATTESA BANDITORE</span>'
+                  : s.pause_after_award
+                    ? `<span class="badge danger">${hasPlayer ? 'PAUSA PROGRAMMATA' : 'PAUSA'}</span>`
+                    : s.hold_active
                     ? '<span class="badge danger">HOLD</span>'
                     : ''
               }
@@ -18026,6 +18459,7 @@
 
 
       bindAuctionRostersDrawer();
+      bindAuctionRosterCreditEditors();
 
 
       $('auction-toggle-role-ready')
@@ -18254,29 +18688,6 @@
             ? auctionControllerTeamMetrics(selectedTeam.id)
             : null;
 
-        const creditInput = $('auction-admin-remaining-credits');
-        const creditButton = $('auction-admin-set-credits');
-        const creditLabel = $('auction-admin-credit-label');
-
-        if (creditInput) {
-          creditInput.disabled = !selectedMetrics;
-          creditInput.max = '999999';
-          if (selectedMetrics) {
-            creditInput.value = String(
-              Number(selectedMetrics.remainingCredits || 0)
-            );
-          }
-        }
-
-        if (creditButton) {
-          creditButton.disabled = !selectedMetrics;
-        }
-
-        if (creditLabel) {
-          creditLabel.textContent =
-            `Crediti residui${selectedTeam?.name ? ` · ${selectedTeam.name}` : ''}`;
-        }
-
         const selectedPhaseTeam =
           (state.auction?.rolePhase?.teams || [])
             .find(team => team.teamId === state.auctionAdminTeamId)
@@ -18310,7 +18721,8 @@
             ? auctionPlayerMatchesCurrentRolePhase(selectedPlayer)
             : false;
         const callAllowed = Boolean(
-          !hasPlayer
+          !prestartHold
+          && !hasPlayer
           && !s.pause_after_award
           && selectedTeam
           && selectedPlayer
@@ -18321,9 +18733,11 @@
         if (callButton) callButton.disabled = !callAllowed;
         if (callMeta) {
           callMeta.textContent =
-            hasPlayer
-              ? 'LOTTO GIÀ ATTIVO'
-              : s.pause_after_award
+            prestartHold
+              ? 'ATTENDI AVVIO'
+              : hasPlayer
+                ? 'LOTTO GIÀ ATTIVO'
+                : s.pause_after_award
                 ? 'ASTA IN PAUSA'
                 : !selectedTeam
                   ? 'SELEZIONA SQUADRA'
@@ -18432,67 +18846,11 @@
       syncAuctionAdminBidControls();
 
 
-      $('auction-admin-set-credits')
-        ?.addEventListener(
-          'click',
-          async () => {
-            const teamId = state.auctionAdminTeamId;
-            const metrics = teamId
-              ? auctionControllerTeamMetrics(teamId)
-              : null;
-            const input = $('auction-admin-remaining-credits');
-            const remaining = Number(input?.value);
-
-            if (!teamId || !metrics) {
-              return msg('Seleziona una squadra.', 'warning');
-            }
-
-            if (
-              !Number.isInteger(remaining)
-              || remaining < 0
-              || remaining > 999999
-            ) {
-              return msg(
-                'Inserisci un valore tra 0 e 999999 crediti.',
-                'warning'
-              );
-            }
-
-            if (remaining === Number(metrics.remainingCredits || 0)) {
-              return;
-            }
-
-            if (!confirm(
-              `Impostare i crediti residui di ${metrics.team?.name || 'questa squadra'} da ${Number(metrics.remainingCredits || 0)} a ${remaining}?`
-            )) {
-              return;
-            }
-
-            try {
-              await api(
-                ENDPOINTS.auction,
-                {
-                  action: 'setTeamCredits',
-                  sessionId: s.id,
-                  teamId,
-                  remaining
-                }
-              );
-
-              msg('Crediti residui aggiornati.', 'success');
-              await loadAuction();
-            } catch (error) {
-              msg(error.message, 'error');
-            }
-          }
-        );
-
-
-      $('auction-hide-credit-events')
+      $('auction-only-confirmed-awards')
         ?.addEventListener(
           'change',
           event => {
-            state.auctionHideCreditEvents =
+            state.auctionOnlyConfirmedAwards =
               event.target.checked === true;
             renderAuctionLive();
           }
@@ -18619,6 +18977,33 @@
             }
           );
         });
+
+
+      $('auction-release-start')
+        ?.addEventListener(
+          'click',
+          async event => {
+            const button = event.currentTarget;
+            button.disabled = true;
+
+            try {
+              await api(
+                ENDPOINTS.auction,
+                {
+                  action: 'releaseAuctionStart',
+                  sessionId: s.id
+                }
+              );
+
+              state.auctionAdminConsoleOpen = true;
+              msg('Asta avviata definitivamente.', 'success');
+              await loadAuction();
+            } catch (error) {
+              button.disabled = false;
+              msg(error.message, 'error');
+            }
+          }
+        );
 
 
       $('auction-admin-call-player')
