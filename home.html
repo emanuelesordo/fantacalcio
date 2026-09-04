@@ -8945,6 +8945,264 @@
         overflow:auto!important;
       }
     }
+
+
+    /* =====================================================
+       V35 · ricerca Banditore visibile, pannelli full-height,
+       coda/rilanci bilanciati e slot Rose di tutti
+       ===================================================== */
+
+    /* La tendina dei risultati deve aprirsi SOTTO il campo. Nelle versioni
+       precedenti erano rimasti contemporaneamente top e bottom, causando
+       un box assoluto compresso/non visibile in alcuni layout. */
+    .auctioneer-player-section{
+      position:relative!important;
+      z-index:40!important;
+      overflow:visible!important;
+    }
+
+    .auctioneer-unified-player{
+      position:relative!important;
+      z-index:41!important;
+      overflow:visible!important;
+    }
+
+    .auctioneer-admin-search-wrap{
+      position:relative!important;
+      z-index:42!important;
+      min-width:0;
+      overflow:visible!important;
+    }
+
+    .auctioneer-admin-search-wrap>label{
+      display:grid;
+      gap:3px;
+      margin:0;
+      font-size:6px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .auctioneer-unified-player .auctioneer-search-results{
+      top:calc(100% + 3px)!important;
+      bottom:auto!important;
+      left:0!important;
+      right:0!important;
+      z-index:999!important;
+      max-height:min(250px,34dvh)!important;
+      overflow:auto!important;
+      overscroll-behavior:contain;
+      box-shadow:0 18px 34px rgba(0,7,18,.52)!important;
+    }
+
+    .auctioneer-unified-player .auctioneer-search-results:not(:empty){
+      display:block!important;
+    }
+
+    .auctioneer-unified-player .auctioneer-search-result{
+      min-height:30px!important;
+      height:auto!important;
+      padding:4px 7px!important;
+      font-size:7px!important;
+    }
+
+    .auctioneer-unified-player .auctioneer-search-result strong{
+      font-size:8px!important;
+    }
+
+    /* Console Banditore: usa tutta l'altezza del drawer. Il contenuto resta
+       compatto ma l'eventuale spazio residuo viene distribuito fra le sezioni,
+       anziché lasciare una fascia vuota in fondo. */
+    .auction-lower-main>.auctioneer-console-drawer>.auctioneer-console{
+      height:100%!important;
+      min-height:0!important;
+      max-height:none!important;
+      display:grid!important;
+      grid-template-rows:auto minmax(0,1fr)!important;
+      overflow:hidden!important;
+    }
+
+    .auction-lower-main>.auctioneer-console-drawer>.auctioneer-console
+      .auctioneer-console-body{
+      height:100%!important;
+      min-height:0!important;
+      overflow:auto!important;
+      scrollbar-gutter:stable;
+    }
+
+    .auction-lower-main>.auctioneer-console-drawer>.auctioneer-console
+      .auctioneer-bid-panel{
+      min-height:100%!important;
+      align-content:space-between!important;
+      gap:4px!important;
+    }
+
+    .auction-lower-main>.auctioneer-console-drawer>.auctioneer-console
+      .auctioneer-team-cube-unified{
+      min-height:24px!important;
+      max-height:30px!important;
+      padding:2px 4px!important;
+    }
+
+    /* La colonna "Rosa" contiene un solo pannello: deve quindi occupare
+       l'intera altezza disponibile e lasciare lo scroll alla lista interna. */
+    .auction-lower-main>.auction-team-column-roster-only{
+      height:100%!important;
+      min-height:0!important;
+      display:grid!important;
+      grid-template-columns:minmax(0,1fr)!important;
+      grid-template-rows:minmax(0,1fr)!important;
+      overflow:hidden!important;
+    }
+
+    .auction-team-column-roster-only>.auction-team-roster{
+      height:100%!important;
+      min-height:0!important;
+      overflow:hidden!important;
+    }
+
+    .auction-team-column-roster-only .auction-team-roster-list{
+      height:100%!important;
+      min-height:0!important;
+      overflow:auto!important;
+      overscroll-behavior:contain;
+      scrollbar-width:thin;
+    }
+
+    /* Coda e ultimi rilanci condividono sempre tutto lo spazio verticale
+       residuo. 128px garantiscono circa quattro record di coda + testata;
+       112px garantiscono almeno quattro rilanci compatti + testata. */
+    .auction-middle-column{
+      height:100%!important;
+      min-height:0!important;
+      overflow:hidden!important;
+      grid-template-rows:
+        auto
+        auto
+        minmax(128px,1fr)
+        auto
+        minmax(112px,1fr)!important;
+      gap:4px!important;
+    }
+
+    .auction-middle-column:not(:has(.auction-central-queue)){
+      grid-template-rows:
+        auto
+        auto
+        auto
+        minmax(112px,1fr)!important;
+    }
+
+    .auction-middle-column>.auction-central-queue{
+      height:100%!important;
+      min-height:128px!important;
+      max-height:none!important;
+      align-self:stretch!important;
+      overflow:hidden!important;
+    }
+
+    .auction-central-queue .auction-call-queue-drawer-content,
+    .auction-central-queue .auction-call-queue{
+      height:100%!important;
+      min-height:0!important;
+      overflow:hidden!important;
+    }
+
+    .auction-central-queue .auction-call-queue{
+      display:grid!important;
+      grid-template-rows:auto auto minmax(0,1fr)!important;
+    }
+
+    .auction-central-queue .auction-call-queue-list{
+      height:100%!important;
+      min-height:0!important;
+      max-height:none!important;
+      overflow-y:auto!important;
+      overflow-x:hidden!important;
+      align-content:start!important;
+      scrollbar-gutter:stable;
+    }
+
+    .auction-middle-column>.auction-bid-history{
+      height:100%!important;
+      min-height:112px!important;
+      overflow:hidden!important;
+      display:grid!important;
+      grid-template-rows:auto minmax(0,1fr)!important;
+    }
+
+    .auction-middle-column>.auction-bid-history .auction-bid-chips{
+      min-height:0!important;
+      height:100%!important;
+      overflow-y:auto!important;
+      overflow-x:hidden!important;
+      align-content:start!important;
+      scrollbar-gutter:stable;
+    }
+
+    /* Rose di tutti: anche una rosa vuota mostra già gli slot previsti dal
+       setup. Le righe vuote non sono interattive e restano volutamente opache. */
+    .auction-roster-edit-row.is-empty{
+      opacity:.42!important;
+      border-style:dashed!important;
+      border-color:rgba(112,155,194,.22)!important;
+      background:rgba(7,25,43,.34)!important;
+      cursor:default!important;
+      user-select:none;
+    }
+
+    .auction-roster-edit-row.is-empty .rolebadge{
+      opacity:.72;
+    }
+
+    .auction-all-roster-empty-label{
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      color:#8da6bd;
+      font-size:6px;
+      font-weight:800;
+    }
+
+    .auction-all-roster-empty-price{
+      color:#637c92;
+      font-size:6px;
+      font-weight:900;
+      text-align:center;
+    }
+
+    .auction-all-roster-empty-actions{
+      width:0;
+      min-width:0;
+      height:1px;
+      overflow:hidden;
+    }
+
+    .auction-roster-team-list{
+      scrollbar-gutter:stable;
+    }
+
+    @media(max-height:700px){
+      .auction-middle-column{
+        grid-template-rows:
+          auto
+          auto
+          minmax(112px,1fr)
+          auto
+          minmax(100px,1fr)!important;
+      }
+
+      .auction-middle-column>.auction-central-queue{
+        min-height:112px!important;
+      }
+
+      .auction-middle-column>.auction-bid-history{
+        min-height:100px!important;
+      }
+    }
+
 </style>
 </head>
 <body>
@@ -12520,7 +12778,7 @@
       `;
 
       const teamRosterHtml = `
-        <div class="auction-team-column">
+        <div class="auction-team-column auction-team-column-roster-only">
           <section class="auction-team-roster">
 
             <div class="auction-team-roster-head">
@@ -15024,6 +15282,145 @@
     }
 
 
+    function auctionAllRosterDisplayEntries(rows, mode) {
+      const rosterConfig =
+        parseRosterConfig(
+          state.auction?.settings?.roster_config
+        );
+
+      const entries = [];
+
+      if (mode === 'classic') {
+        const limits =
+          rosterConfig?.classic
+          || {};
+
+        ['P', 'D', 'C', 'A']
+          .forEach(role => {
+            const group =
+              rows.filter(item =>
+                item.player?.classic_role === role
+              );
+
+            group.forEach(item =>
+              entries.push({
+                assignment: item,
+                empty: false
+              })
+            );
+
+            const required =
+              Math.max(
+                0,
+                Number(limits?.[role] || 0)
+              );
+
+            for (
+              let index = group.length;
+              index < required;
+              index += 1
+            ) {
+              entries.push({
+                empty: true,
+                emptyRole: role
+              });
+            }
+          });
+
+        /* Manteniamo visibili anche eventuali righe fuori configurazione,
+           senza alterare il numero degli slot previsti. */
+        rows
+          .filter(item =>
+            !['P', 'D', 'C', 'A']
+              .includes(item.player?.classic_role)
+          )
+          .forEach(item =>
+            entries.push({
+              assignment: item,
+              empty: false
+            })
+          );
+
+        return entries;
+      }
+
+      const mantra =
+        rosterConfig?.mantra
+        || {};
+
+      const isGoalkeeperPlayer = player =>
+        playerRoles(
+          player || {},
+          mode
+        )
+          .some(role =>
+            ['P', 'Por', 'POR']
+              .includes(role)
+          );
+
+      const goalkeeperRows =
+        rows.filter(item =>
+          isGoalkeeperPlayer(item.player)
+        );
+
+      const outfieldRows =
+        rows.filter(item =>
+          !isGoalkeeperPlayer(item.player)
+        );
+
+      goalkeeperRows.forEach(item =>
+        entries.push({
+          assignment: item,
+          empty: false
+        })
+      );
+
+      const minimumGoalkeepers =
+        Math.max(
+          0,
+          Number(
+            mantra?.goalkeepers?.min
+            ?? 2
+          )
+        );
+
+      for (
+        let index = goalkeeperRows.length;
+        index < minimumGoalkeepers;
+        index += 1
+      ) {
+        entries.push({
+          empty: true,
+          emptyRole: 'Por'
+        });
+      }
+
+      outfieldRows.forEach(item =>
+        entries.push({
+          assignment: item,
+          empty: false
+        })
+      );
+
+      const minimumTotal =
+        Math.max(
+          entries.length,
+          Number(
+            mantra?.total?.min
+            ?? 23
+          )
+        );
+
+      while (entries.length < minimumTotal) {
+        entries.push({
+          empty: true
+        });
+      }
+
+      return entries;
+    }
+
+
     function renderAuctionAllRostersDrawer() {
       const canView =
         auctionHasPresidentRole()
@@ -15130,6 +15527,12 @@
                 }
               );
 
+          const displayRows =
+            auctionAllRosterDisplayEntries(
+              rows,
+              mode
+            );
+
           const spent =
             rows.reduce(
               (sum, item) =>
@@ -15213,91 +15616,110 @@
               <div class="auction-roster-team-list">
 
                 ${
-                  rows.length
-                    ? rows.map(item => {
-                        const roles =
-                          playerRoles(
-                            item.player || {},
-                            mode
-                          );
-
-                        return `
-                          <div
-                            class="auction-roster-edit-row"
-                            ${canEdit ? 'draggable="true"' : ''}
-                            data-roster-assignment="${esc(item.id)}"
-                            data-roster-source-team="${esc(team.id)}"
-                          >
-
-                            <span class="auction-roster-mini-roles">
-                              ${roles.map(role => `
-                                <span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>
-                              `).join('') || '<span class="rolebadge">—</span>'}
-                            </span>
-
-                            <strong class="auction-all-roster-player-name">
-                              ${esc(item.player?.name || '—')}
-                            </strong>
-
-
-                            <span class="auction-all-roster-price">
-                              ${Number(item.purchase_price || 0)}
-                            </span>
-
-
+                  displayRows.map(entry => {
+                    if (entry.empty) {
+                      return `
+                        <div
+                          class="auction-roster-edit-row is-empty"
+                          aria-label="Slot rosa disponibile"
+                        >
+                          <span class="auction-roster-mini-roles">
                             ${
-                              canEdit
-                                ? `
-                                    <div class="auction-roster-row-actions">
-
-                                      <button
-                                        type="button"
-                                        class="auction-roster-icon-btn swap transfer-roster-player"
-                                        data-assignment="${esc(item.id)}"
-                                        data-player="${esc(item.player?.name || 'Giocatore')}"
-                                        data-team-id="${esc(team.id)}"
-                                        data-team="${esc(team.name)}"
-                                        title="Cambia squadra"
-                                      >
-                                        ⇄
-                                      </button>
-
-                                      <button
-                                        type="button"
-                                        class="auction-roster-icon-btn edit-roster-price"
-                                        data-assignment="${esc(item.id)}"
-                                        data-player="${esc(item.player?.name || 'Giocatore')}"
-                                        data-team="${esc(team.name)}"
-                                        data-price="${Number(item.purchase_price || 0)}"
-                                        title="Modifica prezzo"
-                                      >
-                                        ✎
-                                      </button>
-
-                                      <button
-                                        type="button"
-                                        class="auction-roster-icon-btn remove remove-roster-player"
-                                        data-assignment="${esc(item.id)}"
-                                        data-player="${esc(item.player?.name || 'Giocatore')}"
-                                        data-team="${esc(team.name)}"
-                                        title="Rimuovi dalla rosa"
-                                      >
-                                        ×
-                                      </button>
-
-                                    </div>
-                                  `
-                                : ''
+                              entry.emptyRole
+                                ? `<span class="rolebadge" data-role="${esc(entry.emptyRole)}">${esc(entry.emptyRole)}</span>`
+                                : '<span class="auction-roster-empty-index">—</span>'
                             }
+                          </span>
 
-                          </div>
-                        `;
-                      }).join('')
-                    : `
-                        <div class="small soft" style="padding:7px">
-                          Rosa vuota.
+                          <span class="auction-all-roster-empty-label">
+                            Slot disponibile
+                          </span>
+
+                          <span class="auction-all-roster-empty-price">—</span>
+                          <span class="auction-all-roster-empty-actions" aria-hidden="true"></span>
                         </div>
-                      `
+                      `;
+                    }
+
+                    const item =
+                      entry.assignment;
+
+                    const roles =
+                      playerRoles(
+                        item.player || {},
+                        mode
+                      );
+
+                    return `
+                      <div
+                        class="auction-roster-edit-row"
+                        ${canEdit ? 'draggable="true"' : ''}
+                        data-roster-assignment="${esc(item.id)}"
+                        data-roster-source-team="${esc(team.id)}"
+                      >
+
+                        <span class="auction-roster-mini-roles">
+                          ${roles.map(role => `
+                            <span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>
+                          `).join('') || '<span class="rolebadge">—</span>'}
+                        </span>
+
+                        <strong class="auction-all-roster-player-name">
+                          ${esc(item.player?.name || '—')}
+                        </strong>
+
+                        <span class="auction-all-roster-price">
+                          ${Number(item.purchase_price || 0)}
+                        </span>
+
+                        ${
+                          canEdit
+                            ? `
+                                <div class="auction-roster-row-actions">
+
+                                  <button
+                                    type="button"
+                                    class="auction-roster-icon-btn swap transfer-roster-player"
+                                    data-assignment="${esc(item.id)}"
+                                    data-player="${esc(item.player?.name || 'Giocatore')}"
+                                    data-team-id="${esc(team.id)}"
+                                    data-team="${esc(team.name)}"
+                                    title="Cambia squadra"
+                                  >
+                                    ⇄
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    class="auction-roster-icon-btn edit-roster-price"
+                                    data-assignment="${esc(item.id)}"
+                                    data-player="${esc(item.player?.name || 'Giocatore')}"
+                                    data-team="${esc(team.name)}"
+                                    data-price="${Number(item.purchase_price || 0)}"
+                                    title="Modifica prezzo"
+                                  >
+                                    ✎
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    class="auction-roster-icon-btn remove remove-roster-player"
+                                    data-assignment="${esc(item.id)}"
+                                    data-player="${esc(item.player?.name || 'Giocatore')}"
+                                    data-team="${esc(team.name)}"
+                                    title="Rimuovi dalla rosa"
+                                  >
+                                    ×
+                                  </button>
+
+                                </div>
+                              `
+                            : '<span class="auction-all-roster-empty-actions" aria-hidden="true"></span>'
+                        }
+
+                      </div>
+                    `;
+                  }).join('')
                 }
 
               </div>
@@ -18058,26 +18480,28 @@
           <div class="auctioneer-section auctioneer-player-section">
             <div class="auctioneer-bid-section-title">Svincolato</div>
             <div class="auctioneer-unified-player">
-              <label>
-                Seleziona giocatore
-                <input
-                  id="auction-admin-player-search"
-                  type="search"
-                  placeholder="Cerca uno svincolato..."
-                  autocomplete="off"
-                  value="${esc(
-                    hasPlayer
-                      ? p?.name || ''
-                      : state.auctionAdminPlayerSearch
-                  )}"
-                  ${hasPlayer ? 'disabled' : ''}
-                >
-              </label>
+              <div class="auctioneer-admin-search-wrap">
+                <label>
+                  Seleziona giocatore
+                  <input
+                    id="auction-admin-player-search"
+                    type="search"
+                    placeholder="Cerca uno svincolato..."
+                    autocomplete="off"
+                    value="${esc(
+                      hasPlayer
+                        ? p?.name || ''
+                        : state.auctionAdminPlayerSearch
+                    )}"
+                    ${hasPlayer ? 'disabled' : ''}
+                  >
+                </label>
 
-              <div
-                id="auction-admin-search-results"
-                class="auctioneer-search-results"
-              ></div>
+                <div
+                  id="auction-admin-search-results"
+                  class="auctioneer-search-results"
+                ></div>
+              </div>
 
               <div
                 id="auction-admin-selected-player"
