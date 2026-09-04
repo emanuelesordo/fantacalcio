@@ -10057,7 +10057,7 @@
           const currentName = button.dataset.name || '';
           const raw = prompt('Nuovo nome squadra', currentName);
           if (raw === null) return;
-          const teamName = raw.trim();
+          const teamName = raw.trim().toLocaleUpperCase('it-IT');
           if (teamName.length < 2 || teamName.length > 60) {
             return msg('Il nome della squadra deve avere tra 2 e 60 caratteri.', 'error');
           }
@@ -10148,7 +10148,7 @@
 
     $('create-team-form').addEventListener('submit', async event => {
       event.preventDefault();
-      const teamName = $('manage-new-team').value.trim();
+      const teamName = $('manage-new-team').value.trim().toLocaleUpperCase('it-IT');
       if (teamName.length < 2) return msg('Nome squadra non valido.', 'error');
       try {
         await api(ENDPOINTS.league, { action: 'createTeam', teamName });
@@ -10732,8 +10732,213 @@
         : '<span class="auction-signal-empty">—</span>';
     }
 
+    function normalizePlayerSearchText(value) {
+      return String(value || '')
+        .trim()
+        .toLocaleLowerCase('it-IT')
+        .replace(/ß/g, 'ss')
+        .replace(/æ/g, 'ae')
+        .replace(/œ/g, 'oe')
+        .replace(/[øöő]/g, 'o')
+        .replace(/[ł]/g, 'l')
+        .replace(/[đð]/g, 'd')
+        .replace(/[þ]/g, 'th')
+        .replace(/[ı]/g, 'i')
+        .replace(/[ħ]/g, 'h')
+        .replace(/[ŧ]/g, 't')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[’'`´]/g, '')
+        .replace(/[^a-z0-9]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function loosePlayerSearchText(value) {
+      return normalizePlayerSearchText(value)
+        .replace(/([a-z])\1+/g, '$1')
+        .replace(/h/g, '')
+        .replace(/\s+/g, '');
+    }
+
+    function damerauLevenshtein(a, b) {
+      const source = String(a || '');
+      const target = String(b || '');
+
+      if (source === target) return 0;
+      if (!source.length) return target.length;
+      if (!target.length) return source.length;
+
+      const maxDistance = source.length + target.length;
+      const matrix = Array.from(
+        { length: source.length + 2 },
+        () => Array(target.length + 2).fill(0)
+      );
+      const lastRow = Object.create(null);
+
+      matrix[0][0] = maxDistance;
+      for (let i = 0; i <= source.length; i += 1) {
+        matrix[i + 1][0] = maxDistance;
+        matrix[i + 1][1] = i;
+      }
+      for (let j = 0; j <= target.length; j += 1) {
+        matrix[0][j + 1] = maxDistance;
+        matrix[1][j + 1] = j;
+      }
+
+      for (let i = 1; i <= source.length; i += 1) {
+        let lastMatchColumn = 0;
+
+        for (let j = 1; j <= target.length; j += 1) {
+          const previousMatchingRow = lastRow[target[j - 1]] || 0;
+          const previousMatchingColumn = lastMatchColumn;
+          let cost = 1;
+
+          if (source[i - 1] === target[j - 1]) {
+            cost = 0;
+            lastMatchColumn = j;
+          }
+
+          matrix[i + 1][j + 1] = Math.min(
+            matrix[i][j] + cost,
+            matrix[i + 1][j] + 1,
+            matrix[i][j + 1] + 1,
+            matrix[previousMatchingRow][previousMatchingColumn]
+              + (i - previousMatchingRow - 1)
+              + 1
+              + (j - previousMatchingColumn - 1)
+          );
+        }
+
+        lastRow[source[i - 1]] = i;
+      }
+
+      return matrix[source.length + 1][target.length + 1];
+    }
+
+    function playerSearchRank(player, rawQuery, mode) {
+      const query = normalizePlayerSearchText(rawQuery);
+      if (!query) {
+        return { tier: 0, distance: 0, position: 0 };
+      }
+
+      const name = normalizePlayerSearchText(player?.name);
+      const compactName = name.replace(/\s+/g, '');
+      const compactQuery = query.replace(/\s+/g, '');
+      const roles = playerRoles(player || {}, mode);
+      const searchable = normalizePlayerSearchText([
+        player?.name,
+        player?.serie_a_team,
+        player?.classic_role,
+        ...roles,
+        player?.slot
+      ].filter(Boolean).join(' '));
+
+      if (name === query) {
+        return { tier: 0, distance: 0, position: 0 };
+      }
+
+      if (name.startsWith(query)) {
+        return { tier: 1, distance: 0, position: 0 };
+      }
+
+      const wordPrefix = name
+        .split(' ')
+        .findIndex(word => word.startsWith(query));
+      if (wordPrefix >= 0) {
+        return { tier: 2, distance: 0, position: wordPrefix };
+      }
+
+      const namePosition = name.indexOf(query);
+      if (namePosition >= 0) {
+        return { tier: 3, distance: 0, position: namePosition };
+      }
+
+      const genericPosition = searchable.indexOf(query);
+      if (genericPosition >= 0) {
+        return { tier: 4, distance: 0, position: genericPosition };
+      }
+
+      if (compactQuery.length < 3) {
+        return null;
+      }
+
+      const looseQuery = loosePlayerSearchText(query);
+      const looseName = loosePlayerSearchText(name);
+      if (
+        looseQuery.length >= 4
+        && (
+          looseName.startsWith(looseQuery)
+          || looseName.includes(looseQuery)
+        )
+      ) {
+        return {
+          tier: 5,
+          distance: 0,
+          position: Math.max(0, looseName.indexOf(looseQuery))
+        };
+      }
+
+      const threshold =
+        compactQuery.length <= 4
+          ? 1
+          : compactQuery.length <= 8
+            ? 2
+            : 3;
+
+      const candidateLengths = new Set([
+        Math.max(1, compactQuery.length - 1),
+        compactQuery.length,
+        compactQuery.length + 1,
+        compactQuery.length + 2
+      ]);
+
+      let bestDistance = Number.POSITIVE_INFINITY;
+
+      for (const length of candidateLengths) {
+        if (length > compactName.length) continue;
+        const candidate = compactName.slice(0, length);
+        bestDistance = Math.min(
+          bestDistance,
+          damerauLevenshtein(compactQuery, candidate)
+        );
+      }
+
+      for (const word of name.split(' ')) {
+        const compactWord = word.replace(/\s+/g, '');
+        for (const length of candidateLengths) {
+          if (length > compactWord.length) continue;
+          bestDistance = Math.min(
+            bestDistance,
+            damerauLevenshtein(
+              compactQuery,
+              compactWord.slice(0, length)
+            )
+          );
+        }
+      }
+
+      if (bestDistance <= threshold) {
+        return {
+          tier: 6,
+          distance: bestDistance,
+          position: 0
+        };
+      }
+
+      return null;
+    }
+
+    function comparePlayerSearchRanks(rankA, rankB) {
+      return (
+        (rankA?.tier ?? 99) - (rankB?.tier ?? 99)
+        || (rankA?.distance ?? 99) - (rankB?.distance ?? 99)
+        || (rankA?.position ?? 99) - (rankB?.position ?? 99)
+      );
+    }
+
     function filterPlayers(players, controls, selectedRoles, mode) {
-      const q = String(controls.search?.value || '').trim().toLowerCase();
+      const q = String(controls.search?.value || '').trim();
       const team = controls.team?.value || 'all';
       const slot = controls.slot?.value || 'all';
       const flag = controls.flag?.value || 'all';
@@ -10745,7 +10950,7 @@
         if (slot !== 'all' && String(player.slot ?? '') !== slot) return false;
         if (!matchesFlag(player, flag)) return false;
         if (!q) return true;
-        return [player.name,player.serie_a_team,player.classic_role,...roles,player.slot].filter(Boolean).join(' ').toLowerCase().includes(q);
+        return playerSearchRank(player, q, mode) !== null;
       });
     }
 
@@ -17228,12 +17433,9 @@
             if (
               selected
               &&
-              selected.name
-                .toLowerCase()
+              normalizePlayerSearchText(selected.name)
               !==
-              event.target.value
-                .trim()
-                .toLowerCase()
+              normalizePlayerSearchText(event.target.value)
             ) {
               state.auctionSelectedPlayerId =
                 null;
@@ -18159,10 +18361,8 @@
             if (
               selected
               &&
-              selected.name.toLowerCase()
-              !== event.target.value
-                .trim()
-                .toLowerCase()
+              normalizePlayerSearchText(selected.name)
+              !== normalizePlayerSearchText(event.target.value)
             ) {
               state.auctionAdminPlayerId =
                 null;
@@ -18550,14 +18750,14 @@
         return;
       }
 
-      const query =
+      const rawQuery =
         String(
           state.auctionAdminPlayerSearch
-          ||
-          ''
-        )
-          .trim()
-          .toLowerCase();
+          || ''
+        ).trim();
+
+      const normalizedQuery =
+        normalizePlayerSearchText(rawQuery);
 
       const selected =
         (state.auction?.callCandidates || [])
@@ -18569,43 +18769,59 @@
         ||
         null;
 
+      /*
+       * La tendina vive solo durante una ricerca effettiva:
+       * - campo vuoto -> chiusa
+       * - giocatore già selezionato e testo coincidente -> chiusa
+       * - nessuna corrispondenza -> chiusa
+       */
       if (
-        selected
-        &&
-        !query
+        !normalizedQuery
+        || (
+          selected
+          && normalizePlayerSearchText(selected.name)
+            === normalizedQuery
+        )
       ) {
         box.innerHTML = '';
         return;
       }
 
-      if (
-        query.length < 1
-      ) {
-        box.innerHTML = '';
-        return;
-      }
+      const mode =
+        state.auction?.settings?.fantasy_mode
+        || 'classic';
 
       const matches =
         (state.auction?.callCandidates || [])
-          .filter(player =>
-            [
-              player.name,
-              player.serie_a_team,
-              ...playerRoles(
+          .map(player => ({
+            player,
+            rank:
+              playerSearchRank(
                 player,
-                state.auction?.settings?.fantasy_mode
+                rawQuery,
+                mode
               )
-            ]
-              .filter(Boolean)
-              .join(' ')
-              .toLowerCase()
-              .includes(query)
+          }))
+          .filter(item => item.rank !== null)
+          .sort((a, b) =>
+            comparePlayerSearchRanks(a.rank, b.rank)
+            || String(a.player.name || '')
+              .localeCompare(
+                String(b.player.name || ''),
+                'it',
+                { sensitivity: 'base' }
+              )
           )
           .slice(0, 8);
 
+      if (!matches.length) {
+        box.innerHTML = '';
+        return;
+      }
+
       box.innerHTML =
         matches
-          .map(player => `
+          .map(({ player, rank }) => `
             <button
               type="button"
               class="auctioneer-search-result"
@@ -18614,13 +18830,14 @@
               <span>
                 <strong>${esc(player.name)}</strong>
                 · ${esc(player.serie_a_team || '')}
+                ${rank.tier >= 5 ? '<small class="soft"> · suggerito</small>' : ''}
               </span>
 
               <span class="badge">
                 ${esc(
                   playerRoles(
                     player,
-                    state.auction?.settings?.fantasy_mode
+                    mode
                   )
                     .join('/')
                 )}
@@ -19100,12 +19317,27 @@
           mode
         );
 
+      const searchQuery =
+        String(
+          state.auctionFilterSearch
+          || ''
+        ).trim();
+
       const players =
         sortedPlayers(
           filteredPlayers,
           state.auctionSort,
           mode
         );
+
+      if (searchQuery) {
+        players.sort((a, b) =>
+          comparePlayerSearchRanks(
+            playerSearchRank(a, searchQuery, mode),
+            playerSearchRank(b, searchQuery, mode)
+          )
+        );
+      }
 
 
       updateAuctionSortIndicators();
