@@ -10212,6 +10212,162 @@
       }
     }
 
+
+    /* =====================================================
+       V41 · Coda full-width + Rose di tutti max 6 / wrap bilanciato
+       ===================================================== */
+
+    /*
+     * La Coda centrale non è più un drawer laterale. La vecchia classe
+     * .auction-call-queue-drawer è stata rimossa dal markup: il pannello
+     * occupa sempre il 100% della cella centrale e non può ricadere nelle
+     * vecchie regole width/min-width/max-width da 32px.
+     */
+    .auction-middle-lower-zone>.auction-central-queue{
+      width:100%!important;
+      min-width:0!important;
+      max-width:100%!important;
+      height:100%!important;
+      min-height:124px!important;
+      max-height:none!important;
+      margin:0!important;
+      align-self:stretch!important;
+      box-sizing:border-box!important;
+      overflow:hidden!important;
+      border-radius:var(--radius)!important;
+    }
+
+    .auction-middle-lower-zone>.auction-central-queue>.auction-call-queue-drawer-content{
+      width:100%!important;
+      min-width:0!important;
+      max-width:100%!important;
+      height:100%!important;
+      min-height:0!important;
+      margin:0!important;
+      padding:4px!important;
+      box-sizing:border-box!important;
+      overflow:hidden!important;
+    }
+
+    .auction-middle-lower-zone>.auction-central-queue .auction-call-queue{
+      width:100%!important;
+      min-width:0!important;
+      max-width:100%!important;
+      height:100%!important;
+      min-height:0!important;
+      box-sizing:border-box!important;
+      overflow:hidden!important;
+    }
+
+    .auction-middle-lower-zone>.auction-central-queue .auction-call-queue-list{
+      min-width:0!important;
+      width:100%!important;
+      min-height:0!important;
+      height:100%!important;
+      overflow-y:auto!important;
+      overflow-x:hidden!important;
+    }
+
+    /*
+     * Rose di tutti.
+     * <= 6 squadre: una sola riga Grid a larghezze identiche.
+     * > 6 squadre: Flexbox con wrap; JS calcola il minor numero possibile
+     * di righe con non più di 6 colonne. Ogni card conserva la stessa
+     * larghezza in tutte le righe e ogni riga si divide equamente l'altezza.
+     */
+    .auction-rosters-drawer[open] .auction-all-rosters-grid{
+      --auction-roster-gap:3px;
+      width:100%!important;
+      height:100%!important;
+      min-width:0!important;
+      min-height:0!important;
+      overflow:hidden!important;
+      gap:var(--auction-roster-gap)!important;
+      align-items:stretch!important;
+      align-content:stretch!important;
+    }
+
+    .auction-rosters-drawer[open] .auction-all-rosters-grid.is-single-row{
+      display:grid!important;
+      grid-template-columns:repeat(var(--auction-roster-cols,1),minmax(0,1fr))!important;
+      grid-template-rows:minmax(0,1fr)!important;
+      grid-auto-rows:minmax(0,1fr)!important;
+    }
+
+    .auction-rosters-drawer[open] .auction-all-rosters-grid.is-wrapped{
+      display:flex!important;
+      flex-flow:row wrap!important;
+      justify-content:flex-start!important;
+      align-items:stretch!important;
+      align-content:stretch!important;
+    }
+
+    .auction-rosters-drawer[open] .auction-all-rosters-grid.is-wrapped>.auction-roster-team-card{
+      flex:
+        0
+        0
+        calc(var(--auction-roster-card-width) - var(--auction-roster-card-gap-x))!important;
+      width:
+        calc(var(--auction-roster-card-width) - var(--auction-roster-card-gap-x))!important;
+      max-width:
+        calc(var(--auction-roster-card-width) - var(--auction-roster-card-gap-x))!important;
+      height:
+        calc(var(--auction-roster-card-height) - var(--auction-roster-card-gap-y))!important;
+      min-height:0!important;
+    }
+
+    .auction-rosters-drawer[open] .auction-roster-team-card{
+      min-width:0!important;
+      min-height:0!important;
+      overflow:hidden!important;
+      display:grid!important;
+      grid-template-rows:auto minmax(0,1fr)!important;
+    }
+
+    /* Header fermo; SOLO il body/list della singola rosa scorre. */
+    .auction-rosters-drawer[open] .auction-roster-team-head{
+      min-width:0!important;
+      flex:none!important;
+      overflow:hidden!important;
+    }
+
+    .auction-rosters-drawer[open] .auction-roster-team-list{
+      min-width:0!important;
+      min-height:0!important;
+      width:100%!important;
+      height:100%!important;
+      max-height:none!important;
+      display:grid!important;
+      grid-auto-rows:minmax(25px,max-content)!important;
+      align-content:start!important;
+      overflow-y:auto!important;
+      overflow-x:hidden!important;
+      overscroll-behavior:contain!important;
+      scrollbar-gutter:stable!important;
+      scrollbar-width:thin;
+      touch-action:pan-y;
+    }
+
+    .auction-rosters-drawer[open] .auction-roster-team-list>.auction-roster-edit-row{
+      min-height:25px!important;
+      width:100%!important;
+      min-width:0!important;
+      flex:none!important;
+    }
+
+    /* Nessun fallback mobile può trasformare il pannello in uno scroll
+       globale: il numero di colonne resta quello calcolato dal layout V41. */
+    @media(max-width:760px){
+      .auction-rosters-drawer[open] .auction-all-rosters-grid.is-single-row{
+        grid-template-columns:repeat(var(--auction-roster-cols,1),minmax(0,1fr))!important;
+      }
+
+      .auction-rosters-drawer[open] .auction-all-rosters-grid.is-wrapped{
+        display:flex!important;
+        flex-flow:row wrap!important;
+      }
+    }
+
 </style>
 </head>
 <body>
@@ -14969,7 +15125,7 @@
       return `
         <section
           id="auction-call-queue-drawer"
-          class="auction-call-queue-drawer auction-central-queue"
+          class="auction-central-queue"
         >
           <div class="auction-call-queue-drawer-content">
 
@@ -16941,52 +17097,47 @@
       const count =
         Math.max(1, Number(teamCount || 0));
 
-      const maxColumns =
-        Math.min(5, count);
-
-      const minimumRows =
-        Math.max(
-          1,
-          Math.ceil(count / 5)
-        );
-
       /*
-       * Privilegiamo righe perfettamente uguali quando basta al massimo
-       * una riga in più rispetto alla disposizione più compatta.
-       * Esempi: 12 -> 4x3, 9 -> 3x3, 8 -> 4x2.
-       * Evitiamo però casi patologici come 14 -> 2x7: in quel caso
-       * teniamo 5+5+4, molto più leggibile nel viewport.
+       * V41 · Rose di tutti
+       * - fino a 6 squadre: una sola riga, una card per squadra;
+       * - oltre 6: il numero minimo possibile di righe, con massimo 6
+       *   colonne e card tutte della stessa larghezza.
+       *
+       * Esempi richiesti:
+       *  6 -> 6 x 1
+       *  8 -> 4 x 2
+       * 10 -> 5 x 2
+       * 12 -> 6 x 2
+       *
+       * Per quantità non divisibili (es. 7, 13) la griglia mantiene la
+       * stessa larghezza di card per ogni riga; l'ultima può avere celle
+       * non occupate, senza allargare le card residue.
        */
-      let columns = 0;
+      const rows =
+        count <= 6
+          ? 1
+          : Math.max(2, Math.ceil(count / 6));
 
-      for (let candidate = maxColumns; candidate >= 2; candidate -= 1) {
-        if (
-          count % candidate === 0
-          && count / candidate <= minimumRows + 1
-        ) {
-          columns = candidate;
-          break;
-        }
-      }
+      const columns =
+        count <= 6
+          ? count
+          : Math.min(6, Math.ceil(count / rows));
 
-      if (!columns) {
-        columns =
-          Math.min(
-            5,
-            Math.max(
-              1,
-              Math.ceil(count / minimumRows)
-            )
-          );
-      }
+      const gap = 3;
 
       return {
         columns,
-        rows:
-          Math.max(
-            1,
-            Math.ceil(count / columns)
-          )
+        rows,
+        wrapped:
+          count > 6,
+        cardWidth:
+          `${(100 / columns).toFixed(6)}%`,
+        cardHeight:
+          `${(100 / rows).toFixed(6)}%`,
+        cardGapX:
+          `${(gap * (columns - 1) / columns).toFixed(3)}px`,
+        cardGapY:
+          `${(gap * (rows - 1) / rows).toFixed(3)}px`
       };
     }
 
@@ -17004,55 +17155,90 @@
           rosterConfig?.classic
           || {};
 
-        ['P', 'D', 'C', 'A']
-          .forEach(role => {
-            const group =
-              rows.filter(item =>
-                item.player?.classic_role === role
-              );
+        const roleData =
+          ['P', 'D', 'C', 'A']
+            .map(role => {
+              const configured =
+                limits?.[role];
 
-            group.forEach(item =>
-              entries.push({
-                assignment: item,
-                empty: false
-              })
-            );
+              const minimum =
+                Math.max(
+                  0,
+                  Number(
+                    typeof configured === 'object'
+                      ? configured?.min ?? configured?.max ?? 0
+                      : configured || 0
+                  )
+                );
 
-            const roleLimit =
-              limits?.[role];
+              const maximum =
+                Math.max(
+                  minimum,
+                  Number(
+                    typeof configured === 'object'
+                      ? configured?.max ?? configured?.min ?? minimum
+                      : configured || minimum
+                  )
+                );
 
-            const required =
-              Math.max(
-                0,
-                Number(
-                  typeof roleLimit === 'object'
-                    ? roleLimit?.max ?? roleLimit?.min ?? 0
-                    : roleLimit || 0
-                )
-              );
+              const group =
+                rows.filter(item =>
+                  item.player?.classic_role === role
+                );
 
-            for (
-              let index = group.length;
-              index < required;
-              index += 1
-            ) {
-              entries.push({
-                empty: true,
-                emptyRole: role
-              });
-            }
-          });
+              return {
+                role,
+                group,
+                minimum,
+                maximum
+              };
+            });
 
-        /* Manteniamo visibili anche eventuali righe fuori configurazione,
-           senza alterare il numero degli slot previsti. */
+        const minimumReached =
+          roleData.every(item =>
+            item.group.length >= item.minimum
+          );
+
+        roleData.forEach(item => {
+          item.group.forEach(assignment =>
+            entries.push({
+              assignment,
+              empty: false
+            })
+          );
+
+          /*
+           * Prima del completamento del minimo mostriamo soltanto gli slot
+           * necessari al minimo. Appena tutti i minimi sono raggiunti si
+           * rendono disponibili, uno per riga, anche gli slot fino al massimo.
+           * Nei Classic con quota fissa min=max il comportamento resta identico.
+           */
+          const target =
+            minimumReached
+              ? item.maximum
+              : item.minimum;
+
+          for (
+            let index = item.group.length;
+            index < target;
+            index += 1
+          ) {
+            entries.push({
+              empty: true,
+              emptyRole: item.role
+            });
+          }
+        });
+
+        /* Manteniamo visibili eventuali righe fuori configurazione. */
         rows
           .filter(item =>
             !['P', 'D', 'C', 'A']
               .includes(item.player?.classic_role)
           )
-          .forEach(item =>
+          .forEach(assignment =>
             entries.push({
-              assignment: item,
+              assignment,
               empty: false
             })
           );
@@ -17084,26 +17270,79 @@
           !isGoalkeeperPlayer(item.player)
         );
 
-      goalkeeperRows.forEach(item =>
-        entries.push({
-          assignment: item,
-          empty: false
-        })
-      );
-
-      const displayedGoalkeeperSlots =
+      const goalkeeperMin =
         Math.max(
-          goalkeeperRows.length,
+          0,
           Number(
-            mantra?.goalkeepers?.max
-            ?? mantra?.goalkeepers?.min
+            mantra?.goalkeepers?.min
+            ?? mantra?.goalkeepers?.max
             ?? 2
           )
         );
 
+      const goalkeeperMax =
+        Math.max(
+          goalkeeperMin,
+          Number(
+            mantra?.goalkeepers?.max
+            ?? mantra?.goalkeepers?.min
+            ?? goalkeeperMin
+          )
+        );
+
+      const outfieldMin =
+        Math.max(
+          0,
+          Number(
+            mantra?.outfield?.min
+            ?? 0
+          )
+        );
+
+      const totalMin =
+        Math.max(
+          goalkeeperMin + outfieldMin,
+          Number(
+            mantra?.total?.min
+            ?? 23
+          )
+        );
+
+      const totalMax =
+        Math.max(
+          totalMin,
+          Number(
+            mantra?.total?.max
+            ?? mantra?.total?.min
+            ?? totalMin
+          )
+        );
+
+      const minimumReached =
+        goalkeeperRows.length >= goalkeeperMin
+        && outfieldRows.length >= outfieldMin
+        && rows.length >= totalMin;
+
+      const goalkeeperTarget =
+        minimumReached
+          ? goalkeeperMax
+          : goalkeeperMin;
+
+      const totalTarget =
+        minimumReached
+          ? totalMax
+          : totalMin;
+
+      goalkeeperRows.forEach(assignment =>
+        entries.push({
+          assignment,
+          empty: false
+        })
+      );
+
       for (
         let index = goalkeeperRows.length;
-        index < displayedGoalkeeperSlots;
+        index < goalkeeperTarget;
         index += 1
       ) {
         entries.push({
@@ -17112,24 +17351,17 @@
         });
       }
 
-      outfieldRows.forEach(item =>
+      outfieldRows.forEach(assignment =>
         entries.push({
-          assignment: item,
+          assignment,
           empty: false
         })
       );
 
-      const displayedTotalSlots =
-        Math.max(
-          entries.length,
-          Number(
-            mantra?.total?.max
-            ?? mantra?.total?.min
-            ?? 23
-          )
-        );
-
-      while (entries.length < displayedTotalSlots) {
+      while (
+        entries.length
+        < Math.max(rows.length, totalTarget)
+      ) {
         entries.push({
           empty: true
         });
@@ -17137,6 +17369,7 @@
 
       return entries;
     }
+
 
 
     function renderAuctionAllRostersDrawer() {
@@ -17497,8 +17730,8 @@
 
 
             <div
-              class="auction-all-rosters-grid"
-              style="--auction-roster-cols:${rosterGrid.columns};--auction-roster-rows:${rosterGrid.rows}"
+              class="auction-all-rosters-grid ${rosterGrid.wrapped ? 'is-wrapped' : 'is-single-row'}"
+              style="--auction-roster-cols:${rosterGrid.columns};--auction-roster-rows:${rosterGrid.rows};--auction-roster-card-width:${rosterGrid.cardWidth};--auction-roster-card-height:${rosterGrid.cardHeight};--auction-roster-card-gap-x:${rosterGrid.cardGapX};--auction-roster-card-gap-y:${rosterGrid.cardGapY}"
             >
               ${
                 cards
