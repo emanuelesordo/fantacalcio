@@ -15710,8 +15710,19 @@
       const saved = (data.teamOrder || [])
         .map(item => item.team_id)
         .filter(id => allIds.includes(id));
+      const isTest =
+        session.is_test === true
+        || session.setup_snapshot?.test_mode === true;
 
-      const eligible = teams.filter(team => team.president).map(team => team.id);
+      /*
+       * In una sessione ufficiale una squadra può essere iscritta solo
+       * se ha un Presidente attivo. Nel test il Banditore/Admin può invece
+       * pilotare direttamente tutte le squadre, quindi l'associazione non
+       * è obbligatoria.
+       */
+      const eligible = isTest
+        ? allIds
+        : teams.filter(team => team.president).map(team => team.id);
       const included = saved.length
         ? saved
         : eligible.slice(0, expected);
@@ -15814,24 +15825,42 @@
         .filter(Boolean);
 
       const validCount = included.length === expected;
+      const isTest =
+        session.is_test === true
+        || session.setup_snapshot?.test_mode === true;
       const allIncludedHavePresident = included.every(team => team.president);
-      const canSave = auctionCanControl() && validCount && allIncludedHavePresident;
+      const presidentRequirementOk = isTest || allIncludedHavePresident;
+      const canSave = auctionCanControl() && validCount && presidentRequirementOk;
 
-      const teamRow = (team, index, includedList) => `
+      const teamRow = (team, index, includedList) => {
+        const canUseTeam = isTest || Boolean(team.president);
+        const presidentLabel = team.president
+          ? `Presidente: ${esc(team.president.username)}`
+          : isTest
+            ? 'Nessun Presidente · ammesso nel test'
+            : 'Nessun Presidente';
+        const excludedBadge = team.president
+          ? 'ESCLUSA'
+          : isTest
+            ? 'TEST'
+            : 'NO PRES.';
+
+        return `
         <div
-          class="auction-team-dnd-row ${team.president ? '' : 'is-disabled'}"
+          class="auction-team-dnd-row ${canUseTeam ? '' : 'is-disabled'}"
           data-team="${esc(team.id)}"
-          draggable="${team.president ? 'true' : 'false'}"
-          title="${team.president ? 'Trascina per spostare o riordinare' : 'Assegna prima un Presidente'}"
+          draggable="${canUseTeam ? 'true' : 'false'}"
+          title="${canUseTeam ? 'Trascina per spostare o riordinare' : 'Assegna prima un Presidente'}"
         >
           <span class="drag-handle">⋮⋮</span>
           <div>
             <strong>${esc(team.name)}</strong>
-            <small>${team.president ? `Presidente: ${esc(team.president.username)}` : 'Nessun Presidente'}</small>
+            <small>${presidentLabel}</small>
           </div>
-          ${includedList ? `<span class="badge primary">${index + 1}</span>` : `<span class="badge ${team.president ? '' : 'warn'}">${team.president ? 'ESCLUSA' : 'NO PRES.'}</span>`}
+          ${includedList ? `<span class="badge primary">${index + 1}</span>` : `<span class="badge ${!team.president && !isTest ? 'warn' : ''}">${excludedBadge}</span>`}
         </div>
       `;
+      };
 
       $('auction-root').innerHTML = `
         <div class="auction-lobby">
@@ -15872,7 +15901,8 @@
             </div>
 
             ${!validCount ? `<div class="small soft" style="margin-top:6px">Seleziona esattamente ${expected} squadre.</div>` : ''}
-            ${validCount && !allIncludedHavePresident ? '<div class="small soft" style="margin-top:6px">Tutte le squadre iscritte devono avere un Presidente.</div>' : ''}
+            ${!isTest && validCount && !allIncludedHavePresident ? '<div class="small soft" style="margin-top:6px">Tutte le squadre iscritte devono avere un Presidente.</div>' : ''}
+            ${isTest && included.some(team => !team.president) ? '<div class="small soft" style="margin-top:6px">Modalità test: le squadre senza Presidente saranno gestite direttamente da Banditore/Admin.</div>' : ''}
 
             ${auctionCanControl() ? `
               <div class="auction-team-selection-actions">
