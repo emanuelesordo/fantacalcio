@@ -9203,6 +9203,162 @@
       }
     }
 
+
+    /* =====================================================
+       V36 · record uniformi come Rosa + coda persistente
+       ===================================================== */
+
+    /*
+     * Tutti i record compatti dell'asta adottano la stessa grammatica
+     * visiva della Rosa: una sola card piena, bordo continuo, raggio corto
+     * e nessuna linea/pillola che attraversi la riga.
+     */
+    .auction-call-queue-row,
+    .auction-bid-chip,
+    .auction-award-row,
+    .auction-award-operation-row{
+      border:1px solid rgba(40,89,142,.55)!important;
+      border-radius:4px!important;
+      background:linear-gradient(
+        145deg,
+        rgba(34,64,96,.50),
+        rgba(13,32,54,.42)
+      )!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.035)!important;
+    }
+
+    .auction-call-queue-list{
+      gap:2px!important;
+      padding:3px!important;
+    }
+
+    .auction-call-queue-row,
+    .auction-central-queue .auction-call-queue-row{
+      width:100%!important;
+      min-width:0!important;
+      min-height:25px!important;
+      height:auto!important;
+      padding:2px 4px!important;
+      gap:3px!important;
+      grid-template-columns:
+        10px
+        minmax(21px,auto)
+        minmax(0,1fr)
+        42px
+        22px
+        22px!important;
+      align-items:center!important;
+      overflow:hidden!important;
+    }
+
+    .auction-call-queue-row .auction-queue-handle{
+      width:10px!important;
+      min-width:10px!important;
+      color:rgba(151,184,216,.58)!important;
+      font-size:8px!important;
+    }
+
+    .auction-call-queue-row .auction-roster-mini-roles{
+      min-width:0!important;
+      gap:1px!important;
+    }
+
+    .auction-call-queue-row .auction-roster-mini-roles .rolebadge{
+      min-width:18px!important;
+      height:13px!important;
+      min-height:13px!important;
+      padding:0 2px!important;
+      border-radius:3px!important;
+      font-size:5.5px!important;
+      line-height:13px!important;
+    }
+
+    .auction-call-queue-row .auction-queue-player strong{
+      font-size:7px!important;
+      line-height:1.05!important;
+    }
+
+    /*
+     * Il prezzo usa lo stesso trattamento del badge prezzo della Rosa:
+     * rettangolo compatto, non una pillola che crea l'effetto "linea".
+     */
+    .auction-call-queue-row .auction-queue-price input{
+      width:100%!important;
+      min-width:0!important;
+      min-height:19px!important;
+      height:19px!important;
+      padding:1px 3px!important;
+      border:1px solid rgba(103,161,255,.40)!important;
+      border-radius:4px!important;
+      background:rgba(58,118,199,.88)!important;
+      color:#fff!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.08)!important;
+      font-size:7px!important;
+      font-weight:950!important;
+      text-align:center!important;
+    }
+
+    .auction-call-queue-row .auction-queue-remove,
+    .auction-call-queue-row .auction-queue-call,
+    .auction-call-queue-row .auction-queue-call-placeholder{
+      width:22px!important;
+      min-width:22px!important;
+      min-height:19px!important;
+      height:19px!important;
+      padding:0!important;
+      border-radius:4px!important;
+      font-size:9px!important;
+    }
+
+    .auction-call-queue-row .auction-queue-call-placeholder{
+      display:block!important;
+      visibility:hidden!important;
+      pointer-events:none!important;
+    }
+
+    .auction-bid-chips{
+      display:grid!important;
+      grid-template-columns:minmax(0,1fr)!important;
+      align-content:start!important;
+      gap:2px!important;
+    }
+
+    .auction-bid-chip{
+      width:100%!important;
+      min-height:25px!important;
+      padding:2px 5px!important;
+      display:grid!important;
+      grid-template-columns:minmax(0,1fr) auto!important;
+      gap:5px!important;
+      align-items:center!important;
+    }
+
+    .auction-bid-chip span{
+      min-width:0!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+      white-space:nowrap!important;
+      font-size:7px!important;
+      font-weight:850!important;
+    }
+
+    .auction-bid-chip strong{
+      min-width:28px!important;
+      padding:2px 5px!important;
+      border-radius:4px!important;
+      background:rgba(58,118,199,.88)!important;
+      color:#fff!important;
+      text-align:center!important;
+      font-size:7px!important;
+    }
+
+    .auction-award-row,
+    .auction-award-operation-row{
+      min-height:25px!important;
+      border-radius:4px!important;
+    }
+
+
 </style>
 </head>
 <body>
@@ -9920,7 +10076,7 @@
       })[role] || role || '—';
     }
 
-    async function api(endpoint, payload = {}, { league = true, quiet = false } = {}) {
+    async function api(endpoint, payload = {}, { league = true, quiet = false, keepalive = false } = {}) {
       if (!state.session?.token) {
         showLoginGate(
           'Accedi per continuare.',
@@ -9946,7 +10102,8 @@
         response = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
+          body: JSON.stringify(body),
+          keepalive: Boolean(keepalive)
         });
       } catch {
         throw new Error('Impossibile contattare il server.');
@@ -13151,6 +13308,283 @@
     }
 
 
+    /*
+     * PAUSA CODA PERSISTENTE
+     *
+     * La preferenza autorevole vive in auction_team_state. Durante il breve
+     * intervallo fra click e conferma server conserviamo però un "intent"
+     * locale: se il browser viene ricaricato prima che il POST termini,
+     * l'interfaccia non torna ad autoplay e il nuovo caricamento ritenta
+     * silenziosamente il salvataggio.
+     */
+    const auctionQueuePausePersistInFlight =
+      new Set();
+
+
+    function auctionQueuePauseContext(data = state.auction) {
+      const sessionId =
+        data?.auctionSession?.id
+        ||
+        null;
+
+      const teamId =
+        data?.myTeam?.teamId
+        ||
+        data?.myTeam?.team?.id
+        ||
+        (
+          data === state.auction
+            ? auctionMyTeamId()
+            : null
+        );
+
+      if (!sessionId || !teamId) {
+        return null;
+      }
+
+      return {
+        sessionId,
+        teamId,
+        key:
+          `fantacalcio:auction-queue-paused:${sessionId}:${teamId}`
+      };
+    }
+
+
+    function auctionQueuePausePending(data = state.auction) {
+      const context =
+        auctionQueuePauseContext(data);
+
+      if (!context) {
+        return null;
+      }
+
+      try {
+        const raw =
+          localStorage.getItem(
+            context.key
+          );
+
+        if (!raw) {
+          return null;
+        }
+
+        const parsed =
+          JSON.parse(raw);
+
+        if (
+          typeof parsed?.paused
+          !== 'boolean'
+        ) {
+          localStorage.removeItem(
+            context.key
+          );
+          return null;
+        }
+
+        return {
+          ...context,
+          paused:
+            parsed.paused === true,
+          updatedAt:
+            Number(parsed.updatedAt || 0)
+        };
+      } catch {
+        return null;
+      }
+    }
+
+
+    function setAuctionQueuePausePending(
+      paused,
+      data = state.auction
+    ) {
+      const context =
+        auctionQueuePauseContext(data);
+
+      if (!context) {
+        return null;
+      }
+
+      localStorage.setItem(
+        context.key,
+        JSON.stringify({
+          paused:
+            paused === true,
+          updatedAt:
+            Date.now()
+        })
+      );
+
+      return context;
+    }
+
+
+    function clearAuctionQueuePausePending(
+      data = state.auction,
+      expectedPaused = null
+    ) {
+      const pending =
+        auctionQueuePausePending(data);
+
+      if (!pending) {
+        return;
+      }
+
+      if (
+        expectedPaused !== null
+        &&
+        pending.paused
+          !== (expectedPaused === true)
+      ) {
+        return;
+      }
+
+      localStorage.removeItem(
+        pending.key
+      );
+    }
+
+
+    function persistAuctionQueuePaused(
+      paused,
+      {
+        data = state.auction,
+        quiet = false
+      } = {}
+    ) {
+      const context =
+        auctionQueuePauseContext(data);
+
+      if (!context) {
+        return Promise.resolve(null);
+      }
+
+      const desired =
+        paused === true;
+
+      const flightKey =
+        `${context.sessionId}:${context.teamId}:${desired ? '1' : '0'}`;
+
+      if (
+        auctionQueuePausePersistInFlight
+          .has(flightKey)
+      ) {
+        return Promise.resolve(null);
+      }
+
+      auctionQueuePausePersistInFlight
+        .add(flightKey);
+
+      return api(
+        ENDPOINTS.auction,
+        {
+          action:
+            'setCallQueuePaused',
+          sessionId:
+            context.sessionId,
+          paused:
+            desired
+        },
+        {
+          quiet,
+          keepalive:
+            true
+        }
+      )
+        .then(result => {
+          if (result?.ok) {
+            clearAuctionQueuePausePending(
+              data,
+              desired
+            );
+
+            if (
+              state.auction
+              &&
+              state.auction
+                ?.auctionSession
+                ?.id
+                === context.sessionId
+            ) {
+              state.auction.callQueueSettings = {
+                ...(state.auction.callQueueSettings || {}),
+                autoPaused:
+                  desired
+              };
+            }
+          }
+
+          return result;
+        })
+        .catch(error => {
+          /*
+           * L'intent locale NON viene cancellato: in caso di reload/rete
+           * instabile il prossimo getLobby ritenta il salvataggio.
+           */
+          if (!quiet) {
+            msg(
+              `${error.message} La preferenza verrà ritentata automaticamente.`,
+              'error'
+            );
+          }
+
+          return null;
+        })
+        .finally(() => {
+          auctionQueuePausePersistInFlight
+            .delete(flightKey);
+        });
+    }
+
+
+    function mergeAuctionQueuePausePending(
+      data
+    ) {
+      const pending =
+        auctionQueuePausePending(data);
+
+      if (!pending) {
+        return data;
+      }
+
+      const serverPaused =
+        data?.callQueueSettings
+          ?.autoPaused === true;
+
+      data.callQueueSettings = {
+        ...(data.callQueueSettings || {}),
+        autoPaused:
+          pending.paused
+      };
+
+      if (
+        serverPaused
+        === pending.paused
+      ) {
+        clearAuctionQueuePausePending(
+          data,
+          pending.paused
+        );
+      } else {
+        /*
+         * Un refresh può aver interrotto il POST precedente. Non blocchiamo
+         * il rendering: riproviamo in background con fetch keepalive.
+         */
+        void persistAuctionQueuePaused(
+          pending.paused,
+          {
+            data,
+            quiet:
+              true
+          }
+        );
+      }
+
+      return data;
+    }
+
+
     function auctionQueueCapacityForPlayer(player) {
       const info =
         auctionMyTeamDashboardData();
@@ -13753,38 +14187,46 @@
       $('auction-queue-autoplay')
         ?.addEventListener(
           'click',
-          async () => {
-            const sessionId = auctionSession()?.id;
-            if (!sessionId) return;
+          () => {
+            const sessionId =
+              auctionSession()?.id;
+
+            if (!sessionId) {
+              return;
+            }
 
             const previous =
-              state.auction?.callQueueSettings?.autoPaused === true;
-            const next = !previous;
+              state.auction
+                ?.callQueueSettings
+                ?.autoPaused === true;
+
+            const next =
+              !previous;
+
+            /*
+             * Aggiornamento immediato + intent persistente locale.
+             * Il POST parte in background e usa keepalive, quindi un refresh
+             * immediato non deve riattivare l'autoplay.
+             */
+            setAuctionQueuePausePending(
+              next
+            );
 
             state.auction.callQueueSettings = {
               ...(state.auction.callQueueSettings || {}),
-              autoPaused: next
+              autoPaused:
+                next
             };
+
             patchAuctionCallQueueUi();
 
-            try {
-              await api(
-                ENDPOINTS.auction,
-                {
-                  action: 'setCallQueuePaused',
-                  sessionId,
-                  paused: next
-                }
-              );
-              await loadAuction({ quiet: true });
-            } catch (error) {
-              state.auction.callQueueSettings = {
-                ...(state.auction.callQueueSettings || {}),
-                autoPaused: previous
-              };
-              patchAuctionCallQueueUi();
-              msg(error.message, 'error');
-            }
+            void persistAuctionQueuePaused(
+              next,
+              {
+                quiet:
+                  false
+              }
+            );
           }
         );
 
@@ -16694,6 +17136,14 @@
         data.myCallQueue =
           state.auction.myCallQueue;
       }
+
+      /*
+       * Se il click PAUSA/RIPRENDI è avvenuto immediatamente prima di un
+       * refresh, conserva l'intent locale e ritenta il salvataggio in bg.
+       */
+      mergeAuctionQueuePausePending(
+        data
+      );
 
 
       const nextStructureSignature =
