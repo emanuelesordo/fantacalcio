@@ -9855,6 +9855,124 @@
       }
     }
 
+
+    /* =====================================================
+       V39 · coda sempre presente + Rose di tutti a viewport fisso
+       ===================================================== */
+
+    /* La Coda non viene più soppressa nella variante smartphone/dual:
+       per un Presidente in modalità CHIAMA resta sempre uno dei gadget
+       inferiori, con gestione completa e scroll interno. */
+    .auction-middle-lower-zone.has-queue>.auction-central-queue{
+      display:block!important;
+      visibility:visible!important;
+      opacity:1!important;
+      min-width:0!important;
+      min-height:124px!important;
+      height:100%!important;
+      overflow:hidden!important;
+    }
+
+    .auction-middle-lower-zone.has-queue .auction-call-queue-drawer-content,
+    .auction-middle-lower-zone.has-queue .auction-call-queue{
+      width:100%!important;
+      height:100%!important;
+      min-width:0!important;
+      min-height:0!important;
+      overflow:hidden!important;
+    }
+
+    .auction-middle-lower-zone.has-queue .auction-call-queue-list{
+      min-height:0!important;
+      height:100%!important;
+      max-height:none!important;
+      overflow-y:auto!important;
+      overflow-x:hidden!important;
+      overscroll-behavior:contain!important;
+      scrollbar-gutter:stable;
+    }
+
+    /* Rose di tutti: il drawer aperto NON scorre mai come blocco unico.
+       Tutte le squadre restano contemporaneamente nel viewport; la griglia
+       usa sempre il numero di colonne/righe calcolato dal JS (max 5/riga). */
+    .auction-rosters-drawer[open]{
+      overflow:hidden!important;
+    }
+
+    .auction-rosters-drawer[open]>.auction-rosters-content{
+      overflow:hidden!important;
+      overscroll-behavior:none!important;
+      min-height:0!important;
+    }
+
+    .auction-rosters-drawer[open] .auction-all-rosters-grid{
+      display:grid!important;
+      grid-template-columns:repeat(var(--auction-roster-cols,4),minmax(0,1fr))!important;
+      grid-template-rows:repeat(var(--auction-roster-rows,1),minmax(0,1fr))!important;
+      grid-auto-rows:minmax(0,1fr)!important;
+      height:100%!important;
+      min-height:0!important;
+      width:100%!important;
+      overflow:hidden!important;
+      align-items:stretch!important;
+      align-content:stretch!important;
+    }
+
+    .auction-rosters-drawer[open] .auction-roster-team-card{
+      min-width:0!important;
+      min-height:0!important;
+      width:100%!important;
+      height:100%!important;
+      display:grid!important;
+      grid-template-rows:auto minmax(0,1fr)!important;
+      overflow:hidden!important;
+    }
+
+    .auction-rosters-drawer[open] .auction-roster-team-head{
+      min-width:0!important;
+      min-height:0!important;
+      overflow:hidden!important;
+    }
+
+    /* L'unico scroll ammesso nel drawer è quello della singola rosa. */
+    .auction-rosters-drawer[open] .auction-roster-team-list{
+      display:grid!important;
+      grid-auto-rows:minmax(25px,auto)!important;
+      align-content:start!important;
+      min-width:0!important;
+      min-height:0!important;
+      width:100%!important;
+      height:100%!important;
+      max-height:none!important;
+      overflow-y:auto!important;
+      overflow-x:hidden!important;
+      overscroll-behavior:contain!important;
+      scrollbar-gutter:stable;
+      scrollbar-width:thin;
+      touch-action:pan-y;
+    }
+
+    .auction-rosters-drawer[open] .auction-roster-team-list .auction-roster-edit-row{
+      min-width:0!important;
+      width:100%!important;
+      flex:none!important;
+    }
+
+    /* Annulla il vecchio fallback mobile a 2 colonne: anche su viewport
+       stretti tutte le rose si spartiscono il drawer secondo la griglia
+       bilanciata calcolata in base al numero effettivo di squadre. */
+    @media(max-width:760px){
+      .auction-rosters-drawer[open] .auction-all-rosters-grid{
+        grid-template-columns:repeat(var(--auction-roster-cols,4),minmax(0,1fr))!important;
+        grid-template-rows:repeat(var(--auction-roster-rows,1),minmax(0,1fr))!important;
+        grid-auto-rows:minmax(0,1fr)!important;
+      }
+
+      .auction-middle-lower-zone.has-queue>.auction-central-queue{
+        min-height:120px!important;
+      }
+    }
+
 </style>
 </head>
 <body>
@@ -13870,8 +13988,6 @@
         auctionCallMode()
         &&
         auctionHasPresidentRole()
-        &&
-        !auctionUseMobilePresidentConsole()
       );
     }
 
@@ -14275,8 +14391,6 @@
         !auctionCallMode()
         ||
         !auctionHasPresidentRole()
-        ||
-        auctionUseMobilePresidentConsole()
       ) {
         return '';
       }
@@ -16337,7 +16451,7 @@
                 0,
                 Number(
                   typeof roleLimit === 'object'
-                    ? roleLimit?.min ?? roleLimit?.max ?? 0
+                    ? roleLimit?.max ?? roleLimit?.min ?? 0
                     : roleLimit || 0
                 )
               );
@@ -16402,18 +16516,19 @@
         })
       );
 
-      const minimumGoalkeepers =
+      const displayedGoalkeeperSlots =
         Math.max(
-          0,
+          goalkeeperRows.length,
           Number(
-            mantra?.goalkeepers?.min
+            mantra?.goalkeepers?.max
+            ?? mantra?.goalkeepers?.min
             ?? 2
           )
         );
 
       for (
         let index = goalkeeperRows.length;
-        index < minimumGoalkeepers;
+        index < displayedGoalkeeperSlots;
         index += 1
       ) {
         entries.push({
@@ -16429,16 +16544,17 @@
         })
       );
 
-      const minimumTotal =
+      const displayedTotalSlots =
         Math.max(
           entries.length,
           Number(
-            mantra?.total?.min
+            mantra?.total?.max
+            ?? mantra?.total?.min
             ?? 23
           )
         );
 
-      while (entries.length < minimumTotal) {
+      while (entries.length < displayedTotalSlots) {
         entries.push({
           empty: true
         });
@@ -19859,6 +19975,9 @@
 
 
 
+      const callQueueHtml =
+        renderAuctionCallQueue();
+
       $('auction-root').innerHTML = `
         <div class="auction-cockpit">
 
@@ -19950,8 +20069,8 @@
                   <section class="auction-middle-quick">
                     ${quickStripHtml}
                   </section>
-                  <div class="auction-middle-lower-zone ${auctionCallMode() ? 'has-queue' : 'no-queue'}">
-                    ${renderAuctionCallQueue()}
+                  <div class="auction-middle-lower-zone ${callQueueHtml.trim() ? 'has-queue' : 'no-queue'}">
+                    ${callQueueHtml}
                     <div class="auction-middle-vice-slot">${viceHtml}</div>
                     ${recentBidsHtml}
                   </div>
