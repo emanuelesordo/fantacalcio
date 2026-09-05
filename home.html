@@ -2,7 +2,7 @@
 <html lang="it">
 <!--
   ============================================================
-  FANTACALCIO LIVE - HOME MONOLITICA
+  FANTACALCIO LIVE - GLASS V2 · REBASE FUNZIONALE V42
   ============================================================
 
   File applicativo canonico.
@@ -33,7 +33,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>Fantacalcio Live</title>
+  <meta name="theme-color" content="#07111f">
+  <meta name="description" content="Fantacalcio Live Glass V2: interfaccia glass basata sulle logiche operative della V42 canonica.">
+  <title>Fantacalcio Live · Glass V2</title>
 
   <style>
     :root{
@@ -10752,9 +10754,502 @@
       }
     }
 
+
+    /* =====================================================
+       GLASS EDITION · visual language derived from supplied reference
+       Same DOM contracts / IDs / API client as canonical home.html.
+       ===================================================== */
+    :root{
+      color-scheme:dark;
+      --ink:#f7f9fc;
+      --text:#f7f9fc;
+      --soft:#aebbd0;
+      --muted:#76859d;
+      --bg:#050b14;
+      --bg-2:#091424;
+      --glass:rgba(15,28,46,.72);
+      --glass-strong:rgba(18,34,55,.92);
+      --glass-soft:rgba(255,255,255,.045);
+      --panel:rgba(15,28,46,.72);
+      --panel2:rgba(18,34,55,.88);
+      --panel3:rgba(255,255,255,.055);
+      --line:rgba(255,255,255,.105);
+      --line2:rgba(255,255,255,.18);
+      --line-strong:rgba(255,255,255,.18);
+      --primary:#6da7ff;
+      --primary2:#3175f6;
+      --blue:#6da7ff;
+      --blue-2:#3175f6;
+      --cyan:#58d5df;
+      --good:#2ba678;
+      --green:#57d6a0;
+      --warn:#b68433;
+      --yellow:#f0c75e;
+      --danger:#b7465a;
+      --red:#ff7081;
+      --orange:#ff9b65;
+      --violet:#b58cff;
+      --shadow:0 24px 70px rgba(0,0,0,.36);
+      --radius:22px;
+      --radius-sm:14px;
+      --r:18px;
+      --sidebar:248px;
+      --topbar:76px;
+      --ease:cubic-bezier(.22,1,.36,1);
+    }
+
+    body.modern-glass{
+      margin:0;
+      min-width:320px;
+      min-height:100dvh;
+      overflow:hidden;
+      font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at 76% -10%,rgba(58,117,246,.24),transparent 32rem),
+        radial-gradient(circle at 6% 90%,rgba(88,213,223,.11),transparent 30rem),
+        linear-gradient(145deg,var(--bg),var(--bg-2) 58%,#06101e);
+      color:var(--ink);
+      -webkit-font-smoothing:antialiased;
+    }
+
+    body.modern-glass::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.22;
+      background-image:
+        linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+      background-size:42px 42px;
+      mask-image:linear-gradient(to bottom,black,transparent 80%);
+      z-index:-1;
+    }
+
+    body.modern-glass #app-shell.app{
+      height:100dvh;
+      min-height:100dvh;
+      padding:0;
+      gap:0;
+      display:grid;
+      grid-template-columns:var(--sidebar) minmax(0,1fr);
+      grid-template-rows:var(--topbar) minmax(0,1fr);
+      overflow:hidden;
+      background:transparent;
+    }
+
+    body.modern-glass.modern-no-sidebar #app-shell.app{grid-template-columns:minmax(0,1fr)}
+    body.modern-glass.modern-no-sidebar .app-head,
+    body.modern-glass.modern-no-sidebar .workspace{grid-column:1}
+
+    body.modern-glass #main-nav.modern-sidebar{
+      grid-column:1;
+      grid-row:1/3;
+      position:fixed;
+      z-index:30;
+      inset:0 auto 0 0;
+      width:var(--sidebar);
+      min-width:var(--sidebar);
+      height:100dvh;
+      padding:22px 16px;
+      display:flex;
+      flex-direction:column;
+      gap:5px;
+      overflow:hidden;
+      background:rgba(4,11,20,.64);
+      border:0;
+      border-right:1px solid var(--line);
+      border-radius:0;
+      box-shadow:none;
+      backdrop-filter:blur(24px) saturate(130%);
+    }
+    body.modern-glass #main-nav[hidden]{display:none!important}
+
+    .modern-brand{
+      display:flex;align-items:center;gap:11px;padding:1px 8px 24px;color:var(--ink);text-decoration:none;
+    }
+    .modern-brand-mark{
+      position:relative;width:38px;height:38px;display:grid;place-items:center;flex:0 0 auto;border-radius:13px;
+      background:linear-gradient(145deg,var(--blue),var(--blue-2));color:white;font-size:13px;font-weight:950;
+      box-shadow:0 10px 30px rgba(49,117,246,.3),inset 0 1px rgba(255,255,255,.3);
+    }
+    .modern-brand-mark::after{content:"";position:absolute;width:7px;height:7px;right:-1px;top:-1px;border-radius:50%;background:var(--green);border:3px solid #07101d}
+    .modern-brand-copy{min-width:0}.modern-brand-copy strong{display:block;font-size:14px;letter-spacing:.01em}.modern-brand-copy small{display:block;margin-top:2px;color:var(--muted);font-size:9px;letter-spacing:.12em}
+    .modern-nav-label{padding:0 11px 8px;color:#536178;font-size:9px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}
+
+    body.modern-glass #main-nav .nav-btn{
+      position:relative;
+      flex:0 0 auto;
+      width:100%;
+      min-width:0;
+      min-height:45px;
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      gap:12px;
+      padding:0 12px;
+      border:1px solid transparent;
+      border-radius:13px;
+      background:transparent;
+      box-shadow:none;
+      color:#8f9eb4;
+      text-decoration:none;
+      font-size:12px;
+      font-weight:700;
+      transition:.22s var(--ease);
+    }
+    body.modern-glass #main-nav .nav-btn:hover{color:var(--ink);background:rgba(255,255,255,.04)}
+    body.modern-glass #main-nav .nav-btn.active,
+    body.modern-glass #main-nav .nav-btn[aria-current="page"]{
+      color:#fff;
+      background:linear-gradient(100deg,rgba(76,139,255,.17),rgba(76,139,255,.055));
+      border-color:rgba(109,167,255,.18);
+      box-shadow:inset 3px 0 var(--blue);
+    }
+    .nav-glyph{width:22px;height:22px;display:grid;place-items:center;flex:0 0 22px;color:currentColor;font-size:15px}
+    .modern-sidebar-footer{
+      margin-top:auto;padding:15px;border:1px solid var(--line);border-radius:18px;
+      background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.025));
+      box-shadow:inset 0 1px rgba(255,255,255,.05);
+    }
+    .modern-sidebar-footer .modern-sidebar-eyebrow{color:var(--muted);font-size:8px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+    .modern-sidebar-footer strong{display:block;margin:7px 0 3px;font-size:11px}.modern-sidebar-footer small{display:block;color:var(--soft);font-size:8px}
+    .modern-sidebar-footer i{display:block;width:84%;height:4px;margin-top:13px;border-radius:8px;background:linear-gradient(90deg,var(--blue),var(--cyan))}
+
+    body.modern-glass .app-head.modern-topbar{
+      grid-column:2;
+      grid-row:1;
+      position:sticky;
+      z-index:24;
+      top:0;
+      height:var(--topbar);
+      min-height:var(--topbar);
+      padding:0 clamp(20px,3vw,44px);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+      border:0;
+      border-radius:0;
+      background:linear-gradient(to bottom,rgba(5,11,20,.92),rgba(5,11,20,.68),transparent);
+      box-shadow:none;
+      backdrop-filter:blur(14px);
+    }
+    .modern-page-heading{min-width:0}.modern-kicker{color:var(--blue);font-size:8px;font-weight:900;letter-spacing:.15em}.modern-title-line{display:flex;align-items:center;gap:9px;min-width:0}
+    .modern-title-line h1{margin:1px 0 0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:clamp(18px,2.1vw,25px);line-height:1.1;letter-spacing:-.035em}
+    .modern-page-heading>p{margin:4px 0 0;color:var(--muted);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    body.modern-glass .league-pill{height:25px;display:flex;align-items:center;gap:5px;padding:0 8px;border:1px solid var(--line);border-radius:99px;background:rgba(255,255,255,.035)}
+    body.modern-glass .league-pill strong{max-width:220px;font-size:8px;color:var(--soft)}body.modern-glass .league-pill small{font-size:7px;color:var(--muted)}
+    .modern-head-actions{display:flex;align-items:center;gap:8px}.modern-status-pill{display:flex;align-items:center;gap:7px;height:34px;padding:0 11px;border:1px solid var(--line);border-radius:99px;background:rgba(255,255,255,.035);color:var(--soft);font-size:8px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+    .modern-status-pill i{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 5px rgba(87,214,160,.1)}
+    body.modern-glass .user-label{max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--soft);font-size:9px;font-weight:800}
+    body.modern-glass .app-head button{height:38px;min-width:38px;min-height:38px;padding:0 10px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.045);box-shadow:none;color:var(--soft);font-size:9px;cursor:pointer}
+    body.modern-glass .app-head button:hover{background:rgba(255,255,255,.075);color:var(--ink);filter:none}.modern-command-trigger{font-weight:900!important;letter-spacing:-.02em}
+
+    body.modern-glass .workspace{
+      grid-column:2;
+      grid-row:2;
+      min-width:0;
+      min-height:0;
+      height:auto;
+      overflow:auto;
+      overscroll-behavior:contain;
+      padding:6px clamp(20px,3vw,44px) 44px;
+      position:relative;
+    }
+    body.modern-glass .view{height:auto;min-height:100%;overflow:visible;padding:0;animation:modernViewIn .35s var(--ease)}
+    body.modern-glass .view.no-page-scroll{height:100%;min-height:0;overflow:hidden}
+    @keyframes modernViewIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+
+    /* Glass cards and common controls outside the specialised auction cockpit. */
+    body.modern-glass .view:not(#view-auction) .panel,
+    body.modern-glass .auth-card,
+    body.modern-glass .view:not(#view-auction) .table-wrap{
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      background:linear-gradient(145deg,rgba(255,255,255,.066),rgba(255,255,255,.024));
+      box-shadow:inset 0 1px rgba(255,255,255,.055),var(--shadow);
+      backdrop-filter:blur(22px) saturate(125%);
+    }
+    body.modern-glass .view:not(#view-auction) .panel{padding:20px}
+    body.modern-glass .panel-title{margin-bottom:17px}.modern-glass .panel-title h2,.modern-glass .panel-title h3{font-size:14px;letter-spacing:-.015em}.modern-glass .panel-title p{margin-top:5px;color:var(--muted);font-size:10px;line-height:1.45}
+
+    body.modern-glass .view:not(#view-auction) button:not(.nav-btn),
+    body.modern-glass .auth-gate button{
+      min-height:40px;padding:0 15px;border:1px solid transparent;border-radius:12px;
+      background:linear-gradient(145deg,#4f8fff,#2f70ef);
+      box-shadow:0 8px 24px rgba(49,117,246,.2),inset 0 1px rgba(255,255,255,.24);
+      color:white;font-size:10px;font-weight:850;cursor:pointer;transition:.2s var(--ease);
+    }
+    body.modern-glass .view:not(#view-auction) button:not(.nav-btn):hover,body.modern-glass .auth-gate button:hover{transform:translateY(-1px);filter:brightness(1.07)}
+    body.modern-glass .view:not(#view-auction) button.secondary{background:rgba(255,255,255,.055);border-color:var(--line);box-shadow:none;color:var(--soft)}
+    body.modern-glass .view:not(#view-auction) button.good{background:linear-gradient(145deg,#3bc58c,#209568);box-shadow:0 8px 24px rgba(47,186,130,.18)}
+    body.modern-glass .view:not(#view-auction) button.danger{background:rgba(255,112,129,.1);border-color:rgba(255,112,129,.18);box-shadow:none;color:#ff9eaa}
+    body.modern-glass .view:not(#view-auction) button.warn{background:linear-gradient(145deg,#f0c75e,#d59d2d);color:#17120a;box-shadow:0 8px 24px rgba(240,199,94,.16)}
+
+    body.modern-glass .view:not(#view-auction) input:not([type="checkbox"]),
+    body.modern-glass .view:not(#view-auction) select,
+    body.modern-glass .view:not(#view-auction) textarea,
+    body.modern-glass .auth-gate input{
+      width:100%;min-height:39px;padding:0 11px;border:1px solid var(--line);border-radius:11px;
+      background:rgba(0,0,0,.18);color:var(--ink);outline:0;font-size:10px;
+    }
+    body.modern-glass .view:not(#view-auction) input:focus,body.modern-glass .view:not(#view-auction) select:focus,body.modern-glass .view:not(#view-auction) textarea:focus,body.modern-glass .auth-gate input:focus{border-color:rgba(109,167,255,.65);box-shadow:0 0 0 3px rgba(109,167,255,.08)}
+    body.modern-glass label{color:var(--muted);font-size:9px;font-weight:700}
+
+    body.modern-glass .home-layout,body.modern-glass .manage-layout{gap:15px}
+    body.modern-glass .setup-layout{gap:15px}
+    body.modern-glass .setup-layout .full{grid-column:1/-1}
+    body.modern-glass .kpis{gap:12px}
+    body.modern-glass .kpi{min-height:86px;padding:15px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.035);box-shadow:inset 0 1px rgba(255,255,255,.03)}
+    body.modern-glass .kpi span{font-size:8px;color:var(--muted);letter-spacing:.07em}body.modern-glass .kpi strong{font-size:23px;letter-spacing:-.035em}
+    body.modern-glass .compact-list{gap:7px}.modern-glass .compact-row{min-height:50px;padding:8px 10px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.025);transition:.18s}.modern-glass .compact-row:hover{background:rgba(255,255,255,.04);border-color:var(--line-strong)}
+    body.modern-glass .badge{min-height:23px;padding:2px 8px;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.035);color:var(--soft);font-size:8px}
+
+    body.modern-glass #view-list .list-view-layout{gap:12px}
+    body.modern-glass #view-list .rolebar{gap:6px}.modern-glass #view-list .rolebtn{min-width:36px;height:34px;border-radius:10px;background:rgba(255,255,255,.035);border-color:var(--line);color:var(--soft)}
+    body.modern-glass #view-list .rolebtn.active{color:#08111e;background:var(--primary);border-color:transparent}
+    body.modern-glass #view-list .filters{gap:8px}.modern-glass #view-list .table-wrap{overflow:auto}
+    body.modern-glass #view-list table{border-collapse:collapse}.modern-glass #view-list th{height:43px;padding:0 14px;background:rgba(10,24,41,.92);border-bottom:1px solid var(--line);color:#607089;font-size:8px;letter-spacing:.09em;text-transform:uppercase}.modern-glass #view-list td{height:48px;padding:0 14px;border-bottom:1px solid rgba(255,255,255,.055);color:var(--soft);font-size:9px}.modern-glass #view-list tbody tr:hover{background:rgba(255,255,255,.032)}
+
+    body.modern-glass #view-rosters .rosters-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    body.modern-glass #view-rosters details.team-card,body.modern-glass #view-rosters .panel{overflow:hidden;border-radius:18px}
+    body.modern-glass #view-rosters details.team-card summary{padding:12px 14px;background:rgba(255,255,255,.045)}
+    body.modern-glass #view-rosters .roster-body{padding:10px;gap:6px}.modern-glass #view-rosters .roster-player{min-height:42px;padding:6px 8px;border-color:var(--line);border-radius:11px;background:rgba(255,255,255,.025)}
+
+    /* Authentication */
+    body.modern-glass .auth-gate{background:transparent;backdrop-filter:none}.modern-glass .auth-card{width:min(450px,calc(100% - 28px));padding:28px;border-radius:28px}.modern-glass .auth-brand-mark{width:46px;height:46px;border-radius:15px;background:linear-gradient(145deg,var(--blue),var(--blue-2));box-shadow:0 12px 34px rgba(49,117,246,.28)}.modern-glass .auth-kicker{color:var(--blue);letter-spacing:.15em}.modern-glass .auth-card h1{font-size:28px;letter-spacing:-.045em}.modern-glass .auth-card p{color:var(--muted);line-height:1.55}
+
+    /* Auction inherits the new palette without replacing the current geometry / state machine UI. */
+    body.modern-glass #view-auction .panel,
+    body.modern-glass #view-auction .auction-command-bar,
+    body.modern-glass #view-auction .auction-team-roster,
+    body.modern-glass #view-auction .auction-call-queue,
+    body.modern-glass #view-auction .auction-bid-history,
+    body.modern-glass #view-auction .auction-free-fixed,
+    body.modern-glass #view-auction .auctioneer-console,
+    body.modern-glass #view-auction .auction-roster-team-card{
+      border-color:var(--line)!important;
+      background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018))!important;
+      box-shadow:inset 0 1px rgba(255,255,255,.045),0 18px 50px rgba(0,0,0,.22)!important;
+      backdrop-filter:blur(18px) saturate(120%);
+    }
+    body.modern-glass #view-auction .auction-statusbar,body.modern-glass #view-auction .auction-team-summary-strip{border-color:var(--line)!important;background:rgba(12,28,46,.86)!important;backdrop-filter:blur(18px)}
+
+    /* TV */
+    body.modern-glass #view-tv .tv-shell{gap:15px}.modern-glass #view-tv .tv-stage{gap:15px}.modern-glass #view-tv .tv-player{border:1px solid var(--line);border-radius:28px;background:radial-gradient(circle at 50% 40%,rgba(67,129,240,.24),transparent 23rem),rgba(10,20,35,.65);box-shadow:var(--shadow)}
+
+    /* Command palette · exclusive to home-glass.html */
+    .modern-command-dialog{width:min(560px,calc(100% - 28px));padding:0;border:0;background:transparent;color:var(--ink)}
+    .modern-command-dialog::backdrop{background:rgba(1,6,12,.72);backdrop-filter:blur(8px)}
+    .modern-command-card{overflow:hidden;border:1px solid var(--line-strong);border-radius:22px;background:rgba(11,24,41,.96);box-shadow:0 30px 90px rgba(0,0,0,.55);backdrop-filter:blur(24px) saturate(130%)}
+    .modern-command-head{padding:16px 17px 10px;display:flex;align-items:center;justify-content:space-between;gap:12px}.modern-command-head span{display:block;color:var(--blue);font-size:8px;font-weight:900;letter-spacing:.15em}.modern-command-head strong{display:block;margin-top:3px;font-size:17px}.modern-command-head button{width:34px;height:34px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.045);color:var(--soft);font-size:18px}
+    .modern-command-search{margin:0 12px 8px;padding:0 11px;min-height:44px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;border:1px solid var(--line);border-radius:13px;background:rgba(0,0,0,.2)}.modern-command-search input{min-width:0;border:0;outline:0;background:transparent;color:var(--ink);font-size:11px}.modern-command-search kbd{padding:3px 6px;border:1px solid var(--line);border-radius:6px;color:var(--muted);font-size:8px}
+    .modern-command-list{max-height:min(380px,52dvh);padding:5px 8px 10px;display:grid;gap:4px;overflow:auto}.modern-command-item{width:100%;min-height:48px;padding:7px 10px;display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:center;gap:9px;border:1px solid transparent;border-radius:12px;background:transparent;color:var(--soft);text-align:left;cursor:pointer}.modern-command-item:hover,.modern-command-item:focus-visible{background:rgba(109,167,255,.09);border-color:rgba(109,167,255,.16);color:var(--ink)}.modern-command-item b{font-size:11px}.modern-command-item small{display:block;margin-top:2px;color:var(--muted);font-size:8px}.modern-command-item em{font-style:normal;color:var(--blue);font-size:8px}.modern-command-foot{padding:9px 15px 12px;border-top:1px solid var(--line);color:#596b82;font-size:8px}
+
+    @media(max-width:1180px){
+      body.modern-glass #view-rosters .rosters-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .modern-status-pill{display:none}
+    }
+
+    @media(max-width:980px){
+      :root{--sidebar:82px}
+      body.modern-glass #main-nav.modern-sidebar{padding:20px 12px}
+      .modern-brand{justify-content:center;padding-inline:0}.modern-brand-copy,.modern-nav-label,.modern-sidebar-footer,body.modern-glass #main-nav .nav-btn>span:last-child{display:none}
+      body.modern-glass #main-nav .nav-btn{justify-content:center;padding:0}.modern-glass #main-nav .nav-btn.active{box-shadow:inset 0 -2px var(--blue)}
+      .modern-glass .home-layout,.modern-glass .manage-layout,.modern-glass .setup-layout{grid-template-columns:1fr}
+    }
+
+    @media(max-width:700px){
+      :root{--topbar:64px}
+      body.modern-glass{padding-bottom:calc(70px + env(safe-area-inset-bottom))}
+      body.modern-glass #app-shell.app{grid-template-columns:1fr;grid-template-rows:var(--topbar) minmax(0,1fr)}
+      body.modern-glass .app-head.modern-topbar{grid-column:1;grid-row:1;height:var(--topbar);min-height:var(--topbar);padding:0 14px}.modern-page-heading>p,.modern-kicker,.modern-status-pill,.modern-command-trigger,body.modern-glass .app-head #reload-btn{display:none}
+      .modern-title-line h1{font-size:18px}.modern-glass .league-pill{display:none!important}.modern-head-actions{gap:5px}.modern-glass .user-label{display:none}.modern-glass .app-head button{height:36px;min-height:36px;padding:0 9px}
+      body.modern-glass .workspace{grid-column:1;grid-row:2;padding:5px 13px 24px;overflow:auto}
+      body.modern-glass #main-nav.modern-sidebar{
+        display:grid!important;
+        grid-auto-flow:column;
+        grid-auto-columns:minmax(64px,1fr);
+        gap:3px;
+        position:fixed;
+        z-index:70;
+        left:9px;right:9px;top:auto;bottom:calc(8px + env(safe-area-inset-bottom));
+        width:auto;min-width:0;height:58px;min-height:58px;padding:5px;
+        overflow-x:auto;overflow-y:hidden;
+        border:1px solid var(--line-strong);border-radius:18px;
+        background:rgba(8,17,30,.9);box-shadow:0 16px 48px rgba(0,0,0,.5);backdrop-filter:blur(24px) saturate(140%);scrollbar-width:none;
+      }
+      body.modern-glass #main-nav[hidden]{display:none!important}
+      body.modern-glass #main-nav::-webkit-scrollbar{display:none}.modern-brand,.modern-nav-label,.modern-sidebar-footer{display:none!important}
+      body.modern-glass #main-nav .nav-btn{width:auto;min-width:64px;min-height:48px;padding:2px 7px;display:grid;grid-template-rows:22px auto;place-items:center;gap:0;border-radius:13px;font-size:7px}.modern-glass #main-nav .nav-btn>span:last-child{display:block}.modern-glass .nav-glyph{width:22px;height:22px;font-size:16px}.modern-glass #main-nav .nav-btn.active{box-shadow:none;background:rgba(109,167,255,.11);color:var(--blue)}
+      body.modern-glass .view:not(#view-auction) .panel{padding:15px;border-radius:18px}.modern-glass .home-layout,.modern-glass .manage-layout,.modern-glass .setup-layout{gap:10px}.modern-glass .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.modern-glass .kpi{min-height:76px;padding:12px}.modern-glass .kpi strong{font-size:20px}
+      body.modern-glass #view-rosters .rosters-grid{grid-template-columns:1fr}
+      body.modern-glass #view-list .filters{grid-template-columns:1fr 1fr}.modern-glass #view-list .filters>label:first-child{grid-column:1/-1}.modern-glass #view-list .player-table{min-width:760px}
+    }
+
+    body.auction-live.modern-glass{padding-bottom:0}
+    body.auction-live.modern-glass #app-shell.app{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr)}
+    body.auction-live.modern-glass .app-head,body.auction-live.modern-glass #main-nav{display:none!important}
+    body.auction-live.modern-glass .workspace{grid-column:1;grid-row:1;padding:0;overflow:hidden}
+
+    @media(prefers-reduced-motion:reduce){body.modern-glass *,body.modern-glass *::before,body.modern-glass *::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
+
+    /* =====================================================
+       GLASS V2 · Chiamate suggerite automatiche
+       ===================================================== */
+    body.modern-glass #view-auction .auction-suggested-calls{
+      min-width:0;
+      padding:5px;
+      border:1px solid rgba(109,167,255,.15);
+      border-radius:10px;
+      background:linear-gradient(145deg,rgba(109,167,255,.065),rgba(88,213,223,.028));
+      box-shadow:inset 0 1px rgba(255,255,255,.035);
+    }
+
+    body.modern-glass #view-auction .auction-suggested-head{
+      min-width:0;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:7px;
+      margin-bottom:4px;
+    }
+
+    body.modern-glass #view-auction .auction-suggested-head strong{
+      display:block;
+      color:var(--ink);
+      font-size:8px;
+      font-weight:950;
+    }
+
+    body.modern-glass #view-auction .auction-suggested-head small{
+      display:block;
+      margin-top:1px;
+      color:var(--muted);
+      font-size:6px;
+    }
+
+    body.modern-glass #view-auction .auction-suggested-head>span{
+      padding:2px 5px;
+      border:1px solid rgba(88,213,223,.2);
+      border-radius:99px;
+      color:var(--cyan);
+      background:rgba(88,213,223,.07);
+      font-size:5.5px;
+      font-weight:950;
+      letter-spacing:.08em;
+    }
+
+    body.modern-glass #view-auction .auction-suggested-list{
+      display:grid;
+      gap:3px;
+    }
+
+    body.modern-glass #view-auction .auction-suggested-row{
+      min-width:0;
+      min-height:28px;
+      display:grid;
+      grid-template-columns:auto minmax(0,1fr) auto auto;
+      align-items:center;
+      gap:5px;
+      padding:3px 4px;
+      border:1px solid rgba(255,255,255,.055);
+      border-radius:8px;
+      background:rgba(255,255,255,.026);
+    }
+
+    body.modern-glass #view-auction .auction-suggested-copy{
+      min-width:0;
+    }
+
+    body.modern-glass #view-auction .auction-suggested-copy strong{
+      display:block;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      color:var(--ink);
+      font-size:7.5px;
+      font-weight:900;
+    }
+
+    body.modern-glass #view-auction .auction-suggested-copy small{
+      display:block;
+      margin-top:1px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      color:var(--muted);
+      font-size:5.7px;
+    }
+
+    body.modern-glass #view-auction .auction-suggested-roles{
+      display:flex;
+      gap:2px;
+      align-items:center;
+    }
+
+    body.modern-glass #view-auction .auction-suggested-quotation{
+      min-width:0;
+      color:var(--soft);
+      font-size:6px;
+      font-weight:850;
+      white-space:nowrap;
+    }
+
+    body.modern-glass #view-auction .auction-suggested-action{
+      min-width:42px!important;
+      min-height:23px!important;
+      height:23px!important;
+      padding:2px 6px!important;
+      border-radius:7px!important;
+      border:1px solid rgba(109,167,255,.24)!important;
+      background:rgba(109,167,255,.11)!important;
+      color:var(--blue)!important;
+      box-shadow:none!important;
+      font-size:5.8px!important;
+      font-weight:950!important;
+    }
+
+    body.modern-glass #view-auction .auction-suggested-action:hover{
+      background:rgba(109,167,255,.18)!important;
+      color:#fff!important;
+    }
+
+    body.modern-glass #view-auction .auction-suggested-action-placeholder{
+      min-width:34px;
+      color:var(--muted);
+      font-size:5px;
+      font-weight:900;
+      text-align:center;
+    }
+
+    /* La Coda mantiene lo scroll sulla sola lista; suggerimenti e header restano fissi. */
+    body.modern-glass #view-auction .auction-call-queue{
+      display:grid!important;
+      grid-template-rows:auto auto auto minmax(0,1fr)!important;
+      gap:3px!important;
+    }
+
+    @media(max-height:760px){
+      body.modern-glass #view-auction .auction-suggested-calls{
+        padding:4px;
+      }
+      body.modern-glass #view-auction .auction-suggested-list{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+      body.modern-glass #view-auction .auction-suggested-row{
+        grid-template-columns:auto minmax(0,1fr) auto;
+      }
+      body.modern-glass #view-auction .auction-suggested-quotation{
+        display:none;
+      }
+    }
+
 </style>
 </head>
-<body>
+<body class="modern-glass">
   <div id="global-message" class="message" aria-live="polite"></div>
 
   <section id="auth-gate" class="auth-gate" hidden>
@@ -10799,33 +11294,50 @@
     </div>
   </section>
 
-  <div id="app-shell" class="app" hidden>
-    <header class="app-head">
-      <div class="brand-line">
-        <div class="brand">Fantacalcio Live</div>
-        <div id="league-pill" class="league-pill" hidden>
-          <strong id="league-pill-name">—</strong>
-          <small id="league-pill-code">—</small>
+  <div id="app-shell" class="app modern-app" hidden>
+    <header class="app-head modern-topbar">
+      <div class="modern-page-heading">
+        <div class="modern-kicker">FANTACALCIO LIVE</div>
+        <div class="modern-title-line">
+          <h1 id="modern-page-title">Le mie leghe</h1>
+          <div id="league-pill" class="league-pill" hidden>
+            <strong id="league-pill-name">—</strong>
+            <small id="league-pill-code">—</small>
+          </div>
         </div>
+        <p id="modern-page-subtitle">Scegli la lega e riprendi il lavoro da dove eri rimasto.</p>
       </div>
 
-      <div class="head-actions">
+      <div class="head-actions modern-head-actions">
+        <span class="modern-status-pill"><i></i> Server autorevole</span>
         <span id="user-label" class="user-label"></span>
+        <button id="modern-command-btn" class="secondary modern-command-trigger" type="button" title="Navigazione rapida (Ctrl/⌘ K)">⌘K</button>
         <button id="league-switch-btn" class="secondary" type="button">Leghe</button>
         <button id="immersion-btn" class="secondary" type="button" title="Vista a schermo intero" aria-label="Vista a schermo intero">⛶</button>
-        <button id="reload-btn" class="secondary" type="button">↻</button>
+        <button id="reload-btn" class="secondary" type="button" title="Aggiorna dati">↻</button>
         <button id="exit-btn" class="secondary" type="button">Esci</button>
       </div>
     </header>
 
-    <nav id="main-nav" class="main-nav" hidden aria-label="Navigazione lega">
-      <a class="nav-btn active" data-view="home" href="#/home">Home</a>
-      <a class="nav-btn" data-view="manage" href="#/manage">Membri</a>
-      <a id="nav-setup" class="nav-btn" data-view="setup" href="#/setup">Setup</a>
-      <a class="nav-btn" data-view="list" href="#/list">Listone</a>
-      <a class="nav-btn" data-view="rosters" href="#/rosters">Rose</a>
-      <a class="nav-btn" data-view="auction" href="#/auction">Asta</a>
-      <a id="nav-tv" class="nav-btn" data-view="tv" href="#/tv">TV</a>
+    <nav id="main-nav" class="main-nav modern-sidebar" hidden aria-label="Navigazione lega">
+      <a class="modern-brand" href="#/home" aria-label="Fantacalcio Live · Home">
+        <span class="modern-brand-mark">F</span>
+        <span class="modern-brand-copy"><strong>Fantacalcio</strong><small>LIVE COCKPIT</small></span>
+      </a>
+      <div class="modern-nav-label">Workspace</div>
+      <a class="nav-btn active" data-view="home" href="#/home"><span class="nav-glyph">⌂</span><span>Home</span></a>
+      <a class="nav-btn" data-view="manage" href="#/manage"><span class="nav-glyph">◎</span><span>Membri</span></a>
+      <a id="nav-setup" class="nav-btn" data-view="setup" href="#/setup"><span class="nav-glyph">⌘</span><span>Setup</span></a>
+      <a class="nav-btn" data-view="list" href="#/list"><span class="nav-glyph">☷</span><span>Listone</span></a>
+      <a class="nav-btn" data-view="rosters" href="#/rosters"><span class="nav-glyph">◫</span><span>Rose</span></a>
+      <a class="nav-btn" data-view="auction" href="#/auction"><span class="nav-glyph">◆</span><span>Asta</span></a>
+      <a id="nav-tv" class="nav-btn" data-view="tv" href="#/tv"><span class="nav-glyph">▣</span><span>TV</span></a>
+      <div class="modern-sidebar-footer">
+        <span class="modern-sidebar-eyebrow">Stato</span>
+        <strong>Frontend statico</strong>
+        <small>Edge Functions + PostgreSQL</small>
+        <i></i>
+      </div>
     </nav>
 
     <main class="workspace">
@@ -11168,6 +11680,22 @@
     </main>
   </div>
 
+
+  <dialog id="modern-command" class="modern-command-dialog">
+    <div class="modern-command-card">
+      <div class="modern-command-head">
+        <div><span>NAVIGAZIONE RAPIDA</span><strong>Vai a una sezione</strong></div>
+        <button id="modern-command-close" type="button" aria-label="Chiudi">×</button>
+      </div>
+      <label class="modern-command-search">
+        <span>⌕</span>
+        <input id="modern-command-search" type="search" autocomplete="off" placeholder="Cerca Home, Asta, Rose, Setup…">
+        <kbd>ESC</kbd>
+      </label>
+      <div id="modern-command-list" class="modern-command-list"></div>
+      <div class="modern-command-foot">Solo navigazione locale: nessuna scrittura sul database.</div>
+    </div>
+  </dialog>
   <script>
     'use strict';
 
@@ -11543,6 +12071,42 @@
     });
 
 
+    const MODERN_ROUTE_META = Object.freeze({
+      leagues: { title: 'Le mie leghe', subtitle: 'Scegli una lega, creane una nuova o controlla le richieste in corso.' },
+      home: { title: 'Dashboard', subtitle: 'Stato della lega, squadre, ruoli personali e richieste da gestire.' },
+      manage: { title: 'Membri e squadre', subtitle: 'Ruoli, Presidenti, Vice, alias e struttura operativa della lega.' },
+      setup: { title: 'Configurazione', subtitle: 'Regole Classic/Mantra, timer, chiamate, rilanci e vincoli della rosa.' },
+      list: { title: 'Listone', subtitle: 'Ricerca, filtri e dati statistici del dataset giocatori attivo.' },
+      rosters: { title: 'Rose', subtitle: 'Crediti, assegnazioni e capacità residua di tutte le squadre.' },
+      auction: { title: 'Asta live', subtitle: 'Cockpit operativo collegato allo stato autorevole del server.' },
+      tv: { title: 'Vista TV', subtitle: 'Presentazione essenziale e leggibile dello stato live dell’asta.' }
+    });
+
+
+    function updateModernChrome() {
+      const meta =
+        MODERN_ROUTE_META[state.view]
+        || MODERN_ROUTE_META.leagues;
+
+      const title = $('modern-page-title');
+      const subtitle = $('modern-page-subtitle');
+
+      if (title) title.textContent = meta.title;
+      if (subtitle) subtitle.textContent = meta.subtitle;
+
+      document.body.classList.toggle(
+        'modern-no-sidebar',
+        !state.selectedLeague?.id
+        || state.view === 'leagues'
+      );
+
+      document.title =
+        state.selectedLeague?.name
+          ? `${meta.title} · ${state.selectedLeague.name} · Fantacalcio Live`
+          : `${meta.title} · Fantacalcio Live`;
+    }
+
+
     function normalizeRouteName(value) {
       const route =
         String(value || '')
@@ -11644,6 +12208,9 @@
           ||
           permissions.isSuperAdmin
         );
+
+
+      updateModernChrome();
     }
 
 
@@ -15472,6 +16039,196 @@
     let auctionQueueSaveChain = Promise.resolve();
 
 
+    function auctionSuggestedCallScore(player) {
+      const d = state.auction || {};
+      const info = auctionMyTeamDashboardData();
+
+      if (!player || !info) {
+        return null;
+      }
+
+      if (!auctionPlayerMatchesCurrentRolePhase(player)) {
+        return null;
+      }
+
+      const capacity = auctionQueueCapacityForPlayer(player);
+      if (!capacity.allowed) {
+        return null;
+      }
+
+      if (
+        auctionQueueRows()
+          .some(item => item.player_id === player.id)
+      ) {
+        return null;
+      }
+
+      const mode = d.settings?.fantasy_mode || 'classic';
+      const assignments = info.assignments || [];
+      const queue = auctionQueueRows();
+      let needScore = 0;
+      let needLabel = '';
+
+      if (mode === 'classic') {
+        const role = player.classic_role || '—';
+        const min = Number(info.roleLimits?.[role]?.min || 0);
+        const acquired = assignments.filter(item => item.player?.classic_role === role).length;
+        const queued = queue.filter(item => item.player?.classic_role === role).length;
+        const missing = Math.max(0, min - acquired);
+        const uncovered = Math.max(0, min - acquired - queued);
+
+        needScore =
+          uncovered > 0
+            ? 70 + Math.min(20, uncovered * 8)
+            : missing > 0
+              ? 42
+              : 8;
+
+        needLabel =
+          uncovered > 0
+            ? `Mancano ${uncovered} ${role} al minimo`
+            : missing > 0
+              ? `${role} già coperto in Coda, ma non ancora acquistato`
+              : `Slot ${role} ancora disponibile`;
+      } else {
+        const goalkeeper = playerRoles(player, mode)
+          .some(role => ['P', 'Por'].includes(role));
+        const bucket = goalkeeper ? 'Por' : 'MOV';
+        const label = goalkeeper ? 'portieri' : 'movimento';
+        const min = Number(info.roleLimits?.[bucket]?.min || 0);
+        const isGoalkeeper = candidate => playerRoles(candidate || {}, mode)
+          .some(role => ['P', 'Por'].includes(role));
+        const acquired = assignments.filter(item => goalkeeper === isGoalkeeper(item.player)).length;
+        const queued = queue.filter(item => goalkeeper === isGoalkeeper(item.player)).length;
+        const uncovered = Math.max(0, min - acquired - queued);
+
+        needScore = uncovered > 0 ? 76 + Math.min(18, uncovered * 7) : 10;
+        needLabel = uncovered > 0
+          ? `Mancano ${uncovered} ${label} al minimo`
+          : `${label[0].toUpperCase()+label.slice(1)} compatibile con la rosa`;
+      }
+
+      const pfc = Number(player.pfc || 0);
+      const pma = Number(player.pma || 0);
+      const expectedFm = Number(player.expected_fantasy_avg || 0);
+      const tit = Number(player.expected_titolarity || 0);
+      const quotation = Number(player.quotation || 0);
+      const slot = Number(player.slot || 0);
+      const maxBid = Number(info.maxBid ?? info.remaining ?? 0);
+
+      let valueScore =
+        Math.min(24, Math.max(0, pfc) * .18)
+        + Math.min(18, Math.max(0, pma) * .12)
+        + Math.min(12, Math.max(0, expectedFm) * 1.1)
+        + Math.min(10, Math.max(0, tit) * .10);
+
+      if (slot > 0) {
+        valueScore += Math.max(0, 14 - slot * 2.5);
+      }
+
+      let budgetScore = 0;
+      if (quotation > 0 && maxBid > 0) {
+        const ratio = quotation / maxBid;
+        budgetScore =
+          ratio <= .20 ? 14 :
+          ratio <= .35 ? 11 :
+          ratio <= .50 ? 7 :
+          ratio <= .75 ? 3 : -8;
+      }
+
+      const score = needScore + valueScore + budgetScore;
+
+      let secondary = '';
+      if (pfc > 0 || pma > 0) {
+        secondary = `PFC ${pfc || '—'} · PMA ${pma || '—'}`;
+      } else if (slot > 0) {
+        secondary = `Slot ${slot}`;
+      } else if (quotation > 0) {
+        secondary = `Qt. ${quotation}`;
+      }
+
+      return {
+        player,
+        score,
+        reason: needLabel,
+        secondary,
+        quotation,
+        slot
+      };
+    }
+
+
+    function auctionSuggestedCalls(limit = 4) {
+      if (
+        !auctionCallMode()
+        || !(auctionHasPresidentRole() || auctionHasViceRole())
+      ) {
+        return [];
+      }
+
+      return (state.auction?.callCandidates || [])
+        .map(auctionSuggestedCallScore)
+        .filter(Boolean)
+        .sort((a, b) =>
+          b.score - a.score
+          || Number(b.player?.pfc || 0) - Number(a.player?.pfc || 0)
+          || Number(b.player?.pma || 0) - Number(a.player?.pma || 0)
+          || String(a.player?.name || '').localeCompare(String(b.player?.name || ''), 'it')
+        )
+        .slice(0, Math.max(1, Number(limit || 4)));
+    }
+
+
+    function renderAuctionSuggestedCalls() {
+      const suggestions = auctionSuggestedCalls(4);
+
+      if (!suggestions.length) {
+        return '';
+      }
+
+      const canQueue = auctionHasPresidentRole();
+      const queueIsEmpty = auctionQueueRows().length === 0;
+      const ownTurn = auctionOwnCallTurn();
+
+      return `
+        <section class="auction-suggested-calls" aria-label="Chiamate suggerite">
+          <div class="auction-suggested-head">
+            <div>
+              <strong>Chiamate suggerite</strong>
+              <small>Priorità rosa · fase · valore · budget</small>
+            </div>
+            <span>AUTO</span>
+          </div>
+
+          <div class="auction-suggested-list">
+            ${suggestions.map(item => {
+              const player = item.player || {};
+              const roles = playerRoles(player, state.auction?.settings?.fantasy_mode);
+              const actionLabel = ownTurn && queueIsEmpty ? 'CHIAMA' : 'CODA';
+              return `
+                <div class="auction-suggested-row">
+                  <span class="auction-suggested-roles">
+                    ${roles.map(role => `<span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>`).join('') || '<span class="rolebadge">—</span>'}
+                  </span>
+                  <div class="auction-suggested-copy">
+                    <strong>${esc(player.name || 'Giocatore')}</strong>
+                    <small>${esc(player.serie_a_team || '—')} · ${esc(item.reason)}${item.secondary ? ` · ${esc(item.secondary)}` : ''}</small>
+                  </div>
+                  <span class="auction-suggested-quotation">${item.quotation > 0 ? `Q ${item.quotation}` : ''}</span>
+                  ${
+                    canQueue
+                      ? `<button type="button" class="auction-suggested-action" data-suggest-call="${esc(player.id)}">${actionLabel}</button>`
+                      : '<span class="auction-suggested-action-placeholder">VICE</span>'
+                  }
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </section>
+      `;
+    }
+
+
     function renderAuctionCallQueue() {
       if (
         !auctionCallMode()
@@ -15562,6 +16319,8 @@
                     ? `<div class="auction-queue-mode-note">Coda in pausa · al tuo turno usa ✓ per scegliere la chiamata.</div>`
                     : `<div class="auction-queue-mode-note is-auto">Autoplay attivo · al tuo turno parte la prima voce valida.</div>`
               }
+
+              ${renderAuctionSuggestedCalls()}
 
               <div
                 id="auction-call-queue-list"
@@ -15990,6 +16749,20 @@
       if (!list) {
         return;
       }
+
+      document
+        .querySelectorAll('[data-suggest-call]')
+        .forEach(button => {
+          button.addEventListener('click', event => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            addPlayerToAuctionQueue(
+              button.dataset.suggestCall,
+              Math.max(1, Number(state.auctionOpeningBid || 1))
+            );
+          });
+        });
 
       $('auction-queue-autoplay')
         ?.addEventListener(
@@ -25401,6 +26174,102 @@
       }
     }
 
+
+
+    /* =====================================================
+       GLASS EDITION · command palette (frontend-only)
+       ===================================================== */
+
+    function modernCommandRoutes() {
+      return Array.from(
+        document.querySelectorAll('#main-nav .nav-btn')
+      )
+        .filter(link => !link.hidden)
+        .map(link => ({
+          route: link.dataset.view,
+          label: link.textContent.trim(),
+          href: link.getAttribute('href')
+        }))
+        .filter(item => item.route && item.href);
+    }
+
+
+    function renderModernCommandList(query = '') {
+      const list = $('modern-command-list');
+      if (!list) return;
+
+      const needle =
+        String(query || '')
+          .trim()
+          .toLocaleLowerCase('it-IT');
+
+      const rows = modernCommandRoutes()
+        .filter(item => {
+          const meta = MODERN_ROUTE_META[item.route] || {};
+          return !needle
+            || item.label.toLocaleLowerCase('it-IT').includes(needle)
+            || String(meta.title || '').toLocaleLowerCase('it-IT').includes(needle)
+            || String(meta.subtitle || '').toLocaleLowerCase('it-IT').includes(needle);
+        });
+
+      list.innerHTML = rows.length
+        ? rows.map(item => {
+            const meta = MODERN_ROUTE_META[item.route] || {};
+            return `
+              <button
+                type="button"
+                class="modern-command-item"
+                data-modern-route="${esc(item.route)}"
+              >
+                <span class="nav-glyph">${
+                  item.route === 'home' ? '⌂' :
+                  item.route === 'manage' ? '◎' :
+                  item.route === 'setup' ? '⌘' :
+                  item.route === 'list' ? '☷' :
+                  item.route === 'rosters' ? '◫' :
+                  item.route === 'auction' ? '◆' : '▣'
+                }</span>
+                <span><b>${esc(meta.title || item.label)}</b><small>${esc(meta.subtitle || '')}</small></span>
+                <em>↵</em>
+              </button>
+            `;
+          }).join('')
+        : '<div class="small soft" style="padding:16px">Nessuna sezione corrispondente.</div>';
+
+      list.querySelectorAll('[data-modern-route]').forEach(button => {
+        button.addEventListener('click', () => {
+          $('modern-command')?.close();
+          switchView(button.dataset.modernRoute);
+        });
+      });
+    }
+
+
+    function openModernCommand() {
+      const dialog = $('modern-command');
+      const search = $('modern-command-search');
+      if (!dialog || typeof dialog.showModal !== 'function') return;
+
+      renderModernCommandList('');
+      search.value = '';
+      dialog.showModal();
+      requestAnimationFrame(() => search.focus());
+    }
+
+
+    $('modern-command-btn')?.addEventListener('click', openModernCommand);
+    $('modern-command-close')?.addEventListener('click', () => $('modern-command')?.close());
+    $('modern-command-search')?.addEventListener('input', event => renderModernCommandList(event.target.value));
+    $('modern-command')?.addEventListener('click', event => {
+      if (event.target === $('modern-command')) $('modern-command').close();
+    });
+
+    document.addEventListener('keydown', event => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        openModernCommand();
+      }
+    });
 
     start()
       .catch(error => {
