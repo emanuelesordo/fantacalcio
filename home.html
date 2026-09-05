@@ -11720,6 +11720,101 @@
       min-height:0!important;
     }
 
+
+
+    /* =====================================================
+       GLASS V6 · Funzioni asta 3×3 + HOLD
+       ===================================================== */
+
+    /* La sezione Funzioni asta assorbe tutto lo spazio verticale residuo. */
+    body.modern-glass #view-auction
+      .auctioneer-bid-panel>.auctioneer-functions-section{
+      flex:1 1 0!important;
+      min-height:0!important;
+      height:auto!important;
+      display:grid!important;
+      grid-template-rows:auto minmax(0,1fr)!important;
+      align-items:stretch!important;
+      overflow:hidden!important;
+    }
+
+    body.modern-glass #view-auction
+      .auctioneer-functions-section>.auctioneer-bid-section-title{
+      min-height:16px!important;
+      height:auto!important;
+      margin:0!important;
+      display:flex!important;
+      align-items:center!important;
+    }
+
+    /* 9 funzioni = matrice 3×3 che riempie tutta l'area residua. */
+    body.modern-glass #view-auction
+      .auctioneer-functions-section>.auctioneer-head-actions{
+      min-width:0!important;
+      min-height:0!important;
+      width:100%!important;
+      height:100%!important;
+      display:grid!important;
+      grid-template-columns:repeat(3,minmax(0,1fr))!important;
+      grid-template-rows:repeat(3,minmax(0,1fr))!important;
+      gap:5px!important;
+      align-items:stretch!important;
+      align-content:stretch!important;
+      justify-items:stretch!important;
+      overflow:hidden!important;
+    }
+
+    body.modern-glass #view-auction
+      .auctioneer-functions-section>.auctioneer-head-actions>button{
+      flex:none!important;
+      min-width:0!important;
+      max-width:none!important;
+      width:100%!important;
+      min-height:0!important;
+      height:100%!important;
+      max-height:none!important;
+      margin:0!important;
+      padding:6px!important;
+      box-sizing:border-box!important;
+      align-self:stretch!important;
+      justify-self:stretch!important;
+      display:flex!important;
+      align-items:center!important;
+      justify-content:center!important;
+      text-align:center!important;
+      overflow:hidden!important;
+    }
+
+    /* HOLD deve essere visivamente distinguibile quando il timer è bloccato. */
+    body.modern-glass #view-auction
+      #auction-hold.warn{
+      border-color:rgba(242,183,64,.72)!important;
+      background:linear-gradient(145deg,rgba(151,101,21,.96),rgba(112,74,18,.96))!important;
+      color:#fff1c2!important;
+      box-shadow:
+        inset 0 1px rgba(255,255,255,.16),
+        0 0 0 1px rgba(242,183,64,.10)!important;
+    }
+
+    /* Anche nei viewport bassi manteniamo la matrice 3×3; se la console
+       deve scorrere, la sezione conserva comunque una superficie utile. */
+    @media(max-height:680px){
+      body.modern-glass #view-auction
+        .auctioneer-bid-panel>.auctioneer-functions-section{
+        flex:0 0 180px!important;
+        min-height:180px!important;
+        display:grid!important;
+        grid-template-rows:auto minmax(0,1fr)!important;
+      }
+
+      body.modern-glass #view-auction
+        .auctioneer-functions-section>.auctioneer-head-actions{
+        display:grid!important;
+        grid-template-columns:repeat(3,minmax(0,1fr))!important;
+        grid-template-rows:repeat(3,minmax(0,1fr))!important;
+      }
+    }
+
 </style>
 </head>
 <body class="modern-glass">
@@ -22481,6 +22576,24 @@
             </button>
 
             <button
+              id="auction-hold"
+              class="${s.hold_active ? 'warn' : 'secondary'}"
+              type="button"
+              ${
+                hasPlayer
+                || (
+                  !hasPlayer
+                  && d.settings?.nomination_timer_enabled !== false
+                )
+                  ? ''
+                  : 'disabled'
+              }
+              title="${s.hold_active ? 'Riprende il timer dal tempo residuo' : 'Blocca il timer mantenendo il tempo residuo'}"
+            >
+              ${s.hold_active ? 'RIPRENDI' : 'HOLD'}
+            </button>
+
+            <button
               id="auction-cancel-call"
               class="danger"
               type="button"
@@ -23636,6 +23749,28 @@
                   s.id
               },
               'Timer ripristinato.'
+            )
+        );
+
+
+      $('auction-hold')
+        ?.addEventListener(
+          'click',
+          () =>
+            auctionAction(
+              {
+                action:
+                  'setHold',
+
+                sessionId:
+                  s.id,
+
+                hold:
+                  !s.hold_active
+              },
+              s.hold_active
+                ? 'Timer ripreso.'
+                : 'Timer in HOLD.'
             )
         );
 
