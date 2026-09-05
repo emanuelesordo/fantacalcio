@@ -12216,6 +12216,138 @@
       }
     }
 
+
+
+    /* =====================================================
+       GLASS V8 · route isolation + Home viewport-safe
+       ===================================================== */
+
+    /*
+     * V7 regression fix.
+     * #view-manage had display:grid!important even when it was NOT the active
+     * route; consequently it remained rendered before #view-setup and looked
+     * as if Members/Teams had been moved into League Setup.
+     * Inactive views are now always excluded from layout.
+     */
+    body.modern-glass .view:not(.active){
+      display:none!important;
+    }
+
+    body.modern-glass #view-manage.active{
+      display:grid!important;
+    }
+
+    body.modern-glass #view-home.active,
+    body.modern-glass #view-setup.active,
+    body.modern-glass #view-list.active,
+    body.modern-glass #view-rosters.active,
+    body.modern-glass #view-tv.active,
+    body.modern-glass #view-leagues.active{
+      display:block!important;
+    }
+
+    /* The workspace itself is exactly the second row of the application
+       cockpit. Padding is included in that height, so cards can never push
+       the application shell below the viewport. */
+    body.modern-glass .workspace{
+      width:100%!important;
+      height:100%!important;
+      min-width:0!important;
+      min-height:0!important;
+      max-height:100%!important;
+      box-sizing:border-box!important;
+    }
+
+    /* Desktop Home is a fixed cockpit: outer cards never scroll out of the
+       application viewport. Only the content lists inside each card scroll. */
+    @media(min-width:981px){
+      body.modern-glass #view-home.active{
+        width:100%!important;
+        height:100%!important;
+        min-height:0!important;
+        max-height:100%!important;
+        overflow:hidden!important;
+      }
+
+      body.modern-glass #view-home>.home-layout{
+        width:100%!important;
+        height:100%!important;
+        min-width:0!important;
+        min-height:0!important;
+        max-height:100%!important;
+        overflow:hidden!important;
+        align-items:stretch!important;
+      }
+
+      body.modern-glass #view-home .home-col{
+        width:100%!important;
+        height:100%!important;
+        min-width:0!important;
+        min-height:0!important;
+        max-height:100%!important;
+        overflow:hidden!important;
+      }
+
+      body.modern-glass #view-home .home-col:first-child{
+        grid-template-rows:auto minmax(0,1fr)!important;
+      }
+
+      body.modern-glass #view-home .home-col:nth-child(2){
+        grid-template-rows:minmax(118px,.62fr) minmax(0,1.38fr)!important;
+      }
+
+      body.modern-glass #view-home .home-col>.panel{
+        width:100%!important;
+        height:100%!important;
+        min-width:0!important;
+        min-height:0!important;
+        max-height:100%!important;
+        display:flex!important;
+        flex-direction:column!important;
+        overflow:hidden!important;
+        box-sizing:border-box!important;
+      }
+
+      body.modern-glass #view-home .home-col>.panel>.panel-title{
+        flex:0 0 auto!important;
+      }
+
+      body.modern-glass #view-home #home-teams,
+      body.modern-glass #view-home #home-me,
+      body.modern-glass #view-home #pending-list{
+        min-width:0!important;
+        min-height:0!important;
+        max-height:none!important;
+        overflow-y:auto!important;
+        overflow-x:hidden!important;
+        overscroll-behavior:contain!important;
+        scrollbar-gutter:stable;
+      }
+
+      body.modern-glass #view-home #home-teams,
+      body.modern-glass #view-home #pending-list{
+        flex:1 1 0!important;
+        height:0!important;
+      }
+
+      body.modern-glass #view-home #home-me{
+        flex:1 1 auto!important;
+      }
+    }
+
+    /* On compact layouts the workspace remains the viewport boundary, while
+       the active Home view may scroll internally because the two columns are
+       intentionally stacked by the responsive design. */
+    @media(max-width:980px){
+      body.modern-glass #view-home.active{
+        height:100%!important;
+        min-height:0!important;
+        max-height:100%!important;
+        overflow-y:auto!important;
+        overflow-x:hidden!important;
+      }
+    }
+
 </style>
 </head>
 <body class="modern-glass">
