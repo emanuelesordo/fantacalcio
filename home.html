@@ -12348,6 +12348,390 @@
       }
     }
 
+
+
+    /* =====================================================
+       GLASS V9 · Home pulita + Membri esclusivi + strip = header
+       ===================================================== */
+
+    /* HOME: nessuna lista membri/squadre/richieste. Solo dashboard e
+       scorciatoie operative, sempre confinate nel cockpit. */
+    body.modern-glass #view-home.active{
+      width:100%!important;
+      height:100%!important;
+      min-width:0!important;
+      min-height:0!important;
+      max-height:100%!important;
+      overflow:hidden!important;
+    }
+
+    body.modern-glass #view-home>.home-dashboard-shell{
+      width:100%!important;
+      height:100%!important;
+      min-width:0!important;
+      min-height:0!important;
+      max-height:100%!important;
+      display:grid!important;
+      grid-template-rows:auto minmax(0,1fr)!important;
+      gap:12px!important;
+      overflow:hidden!important;
+    }
+
+    body.modern-glass #view-home .home-dashboard-kpis{
+      min-width:0!important;
+      flex:none!important;
+    }
+
+    body.modern-glass #view-home .home-dashboard-grid{
+      min-width:0!important;
+      min-height:0!important;
+      height:100%!important;
+      display:grid!important;
+      grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr)!important;
+      gap:12px!important;
+      overflow:hidden!important;
+    }
+
+    body.modern-glass #view-home .home-dashboard-panel{
+      min-width:0!important;
+      min-height:0!important;
+      height:100%!important;
+      max-height:100%!important;
+      display:flex!important;
+      flex-direction:column!important;
+      overflow:hidden!important;
+    }
+
+    body.modern-glass #view-home .home-summary{
+      min-width:0;
+      min-height:0;
+      flex:1 1 auto;
+      display:grid;
+      align-content:center;
+      justify-items:start;
+      gap:14px;
+      padding:18px;
+    }
+
+    body.modern-glass #view-home .home-summary-league{
+      min-width:0;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    body.modern-glass #view-home .home-summary-dot{
+      width:10px;
+      height:10px;
+      flex:0 0 10px;
+      border-radius:999px;
+      background:#4dd7a6;
+      box-shadow:0 0 0 5px rgba(77,215,166,.10),0 0 18px rgba(77,215,166,.30);
+    }
+
+    body.modern-glass #view-home .home-summary-league strong{
+      display:block;
+      color:var(--ink);
+      font-size:18px;
+      line-height:1.05;
+    }
+
+    body.modern-glass #view-home .home-summary-league small{
+      display:block;
+      margin-top:4px;
+      color:var(--muted);
+      font-size:9px;
+    }
+
+    body.modern-glass #view-home .home-summary-roles{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+    }
+
+    body.modern-glass #view-home .home-quick-grid{
+      min-width:0;
+      min-height:0;
+      flex:1 1 auto;
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      grid-template-rows:repeat(2,minmax(0,1fr));
+      gap:8px;
+      padding:10px;
+    }
+
+    body.modern-glass #view-home .home-quick-link{
+      min-width:0;
+      min-height:0;
+      padding:14px;
+      display:grid;
+      grid-template-columns:auto minmax(0,1fr);
+      grid-template-rows:auto auto;
+      align-content:center;
+      column-gap:10px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:rgba(255,255,255,.028);
+      color:var(--soft);
+      text-decoration:none;
+      overflow:hidden;
+      transition:background .16s ease,border-color .16s ease,transform .16s ease;
+    }
+
+    body.modern-glass #view-home .home-quick-link:hover{
+      background:rgba(93,156,245,.09);
+      border-color:rgba(93,156,245,.34);
+      transform:translateY(-1px);
+    }
+
+    body.modern-glass #view-home .home-quick-link>span{
+      grid-row:1 / span 2;
+      align-self:center;
+      color:var(--blue);
+      font-size:18px;
+    }
+
+    body.modern-glass #view-home .home-quick-link strong{
+      color:var(--ink);
+      font-size:12px;
+      line-height:1.1;
+    }
+
+    body.modern-glass #view-home .home-quick-link small{
+      margin-top:3px;
+      color:var(--muted);
+      font-size:8px;
+    }
+
+    /* MEMBRI: le richieste di ingresso vivono SOLO qui. La card destra resta
+       entro il cockpit e divide lo spazio tra membri attivi e richieste. */
+    body.modern-glass #view-manage .manage-members-panel{
+      min-width:0!important;
+      min-height:0!important;
+      overflow:hidden!important;
+    }
+
+    body.modern-glass #view-manage .manage-members-body{
+      min-width:0!important;
+      min-height:0!important;
+      flex:1 1 0!important;
+      display:grid!important;
+      grid-template-rows:minmax(0,1fr) auto!important;
+      gap:8px!important;
+      overflow:hidden!important;
+    }
+
+    body.modern-glass #view-manage #manage-members{
+      min-width:0!important;
+      min-height:0!important;
+      height:100%!important;
+      overflow-y:auto!important;
+      overflow-x:hidden!important;
+    }
+
+    body.modern-glass #view-manage .manage-pending-panel{
+      min-width:0;
+      min-height:0;
+      max-height:34%;
+      display:grid;
+      grid-template-rows:auto minmax(0,1fr);
+      gap:5px;
+      padding-top:7px;
+      border-top:1px solid var(--line);
+      overflow:hidden;
+    }
+
+    body.modern-glass #view-manage .manage-pending-panel[hidden]{
+      display:none!important;
+    }
+
+    body.modern-glass #view-manage .manage-pending-head{
+      min-width:0;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+    }
+
+    body.modern-glass #view-manage .manage-pending-head strong{
+      display:block;
+      color:var(--soft);
+      font-size:9px;
+    }
+
+    body.modern-glass #view-manage .manage-pending-head small{
+      display:block;
+      margin-top:2px;
+      color:var(--muted);
+      font-size:7px;
+    }
+
+    body.modern-glass #view-manage #manage-pending-list{
+      min-width:0;
+      min-height:0;
+      overflow-y:auto!important;
+      overflow-x:hidden!important;
+      overscroll-behavior:contain;
+    }
+
+    body.modern-glass #view-manage .manage-pending-row button{
+      width:auto!important;
+      min-width:54px!important;
+      max-width:76px!important;
+      padding-inline:7px!important;
+    }
+
+    /* ASTA: header e status strip sono ora la stessa identica altezza. */
+    body.modern-glass #view-auction .auction-cockpit{
+      --auction-topbar-height:42px;
+      grid-template-rows:
+        var(--auction-topbar-height)
+        var(--auction-topbar-height)
+        minmax(0,1fr)!important;
+      gap:3px!important;
+    }
+
+    body.modern-glass #view-auction .auction-statusbar,
+    body.modern-glass #view-auction .auction-team-summary-strip{
+      height:var(--auction-topbar-height)!important;
+      min-height:var(--auction-topbar-height)!important;
+      max-height:var(--auction-topbar-height)!important;
+      box-sizing:border-box!important;
+      overflow:hidden!important;
+    }
+
+    body.modern-glass #view-auction .auction-team-summary-strip{
+      padding:3px 4px!important;
+      gap:3px!important;
+      align-items:stretch!important;
+    }
+
+    body.modern-glass #view-auction .auction-team-summary-legend{
+      width:38px!important;
+      min-width:38px!important;
+      font-size:5.3px!important;
+      line-height:1.05!important;
+    }
+
+    body.modern-glass #view-auction .auction-team-summary-item{
+      min-height:0!important;
+      height:100%!important;
+      padding:2px 5px!important;
+    }
+
+    body.modern-glass #view-auction .auction-team-summary-item strong,
+    body.modern-glass #view-auction .auction-team-summary-values{
+      font-size:6.5px!important;
+      line-height:1!important;
+    }
+
+    body.modern-glass #view-auction .auction-team-summary-strip.auction-rosters-accordion-header.is-open{
+      height:var(--auction-topbar-height)!important;
+      min-height:var(--auction-topbar-height)!important;
+      max-height:var(--auction-topbar-height)!important;
+      padding:2px 3px!important;
+    }
+
+    body.modern-glass #view-auction .auction-rosters-live-strip{
+      height:100%!important;
+      min-height:0!important;
+      align-items:stretch!important;
+      gap:2px!important;
+    }
+
+    body.modern-glass #view-auction .auction-rosters-live-cell,
+    body.modern-glass #view-auction .auction-rosters-live-free,
+    body.modern-glass #view-auction .auction-rosters-live-confirm,
+    body.modern-glass #view-auction .auction-rosters-live-leave,
+    body.modern-glass #view-auction .auction-rosters-live-close{
+      min-height:0!important;
+      height:100%!important;
+      border-radius:4px!important;
+    }
+
+    body.modern-glass #view-auction .auction-rosters-live-cell{
+      padding:2px 4px!important;
+    }
+
+    body.modern-glass #view-auction .auction-rosters-live-cell>span,
+    body.modern-glass #view-auction .auction-rosters-live-free>span{
+      font-size:4.7px!important;
+      letter-spacing:.055em!important;
+    }
+
+    body.modern-glass #view-auction .auction-rosters-live-cell>strong{
+      font-size:7px!important;
+      line-height:1!important;
+    }
+
+    body.modern-glass #view-auction .auction-rosters-live-timer>strong{
+      font-size:12px!important;
+    }
+
+    body.modern-glass #view-auction .auction-rosters-live-offer>strong{
+      font-size:10px!important;
+    }
+
+    body.modern-glass #view-auction .auction-rosters-live-roles .rolebadge{
+      min-width:17px!important;
+      height:12px!important;
+      min-height:12px!important;
+      padding:0 2px!important;
+      line-height:12px!important;
+      font-size:5px!important;
+    }
+
+    body.modern-glass #view-auction .auction-rosters-live-free input{
+      height:26px!important;
+      min-height:26px!important;
+      font-size:8px!important;
+    }
+
+    body.modern-glass #view-auction .auction-rosters-live-quick .quick-btn,
+    body.modern-glass #view-auction .auction-rosters-live-confirm,
+    body.modern-glass #view-auction .auction-rosters-live-leave{
+      height:34px!important;
+      min-height:34px!important;
+      align-self:center!important;
+    }
+
+    body.modern-glass #view-auction .auction-rosters-live-quick .quick-btn span{
+      font-size:5.4px!important;
+    }
+
+    body.modern-glass #view-auction .auction-rosters-live-quick .quick-btn strong,
+    body.modern-glass #view-auction .auction-rosters-live-confirm,
+    body.modern-glass #view-auction .auction-rosters-live-leave{
+      font-size:7px!important;
+    }
+
+    body.modern-glass #view-auction .auction-rosters-live-close{
+      font-size:5px!important;
+    }
+
+    @media(max-width:980px){
+      body.modern-glass #view-home.active{
+        overflow-y:auto!important;
+      }
+
+      body.modern-glass #view-home>.home-dashboard-shell{
+        height:auto!important;
+        min-height:100%!important;
+        overflow:visible!important;
+      }
+
+      body.modern-glass #view-home .home-dashboard-grid{
+        grid-template-columns:1fr!important;
+        grid-template-rows:auto auto!important;
+        overflow:visible!important;
+      }
+
+      body.modern-glass #view-home .home-dashboard-panel{
+        min-height:240px!important;
+        height:auto!important;
+      }
+    }
+
 </style>
 </head>
 <body class="modern-glass">
@@ -12503,24 +12887,33 @@
 
       <!-- HOME -->
       <section id="view-home" class="view">
-        <div class="home-layout">
-          <div class="home-col">
-            <div id="home-kpis" class="kpis"></div>
-            <section class="panel">
-              <div class="panel-title"><div><h2>Squadre</h2><p>Presenze e Presidenti.</p></div></div>
-              <div id="home-teams" class="compact-list inner-scroll"></div>
-            </section>
-          </div>
+        <div class="home-dashboard-shell">
+          <div id="home-kpis" class="kpis home-dashboard-kpis"></div>
 
-          <div class="home-col">
-            <section class="panel">
-              <div class="panel-title"><div><h2>Il mio accesso</h2><p>Ruoli e squadra attivi.</p></div></div>
-              <div id="home-me" class="stack"></div>
+          <div class="home-dashboard-grid">
+            <section class="panel home-dashboard-panel home-dashboard-primary">
+              <div class="panel-title">
+                <div>
+                  <h2>Cockpit lega</h2>
+                  <p>Accesso rapido agli strumenti operativi.</p>
+                </div>
+              </div>
+              <div id="home-summary" class="home-summary"></div>
             </section>
 
-            <section id="pending-panel" class="panel">
-              <div class="panel-title"><div><h2>Richieste</h2><p>Aggiornamento automatico.</p></div><span id="pending-count" class="badge">0</span></div>
-              <div id="pending-list" class="compact-list inner-scroll"></div>
+            <section class="panel home-dashboard-panel home-quick-panel">
+              <div class="panel-title">
+                <div>
+                  <h2>Strumenti</h2>
+                  <p>Apri direttamente la sezione che ti serve.</p>
+                </div>
+              </div>
+              <nav class="home-quick-grid" aria-label="Strumenti lega">
+                <a class="home-quick-link" href="#/auction"><span>◆</span><strong>Asta</strong><small>Cockpit live</small></a>
+                <a class="home-quick-link" href="#/list"><span>▦</span><strong>Listone</strong><small>Svincolati e dati</small></a>
+                <a class="home-quick-link" href="#/rosters"><span>◫</span><strong>Rose</strong><small>Rose della lega</small></a>
+                <a class="home-quick-link" href="#/tv"><span>▣</span><strong>TV</strong><small>Vista presentatore</small></a>
+              </nav>
             </section>
           </div>
         </div>
@@ -12542,8 +12935,21 @@
           </section>
 
           <section class="panel manage-panel manage-members-panel">
-            <div class="panel-title"><div><h2>Membri</h2><p>Ruoli lega e appartenenza squadra.</p></div></div>
-            <div id="manage-members" class="compact-list inner-scroll"></div>
+            <div class="panel-title"><div><h2>Membri</h2><p>Ruoli lega, appartenenza squadra e richieste di ingresso.</p></div></div>
+            <div class="manage-members-body">
+              <div id="manage-members" class="compact-list inner-scroll"></div>
+
+              <section id="manage-pending-panel" class="manage-pending-panel">
+                <div class="manage-pending-head">
+                  <div>
+                    <strong>Richieste membri</strong>
+                    <small>Approvazione ingresso nella lega.</small>
+                  </div>
+                  <span id="manage-pending-count" class="badge">0</span>
+                </div>
+                <div id="manage-pending-list" class="compact-list inner-scroll"></div>
+              </section>
+            </div>
           </section>
         </div>
 
@@ -13818,41 +14224,50 @@
       const data = state.dashboard;
       if (!data) return;
 
-      const teams = data.teams || [];
-      const pending = data.pendingRequests || [];
+      const leagueName =
+        data.league?.name
+        || state.selectedLeague?.name
+        || 'Lega';
+
+      const leagueCode =
+        data.league?.code
+        || state.selectedLeague?.code
+        || '—';
+
+      const rolesCount =
+        (data.leagueRoles || []).length
+        + (data.myTeam ? 1 : 0);
 
       $('home-kpis').innerHTML = `
-        <div class="kpi"><span>Squadre</span><strong>${teams.length}</strong></div>
-        <div class="kpi"><span>Richieste</span><strong>${pending.length}</strong></div>
-        <div class="kpi"><span>Ruoli</span><strong>${(data.leagueRoles || []).length + (data.myTeam ? 1 : 0)}</strong></div>
+        <div class="kpi"><span>Lega</span><strong>${esc(leagueName)}</strong></div>
+        <div class="kpi"><span>Codice</span><strong>${esc(leagueCode)}</strong></div>
+        <div class="kpi"><span>Accessi</span><strong>${rolesCount}</strong></div>
       `;
 
-      $('home-teams').innerHTML = teams.map(team => `
-        <div class="compact-row">
-          <div><strong>${esc(team.name)}</strong><small>Presidente: ${esc(team.presidentUsername || '—')}</small></div>
-          <span class="badge ${team.presidentUsername ? 'good' : 'warn'}">${team.presidentUsername ? 'OK' : 'NO PRES.'}</span>
-        </div>
-      `).join('') || '<div class="small soft">Nessuna squadra.</div>';
+      const roleBadges =
+        (data.leagueRoles || [])
+          .map(role => `<span class="badge primary">${esc(roleLabel(role))}</span>`)
+          .join('');
 
-      const roleBadges = (data.leagueRoles || []).map(role => `<span class="badge primary">${esc(roleLabel(role))}</span>`).join('');
-      const teamBadge = data.myTeam ? `<span class="badge good">${esc(roleLabel(data.myTeam.role))} · ${esc(data.myTeam.team?.name || data.myTeam.name || '')}</span>` : '';
-      $('home-me').innerHTML = `<div class="row">${roleBadges}${teamBadge || '<span class="small soft">Nessuna squadra associata.</span>'}</div>`;
+      const teamBadge = data.myTeam
+        ? `<span class="badge good">${esc(roleLabel(data.myTeam.role))} · ${esc(data.myTeam.team?.name || data.myTeam.name || '')}</span>`
+        : '';
 
-      $('pending-panel').hidden = !data.permissions?.canManageMembers;
-      $('pending-count').textContent = pending.length;
-      $('pending-list').innerHTML = pending.map(item => `
-        <div class="compact-row">
-          <div><strong>${esc(item.username || 'Utente')}</strong><small>${item.team?.teamName ? `Squadra: ${esc(item.team.teamName)}` : 'Nessuna squadra richiesta'}</small></div>
-          <div class="row">
-            <button class="approve-member good" data-user="${esc(item.userId)}" type="button">Approva</button>
-            <button class="reject-member danger" data-user="${esc(item.userId)}" type="button">Rifiuta</button>
+      $('home-summary').innerHTML = `
+        <div class="home-summary-league">
+          <span class="home-summary-dot"></span>
+          <div>
+            <strong>${esc(leagueName)}</strong>
+            <small>Server autorevole · Edge Functions + PostgreSQL</small>
           </div>
         </div>
-      `).join('') || '<div class="small soft">Nessuna richiesta.</div>';
-
-      $('pending-list').querySelectorAll('.approve-member').forEach(button => button.addEventListener('click', () => membershipAction('approveMember', button.dataset.user)));
-      $('pending-list').querySelectorAll('.reject-member').forEach(button => button.addEventListener('click', () => membershipAction('rejectMember', button.dataset.user)));
+        <div class="home-summary-roles">
+          ${roleBadges || '<span class="badge">Membro</span>'}
+          ${teamBadge}
+        </div>
+      `;
     }
+
 
     async function membershipAction(action, targetUserId) {
       try {
@@ -13869,9 +14284,19 @@
        ===================================================== */
 
     async function loadManagement() {
-      const data = await api(ENDPOINTS.league, { action: 'getManagementData' });
+      const [data, dashboard] = await Promise.all([
+        api(ENDPOINTS.league, { action: 'getManagementData' }),
+        api(ENDPOINTS.league, { action: 'getDashboard' })
+      ]);
+
       if (!data) return;
+
       state.management = data;
+      if (dashboard) {
+        state.dashboard = dashboard;
+        updateHeader();
+      }
+
       renderManagement();
     }
 
@@ -14042,6 +14467,51 @@
       if (!data) return;
 
       $('create-team-form').hidden = !data.permissions?.canCreateTeam;
+
+      const pendingMemberships =
+        state.dashboard?.pendingRequests || [];
+
+      const pendingPanel = $('manage-pending-panel');
+      const pendingCount = $('manage-pending-count');
+      const pendingList = $('manage-pending-list');
+
+      if (pendingPanel && pendingCount && pendingList) {
+        const canManageMembers =
+          state.dashboard?.permissions?.canManageMembers === true;
+
+        pendingPanel.hidden = !canManageMembers;
+        pendingCount.textContent = pendingMemberships.length;
+        pendingList.innerHTML = pendingMemberships.map(item => `
+          <div class="compact-row manage-pending-row">
+            <div>
+              <strong>${esc(item.username || 'Utente')}</strong>
+              <small>${item.team?.teamName ? `Squadra: ${esc(item.team.teamName)}` : 'Nessuna squadra richiesta'}</small>
+            </div>
+            <div class="row">
+              <button class="approve-member good" data-user="${esc(item.userId)}" type="button">Approva</button>
+              <button class="reject-member danger" data-user="${esc(item.userId)}" type="button">Rifiuta</button>
+            </div>
+          </div>
+        `).join('') || '<div class="small soft">Nessuna richiesta.</div>';
+
+        pendingList
+          .querySelectorAll('.approve-member')
+          .forEach(button =>
+            button.addEventListener(
+              'click',
+              () => membershipAction('approveMember', button.dataset.user)
+            )
+          );
+
+        pendingList
+          .querySelectorAll('.reject-member')
+          .forEach(button =>
+            button.addEventListener(
+              'click',
+              () => membershipAction('rejectMember', button.dataset.user)
+            )
+          );
+      }
 
       const membersWithoutTeam =
         (data.members || [])
