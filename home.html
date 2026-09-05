@@ -11247,6 +11247,131 @@
       }
     }
 
+
+
+    /* =====================================================
+       GLASS V3 · Funzioni asta flex-fill + Rose complete + Coda backup
+       ===================================================== */
+
+    /* Console Banditore: il pannello interno usa tutta l'altezza disponibile.
+       Le sezioni superiori occupano solo il necessario; Funzioni asta prende
+       tutto lo spazio residuo e distribuisce i pulsanti con Flexbox. */
+    body.modern-glass #view-auction
+      .auctioneer-console-body{
+      height:100%!important;
+      min-height:0!important;
+      overflow:hidden!important;
+    }
+
+    body.modern-glass #view-auction
+      .auctioneer-console-body>.auctioneer-bid-panel{
+      height:100%!important;
+      min-height:0!important;
+      display:flex!important;
+      flex-direction:column!important;
+      align-items:stretch!important;
+      gap:5px!important;
+      overflow:hidden!important;
+    }
+
+    body.modern-glass #view-auction
+      .auctioneer-bid-panel>.auctioneer-section:not(.auctioneer-functions-section),
+    body.modern-glass #view-auction
+      .auctioneer-bid-panel>.auction-role-phase-admin-footer,
+    body.modern-glass #view-auction
+      .auctioneer-bid-panel>.auctioneer-pause-note{
+      flex:0 0 auto!important;
+    }
+
+    body.modern-glass #view-auction
+      .auctioneer-functions-section{
+      flex:1 1 0!important;
+      min-height:112px!important;
+      display:flex!important;
+      flex-direction:column!important;
+      align-items:stretch!important;
+      overflow:hidden!important;
+    }
+
+    body.modern-glass #view-auction
+      .auctioneer-functions-section>.auctioneer-bid-section-title{
+      flex:0 0 auto!important;
+    }
+
+    body.modern-glass #view-auction
+      .auctioneer-functions-section>.auctioneer-head-actions{
+      flex:1 1 0!important;
+      min-height:0!important;
+      width:100%!important;
+      display:flex!important;
+      flex-flow:row wrap!important;
+      align-items:stretch!important;
+      align-content:stretch!important;
+      gap:4px!important;
+    }
+
+    body.modern-glass #view-auction
+      .auctioneer-functions-section>.auctioneer-head-actions>button{
+      flex:1 1 calc(25% - 4px)!important;
+      width:auto!important;
+      min-width:calc(25% - 4px)!important;
+      min-height:42px!important;
+      height:auto!important;
+      margin:0!important;
+      display:flex!important;
+      align-items:center!important;
+      justify-content:center!important;
+      text-align:center!important;
+    }
+
+    /* Se il viewport è poco alto, il body della console torna scrollabile:
+       la distribuzione flex rimane, ma nessun controllo viene tagliato. */
+    @media(max-height:760px){
+      body.modern-glass #view-auction
+        .auctioneer-console-body{
+        overflow-y:auto!important;
+        overflow-x:hidden!important;
+      }
+
+      body.modern-glass #view-auction
+        .auctioneer-console-body>.auctioneer-bid-panel{
+        height:auto!important;
+        min-height:100%!important;
+        overflow:visible!important;
+      }
+
+      body.modern-glass #view-auction
+        .auctioneer-functions-section{
+        flex:0 0 auto!important;
+        min-height:108px!important;
+      }
+    }
+
+    /* Coda strategica: le righe che, nella proiezione attuale, superano il
+       massimo di rosa/ruolo restano pienamente gestibili ma vengono mostrate
+       come backup con una lieve riduzione di opacità. */
+    body.modern-glass #view-auction
+      .auction-call-queue-row.is-backup{
+      opacity:.56!important;
+      border-style:dashed!important;
+      filter:saturate(.78)!important;
+    }
+
+    body.modern-glass #view-auction
+      .auction-call-queue-row.is-backup:hover,
+    body.modern-glass #view-auction
+      .auction-call-queue-row.is-backup:focus-within{
+      opacity:.78!important;
+      filter:none!important;
+    }
+
+    /* L'overlay Rose usa l'intero elenco squadre del live snapshot: nessuna
+       card può essere persa solo perché rosters-api restituisce un subset. */
+    body.modern-glass #view-auction
+      .auction-rosters-overlay .auction-all-rosters-grid{
+      max-width:none!important;
+    }
+
 </style>
 </head>
 <body class="modern-glass">
@@ -15932,12 +16057,21 @@
     }
 
 
-    function auctionQueueCapacityForPlayer(player) {
+    function auctionQueueProjection(rows = auctionQueueRows()) {
       const info =
         auctionMyTeamDashboardData();
 
-      if (!info || !player) {
-        return { allowed: true };
+      const normalizedRows =
+        Array.isArray(rows)
+          ? rows
+          : [];
+
+      if (!info) {
+        return normalizedRows.map(item => ({
+          item,
+          backup: false,
+          reason: ''
+        }));
       }
 
       const mode =
@@ -15947,92 +16081,202 @@
       const assignments =
         info.assignments || [];
 
-      const queue =
-        auctionQueueRows();
-
       const totalMaximum =
-        Number(info.rosterMax || info.rosterLimit || 32);
+        Math.max(
+          0,
+          Number(
+            info.rosterMax
+            || info.rosterLimit
+            || 0
+          )
+        );
 
-      if (
-        totalMaximum > 0
-        && assignments.length + queue.length >= totalMaximum
-      ) {
-        return {
-          allowed: false,
-          message: `La rosa ha già occupato tutti i ${totalMaximum} slot, inclusa la Coda.`
-        };
-      }
+      let projectedTotal =
+        assignments.length;
 
       if (mode === 'classic') {
-        const role =
-          player.classic_role;
+        const roleUsed = {};
 
-        const roleMaximum =
-          Number(info.roleLimits?.[role]?.max || 0);
+        ['P', 'D', 'C', 'A'].forEach(role => {
+          roleUsed[role] =
+            assignments.filter(item =>
+              item.player?.classic_role === role
+            ).length;
+        });
 
-        if (roleMaximum <= 0) {
+        return normalizedRows.map(item => {
+          const role =
+            item.player?.classic_role
+            || '—';
+
+          const roleMaximum =
+            Math.max(
+              0,
+              Number(
+                info.roleLimits?.[role]?.max
+                || 0
+              )
+            );
+
+          const totalFull =
+            totalMaximum > 0
+            && projectedTotal >= totalMaximum;
+
+          const roleFull =
+            roleMaximum <= 0
+            || Number(roleUsed[role] || 0) >= roleMaximum;
+
+          const backup =
+            totalFull || roleFull;
+
+          let reason = '';
+
+          if (backup) {
+            reason = totalFull
+              ? `Backup: supererebbe il massimo totale di ${totalMaximum} giocatori.`
+              : `Backup: supererebbe il massimo ${role} di ${roleMaximum} giocatori.`;
+          } else {
+            projectedTotal += 1;
+            roleUsed[role] =
+              Number(roleUsed[role] || 0) + 1;
+          }
+
           return {
-            allowed: false,
-            message: `Il ruolo ${role || 'del giocatore'} non ha slot configurati.`
+            item,
+            backup,
+            reason
           };
-        }
-
-        const acquired =
-          assignments.filter(item =>
-            item.player?.classic_role === role
-          ).length;
-
-        const queued =
-          queue.filter(item =>
-            item.player?.classic_role === role
-          ).length;
-
-        const remaining =
-          roleMaximum - acquired - queued;
-
-        return remaining > 0
-          ? { allowed: true, remaining }
-          : {
-              allowed: false,
-              message: `Nessuno slot ${role} disponibile: ${acquired} acquistati e ${queued} già in Coda su ${roleMaximum}.`
-            };
+        });
       }
 
       const isGoalkeeper = candidate =>
         playerRoles(candidate || {}, mode)
           .some(role => ['P', 'Por'].includes(role));
 
-      const goalkeeper =
-        isGoalkeeper(player);
-
-      const bucket =
-        goalkeeper ? 'Por' : 'MOV';
-
-      const label =
-        goalkeeper ? 'portieri' : 'movimento';
-
-      const roleMaximum =
-        Number(info.roleLimits?.[bucket]?.max || totalMaximum);
-
-      const acquired =
+      let goalkeeperUsed =
         assignments.filter(item =>
-          goalkeeper === isGoalkeeper(item.player)
+          isGoalkeeper(item.player)
         ).length;
 
-      const queued =
-        queue.filter(item =>
-          goalkeeper === isGoalkeeper(item.player)
-        ).length;
+      let movementUsed =
+        assignments.length - goalkeeperUsed;
 
-      const remaining =
-        roleMaximum - acquired - queued;
+      const goalkeeperMaximum =
+        Math.max(
+          0,
+          Number(
+            info.roleLimits?.Por?.max
+            || totalMaximum
+          )
+        );
 
-      return remaining > 0
-        ? { allowed: true, remaining }
-        : {
-            allowed: false,
-            message: `Nessuno slot ${label} disponibile: ${acquired} acquistati e ${queued} già in Coda su ${roleMaximum}.`
-          };
+      const movementMaximum =
+        Math.max(
+          0,
+          Number(
+            info.roleLimits?.MOV?.max
+            || totalMaximum
+          )
+        );
+
+      return normalizedRows.map(item => {
+        const goalkeeper =
+          isGoalkeeper(item.player);
+
+        const bucketMaximum =
+          goalkeeper
+            ? goalkeeperMaximum
+            : movementMaximum;
+
+        const bucketUsed =
+          goalkeeper
+            ? goalkeeperUsed
+            : movementUsed;
+
+        const totalFull =
+          totalMaximum > 0
+          && projectedTotal >= totalMaximum;
+
+        const bucketFull =
+          bucketMaximum > 0
+          && bucketUsed >= bucketMaximum;
+
+        const backup =
+          totalFull || bucketFull;
+
+        let reason = '';
+
+        if (backup) {
+          reason = totalFull
+            ? `Backup: supererebbe il massimo totale di ${totalMaximum} giocatori.`
+            : `Backup: supererebbe il massimo ${goalkeeper ? 'portieri' : 'movimento'} di ${bucketMaximum} giocatori.`;
+        } else {
+          projectedTotal += 1;
+
+          if (goalkeeper) {
+            goalkeeperUsed += 1;
+          } else {
+            movementUsed += 1;
+          }
+        }
+
+        return {
+          item,
+          backup,
+          reason
+        };
+      });
+    }
+
+
+    function auctionQueueCapacityForPlayer(player) {
+      const queue =
+        auctionQueueRows();
+
+      /*
+       * La Coda è una lista strategica, non una proiezione vincolante della
+       * rosa finale: può quindi contenere anche giocatori di backup oltre i
+       * massimi di rosa/ruolo. L'unico limite tecnico resta quello del backend
+       * (50 record per salvataggio della Coda).
+       */
+      if (queue.length >= 50) {
+        return {
+          allowed: false,
+          backup: false,
+          message: 'La coda può contenere al massimo 50 giocatori.'
+        };
+      }
+
+      if (!player) {
+        return {
+          allowed: true,
+          backup: false,
+          message: ''
+        };
+      }
+
+      const hypothetical = [
+        ...queue,
+        {
+          player_id: player.id,
+          player
+        }
+      ];
+
+      const projected =
+        auctionQueueProjection(hypothetical);
+
+      const stateForPlayer =
+        projected[projected.length - 1]
+        || null;
+
+      return {
+        allowed: true,
+        backup:
+          stateForPlayer?.backup === true,
+        message:
+          stateForPlayer?.reason || ''
+      };
     }
 
 
@@ -16136,7 +16380,16 @@
           ratio <= .75 ? 3 : -8;
       }
 
-      const score = needScore + valueScore + budgetScore;
+      const backupPenalty =
+        capacity.backup === true
+          ? 38
+          : 0;
+
+      const score =
+        needScore
+        + valueScore
+        + budgetScore
+        - backupPenalty;
 
       let secondary = '';
       if (pfc > 0 || pma > 0) {
@@ -16150,7 +16403,10 @@
       return {
         player,
         score,
-        reason: needLabel,
+        reason:
+          capacity.backup
+            ? `${needLabel} · Backup oltre capienza attuale`
+            : needLabel,
         secondary,
         quotation,
         slot
@@ -16241,6 +16497,17 @@
       const rows =
         auctionQueueRows();
 
+      const projectedQueue =
+        auctionQueueProjection(rows);
+
+      const backupByPlayerId =
+        new Map(
+          projectedQueue.map(entry => [
+            entry.item?.player_id,
+            entry
+          ])
+        );
+
       const editable =
         auctionCanManageCallQueue();
 
@@ -16330,11 +16597,19 @@
                 ${
                   rows.length
                     ? rows.map(
-                        item => `
+                        item => {
+                          const projection =
+                            backupByPlayerId.get(item.player_id);
+
+                          const backup =
+                            projection?.backup === true;
+
+                          return `
                           <div
-                            class="auction-call-queue-row"
+                            class="auction-call-queue-row ${backup ? 'is-backup' : ''}"
                             data-queue-player="${esc(item.player_id)}"
                             draggable="${editable ? 'true' : 'false'}"
+                            ${backup ? `title="${esc(projection?.reason || 'Giocatore di backup oltre la capienza attuale.')}"` : ''}
                           >
 
                             <span class="auction-queue-handle" aria-hidden="true">⋮⋮</span>
@@ -16404,7 +16679,8 @@
                             }
 
                           </div>
-                        `
+                        `;
+                        }
                       ).join('')
                     : `
                         <div class="live-placeholder">
@@ -18634,23 +18910,51 @@
       const rosterData =
         state.auctionPersonalRoster;
 
-      const allTeams =
-        rosterData?.teams
-        ||
-        state.auction?.teams
-        ||
-        [];
-
-      const participatingIds =
-        new Set(
-          (state.auction?.teamOrder || [])
-            .map(item => item.team_id)
+      const liveTeams =
+        auctionParticipatingTeams(
+          state.auction || {}
         );
 
+      const rosterTeams =
+        rosterData?.teams || [];
+
+      const teamById =
+        new Map();
+
+      /*
+       * Lo snapshot dell'asta è la fonte primaria per sapere quante squadre
+       * devono essere visibili. I dati Rose vengono fusi sopra senza poter
+       * eliminare squadre mancanti dalla risposta rosters-api.
+       */
+      [...liveTeams, ...rosterTeams].forEach(team => {
+        if (!team?.id) {
+          return;
+        }
+
+        teamById.set(
+          team.id,
+          {
+            ...(teamById.get(team.id) || {}),
+            ...team
+          }
+        );
+      });
+
+      const orderedIds =
+        [
+          ...liveTeams.map(team => team.id),
+          ...rosterTeams.map(team => team.id)
+        ]
+          .filter(
+            (id, index, list) =>
+              id
+              && list.indexOf(id) === index
+          );
+
       const teams =
-        participatingIds.size
-          ? allTeams.filter(team => participatingIds.has(team.id))
-          : allTeams;
+        orderedIds
+          .map(id => teamById.get(id))
+          .filter(Boolean);
 
       const rosterGrid =
         auctionRosterGridLayout(teams.length);
@@ -20769,12 +21073,11 @@
       const calledRoles = hasPlayer
         ? playerRoles(player || {}, d.settings?.fantasy_mode)
         : [];
-      const callerTeam =
-        d.currentNominationTeam
-        || (d.teams || []).find(team => team.id === s.current_nomination_team_id)
-        || null;
-      const callerReference =
-        auctionTeamReference(callerTeam, callerTeam?.name || '—');
+      const playerSerieATeam =
+        hasPlayer
+          ? String(player?.serie_a_team || '—')
+          : '—';
+
       const leaderReference = hasPlayer
         ? auctionTeamReference(d.currentBidderTeam, d.currentBidderTeam?.name || '—')
         : '—';
@@ -20815,7 +21118,7 @@
 
               <div class="auction-rosters-live-cell auction-rosters-live-caller">
                 <span>SQUADRA</span>
-                <strong>${esc(callerReference)}</strong>
+                <strong>${esc(playerSerieATeam)}</strong>
               </div>
 
               <div class="auction-rosters-live-cell auction-rosters-live-offer">
@@ -23992,6 +24295,11 @@
           ? `Giocatore fuori dalla fase ${auctionRolePhaseLabel(state.auction?.rolePhase?.key)}: puoi consultarlo, ma non accodarlo o chiamarlo.`
           : queueCapacity.message;
 
+      const queueBackupHint =
+        queueCapacity.backup
+          ? ` Verrà inserito come backup: ${queueCapacity.message}`
+          : '';
+
       const queueIsEmpty =
         auctionQueueRows().length === 0;
 
@@ -24029,8 +24337,8 @@
                     : auctionHasPresidentRole()
                     ? (
                         queueIsEmpty
-                          ? 'Inserisci come prima chiamata: verrà elaborato automaticamente dalla coda'
-                          : 'Aggiungi subito alla coda'
+                          ? `Inserisci come prima chiamata: verrà elaborato automaticamente dalla coda.${queueBackupHint}`
+                          : `Aggiungi subito alla coda.${queueBackupHint}`
                       )
                     : 'Solo il Presidente può usare la coda'
                 }"
