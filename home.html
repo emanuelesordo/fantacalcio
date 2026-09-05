@@ -11372,6 +11372,294 @@
       max-width:none!important;
     }
 
+
+
+    /* =====================================================
+       GLASS V4 · fix definitivi: Funzioni asta, Rose 10/10,
+       suggerimenti sotto Svincolati, backup fuori dalla Rosa
+       ===================================================== */
+
+    /* -----------------------------------------------------
+       CONSOLE BANDITORE
+       Il drawer laterale è già alto quanto la colonna. L'area interna viene
+       ora ancorata esplicitamente a tutti i bordi disponibili a destra della
+       linguetta verticale: non può più fermarsi all'altezza del contenuto.
+       ----------------------------------------------------- */
+    body.modern-glass #view-auction
+      .auction-lower-main>.auctioneer-console-drawer[open]{
+      position:relative!important;
+      height:100%!important;
+      min-height:0!important;
+      max-height:none!important;
+      overflow:hidden!important;
+    }
+
+    body.modern-glass #view-auction
+      .auction-lower-main>.auctioneer-console-drawer[open]>.auctioneer-console{
+      position:absolute!important;
+      top:0!important;
+      right:0!important;
+      bottom:0!important;
+      left:31px!important;
+      width:auto!important;
+      min-width:0!important;
+      max-width:none!important;
+      height:auto!important;
+      min-height:0!important;
+      max-height:none!important;
+      margin:0!important;
+      padding:6px!important;
+      box-sizing:border-box!important;
+      display:grid!important;
+      grid-template-rows:auto minmax(0,1fr)!important;
+      overflow:hidden!important;
+    }
+
+    body.modern-glass #view-auction
+      .auction-lower-main>.auctioneer-console-drawer[open]>.auctioneer-console
+      >.auctioneer-console-head{
+      min-height:0!important;
+      margin:0 0 5px!important;
+      flex:0 0 auto!important;
+    }
+
+    body.modern-glass #view-auction
+      .auction-lower-main>.auctioneer-console-drawer[open]>.auctioneer-console
+      >.auctioneer-console-body{
+      min-width:0!important;
+      min-height:0!important;
+      width:100%!important;
+      height:100%!important;
+      display:flex!important;
+      flex-direction:column!important;
+      align-items:stretch!important;
+      overflow:hidden!important;
+    }
+
+    body.modern-glass #view-auction
+      .auction-lower-main>.auctioneer-console-drawer[open]
+      .auctioneer-console-body>.auctioneer-bid-panel{
+      flex:1 1 auto!important;
+      min-width:0!important;
+      min-height:0!important;
+      height:100%!important;
+      display:flex!important;
+      flex-direction:column!important;
+      align-items:stretch!important;
+      gap:5px!important;
+      overflow:hidden!important;
+    }
+
+    body.modern-glass #view-auction
+      .auctioneer-bid-panel>.auctioneer-section:not(.auctioneer-functions-section),
+    body.modern-glass #view-auction
+      .auctioneer-bid-panel>.auction-role-phase-admin-footer,
+    body.modern-glass #view-auction
+      .auctioneer-bid-panel>.auctioneer-pause-note{
+      flex:0 0 auto!important;
+    }
+
+    /* Funzioni asta = tutto lo spazio verticale rimasto. */
+    body.modern-glass #view-auction
+      .auctioneer-bid-panel>.auctioneer-functions-section{
+      flex:1 1 0!important;
+      min-height:0!important;
+      height:auto!important;
+      display:flex!important;
+      flex-direction:column!important;
+      align-items:stretch!important;
+      overflow:hidden!important;
+    }
+
+    body.modern-glass #view-auction
+      .auctioneer-functions-section>.auctioneer-bid-section-title{
+      flex:0 0 auto!important;
+      min-height:16px!important;
+      display:flex!important;
+      align-items:center!important;
+    }
+
+    body.modern-glass #view-auction
+      .auctioneer-functions-section>.auctioneer-head-actions{
+      flex:1 1 auto!important;
+      min-width:0!important;
+      min-height:0!important;
+      width:100%!important;
+      height:100%!important;
+      display:flex!important;
+      flex-flow:row wrap!important;
+      align-items:stretch!important;
+      align-content:stretch!important;
+      justify-content:stretch!important;
+      gap:4px!important;
+      overflow:hidden!important;
+    }
+
+    body.modern-glass #view-auction
+      .auctioneer-functions-section>.auctioneer-head-actions>button{
+      flex:1 1 calc(25% - 4px)!important;
+      min-width:calc(25% - 4px)!important;
+      max-width:none!important;
+      width:auto!important;
+      min-height:0!important;
+      height:auto!important;
+      margin:0!important;
+      padding:5px!important;
+      align-self:stretch!important;
+      display:flex!important;
+      align-items:center!important;
+      justify-content:center!important;
+      text-align:center!important;
+    }
+
+    /* Se l'altezza è davvero insufficiente, meglio uno scroll della sola
+       console che tagliare i controlli. Sui viewport normali non interviene. */
+    @media(max-height:680px){
+      body.modern-glass #view-auction
+        .auction-lower-main>.auctioneer-console-drawer[open]>.auctioneer-console
+        >.auctioneer-console-body{
+        overflow-y:auto!important;
+        overflow-x:hidden!important;
+      }
+
+      body.modern-glass #view-auction
+        .auction-lower-main>.auctioneer-console-drawer[open]
+        .auctioneer-console-body>.auctioneer-bid-panel{
+        height:auto!important;
+        min-height:100%!important;
+        overflow:visible!important;
+      }
+
+      body.modern-glass #view-auction
+        .auctioneer-bid-panel>.auctioneer-functions-section{
+        flex:0 0 112px!important;
+        min-height:112px!important;
+      }
+    }
+
+    /* -----------------------------------------------------
+       SVINCOLATI + CHIAMATE SUGGERITE
+       La card suggerimenti è una quarta fascia sotto il listone, non dentro
+       la Coda. Il listone conserva tutto lo spazio elastico disponibile.
+       ----------------------------------------------------- */
+    body.modern-glass #view-auction
+      .auction-free-fixed.has-caller-controls{
+      grid-template-rows:auto auto minmax(0,1fr) auto!important;
+    }
+
+    body.modern-glass #view-auction
+      .auction-free-fixed.no-caller-controls{
+      grid-template-rows:auto minmax(0,1fr) auto!important;
+    }
+
+    body.modern-glass #view-auction
+      .auction-free-fixed>.drawer-table{
+      min-height:0!important;
+      height:100%!important;
+      overflow:auto!important;
+    }
+
+    body.modern-glass #view-auction
+      .auction-free-suggestions{
+      min-width:0!important;
+      min-height:0!important;
+      padding:4px 5px 5px!important;
+      border-top:1px solid rgba(109,167,255,.13);
+      background:rgba(7,19,33,.46);
+    }
+
+    body.modern-glass #view-auction
+      .auction-free-suggestions:empty{
+      display:none!important;
+      padding:0!important;
+      border:0!important;
+    }
+
+    body.modern-glass #view-auction
+      .auction-free-suggestions .auction-suggested-calls{
+      margin:0!important;
+      max-height:156px!important;
+      overflow:hidden!important;
+    }
+
+    body.modern-glass #view-auction
+      .auction-free-suggestions .auction-suggested-list{
+      max-height:120px!important;
+      overflow-y:auto!important;
+      overflow-x:hidden!important;
+      overscroll-behavior:contain!important;
+      scrollbar-width:thin;
+    }
+
+    /* -----------------------------------------------------
+       ROSE OVERLAY
+       La quantità di card viene ora dal set completo restituito dal live
+       snapshot. Le regole geometriche restano 1xN fino a 6, poi wrap con
+       massimo 6 colonne e minimo numero di righe.
+       ----------------------------------------------------- */
+    body.modern-glass #view-auction
+      .auction-rosters-overlay{
+      min-width:0!important;
+      min-height:0!important;
+      overflow:hidden!important;
+    }
+
+    body.modern-glass #view-auction
+      .auction-rosters-overlay>.auction-all-rosters-grid{
+      min-width:0!important;
+      min-height:0!important;
+      width:100%!important;
+      height:100%!important;
+      max-width:none!important;
+      max-height:none!important;
+      overflow:hidden!important;
+      align-content:stretch!important;
+    }
+
+    body.modern-glass #view-auction
+      .auction-rosters-overlay .auction-all-rosters-grid.is-single-row{
+      display:grid!important;
+      grid-template-columns:repeat(var(--auction-roster-cols,1),minmax(0,1fr))!important;
+      grid-template-rows:minmax(0,1fr)!important;
+    }
+
+    body.modern-glass #view-auction
+      .auction-rosters-overlay .auction-all-rosters-grid.is-wrapped{
+      display:flex!important;
+      flex-flow:row wrap!important;
+      align-items:stretch!important;
+      align-content:stretch!important;
+      justify-content:flex-start!important;
+    }
+
+    body.modern-glass #view-auction
+      .auction-rosters-overlay .auction-all-rosters-grid.is-wrapped
+      >.auction-roster-team-card{
+      flex:0 0 calc(var(--auction-roster-card-width) - var(--auction-roster-card-gap-x))!important;
+      width:calc(var(--auction-roster-card-width) - var(--auction-roster-card-gap-x))!important;
+      max-width:calc(var(--auction-roster-card-width) - var(--auction-roster-card-gap-x))!important;
+      height:calc(var(--auction-roster-card-height) - var(--auction-roster-card-gap-y))!important;
+      max-height:calc(var(--auction-roster-card-height) - var(--auction-roster-card-gap-y))!important;
+      min-width:0!important;
+      min-height:0!important;
+    }
+
+    body.modern-glass #view-auction
+      .auction-rosters-overlay .auction-roster-team-card{
+      overflow:hidden!important;
+      display:grid!important;
+      grid-template-rows:auto minmax(0,1fr)!important;
+    }
+
+    body.modern-glass #view-auction
+      .auction-rosters-overlay .auction-roster-team-list{
+      min-height:0!important;
+      height:100%!important;
+      overflow-y:auto!important;
+      overflow-x:hidden!important;
+      overscroll-behavior:contain!important;
+    }
+
 </style>
 </head>
 <body class="modern-glass">
@@ -15059,13 +15347,18 @@
           .join('');
 
       const allQueueEntries =
-        auctionQueueRows()
-          .filter(item => item.player)
-          .map(item => ({
-            player: item.player,
-            price: Number(item.opening_bid || 1),
+        auctionQueueProjection(
+          auctionQueueRows()
+        )
+          .filter(entry =>
+            entry?.item?.player
+            && entry.backup !== true
+          )
+          .map(entry => ({
+            player: entry.item.player,
+            price: Number(entry.item.opening_bid || 1),
             queued: true,
-            position: Number(item.position || 0)
+            position: Number(entry.item.position || 0)
           }));
 
       const queueEntries =
@@ -16587,8 +16880,6 @@
                     : `<div class="auction-queue-mode-note is-auto">Autoplay attivo · al tuo turno parte la prima voce valida.</div>`
               }
 
-              ${renderAuctionSuggestedCalls()}
-
               <div
                 id="auction-call-queue-list"
                 class="auction-call-queue-list"
@@ -17019,13 +17310,6 @@
 
 
     function attachAuctionCallQueueEvents() {
-      const list =
-        $('auction-call-queue-list');
-
-      if (!list) {
-        return;
-      }
-
       document
         .querySelectorAll('[data-suggest-call]')
         .forEach(button => {
@@ -17039,6 +17323,13 @@
             );
           });
         });
+
+      const list =
+        $('auction-call-queue-list');
+
+      if (!list) {
+        return;
+      }
 
       $('auction-queue-autoplay')
         ?.addEventListener(
@@ -17754,8 +18045,11 @@
       const showSupremeMetric =
         auctionIsSuperAdmin();
 
+      const hasCallerControls =
+        Boolean(String(callerControlsHtml || '').trim());
+
       return `
-        <aside class="auction-free-fixed">
+        <aside class="auction-free-fixed ${hasCallerControls ? 'has-caller-controls' : 'no-caller-controls'}">
 
           ${callerControlsHtml}
 
@@ -17868,6 +18162,10 @@
 
             </table>
 
+          </div>
+
+          <div class="auction-free-suggestions">
+            ${renderAuctionSuggestedCalls()}
           </div>
 
         </aside>
@@ -21011,14 +21309,39 @@
 
     function auctionParticipatingTeams(data = state.auction) {
       const d = data || {};
-      const byId = Object.fromEntries((d.teams || []).map(team => [team.id, team]));
-      const ordered = (d.teamOrder || [])
-        .map(item => byId[item.team_id])
-        .filter(Boolean);
+      const liveTeams =
+        Array.isArray(d.teams)
+          ? d.teams.filter(team => team?.id)
+          : [];
 
-      return ordered.length
-        ? ordered
-        : (d.teams || []);
+      const byId =
+        Object.fromEntries(
+          liveTeams.map(team => [team.id, team])
+        );
+
+      const ordered =
+        (d.teamOrder || [])
+          .map(item => byId[item.team_id])
+          .filter(Boolean);
+
+      const seen =
+        new Set(
+          ordered.map(team => team.id)
+        );
+
+      const missingFromOrder =
+        liveTeams.filter(team => !seen.has(team.id));
+
+      /*
+       * teamOrder resta la fonte dell'ordine dell'asta, ma non deve mai
+       * ridurre il numero di squadre mostrato nel cockpit. Alcune sessioni
+       * legacy/test possono avere teamOrder incompleto rispetto alla lista
+       * delle squadre attive restituita dallo snapshot live.
+       */
+      return [
+        ...ordered,
+        ...missingFromOrder
+      ];
     }
 
 
@@ -21117,7 +21440,7 @@
               </div>
 
               <div class="auction-rosters-live-cell auction-rosters-live-caller">
-                <span>SQUADRA</span>
+                <span>CLUB</span>
                 <strong>${esc(playerSerieATeam)}</strong>
               </div>
 
