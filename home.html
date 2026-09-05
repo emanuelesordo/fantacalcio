@@ -12898,6 +12898,134 @@
       }
     }
 
+
+
+    /* =====================================================
+       GLASS V6V · log crediti, geometria cockpit, timer hard-lock,
+       suggerimenti fullscreen e tipografia liste uniforme
+       ===================================================== */
+
+    /* Strip RIM: alias e valori leggibili come il nome giocatore in Rosa. */
+    body.modern-glass #view-auction
+      .auction-team-summary-strip:not(.is-open) .auction-team-summary-item strong,
+    body.modern-glass #view-auction
+      .auction-team-summary-strip:not(.is-open) .auction-team-summary-values b{
+      font-size:8px!important;
+      line-height:1!important;
+      font-weight:900!important;
+    }
+
+    body.modern-glass #view-auction
+      .auction-team-summary-strip:not(.is-open) .auction-team-summary-values i{
+      font-size:7px!important;
+      line-height:1!important;
+    }
+
+    body.modern-glass #view-auction
+      .auction-team-summary-strip:not(.is-open) .auction-team-summary-item{
+      padding-inline:5px!important;
+      gap:4px!important;
+    }
+
+    /* Desktop normale: Rosa personale = 3/4 circa della larghezza V6U.
+       A console chiusa lo spazio recuperato amplia la colonna centrale/Coda.
+       A console aperta la colonna centrale resta compatta e lo spazio passa
+       soprattutto agli Svincolati. Il fullscreen conserva la geometria V6U. */
+    @media(min-width:1101px){
+      html:not(:fullscreen) body.modern-glass #view-auction
+        .auction-lower-main:not(:has(>.auctioneer-console-drawer[open])){
+        grid-template-columns:
+          minmax(185px,clamp(190px,13.5vw,236px))
+          minmax(250px,410px)
+          minmax(320px,1fr)
+          auto!important;
+      }
+
+      html:not(:fullscreen) body.modern-glass #view-auction
+        .auction-lower-main:has(>.auctioneer-console-drawer[open]){
+        grid-template-columns:
+          minmax(185px,clamp(190px,13.5vw,236px))
+          minmax(250px,330px)
+          minmax(320px,1fr)
+          auto!important;
+      }
+    }
+
+    /* Full immersion: più suggerimenti in vera griglia 2 colonne. */
+    :fullscreen body.modern-glass #view-auction
+      .auction-free-suggestions .auction-suggested-calls.is-full-immersion{
+      max-height:166px!important;
+    }
+
+    :fullscreen body.modern-glass #view-auction
+      .auction-free-suggestions .auction-suggested-calls.is-full-immersion
+      .auction-suggested-list{
+      display:grid!important;
+      grid-template-columns:repeat(2,minmax(0,1fr))!important;
+      grid-auto-flow:row!important;
+      max-height:132px!important;
+      overflow-y:auto!important;
+      gap:3px!important;
+    }
+
+    /* Linguaggio row uniforme: nomi giocatore/alias come la Rosa. */
+    body.modern-glass #view-auction
+      .auction-queue-player strong,
+    body.modern-glass #view-auction
+      .auction-suggested-copy strong,
+    body.modern-glass #view-auction
+      .auction-all-roster-player-name,
+    body.modern-glass #view-auction
+      .auction-free-fixed .player-name,
+    body.modern-glass #view-auction
+      .auction-bid-team-name,
+    body.modern-glass #view-auction
+      .auctioneer-team-cube-unified strong,
+    body.modern-glass #view-auction
+      .auction-award-row strong,
+    body.modern-glass #view-auction
+      .auction-roster-team-identity strong{
+      font-size:8px!important;
+      line-height:1!important;
+      font-weight:900!important;
+      letter-spacing:0!important;
+    }
+
+    body.modern-glass #view-auction
+      .auction-call-queue-row,
+    body.modern-glass #view-auction
+      .auction-bid-chip,
+    body.modern-glass #view-auction
+      .auction-suggested-row,
+    body.modern-glass #view-auction
+      .auction-roster-edit-row,
+    body.modern-glass #view-auction
+      .auction-award-row{
+      border-radius:4px!important;
+      border-color:rgba(159,202,242,.17)!important;
+      background:linear-gradient(145deg,rgba(34,64,96,.50),rgba(13,32,54,.42))!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.035)!important;
+    }
+
+    body.modern-glass #view-auction
+      .auction-free-fixed .player-table tbody tr{
+      background:linear-gradient(145deg,rgba(34,64,96,.20),rgba(13,32,54,.14))!important;
+    }
+
+    /* Timer non attivo = nessun affordance di rilancio. */
+    body.modern-glass #view-auction
+      button:disabled.quick-btn,
+    body.modern-glass #view-auction
+      #president-bid:disabled,
+    body.modern-glass #view-auction
+      #auction-admin-place-bid:disabled,
+    body.modern-glass #view-auction
+      #auction-mobile-confirm:disabled{
+      cursor:not-allowed!important;
+      opacity:.38!important;
+      filter:saturate(.45)!important;
+    }
+
 </style>
 </head>
 <body class="modern-glass">
@@ -13419,6 +13547,7 @@
       auctionAdminBidAmount: 1,
       auctionAdminBidTeamId: null,
       auctionAdminBidPlayerKey: '',
+      auctionAdminBidAutoKey: '',
       auctionAdminReadyTeamId: null,
       auctionAdminDefaultTeamKey: '',
       auctionOnlyConfirmedAwards: false,
@@ -14107,6 +14236,13 @@
           button.title = title;
           button.setAttribute('aria-label', title);
         });
+
+      if (
+        state.view === 'auction'
+        && auctionSession()?.status === 'live'
+      ) {
+        renderAuctionLive();
+      }
     });
 
 
@@ -18069,7 +18205,13 @@
 
 
     function renderAuctionSuggestedCalls() {
-      const suggestions = auctionSuggestedCalls(4);
+      const fullImmersion =
+        Boolean(document.fullscreenElement);
+
+      const suggestions =
+        auctionSuggestedCalls(
+          fullImmersion ? 8 : 4
+        );
 
       if (!suggestions.length) {
         return '';
@@ -18080,7 +18222,7 @@
       const ownTurn = auctionOwnCallTurn();
 
       return `
-        <section class="auction-suggested-calls" aria-label="Chiamate suggerite">
+        <section class="auction-suggested-calls ${fullImmersion ? 'is-full-immersion' : ''}" aria-label="Chiamate suggerite">
           <div class="auction-suggested-head">
             <div>
               <strong>Chiamate suggerite</strong>
@@ -19060,6 +19202,8 @@
 
       const canBid =
         hasPlayer
+        &&
+        auctionBidTimerIsActive(s)
         &&
         myTurn
         &&
@@ -22082,6 +22226,71 @@
     }
 
 
+    function captureAuctionPersistentCardHeaders() {
+      return {
+        rosterHead:
+          document.querySelector(
+            '.auction-team-column-roster-only .auction-team-roster-head'
+          ),
+
+        queueHead:
+          document.querySelector(
+            '.auction-central-queue .auction-call-queue-head'
+          )
+      };
+    }
+
+
+    function restoreAuctionPersistentCardHeaders(snapshot) {
+      if (!snapshot) {
+        return;
+      }
+
+      const replacePreservingControls = (
+        oldHead,
+        selector,
+        dynamicSelectors = []
+      ) => {
+        if (!oldHead) {
+          return;
+        }
+
+        const newHead =
+          document.querySelector(selector);
+
+        if (!newHead) {
+          return;
+        }
+
+        dynamicSelectors.forEach(itemSelector => {
+          const oldNode =
+            oldHead.querySelector(itemSelector);
+          const newNode =
+            newHead.querySelector(itemSelector);
+
+          if (oldNode && newNode) {
+            oldNode.textContent =
+              newNode.textContent;
+          }
+        });
+
+        newHead.replaceWith(oldHead);
+      };
+
+      replacePreservingControls(
+        snapshot.rosterHead,
+        '.auction-team-column-roster-only .auction-team-roster-head',
+        ['.auction-roster-remaining']
+      );
+
+      replacePreservingControls(
+        snapshot.queueHead,
+        '.auction-central-queue .auction-call-queue-head',
+        ['.auction-call-queue-title .badge']
+      );
+    }
+
+
     function restoreAuctionFocus(snapshot) {
       if (!snapshot?.id) {
         return;
@@ -22224,14 +22433,33 @@
       const adminBidMinimum =
         1;
 
-      state.auctionAdminBidAmount =
-        Math.max(
-          adminBidMinimum,
-          Number(
-            state.auctionAdminBidAmount
-            || adminBidMinimum
-          )
-        );
+      const adminBidAutoKey =
+        `${s.current_player_id || ''}|${currentBid}`;
+
+      if (
+        state.auctionAdminBidAutoKey
+        !== adminBidAutoKey
+      ) {
+        state.auctionAdminBidAutoKey =
+          adminBidAutoKey;
+
+        state.auctionAdminBidAmount =
+          s.current_player_id
+            ? Math.max(1, currentBid + 1)
+            : 1;
+      } else {
+        state.auctionAdminBidAmount =
+          Math.max(
+            adminBidMinimum,
+            Number(
+              state.auctionAdminBidAmount
+              || adminBidMinimum
+            )
+          );
+      }
+
+      const bidTimerActive =
+        auctionBidTimerIsActive(s);
 
       const adminBidInput =
         $('auction-admin-bid-amount');
@@ -22239,6 +22467,9 @@
       if (adminBidInput) {
         adminBidInput.min =
           String(adminBidMinimum);
+
+        adminBidInput.disabled =
+          !bidTimerActive;
 
         if (
           document.activeElement
@@ -22249,6 +22480,25 @@
               state.auctionAdminBidAmount
             );
         }
+      }
+
+      document
+        .querySelectorAll(
+          '[data-admin-bid-step], [data-admin-bid-offset]'
+        )
+        .forEach(button => {
+          button.disabled =
+            !bidTimerActive;
+        });
+
+      const controllerBidButton =
+        $('auction-admin-place-bid');
+
+      if (
+        controllerBidButton
+        && !bidTimerActive
+      ) {
+        controllerBidButton.disabled = true;
       }
 
       const selectedBid =
@@ -22381,6 +22631,16 @@
           }
         });
 
+
+      if (!bidTimerActive) {
+        document
+          .querySelectorAll(
+            '.quick-btn[data-offset], #president-bid, #auction-mobile-confirm, #auction-free-bid, #auction-mobile-free-bid, #auction-mobile-bid-minus, #auction-mobile-bid-plus'
+          )
+          .forEach(control => {
+            control.disabled = true;
+          });
+      }
 
       renderAuctionTimer();
     }
@@ -22576,6 +22836,11 @@
       const focusSnapshot =
         captureAuctionFocus();
 
+      const persistentHeaderSnapshot =
+        onlyIfChanged
+          ? captureAuctionPersistentCardHeaders()
+          : null;
+
 
       if (rosterChanged) {
         await loadAuctionPersonalRoster(
@@ -22599,6 +22864,13 @@
 
 
       renderAuction();
+
+      if (onlyIfChanged) {
+        restoreAuctionPersistentCardHeaders(
+          persistentHeaderSnapshot
+        );
+      }
+
       renderTv();
       updateHeader();
 
@@ -22608,6 +22880,32 @@
     }
 
     function auctionSession() { return state.auction?.auctionSession || null; }
+
+    function auctionBidTimerIsActive(session = auctionSession()) {
+      if (
+        !session
+        || session.status !== 'live'
+        || !session.current_player_id
+        || session.prestart_hold === true
+        || session.hold_active === true
+        || session.timer_expired_at
+        || !session.timer_deadline
+      ) {
+        return false;
+      }
+
+      const deadline =
+        Date.parse(session.timer_deadline);
+
+      if (!Number.isFinite(deadline)) {
+        return false;
+      }
+
+      return deadline > (
+        Date.now()
+        + Number(state.serverOffsetMs || 0)
+      );
+    }
     function auctionCanControl() { return state.auction?.permissions?.canControlAuction === true; }
     function auctionIsSuperAdmin() {
       return Boolean(
@@ -23368,8 +23666,12 @@
         d.settings?.bid_mode !== 'turn'
         || !d.currentTurnTeam
         || d.currentTurnTeam.id === auctionMyTeamId();
+      const bidTimerActive =
+        auctionBidTimerIsActive(s);
+
       const canPresidentBid = Boolean(
         hasPlayer
+        && bidTimerActive
         && auctionHasPresidentRole()
         && isPresidentTurn
         && !hasLeftCurrentPlayer
@@ -23381,6 +23683,7 @@
       );
       const canSelectBid = Boolean(
         hasPlayer
+        && bidTimerActive
         && (canPresidentBid || auctionCanControl())
       );
       const calledRoles = hasPlayer
@@ -23767,8 +24070,13 @@
         &&
         auctionOwnCallTurn();
 
+      const bidTimerActive =
+        auctionBidTimerIsActive(s);
+
       const canPresidentBid =
         hasPlayer
+        &&
+        bidTimerActive
         &&
         auctionHasPresidentRole()
         &&
@@ -23788,6 +24096,8 @@
 
       const canSelectBid =
         hasPlayer
+        &&
+        bidTimerActive
         &&
         (
           canPresidentBid
@@ -24301,6 +24611,9 @@
           || ''
         );
 
+      const adminBidAutoKey =
+        `${adminBidPlayerKey}|${currentBid}`;
+
       const participatingTeams =
         auctionParticipatingTeams(d);
 
@@ -24339,17 +24652,19 @@
       }
 
       if (
-        state.auctionAdminBidPlayerKey
-        !== adminBidPlayerKey
+        state.auctionAdminBidAutoKey
+        !== adminBidAutoKey
       ) {
         state.auctionAdminBidPlayerKey =
           adminBidPlayerKey;
 
+        state.auctionAdminBidAutoKey =
+          adminBidAutoKey;
+
         state.auctionAdminBidAmount =
-          Math.max(
-            1,
-            currentBid || 1
-          );
+          hasPlayer
+            ? Math.max(1, currentBid + 1)
+            : 1;
       } else {
         state.auctionAdminBidAmount =
           Math.max(
@@ -25113,6 +25428,8 @@
 
       const syncAuctionAdminBidControls = () => {
         const liveAdminBidMinimum = 1;
+        const liveBidTimerActive =
+          auctionBidTimerIsActive(auctionSession());
 
         state.auctionAdminBidAmount =
           Math.max(
@@ -25127,7 +25444,20 @@
         if (amountInput) {
           amountInput.min = String(liveAdminBidMinimum);
           amountInput.value = String(state.auctionAdminBidAmount);
+          amountInput.disabled =
+            !hasPlayer
+            || !liveBidTimerActive;
         }
+
+        document
+          .querySelectorAll(
+            '[data-admin-bid-step], [data-admin-bid-offset]'
+          )
+          .forEach(button => {
+            button.disabled =
+              !hasPlayer
+              || !liveBidTimerActive;
+          });
 
         document
           .querySelectorAll('[data-admin-team]')
@@ -25225,6 +25555,7 @@
         if (confirmButton) {
           confirmButton.disabled = !(
             hasPlayer
+            && liveBidTimerActive
             && selectedTeam
             && bidWithinCap
           );
@@ -25523,6 +25854,13 @@
         ?.addEventListener(
           'click',
           async () => {
+            if (!auctionBidTimerIsActive()) {
+              return msg(
+                'Il timer non è attivo: il Banditore non può registrare altri rilanci.',
+                'warning'
+              );
+            }
+
             const liveAdminBidMinimum =
               1;
 
@@ -27161,6 +27499,7 @@
 
     async function placeBid(teamId,amount,source){
       if(!teamId)return msg('Squadra non disponibile.','error');
+      if(!auctionBidTimerIsActive())return msg('Il timer non è attivo: non sono consentiti altri rilanci.','warning');
       try{await api(ENDPOINTS.auction,{action:'placeBid',sessionId:auctionSession().id,teamId,amount:Number(amount),source});await loadAuction()}catch(error){msg(error.message,'error')}
     }
 
