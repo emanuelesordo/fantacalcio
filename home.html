@@ -11660,6 +11660,66 @@
       overscroll-behavior:contain!important;
     }
 
+
+
+    /* =====================================================
+       GLASS V5 · Rose: fix 10/10 card realmente visibili
+       ===================================================== */
+
+    /*
+     * Bug V4: auctionRosterGridLayout calcolava le larghezze usando gap=3px,
+     * mentre l'overlay applicava gap=4px. Con 5 colonne il totale risultava
+     * 4px più largo del contenitore: la quinta card andava a capo. Con 10
+     * squadre si otteneva quindi 4+4+2, ma l'overlay era alto solo per 2 righe
+     * e le ultime 2 card finivano sotto il viewport.
+     *
+     * V5 usa un'unica sorgente di verità (4px) e border-box su ogni card.
+     */
+    body.modern-glass #view-auction
+      .auction-rosters-overlay .auction-all-rosters-grid{
+      --auction-roster-gap:4px!important;
+      gap:var(--auction-roster-gap)!important;
+      box-sizing:border-box!important;
+    }
+
+    body.modern-glass #view-auction
+      .auction-rosters-overlay .auction-all-rosters-grid.is-wrapped{
+      display:flex!important;
+      flex-flow:row wrap!important;
+      justify-content:flex-start!important;
+      align-items:flex-start!important;
+      align-content:flex-start!important;
+      column-gap:var(--auction-roster-gap)!important;
+      row-gap:var(--auction-roster-gap)!important;
+    }
+
+    body.modern-glass #view-auction
+      .auction-rosters-overlay .auction-all-rosters-grid.is-wrapped
+      >.auction-roster-team-card{
+      box-sizing:border-box!important;
+      flex-grow:0!important;
+      flex-shrink:0!important;
+      flex-basis:calc(var(--auction-roster-card-width) - var(--auction-roster-card-gap-x))!important;
+      width:calc(var(--auction-roster-card-width) - var(--auction-roster-card-gap-x))!important;
+      max-width:calc(var(--auction-roster-card-width) - var(--auction-roster-card-gap-x))!important;
+      height:calc(var(--auction-roster-card-height) - var(--auction-roster-card-gap-y))!important;
+      max-height:calc(var(--auction-roster-card-height) - var(--auction-roster-card-gap-y))!important;
+      min-width:0!important;
+      min-height:0!important;
+      margin:0!important;
+    }
+
+    body.modern-glass #view-auction
+      .auction-rosters-overlay .auction-all-rosters-grid.is-single-row
+      >.auction-roster-team-card{
+      box-sizing:border-box!important;
+      min-width:0!important;
+      width:100%!important;
+      max-width:none!important;
+      height:100%!important;
+      min-height:0!important;
+    }
+
 </style>
 </head>
 <body class="modern-glass">
@@ -18946,7 +19006,7 @@
           ? count
           : Math.min(6, Math.ceil(count / rows));
 
-      const gap = 3;
+      const gap = 4;
 
       return {
         columns,
@@ -19549,7 +19609,7 @@
         >
           <div
             class="auction-all-rosters-grid ${rosterGrid.wrapped ? 'is-wrapped' : 'is-single-row'}"
-            style="--auction-roster-cols:${rosterGrid.columns};--auction-roster-rows:${rosterGrid.rows};--auction-roster-card-width:${rosterGrid.cardWidth};--auction-roster-card-height:${rosterGrid.cardHeight};--auction-roster-card-gap-x:${rosterGrid.cardGapX};--auction-roster-card-gap-y:${rosterGrid.cardGapY}"
+            style="--auction-roster-cols:${rosterGrid.columns};--auction-roster-rows:${rosterGrid.rows};--auction-roster-gap:4px;--auction-roster-card-width:${rosterGrid.cardWidth};--auction-roster-card-height:${rosterGrid.cardHeight};--auction-roster-card-gap-x:${rosterGrid.cardGapX};--auction-roster-card-gap-y:${rosterGrid.cardGapY}"
           >
             ${
               cards
