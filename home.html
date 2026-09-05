@@ -11818,98 +11818,83 @@
 
 
     /* =====================================================
-       GLASS V7 · Gestione membri/squadre viewport-safe + modal editing
+       V6R · gestione Membri/Squadre confinata + modal squadra
        ===================================================== */
 
-    body.modern-glass #view-manage{
+    body.modern-glass .workspace:has(#view-manage.active){
+      overflow:hidden!important;
+      padding-bottom:6px!important;
+    }
+
+    body.modern-glass #view-manage.active{
       height:100%!important;
       min-height:0!important;
       max-height:100%!important;
       overflow:hidden!important;
       display:grid!important;
       grid-template-rows:minmax(0,1fr) auto!important;
-      gap:8px!important;
+      gap:6px!important;
     }
 
-    body.modern-glass #view-manage>.manage-layout{
-      width:100%!important;
-      height:100%!important;
+    body.modern-glass #view-manage .manage-layout{
+      min-width:0!important;
       min-height:0!important;
+      height:100%!important;
       max-height:100%!important;
       overflow:hidden!important;
-      grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
-      gap:12px!important;
+      align-items:stretch!important;
     }
 
-    body.modern-glass #view-manage .manage-panel{
-      width:100%!important;
-      height:100%!important;
+    body.modern-glass #view-manage .manage-layout>.panel{
       min-width:0!important;
       min-height:0!important;
       max-height:100%!important;
+      height:100%!important;
       overflow:hidden!important;
       display:flex!important;
       flex-direction:column!important;
       box-sizing:border-box!important;
     }
 
-    body.modern-glass #view-manage .manage-panel>.panel-title,
-    body.modern-glass #view-manage .manage-create-team-form{
+    body.modern-glass #view-manage #create-team-form,
+    body.modern-glass #view-manage .panel-title{
       flex:0 0 auto!important;
     }
 
     body.modern-glass #view-manage #manage-teams,
     body.modern-glass #view-manage #manage-members{
-      flex:1 1 0!important;
+      flex:1 1 auto!important;
       min-height:0!important;
-      height:auto!important;
+      max-height:100%!important;
       overflow-y:auto!important;
       overflow-x:hidden!important;
       overscroll-behavior:contain!important;
       scrollbar-gutter:stable;
-      padding-right:2px;
     }
 
     body.modern-glass #view-manage #vice-requests-panel{
       min-height:0!important;
-      max-height:26vh!important;
+      max-height:min(190px,28vh)!important;
       overflow:hidden!important;
-      flex:none!important;
+      display:flex;
+      flex-direction:column;
+      box-sizing:border-box!important;
+    }
+
+    body.modern-glass #view-manage #vice-requests-panel[hidden]{
+      display:none!important;
     }
 
     body.modern-glass #view-manage #vice-requests{
-      max-height:18vh!important;
+      min-height:0!important;
       overflow-y:auto!important;
       overflow-x:hidden!important;
-    }
-
-    body.modern-glass #view-manage .manage-panel-title{
-      display:flex!important;
-      align-items:flex-start!important;
-      justify-content:space-between!important;
-      gap:8px!important;
-    }
-
-    body.modern-glass #view-manage .manage-refresh-btn{
-      width:34px!important;
-      min-width:34px!important;
-      max-width:34px!important;
-      height:34px!important;
-      min-height:34px!important;
-      padding:0!important;
-      border-radius:10px!important;
-      font-size:14px!important;
-      flex:0 0 34px!important;
+      overscroll-behavior:contain!important;
     }
 
     body.modern-glass #view-manage .manage-team-row{
-      width:100%!important;
       min-width:0!important;
-      max-width:100%!important;
-      display:grid!important;
-      grid-template-columns:minmax(108px,.72fr) minmax(0,1.55fr)!important;
-      align-items:center!important;
-      gap:7px!important;
+      width:100%!important;
       box-sizing:border-box!important;
     }
 
@@ -11920,7 +11905,7 @@
 
     body.modern-glass #view-manage .manage-team-identity strong,
     body.modern-glass #view-manage .manage-team-identity small{
-      min-width:0!important;
+      max-width:100%!important;
       overflow:hidden!important;
       text-overflow:ellipsis!important;
       white-space:nowrap!important;
@@ -11928,104 +11913,19 @@
 
     body.modern-glass #view-manage .manage-team-actions{
       min-width:0!important;
-      width:100%!important;
+      flex:0 0 auto!important;
       display:flex!important;
       align-items:center!important;
       justify-content:flex-end!important;
       gap:4px!important;
-      flex-wrap:nowrap!important;
-      overflow:hidden!important;
-    }
-
-    /* Squadra senza Presidente: prima assegnazione, poi alias, poi azioni. */
-    body.modern-glass #view-manage .manage-team-president-quick{
-      min-width:0!important;
-      flex:1 1 180px!important;
-      max-width:248px!important;
-      display:grid!important;
-      grid-template-columns:minmax(82px,1fr) minmax(54px,72px)!important;
-      gap:3px!important;
-      align-items:center!important;
-    }
-
-    body.modern-glass #view-manage .manage-team-president-quick select{
-      width:100%!important;
-      min-width:0!important;
-      max-width:none!important;
-      height:30px!important;
-      min-height:30px!important;
-      padding:2px 7px!important;
-      font-size:7.5px!important;
-      border-radius:9px!important;
-    }
-
-    body.modern-glass #view-manage .manage-team-president-quick button{
-      width:100%!important;
-      min-width:0!important;
-      max-width:72px!important;
-      height:30px!important;
-      min-height:30px!important;
-      padding:2px 6px!important;
-      font-size:7px!important;
-      border-radius:9px!important;
-    }
-
-    body.modern-glass #view-manage .manage-team-alias-pill{
-      flex:0 1 84px!important;
-      min-width:48px!important;
-      max-width:84px!important;
-      height:28px!important;
-      padding:0 7px!important;
-      display:flex!important;
-      align-items:center!important;
-      justify-content:center!important;
-      overflow:hidden!important;
-      text-overflow:ellipsis!important;
-      white-space:nowrap!important;
-      border:1px solid var(--line)!important;
-      border-radius:9px!important;
-      background:rgba(255,255,255,.035)!important;
-      color:#687b95!important;
-      font-size:6px!important;
-      font-weight:900!important;
-      letter-spacing:.05em!important;
-    }
-
-    body.modern-glass #view-manage .manage-team-alias-pill.has-alias{
-      color:#9ecaff!important;
-      border-color:rgba(109,167,255,.34)!important;
-      background:rgba(69,126,207,.10)!important;
-    }
-
-    body.modern-glass #view-manage .manage-team-ok{
-      min-width:34px!important;
-      max-width:38px!important;
-      height:28px!important;
-      min-height:28px!important;
-      padding:0 6px!important;
-      display:grid!important;
-      place-items:center!important;
-      flex:0 0 auto!important;
-    }
-
-    body.modern-glass #view-manage .manage-team-actions .team-icon-btn{
-      width:30px!important;
-      min-width:30px!important;
-      max-width:30px!important;
-      height:30px!important;
-      min-height:30px!important;
-      padding:0!important;
-      border-radius:9px!important;
-      font-size:11px!important;
-      flex:0 0 30px!important;
     }
 
     body.modern-glass #view-manage #manage-members>.compact-row{
+      min-width:0!important;
       width:100%!important;
       max-width:100%!important;
-      min-width:0!important;
       display:grid!important;
-      grid-template-columns:minmax(120px,.8fr) minmax(0,1.2fr)!important;
+      grid-template-columns:minmax(110px,.8fr) minmax(0,1.2fr)!important;
       gap:8px!important;
       align-items:center!important;
       box-sizing:border-box!important;
@@ -12039,20 +11939,24 @@
       gap:4px 7px!important;
     }
 
-    body.modern-glass #view-manage .member-role-controls .check-line{
-      min-width:0!important;
-      font-size:7px!important;
+    body.modern-glass #view-manage .manage-team-actions .team-icon-btn{
+      width:32px!important;
+      min-width:32px!important;
+      max-width:32px!important;
+      height:32px!important;
+      min-height:32px!important;
+      padding:0!important;
+      border-radius:9px!important;
+      font-size:11px!important;
     }
 
-    /* Modal Overview squadra: nessun campo resta nella lista, quindi il polling
-       non può più interrompere la digitazione dell'alias. */
     body.modern-glass .manage-team-modal{
-      width:min(560px,calc(100vw - 28px));
-      max-width:560px;
+      width:min(520px,calc(100vw - 28px));
+      max-width:520px;
       padding:0;
       border:1px solid rgba(109,167,255,.30);
       border-radius:22px;
-      background:linear-gradient(145deg,rgba(19,47,78,.98),rgba(8,25,44,.99));
+      background:linear-gradient(145deg,rgba(19,47,78,.985),rgba(8,25,44,.995));
       color:var(--ink);
       box-shadow:0 26px 70px rgba(0,0,0,.55),inset 0 1px rgba(255,255,255,.05);
       overflow:hidden;
@@ -12099,44 +12003,39 @@
       font-size:14px!important;
     }
 
-    body.modern-glass .manage-team-modal-grid{
+    body.modern-glass .manage-modal-field{
       display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-    }
-
-    body.modern-glass .manage-team-modal-grid label{
-      display:grid;
-      gap:5px;
-      color:#8fa6bf;
+      gap:6px;
+      color:var(--muted);
       font-size:8px;
-      font-weight:850;
+      font-weight:800;
     }
 
-    body.modern-glass .manage-team-modal-grid input,
-    body.modern-glass .manage-president-actions select{
-      width:100%;
+    body.modern-glass .manage-modal-alias-row{
       min-width:0;
-      min-height:40px;
-      padding:0 11px;
-      border:1px solid var(--line);
-      border-radius:11px;
-      background:rgba(0,0,0,.18);
-      color:var(--ink);
-      outline:0;
-      box-sizing:border-box;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:8px;
+      align-items:center;
+    }
+
+    body.modern-glass .manage-modal-alias-row input{
+      min-width:0!important;
+      width:100%!important;
+      text-transform:uppercase;
     }
 
     body.modern-glass .manage-president-box{
       padding:12px;
-      display:grid;
-      gap:10px;
       border:1px solid var(--line);
       border-radius:14px;
-      background:rgba(255,255,255,.025);
+      background:rgba(4,18,33,.42);
+      display:grid;
+      gap:10px;
     }
 
     body.modern-glass .manage-president-current{
+      min-width:0;
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -12144,9 +12043,9 @@
     }
 
     body.modern-glass .manage-president-current span{
-      color:#8196ad;
+      color:var(--muted);
       font-size:8px;
-      font-weight:850;
+      font-weight:800;
     }
 
     body.modern-glass .manage-president-current strong{
@@ -12154,581 +12053,39 @@
       overflow:hidden;
       text-overflow:ellipsis;
       white-space:nowrap;
-      font-size:10px;
+      font-size:11px;
     }
 
     body.modern-glass .manage-president-actions{
+      min-width:0;
       display:grid;
       grid-template-columns:minmax(0,1fr) auto;
       gap:8px;
     }
 
-    body.modern-glass .manage-president-actions button{
-      min-width:110px;
+    body.modern-glass .manage-president-actions>.danger:only-child{
+      grid-column:1/-1;
+      justify-self:end;
     }
 
     body.modern-glass .manage-team-modal-footer{
       display:flex;
       justify-content:flex-end;
-      gap:8px;
     }
 
-    @media(max-width:1000px){
-      body.modern-glass #view-manage{
-        overflow-y:auto!important;
-        overflow-x:hidden!important;
-        display:block!important;
+    @media(max-width:760px){
+      body.modern-glass #view-manage.active{
+        grid-template-rows:minmax(0,1fr) auto!important;
       }
 
-      body.modern-glass #view-manage>.manage-layout{
-        height:auto!important;
-        max-height:none!important;
-        overflow:visible!important;
+      body.modern-glass #view-manage .manage-layout{
         grid-template-columns:1fr!important;
+        grid-template-rows:repeat(2,minmax(0,1fr))!important;
       }
 
-      body.modern-glass #view-manage .manage-panel{
-        height:min(62vh,620px)!important;
-        max-height:min(62vh,620px)!important;
-      }
-    }
-
-    @media(max-width:720px){
-      body.modern-glass #view-manage .manage-team-row,
-      body.modern-glass #view-manage #manage-members>.compact-row{
-        grid-template-columns:1fr!important;
-      }
-
-      body.modern-glass #view-manage .manage-team-actions{
-        justify-content:flex-start!important;
-      }
-
-      body.modern-glass #view-manage .manage-team-president-quick{
-        max-width:none!important;
-      }
-
-      body.modern-glass .manage-team-modal-grid{
-        grid-template-columns:1fr;
-      }
-
+      body.modern-glass .manage-modal-alias-row,
       body.modern-glass .manage-president-actions{
-        grid-template-columns:1fr;
-      }
-    }
-
-
-
-    /* =====================================================
-       GLASS V8 · route isolation + Home viewport-safe
-       ===================================================== */
-
-    /*
-     * V7 regression fix.
-     * #view-manage had display:grid!important even when it was NOT the active
-     * route; consequently it remained rendered before #view-setup and looked
-     * as if Members/Teams had been moved into League Setup.
-     * Inactive views are now always excluded from layout.
-     */
-    body.modern-glass .view:not(.active){
-      display:none!important;
-    }
-
-    body.modern-glass #view-manage.active{
-      display:grid!important;
-    }
-
-    body.modern-glass #view-home.active,
-    body.modern-glass #view-setup.active,
-    body.modern-glass #view-list.active,
-    body.modern-glass #view-rosters.active,
-    body.modern-glass #view-tv.active,
-    body.modern-glass #view-leagues.active{
-      display:block!important;
-    }
-
-    /* The workspace itself is exactly the second row of the application
-       cockpit. Padding is included in that height, so cards can never push
-       the application shell below the viewport. */
-    body.modern-glass .workspace{
-      width:100%!important;
-      height:100%!important;
-      min-width:0!important;
-      min-height:0!important;
-      max-height:100%!important;
-      box-sizing:border-box!important;
-    }
-
-    /* Desktop Home is a fixed cockpit: outer cards never scroll out of the
-       application viewport. Only the content lists inside each card scroll. */
-    @media(min-width:981px){
-      body.modern-glass #view-home.active{
-        width:100%!important;
-        height:100%!important;
-        min-height:0!important;
-        max-height:100%!important;
-        overflow:hidden!important;
-      }
-
-      body.modern-glass #view-home>.home-layout{
-        width:100%!important;
-        height:100%!important;
-        min-width:0!important;
-        min-height:0!important;
-        max-height:100%!important;
-        overflow:hidden!important;
-        align-items:stretch!important;
-      }
-
-      body.modern-glass #view-home .home-col{
-        width:100%!important;
-        height:100%!important;
-        min-width:0!important;
-        min-height:0!important;
-        max-height:100%!important;
-        overflow:hidden!important;
-      }
-
-      body.modern-glass #view-home .home-col:first-child{
-        grid-template-rows:auto minmax(0,1fr)!important;
-      }
-
-      body.modern-glass #view-home .home-col:nth-child(2){
-        grid-template-rows:minmax(118px,.62fr) minmax(0,1.38fr)!important;
-      }
-
-      body.modern-glass #view-home .home-col>.panel{
-        width:100%!important;
-        height:100%!important;
-        min-width:0!important;
-        min-height:0!important;
-        max-height:100%!important;
-        display:flex!important;
-        flex-direction:column!important;
-        overflow:hidden!important;
-        box-sizing:border-box!important;
-      }
-
-      body.modern-glass #view-home .home-col>.panel>.panel-title{
-        flex:0 0 auto!important;
-      }
-
-      body.modern-glass #view-home #home-teams,
-      body.modern-glass #view-home #home-me,
-      body.modern-glass #view-home #pending-list{
-        min-width:0!important;
-        min-height:0!important;
-        max-height:none!important;
-        overflow-y:auto!important;
-        overflow-x:hidden!important;
-        overscroll-behavior:contain!important;
-        scrollbar-gutter:stable;
-      }
-
-      body.modern-glass #view-home #home-teams,
-      body.modern-glass #view-home #pending-list{
-        flex:1 1 0!important;
-        height:0!important;
-      }
-
-      body.modern-glass #view-home #home-me{
-        flex:1 1 auto!important;
-      }
-    }
-
-    /* On compact layouts the workspace remains the viewport boundary, while
-       the active Home view may scroll internally because the two columns are
-       intentionally stacked by the responsive design. */
-    @media(max-width:980px){
-      body.modern-glass #view-home.active{
-        height:100%!important;
-        min-height:0!important;
-        max-height:100%!important;
-        overflow-y:auto!important;
-        overflow-x:hidden!important;
-      }
-    }
-
-
-
-    /* =====================================================
-       GLASS V9 · Home pulita + Membri esclusivi + strip = header
-       ===================================================== */
-
-    /* HOME: nessuna lista membri/squadre/richieste. Solo dashboard e
-       scorciatoie operative, sempre confinate nel cockpit. */
-    body.modern-glass #view-home.active{
-      width:100%!important;
-      height:100%!important;
-      min-width:0!important;
-      min-height:0!important;
-      max-height:100%!important;
-      overflow:hidden!important;
-    }
-
-    body.modern-glass #view-home>.home-dashboard-shell{
-      width:100%!important;
-      height:100%!important;
-      min-width:0!important;
-      min-height:0!important;
-      max-height:100%!important;
-      display:grid!important;
-      grid-template-rows:auto minmax(0,1fr)!important;
-      gap:12px!important;
-      overflow:hidden!important;
-    }
-
-    body.modern-glass #view-home .home-dashboard-kpis{
-      min-width:0!important;
-      flex:none!important;
-    }
-
-    body.modern-glass #view-home .home-dashboard-grid{
-      min-width:0!important;
-      min-height:0!important;
-      height:100%!important;
-      display:grid!important;
-      grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr)!important;
-      gap:12px!important;
-      overflow:hidden!important;
-    }
-
-    body.modern-glass #view-home .home-dashboard-panel{
-      min-width:0!important;
-      min-height:0!important;
-      height:100%!important;
-      max-height:100%!important;
-      display:flex!important;
-      flex-direction:column!important;
-      overflow:hidden!important;
-    }
-
-    body.modern-glass #view-home .home-summary{
-      min-width:0;
-      min-height:0;
-      flex:1 1 auto;
-      display:grid;
-      align-content:center;
-      justify-items:start;
-      gap:14px;
-      padding:18px;
-    }
-
-    body.modern-glass #view-home .home-summary-league{
-      min-width:0;
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-
-    body.modern-glass #view-home .home-summary-dot{
-      width:10px;
-      height:10px;
-      flex:0 0 10px;
-      border-radius:999px;
-      background:#4dd7a6;
-      box-shadow:0 0 0 5px rgba(77,215,166,.10),0 0 18px rgba(77,215,166,.30);
-    }
-
-    body.modern-glass #view-home .home-summary-league strong{
-      display:block;
-      color:var(--ink);
-      font-size:18px;
-      line-height:1.05;
-    }
-
-    body.modern-glass #view-home .home-summary-league small{
-      display:block;
-      margin-top:4px;
-      color:var(--muted);
-      font-size:9px;
-    }
-
-    body.modern-glass #view-home .home-summary-roles{
-      display:flex;
-      flex-wrap:wrap;
-      gap:6px;
-    }
-
-    body.modern-glass #view-home .home-quick-grid{
-      min-width:0;
-      min-height:0;
-      flex:1 1 auto;
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      grid-template-rows:repeat(2,minmax(0,1fr));
-      gap:8px;
-      padding:10px;
-    }
-
-    body.modern-glass #view-home .home-quick-link{
-      min-width:0;
-      min-height:0;
-      padding:14px;
-      display:grid;
-      grid-template-columns:auto minmax(0,1fr);
-      grid-template-rows:auto auto;
-      align-content:center;
-      column-gap:10px;
-      border:1px solid var(--line);
-      border-radius:16px;
-      background:rgba(255,255,255,.028);
-      color:var(--soft);
-      text-decoration:none;
-      overflow:hidden;
-      transition:background .16s ease,border-color .16s ease,transform .16s ease;
-    }
-
-    body.modern-glass #view-home .home-quick-link:hover{
-      background:rgba(93,156,245,.09);
-      border-color:rgba(93,156,245,.34);
-      transform:translateY(-1px);
-    }
-
-    body.modern-glass #view-home .home-quick-link>span{
-      grid-row:1 / span 2;
-      align-self:center;
-      color:var(--blue);
-      font-size:18px;
-    }
-
-    body.modern-glass #view-home .home-quick-link strong{
-      color:var(--ink);
-      font-size:12px;
-      line-height:1.1;
-    }
-
-    body.modern-glass #view-home .home-quick-link small{
-      margin-top:3px;
-      color:var(--muted);
-      font-size:8px;
-    }
-
-    /* MEMBRI: le richieste di ingresso vivono SOLO qui. La card destra resta
-       entro il cockpit e divide lo spazio tra membri attivi e richieste. */
-    body.modern-glass #view-manage .manage-members-panel{
-      min-width:0!important;
-      min-height:0!important;
-      overflow:hidden!important;
-    }
-
-    body.modern-glass #view-manage .manage-members-body{
-      min-width:0!important;
-      min-height:0!important;
-      flex:1 1 0!important;
-      display:grid!important;
-      grid-template-rows:minmax(0,1fr) auto!important;
-      gap:8px!important;
-      overflow:hidden!important;
-    }
-
-    body.modern-glass #view-manage #manage-members{
-      min-width:0!important;
-      min-height:0!important;
-      height:100%!important;
-      overflow-y:auto!important;
-      overflow-x:hidden!important;
-    }
-
-    body.modern-glass #view-manage .manage-pending-panel{
-      min-width:0;
-      min-height:0;
-      max-height:34%;
-      display:grid;
-      grid-template-rows:auto minmax(0,1fr);
-      gap:5px;
-      padding-top:7px;
-      border-top:1px solid var(--line);
-      overflow:hidden;
-    }
-
-    body.modern-glass #view-manage .manage-pending-panel[hidden]{
-      display:none!important;
-    }
-
-    body.modern-glass #view-manage .manage-pending-head{
-      min-width:0;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:8px;
-    }
-
-    body.modern-glass #view-manage .manage-pending-head strong{
-      display:block;
-      color:var(--soft);
-      font-size:9px;
-    }
-
-    body.modern-glass #view-manage .manage-pending-head small{
-      display:block;
-      margin-top:2px;
-      color:var(--muted);
-      font-size:7px;
-    }
-
-    body.modern-glass #view-manage #manage-pending-list{
-      min-width:0;
-      min-height:0;
-      overflow-y:auto!important;
-      overflow-x:hidden!important;
-      overscroll-behavior:contain;
-    }
-
-    body.modern-glass #view-manage .manage-pending-row button{
-      width:auto!important;
-      min-width:54px!important;
-      max-width:76px!important;
-      padding-inline:7px!important;
-    }
-
-    /* ASTA: header e status strip sono ora la stessa identica altezza. */
-    body.modern-glass #view-auction .auction-cockpit{
-      --auction-topbar-height:42px;
-      grid-template-rows:
-        var(--auction-topbar-height)
-        var(--auction-topbar-height)
-        minmax(0,1fr)!important;
-      gap:3px!important;
-    }
-
-    body.modern-glass #view-auction .auction-statusbar,
-    body.modern-glass #view-auction .auction-team-summary-strip{
-      height:var(--auction-topbar-height)!important;
-      min-height:var(--auction-topbar-height)!important;
-      max-height:var(--auction-topbar-height)!important;
-      box-sizing:border-box!important;
-      overflow:hidden!important;
-    }
-
-    body.modern-glass #view-auction .auction-team-summary-strip{
-      padding:3px 4px!important;
-      gap:3px!important;
-      align-items:stretch!important;
-    }
-
-    body.modern-glass #view-auction .auction-team-summary-legend{
-      width:38px!important;
-      min-width:38px!important;
-      font-size:5.3px!important;
-      line-height:1.05!important;
-    }
-
-    body.modern-glass #view-auction .auction-team-summary-item{
-      min-height:0!important;
-      height:100%!important;
-      padding:2px 5px!important;
-    }
-
-    body.modern-glass #view-auction .auction-team-summary-item strong,
-    body.modern-glass #view-auction .auction-team-summary-values{
-      font-size:6.5px!important;
-      line-height:1!important;
-    }
-
-    body.modern-glass #view-auction .auction-team-summary-strip.auction-rosters-accordion-header.is-open{
-      height:var(--auction-topbar-height)!important;
-      min-height:var(--auction-topbar-height)!important;
-      max-height:var(--auction-topbar-height)!important;
-      padding:2px 3px!important;
-    }
-
-    body.modern-glass #view-auction .auction-rosters-live-strip{
-      height:100%!important;
-      min-height:0!important;
-      align-items:stretch!important;
-      gap:2px!important;
-    }
-
-    body.modern-glass #view-auction .auction-rosters-live-cell,
-    body.modern-glass #view-auction .auction-rosters-live-free,
-    body.modern-glass #view-auction .auction-rosters-live-confirm,
-    body.modern-glass #view-auction .auction-rosters-live-leave,
-    body.modern-glass #view-auction .auction-rosters-live-close{
-      min-height:0!important;
-      height:100%!important;
-      border-radius:4px!important;
-    }
-
-    body.modern-glass #view-auction .auction-rosters-live-cell{
-      padding:2px 4px!important;
-    }
-
-    body.modern-glass #view-auction .auction-rosters-live-cell>span,
-    body.modern-glass #view-auction .auction-rosters-live-free>span{
-      font-size:4.7px!important;
-      letter-spacing:.055em!important;
-    }
-
-    body.modern-glass #view-auction .auction-rosters-live-cell>strong{
-      font-size:7px!important;
-      line-height:1!important;
-    }
-
-    body.modern-glass #view-auction .auction-rosters-live-timer>strong{
-      font-size:12px!important;
-    }
-
-    body.modern-glass #view-auction .auction-rosters-live-offer>strong{
-      font-size:10px!important;
-    }
-
-    body.modern-glass #view-auction .auction-rosters-live-roles .rolebadge{
-      min-width:17px!important;
-      height:12px!important;
-      min-height:12px!important;
-      padding:0 2px!important;
-      line-height:12px!important;
-      font-size:5px!important;
-    }
-
-    body.modern-glass #view-auction .auction-rosters-live-free input{
-      height:26px!important;
-      min-height:26px!important;
-      font-size:8px!important;
-    }
-
-    body.modern-glass #view-auction .auction-rosters-live-quick .quick-btn,
-    body.modern-glass #view-auction .auction-rosters-live-confirm,
-    body.modern-glass #view-auction .auction-rosters-live-leave{
-      height:34px!important;
-      min-height:34px!important;
-      align-self:center!important;
-    }
-
-    body.modern-glass #view-auction .auction-rosters-live-quick .quick-btn span{
-      font-size:5.4px!important;
-    }
-
-    body.modern-glass #view-auction .auction-rosters-live-quick .quick-btn strong,
-    body.modern-glass #view-auction .auction-rosters-live-confirm,
-    body.modern-glass #view-auction .auction-rosters-live-leave{
-      font-size:7px!important;
-    }
-
-    body.modern-glass #view-auction .auction-rosters-live-close{
-      font-size:5px!important;
-    }
-
-    @media(max-width:980px){
-      body.modern-glass #view-home.active{
-        overflow-y:auto!important;
-      }
-
-      body.modern-glass #view-home>.home-dashboard-shell{
-        height:auto!important;
-        min-height:100%!important;
-        overflow:visible!important;
-      }
-
-      body.modern-glass #view-home .home-dashboard-grid{
         grid-template-columns:1fr!important;
-        grid-template-rows:auto auto!important;
-        overflow:visible!important;
-      }
-
-      body.modern-glass #view-home .home-dashboard-panel{
-        min-height:240px!important;
-        height:auto!important;
       }
     }
 
@@ -12887,33 +12244,24 @@
 
       <!-- HOME -->
       <section id="view-home" class="view">
-        <div class="home-dashboard-shell">
-          <div id="home-kpis" class="kpis home-dashboard-kpis"></div>
+        <div class="home-layout">
+          <div class="home-col">
+            <div id="home-kpis" class="kpis"></div>
+            <section class="panel">
+              <div class="panel-title"><div><h2>Squadre</h2><p>Presenze e Presidenti.</p></div></div>
+              <div id="home-teams" class="compact-list inner-scroll"></div>
+            </section>
+          </div>
 
-          <div class="home-dashboard-grid">
-            <section class="panel home-dashboard-panel home-dashboard-primary">
-              <div class="panel-title">
-                <div>
-                  <h2>Cockpit lega</h2>
-                  <p>Accesso rapido agli strumenti operativi.</p>
-                </div>
-              </div>
-              <div id="home-summary" class="home-summary"></div>
+          <div class="home-col">
+            <section class="panel">
+              <div class="panel-title"><div><h2>Il mio accesso</h2><p>Ruoli e squadra attivi.</p></div></div>
+              <div id="home-me" class="stack"></div>
             </section>
 
-            <section class="panel home-dashboard-panel home-quick-panel">
-              <div class="panel-title">
-                <div>
-                  <h2>Strumenti</h2>
-                  <p>Apri direttamente la sezione che ti serve.</p>
-                </div>
-              </div>
-              <nav class="home-quick-grid" aria-label="Strumenti lega">
-                <a class="home-quick-link" href="#/auction"><span>◆</span><strong>Asta</strong><small>Cockpit live</small></a>
-                <a class="home-quick-link" href="#/list"><span>▦</span><strong>Listone</strong><small>Svincolati e dati</small></a>
-                <a class="home-quick-link" href="#/rosters"><span>◫</span><strong>Rose</strong><small>Rose della lega</small></a>
-                <a class="home-quick-link" href="#/tv"><span>▣</span><strong>TV</strong><small>Vista presentatore</small></a>
-              </nav>
+            <section id="pending-panel" class="panel">
+              <div class="panel-title"><div><h2>Richieste</h2><p>Aggiornamento automatico.</p></div><span id="pending-count" class="badge">0</span></div>
+              <div id="pending-list" class="compact-list inner-scroll"></div>
             </section>
           </div>
         </div>
@@ -12922,46 +12270,30 @@
       <!-- MEMBRI / SQUADRE -->
       <section id="view-manage" class="view">
         <div class="manage-layout">
-          <section class="panel manage-panel manage-teams-panel">
-            <div class="panel-title manage-panel-title">
-              <div><h2>Squadre</h2><p>Creazione, Presidente e alias asta.</p></div>
-              <button id="manage-refresh" class="secondary manage-refresh-btn" type="button" title="Aggiorna membri e squadre" aria-label="Aggiorna membri e squadre">↻</button>
-            </div>
-            <form id="create-team-form" class="form-grid manage-create-team-form" style="margin-bottom:6px">
+          <section class="panel">
+            <div class="panel-title"><div><h2>Squadre</h2><p>Creazione e assegnazione Presidente.</p></div></div>
+            <form id="create-team-form" class="form-grid" style="margin-bottom:6px">
               <label>Nuova squadra<input id="manage-new-team" maxlength="60"></label>
               <div style="align-self:end"><button type="submit">Crea squadra</button></div>
             </form>
             <div id="manage-teams" class="compact-list inner-scroll"></div>
           </section>
 
-          <section class="panel manage-panel manage-members-panel">
-            <div class="panel-title"><div><h2>Membri</h2><p>Ruoli lega, appartenenza squadra e richieste di ingresso.</p></div></div>
-            <div class="manage-members-body">
-              <div id="manage-members" class="compact-list inner-scroll"></div>
-
-              <section id="manage-pending-panel" class="manage-pending-panel">
-                <div class="manage-pending-head">
-                  <div>
-                    <strong>Richieste membri</strong>
-                    <small>Approvazione ingresso nella lega.</small>
-                  </div>
-                  <span id="manage-pending-count" class="badge">0</span>
-                </div>
-                <div id="manage-pending-list" class="compact-list inner-scroll"></div>
-              </section>
-            </div>
+          <section class="panel">
+            <div class="panel-title"><div><h2>Membri</h2><p>Ruoli lega e appartenenza squadra.</p></div></div>
+            <div id="manage-members" class="compact-list inner-scroll"></div>
           </section>
         </div>
-
-        <dialog id="manage-team-modal" class="manage-team-modal">
-          <div id="manage-team-modal-content"></div>
-        </dialog>
 
         <section id="vice-requests-panel" class="panel" style="margin-top:6px">
           <div class="panel-title"><div><h2>Richieste Vice</h2><p>Approvazione del Presidente.</p></div></div>
           <div id="vice-requests" class="compact-list"></div>
         </section>
       </section>
+
+      <dialog id="manage-team-modal" class="manage-team-modal">
+        <div id="manage-team-modal-content"></div>
+      </dialog>
 
       <!-- SETUP -->
       <section id="view-setup" class="view">
@@ -13241,7 +12573,6 @@
 
       dashboard: null,
       management: null,
-      manageTeamModalId: null,
       setup: null,
       list: null,
       rosters: null,
@@ -13970,20 +13301,6 @@
       );
 
 
-    $('manage-refresh')
-      ?.addEventListener(
-        'click',
-        async () => {
-          try {
-            await Promise.all([loadManagement(), loadDashboard()]);
-            msg('Membri e squadre aggiornati.', 'success');
-          } catch (error) {
-            msg(error.message, 'error');
-          }
-        }
-      );
-
-
     $('exit-btn')
       .addEventListener(
         'click',
@@ -14224,50 +13541,41 @@
       const data = state.dashboard;
       if (!data) return;
 
-      const leagueName =
-        data.league?.name
-        || state.selectedLeague?.name
-        || 'Lega';
-
-      const leagueCode =
-        data.league?.code
-        || state.selectedLeague?.code
-        || '—';
-
-      const rolesCount =
-        (data.leagueRoles || []).length
-        + (data.myTeam ? 1 : 0);
+      const teams = data.teams || [];
+      const pending = data.pendingRequests || [];
 
       $('home-kpis').innerHTML = `
-        <div class="kpi"><span>Lega</span><strong>${esc(leagueName)}</strong></div>
-        <div class="kpi"><span>Codice</span><strong>${esc(leagueCode)}</strong></div>
-        <div class="kpi"><span>Accessi</span><strong>${rolesCount}</strong></div>
+        <div class="kpi"><span>Squadre</span><strong>${teams.length}</strong></div>
+        <div class="kpi"><span>Richieste</span><strong>${pending.length}</strong></div>
+        <div class="kpi"><span>Ruoli</span><strong>${(data.leagueRoles || []).length + (data.myTeam ? 1 : 0)}</strong></div>
       `;
 
-      const roleBadges =
-        (data.leagueRoles || [])
-          .map(role => `<span class="badge primary">${esc(roleLabel(role))}</span>`)
-          .join('');
+      $('home-teams').innerHTML = teams.map(team => `
+        <div class="compact-row">
+          <div><strong>${esc(team.name)}</strong><small>Presidente: ${esc(team.presidentUsername || '—')}</small></div>
+          <span class="badge ${team.presidentUsername ? 'good' : 'warn'}">${team.presidentUsername ? 'OK' : 'NO PRES.'}</span>
+        </div>
+      `).join('') || '<div class="small soft">Nessuna squadra.</div>';
 
-      const teamBadge = data.myTeam
-        ? `<span class="badge good">${esc(roleLabel(data.myTeam.role))} · ${esc(data.myTeam.team?.name || data.myTeam.name || '')}</span>`
-        : '';
+      const roleBadges = (data.leagueRoles || []).map(role => `<span class="badge primary">${esc(roleLabel(role))}</span>`).join('');
+      const teamBadge = data.myTeam ? `<span class="badge good">${esc(roleLabel(data.myTeam.role))} · ${esc(data.myTeam.team?.name || data.myTeam.name || '')}</span>` : '';
+      $('home-me').innerHTML = `<div class="row">${roleBadges}${teamBadge || '<span class="small soft">Nessuna squadra associata.</span>'}</div>`;
 
-      $('home-summary').innerHTML = `
-        <div class="home-summary-league">
-          <span class="home-summary-dot"></span>
-          <div>
-            <strong>${esc(leagueName)}</strong>
-            <small>Server autorevole · Edge Functions + PostgreSQL</small>
+      $('pending-panel').hidden = !data.permissions?.canManageMembers;
+      $('pending-count').textContent = pending.length;
+      $('pending-list').innerHTML = pending.map(item => `
+        <div class="compact-row">
+          <div><strong>${esc(item.username || 'Utente')}</strong><small>${item.team?.teamName ? `Squadra: ${esc(item.team.teamName)}` : 'Nessuna squadra richiesta'}</small></div>
+          <div class="row">
+            <button class="approve-member good" data-user="${esc(item.userId)}" type="button">Approva</button>
+            <button class="reject-member danger" data-user="${esc(item.userId)}" type="button">Rifiuta</button>
           </div>
         </div>
-        <div class="home-summary-roles">
-          ${roleBadges || '<span class="badge">Membro</span>'}
-          ${teamBadge}
-        </div>
-      `;
-    }
+      `).join('') || '<div class="small soft">Nessuna richiesta.</div>';
 
+      $('pending-list').querySelectorAll('.approve-member').forEach(button => button.addEventListener('click', () => membershipAction('approveMember', button.dataset.user)));
+      $('pending-list').querySelectorAll('.reject-member').forEach(button => button.addEventListener('click', () => membershipAction('rejectMember', button.dataset.user)));
+    }
 
     async function membershipAction(action, targetUserId) {
       try {
@@ -14284,25 +13592,14 @@
        ===================================================== */
 
     async function loadManagement() {
-      const [data, dashboard] = await Promise.all([
-        api(ENDPOINTS.league, { action: 'getManagementData' }),
-        api(ENDPOINTS.league, { action: 'getDashboard' })
-      ]);
-
+      const data = await api(ENDPOINTS.league, { action: 'getManagementData' });
       if (!data) return;
-
       state.management = data;
-      if (dashboard) {
-        state.dashboard = dashboard;
-        updateHeader();
-      }
-
       renderManagement();
     }
 
     function closeManageTeamModal() {
       const dialog = $('manage-team-modal');
-      state.manageTeamModalId = null;
       if (dialog?.open) {
         dialog.close();
       }
@@ -14325,39 +13622,37 @@
 
       const candidates = (data.members || []).filter(member =>
         member.canBePresident !== false
-        && (!member.team || member.userId === president?.userId)
+        && !member.team
       );
 
-      const canRename = Boolean(
-        data.permissions?.isLeagueAdmin
-        || data.permissions?.myPresidentTeamId === team.id
-      );
-      const canManagePresident = data.permissions?.canAssignPresident === true;
       const canAlias = data.permissions?.isLeagueAdmin === true;
-
-      state.manageTeamModalId = teamId;
+      const canManagePresident = data.permissions?.canAssignPresident === true;
 
       content.innerHTML = `
         <div class="manage-team-modal-card">
           <div class="manage-team-modal-head">
             <div>
-              <small>OVERVIEW SQUADRA</small>
+              <small>MODIFICA SQUADRA</small>
               <h3>${esc(team.name)}</h3>
             </div>
             <button id="manage-team-modal-close" class="secondary manage-modal-close" type="button" aria-label="Chiudi">×</button>
           </div>
 
-          <div class="manage-team-modal-grid">
-            <label>
-              Nome squadra
-              <input id="manage-modal-team-name" maxlength="60" value="${esc(team.name)}" ${canRename ? '' : 'disabled'}>
+          ${canAlias ? `
+            <label class="manage-modal-field">
+              <span>Alias asta</span>
+              <div class="manage-modal-alias-row">
+                <input
+                  id="manage-modal-team-alias"
+                  maxlength="10"
+                  value="${esc(team.auction_alias || '')}"
+                  placeholder="MAX 10"
+                  autocomplete="off"
+                >
+                <button id="manage-modal-save-alias" type="button">Salva alias</button>
+              </div>
             </label>
-
-            <label>
-              Alias asta
-              <input id="manage-modal-team-alias" maxlength="10" value="${esc(team.auction_alias || '')}" placeholder="MAX 10" ${canAlias ? '' : 'disabled'}>
-            </label>
-          </div>
+          ` : ''}
 
           <section class="manage-president-box">
             <div class="manage-president-current">
@@ -14367,22 +13662,21 @@
 
             ${canManagePresident ? `
               <div class="manage-president-actions">
-                ${!president ? `
+                ${president ? `
+                  <button id="manage-modal-remove-president" class="danger" type="button">Rimuovi Presidente</button>
+                ` : `
                   <select id="manage-modal-president-select">
                     <option value="">Seleziona Presidente...</option>
                     ${candidates.map(member => `<option value="${esc(member.userId)}">${esc(member.username)}</option>`).join('')}
                   </select>
                   <button id="manage-modal-assign-president" type="button">Assegna</button>
-                ` : `
-                  <button id="manage-modal-remove-president" class="danger" type="button">Rimuovi Presidente</button>
                 `}
               </div>
             ` : ''}
           </section>
 
           <div class="manage-team-modal-footer">
-            <button id="manage-modal-cancel" class="secondary" type="button">Chiudi</button>
-            ${(canRename || canAlias) ? '<button id="manage-modal-save" type="button">Salva modifiche</button>' : ''}
+            <button id="manage-modal-close-footer" class="secondary" type="button">Chiudi</button>
           </div>
         </div>
       `;
@@ -14398,27 +13692,24 @@
       });
 
       $('manage-team-modal-close')?.addEventListener('click', closeManageTeamModal);
-      $('manage-modal-cancel')?.addEventListener('click', closeManageTeamModal);
+      $('manage-modal-close-footer')?.addEventListener('click', closeManageTeamModal);
 
-      $('manage-modal-save')?.addEventListener('click', async () => {
-        const nextName = String($('manage-modal-team-name')?.value || team.name).trim().toLocaleUpperCase('it-IT');
-        const nextAlias = String($('manage-modal-team-alias')?.value || '').trim().toLocaleUpperCase('it-IT');
+      $('manage-modal-save-alias')?.addEventListener('click', async () => {
+        const alias = String($('manage-modal-team-alias')?.value || '')
+          .trim()
+          .toLocaleUpperCase('it-IT');
 
-        if (nextName.length < 2 || nextName.length > 60) {
-          return msg('Il nome della squadra deve avere tra 2 e 60 caratteri.', 'error');
-        }
-        if (nextAlias.length > 10) {
+        if (alias.length > 10) {
           return msg('L’alias asta può contenere al massimo 10 caratteri.', 'error');
         }
 
         try {
-          if (canRename && nextName !== String(team.name || '').toLocaleUpperCase('it-IT')) {
-            await api(ENDPOINTS.league, { action: 'renameTeam', teamId, teamName: nextName });
-          }
-          if (canAlias && nextAlias !== String(team.auction_alias || '').toLocaleUpperCase('it-IT')) {
-            await api(ENDPOINTS.league, { action: 'setTeamAlias', teamId, alias: nextAlias });
-          }
-          msg('Squadra aggiornata.', 'success');
+          await api(ENDPOINTS.league, {
+            action: 'setTeamAlias',
+            teamId,
+            alias
+          });
+          msg(alias ? `Alias asta salvato: ${alias}` : 'Alias asta rimosso.', 'success');
           closeManageTeamModal();
           await Promise.all([loadManagement(), loadDashboard()]);
         } catch (error) {
@@ -14429,8 +13720,13 @@
       $('manage-modal-assign-president')?.addEventListener('click', async () => {
         const targetUserId = $('manage-modal-president-select')?.value;
         if (!targetUserId) return msg('Seleziona un membro.', 'error');
+
         try {
-          await api(ENDPOINTS.league, { action: 'assignPresident', teamId, targetUserId });
+          await api(ENDPOINTS.league, {
+            action: 'assignPresident',
+            teamId,
+            targetUserId
+          });
           msg('Presidente assegnato.', 'success');
           closeManageTeamModal();
           await Promise.all([loadManagement(), loadDashboard()]);
@@ -14442,8 +13738,12 @@
       $('manage-modal-remove-president')?.addEventListener('click', async () => {
         if (!president) return;
         if (!confirm(`Rimuovere ${president.username} come Presidente di ${team.name}?`)) return;
+
         try {
-          await api(ENDPOINTS.league, { action: 'unassignPresident', teamId });
+          await api(ENDPOINTS.league, {
+            action: 'unassignPresident',
+            teamId
+          });
           msg('Presidente rimosso.', 'success');
           closeManageTeamModal();
           await Promise.all([loadManagement(), loadDashboard()]);
@@ -14468,58 +13768,6 @@
 
       $('create-team-form').hidden = !data.permissions?.canCreateTeam;
 
-      const pendingMemberships =
-        state.dashboard?.pendingRequests || [];
-
-      const pendingPanel = $('manage-pending-panel');
-      const pendingCount = $('manage-pending-count');
-      const pendingList = $('manage-pending-list');
-
-      if (pendingPanel && pendingCount && pendingList) {
-        const canManageMembers =
-          state.dashboard?.permissions?.canManageMembers === true;
-
-        pendingPanel.hidden = !canManageMembers;
-        pendingCount.textContent = pendingMemberships.length;
-        pendingList.innerHTML = pendingMemberships.map(item => `
-          <div class="compact-row manage-pending-row">
-            <div>
-              <strong>${esc(item.username || 'Utente')}</strong>
-              <small>${item.team?.teamName ? `Squadra: ${esc(item.team.teamName)}` : 'Nessuna squadra richiesta'}</small>
-            </div>
-            <div class="row">
-              <button class="approve-member good" data-user="${esc(item.userId)}" type="button">Approva</button>
-              <button class="reject-member danger" data-user="${esc(item.userId)}" type="button">Rifiuta</button>
-            </div>
-          </div>
-        `).join('') || '<div class="small soft">Nessuna richiesta.</div>';
-
-        pendingList
-          .querySelectorAll('.approve-member')
-          .forEach(button =>
-            button.addEventListener(
-              'click',
-              () => membershipAction('approveMember', button.dataset.user)
-            )
-          );
-
-        pendingList
-          .querySelectorAll('.reject-member')
-          .forEach(button =>
-            button.addEventListener(
-              'click',
-              () => membershipAction('rejectMember', button.dataset.user)
-            )
-          );
-      }
-
-      const membersWithoutTeam =
-        (data.members || [])
-          .filter(member =>
-            !member.team
-            && member.canBePresident !== false
-          );
-
       $('manage-teams').innerHTML = (data.teams || []).map(team => {
         const president = (data.members || []).find(member =>
           member.team?.teamId === team.id
@@ -14533,45 +13781,38 @@
         );
 
         const canDelete = data.permissions?.isLeagueAdmin === true;
-        const canEditOverview = Boolean(
-          canRename
-          || data.permissions?.isLeagueAdmin
+        const canManageOverview = Boolean(
+          data.permissions?.isLeagueAdmin
           || data.permissions?.canAssignPresident
         );
 
         return `
-          <div class="compact-row manage-team-row ${president ? 'has-president' : 'needs-president'}">
+          <div class="compact-row manage-team-row">
             <div class="manage-team-identity">
               <strong>${esc(team.name)}</strong>
               <small>${president ? `Presidente: ${esc(president.username)}` : 'Presidente non assegnato'}</small>
+              ${team.auction_alias ? `<small class="manage-team-alias-readout">Alias asta: <b>${esc(team.auction_alias)}</b></small>` : ''}
             </div>
 
             <div class="manage-team-actions">
-              ${data.permissions?.canAssignPresident && !president ? `
-                <div class="manage-team-president-quick">
-                  <select class="president-select" data-team="${esc(team.id)}" aria-label="Presidente di ${esc(team.name)}">
-                    <option value="">Presidente...</option>
-                    ${membersWithoutTeam.map(member => `<option value="${esc(member.userId)}">${esc(member.username)}</option>`).join('')}
-                  </select>
-                  <button class="assign-president" data-team="${esc(team.id)}" type="button">Assegna</button>
-                </div>
-              ` : ''}
-
-              ${data.permissions?.isLeagueAdmin ? `
-                <span class="manage-team-alias-pill ${team.auction_alias ? 'has-alias' : ''}" title="Alias asta">
-                  ${team.auction_alias ? esc(team.auction_alias) : 'NO ALIAS'}
-                </span>
-              ` : ''}
-
-              ${president ? '<span class="badge good manage-team-ok">OK</span>' : ''}
-
-              ${canEditOverview ? `
+              ${canManageOverview ? `
                 <button
-                  class="secondary team-icon-btn edit-team-overview"
+                  class="secondary team-icon-btn manage-team-overview"
                   data-team="${esc(team.id)}"
                   type="button"
-                  title="Modifica squadra"
-                  aria-label="Modifica ${esc(team.name)}"
+                  title="Gestisci alias e Presidente"
+                  aria-label="Gestisci alias e Presidente di ${esc(team.name)}"
+                >⚙</button>
+              ` : ''}
+
+              ${canRename ? `
+                <button
+                  class="secondary team-icon-btn rename-team"
+                  data-team="${esc(team.id)}"
+                  data-name="${esc(team.name)}"
+                  type="button"
+                  title="Rinomina squadra"
+                  aria-label="Rinomina ${esc(team.name)}"
                 >✎</button>
               ` : ''}
 
@@ -14590,20 +13831,33 @@
         `;
       }).join('') || '<div class="small soft">Nessuna squadra.</div>';
 
-      $('manage-teams').querySelectorAll('.assign-president').forEach(button => {
-        button.addEventListener('click', async () => {
-          const select = $('manage-teams').querySelector(`.president-select[data-team="${CSS.escape(button.dataset.team)}"]`);
-          if (!select?.value) return msg('Seleziona un membro.', 'error');
-          try {
-            await api(ENDPOINTS.league, { action: 'assignPresident', teamId: button.dataset.team, targetUserId: select.value });
-            msg('Presidente assegnato.', 'success');
-            await Promise.all([loadManagement(), loadDashboard()]);
-          } catch (error) { msg(error.message, 'error'); }
-        });
+      $('manage-teams').querySelectorAll('.manage-team-overview').forEach(button => {
+        button.addEventListener('click', () => openManageTeamModal(button.dataset.team));
       });
 
-      $('manage-teams').querySelectorAll('.edit-team-overview').forEach(button => {
-        button.addEventListener('click', () => openManageTeamModal(button.dataset.team));
+      $('manage-teams').querySelectorAll('.rename-team').forEach(button => {
+        button.addEventListener('click', async () => {
+          const currentName = button.dataset.name || '';
+          const raw = prompt('Nuovo nome squadra', currentName);
+          if (raw === null) return;
+          const teamName = raw.trim().toLocaleUpperCase('it-IT');
+          if (teamName.length < 2 || teamName.length > 60) {
+            return msg('Il nome della squadra deve avere tra 2 e 60 caratteri.', 'error');
+          }
+          if (teamName === currentName) return;
+
+          try {
+            await api(ENDPOINTS.league, {
+              action: 'renameTeam',
+              teamId: button.dataset.team,
+              teamName
+            });
+            msg('Squadra rinominata.', 'success');
+            await Promise.all([loadManagement(), loadDashboard()]);
+          } catch (error) {
+            msg(error.message, 'error');
+          }
+        });
       });
 
       $('manage-teams').querySelectorAll('.delete-team').forEach(button => {
@@ -27789,15 +27043,15 @@
 
     setInterval(()=>{
       if(document.hidden||refreshBusy)return;
-      if(['leagues','home','rosters'].includes(state.view))loadCurrentView(false);
+      if(['leagues','home','manage','rosters'].includes(state.view))loadCurrentView(false);
     },5000);
 
     /* Il Listone non viene più ricaricato automaticamente:
        filtri, ricerca e posizione di scroll restano stabili.
        Resta disponibile il pulsante Aggiorna globale. */
 
-    document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state.view!=='manage')loadCurrentView(true)});
-    window.addEventListener('focus',()=>{if(state.view!=='manage')loadCurrentView(true)});
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadCurrentView(true)});
+    window.addEventListener('focus',()=>loadCurrentView(true));
 
     let auctionMobileModeLast =
       window.matchMedia(
