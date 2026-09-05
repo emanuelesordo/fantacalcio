@@ -12089,6 +12089,235 @@
       }
     }
 
+
+
+    /* =====================================================
+       GLASS V6S · Listone asta compatto + FM attesa + prezzi interi
+       ===================================================== */
+
+    /* La tabella deve rimanere interamente leggibile anche quando la
+       Console Banditore sottrae larghezza al pannello Svincolati. */
+    body.modern-glass #view-auction .auction-free-fixed .player-table{
+      width:100%!important;
+      min-width:0!important;
+      max-width:100%!important;
+      table-layout:fixed!important;
+      border-spacing:0!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed .player-table th,
+    body.modern-glass #view-auction .auction-free-fixed .player-table td{
+      min-width:0!important;
+      padding:3px 2px!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed .player-table th{
+      font-size:5.8px!important;
+      letter-spacing:.025em!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed [data-auction-sort]{
+      min-width:0!important;
+      gap:1px!important;
+      padding:0!important;
+      font-size:5.8px!important;
+      white-space:nowrap!important;
+    }
+
+    /* Ruolo compatto: spazio sufficiente fino a tre badge senza sottrarre
+       troppo spazio al nome del calciatore. */
+    body.modern-glass #view-auction .auction-free-fixed
+      .player-table .auction-player-col-role{
+      width:54px!important;
+      min-width:54px!important;
+      max-width:54px!important;
+      padding-inline:1px!important;
+      white-space:nowrap!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed
+      .auction-player-col-role .rolebadge{
+      min-width:16px!important;
+      width:auto!important;
+      padding-inline:2px!important;
+      margin-right:1px!important;
+      font-size:5.4px!important;
+    }
+
+    /* Il nome prende tutto lo spazio elastico residuo. */
+    body.modern-glass #view-auction .auction-free-fixed
+      .player-table .auction-player-col-name{
+      width:auto!important;
+      min-width:0!important;
+      max-width:none!important;
+      padding-inline:3px!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed
+      .auction-player-col-name .player-name{
+      font-size:7.6px!important;
+      line-height:1.05!important;
+      font-weight:900!important;
+      letter-spacing:.01em!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed
+      .auction-player-team-small{
+      margin-top:1px!important;
+      font-size:5.1px!important;
+      line-height:1!important;
+    }
+
+    /* Colonne dati: larghezze fisse e molto compatte. */
+    body.modern-glass #view-auction .auction-free-fixed
+      .player-table .auction-player-col-signals{
+      width:32px!important;
+      min-width:32px!important;
+      max-width:32px!important;
+      padding-inline:1px!important;
+      text-align:center!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed
+      .player-table .auction-player-col-pfc,
+    body.modern-glass #view-auction .auction-free-fixed
+      .player-table .auction-player-col-fm,
+    body.modern-glass #view-auction .auction-free-fixed
+      .player-table .auction-player-col-pma{
+      width:34px!important;
+      min-width:34px!important;
+      max-width:34px!important;
+      padding-inline:1px!important;
+      text-align:right!important;
+      font-variant-numeric:tabular-nums!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed
+      .player-table .auction-player-col-fm{
+      width:36px!important;
+      min-width:36px!important;
+      max-width:36px!important;
+      color:#b9d7f2!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed
+      .player-table .auction-player-col-supreme{
+      width:35px!important;
+      min-width:35px!important;
+      max-width:35px!important;
+      padding-inline:1px!important;
+      text-align:center!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed
+      .player-table .auction-player-col-action{
+      width:42px!important;
+      min-width:42px!important;
+      max-width:42px!important;
+      padding-inline:1px!important;
+      text-align:center!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed
+      .auction-player-col-action .auction-queue-add{
+      width:100%!important;
+      min-width:0!important;
+      padding-inline:2px!important;
+      font-size:5.5px!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed
+      .auction-signal-list{
+      gap:1px!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed
+      .auction-signal-badge{
+      width:13px!important;
+      height:13px!important;
+      font-size:7px!important;
+    }
+
+    /* Quando il pannello scende sotto ~470px (tipicamente Console Banditore
+       aperta), comprimiamo ancora di poco senza nascondere colonne. */
+    @container free-agents (max-width:470px){
+      body.modern-glass #view-auction .auction-free-fixed .player-table th,
+      body.modern-glass #view-auction .auction-free-fixed .player-table td{
+        padding:2px 1px!important;
+        font-size:6.2px!important;
+      }
+
+      body.modern-glass #view-auction .auction-free-fixed [data-auction-sort]{
+        font-size:5.2px!important;
+      }
+
+      body.modern-glass #view-auction .auction-free-fixed
+        .player-table .auction-player-col-role{
+        width:48px!important;
+        min-width:48px!important;
+        max-width:48px!important;
+      }
+
+      body.modern-glass #view-auction .auction-free-fixed
+        .auction-player-col-role .rolebadge{
+        min-width:14px!important;
+        height:13px!important;
+        min-height:13px!important;
+        line-height:13px!important;
+        padding-inline:1px!important;
+        font-size:5px!important;
+      }
+
+      body.modern-glass #view-auction .auction-free-fixed
+        .auction-player-col-name .player-name{
+        font-size:6.8px!important;
+      }
+
+      body.modern-glass #view-auction .auction-free-fixed
+        .auction-player-team-small{
+        font-size:4.7px!important;
+      }
+
+      body.modern-glass #view-auction .auction-free-fixed
+        .player-table .auction-player-col-signals{
+        width:28px!important;
+        min-width:28px!important;
+        max-width:28px!important;
+      }
+
+      body.modern-glass #view-auction .auction-free-fixed
+        .player-table .auction-player-col-pfc,
+      body.modern-glass #view-auction .auction-free-fixed
+        .player-table .auction-player-col-pma{
+        width:30px!important;
+        min-width:30px!important;
+        max-width:30px!important;
+      }
+
+      body.modern-glass #view-auction .auction-free-fixed
+        .player-table .auction-player-col-fm{
+        width:32px!important;
+        min-width:32px!important;
+        max-width:32px!important;
+      }
+
+      body.modern-glass #view-auction .auction-free-fixed
+        .player-table .auction-player-col-supreme{
+        width:31px!important;
+        min-width:31px!important;
+        max-width:31px!important;
+      }
+
+      body.modern-glass #view-auction .auction-free-fixed
+        .player-table .auction-player-col-action{
+        width:37px!important;
+        min-width:37px!important;
+        max-width:37px!important;
+      }
+    }
+
 </style>
 </head>
 <body class="modern-glass">
@@ -14445,6 +14674,14 @@
       const n = Number(value);
       if (!Number.isFinite(n)) return esc(value);
       return Number.isInteger(n) ? String(n) : n.toFixed(2).replace(/\.?0+$/, '');
+    }
+
+
+    function formatAuctionPrice(value) {
+      if (value === null || value === undefined || value === '') return '—';
+      const n = Number(value);
+      if (!Number.isFinite(n)) return esc(value);
+      return String(Math.round(n));
     }
 
     async function loadList() {
@@ -18636,13 +18873,19 @@
                   </th>
 
                   <th class="num-head auction-player-col-pfc">
-                    <button data-auction-sort="pfc">
+                    <button data-auction-sort="pfc" title="Prezzo Fantaculo consigliato">
                       PFC <span>↕</span>
                     </button>
                   </th>
 
+                  <th class="num-head auction-player-col-fm">
+                    <button data-auction-sort="fm" title="Fanta media attesa importata dal listone">
+                      FM <span>↕</span>
+                    </button>
+                  </th>
+
                   <th class="num-head auction-player-col-pma">
-                    <button data-auction-sort="pma">
+                    <button data-auction-sort="pma" title="Prezzo medio asta">
                       PMA <span>↕</span>
                     </button>
                   </th>
@@ -25282,12 +25525,19 @@
 
           <td class="num auction-player-col-pfc">
             <strong>
-              ${formatNumber(player.pfc)}
+              ${formatAuctionPrice(player.pfc)}
             </strong>
           </td>
 
+          <td
+            class="num auction-player-col-fm"
+            title="Fanta media attesa"
+          >
+            ${formatNumber(player.expected_fantasy_avg)}
+          </td>
+
           <td class="num auction-player-col-pma">
-            ${formatNumber(player.pma)}
+            ${formatAuctionPrice(player.pma)}
           </td>
 
           ${
