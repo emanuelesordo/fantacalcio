@@ -22,15 +22,18 @@ jobs:
           from pathlib import Path
           for name in ['home.html','league-setup.html']:
               p=Path(name)
-              if not p.exists(): continue
+              if not p.exists():
+                  continue
               s=p.read_text(encoding='utf-8')
-              s=s.replace('<option value="quotation">Quotazione Fantacalcio.it</option>','')
-              s=s.replace('<option value="quotation">Quotazione</option>','')
-              s=s.replace("<option value='quotation'>Quotazione Fantacalcio.it</option>",'')
-              s=s.replace("<option value='quotation'>Quotazione</option>",'')
+              for old in [
+                  '<option value="quotation">Quotazione Fantacalcio.it</option>',
+                  '<option value="quotation">Quotazione</option>',
+                  "<option value='quotation'>Quotazione Fantacalcio.it</option>",
+                  "<option value='quotation'>Quotazione</option>"
+              ]:
+                  s=s.replace(old,'')
               p.write_text(s,encoding='utf-8')
           PY
-          git diff --check
       - name: Commit
         run: |
           rm -f .github/workflows/remove-quotation-ui.yml
