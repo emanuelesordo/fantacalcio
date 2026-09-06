@@ -13147,59 +13147,6 @@
       line-height:1!important;
     }
 
-    /* Colonne: trascinabili e ridimensionabili. */
-    body.modern-glass #view-auction .auction-free-fixed .player-table thead th{
-      position:sticky!important;
-      top:0!important;
-      overflow:visible!important;
-      user-select:none!important;
-    }
-
-    body.modern-glass #view-auction .auction-free-fixed .auction-column-draggable{
-      cursor:grab!important;
-    }
-
-    body.modern-glass #view-auction .auction-free-fixed .auction-column-draggable:active,
-    body.modern-glass #view-auction .auction-free-fixed .auction-column-draggable.is-column-dragging{
-      cursor:grabbing!important;
-      opacity:.62!important;
-    }
-
-    body.modern-glass #view-auction .auction-free-fixed .is-column-drop-target{
-      box-shadow:inset 2px 0 0 #59a7ff!important;
-    }
-
-    body.modern-glass #view-auction .auction-free-fixed .auction-column-resize-handle{
-      position:absolute!important;
-      z-index:8!important;
-      top:3px!important;
-      right:-2px!important;
-      bottom:3px!important;
-      width:5px!important;
-      cursor:col-resize!important;
-      touch-action:none!important;
-    }
-
-    body.modern-glass #view-auction .auction-free-fixed .auction-column-resize-handle::after{
-      content:"";
-      position:absolute;
-      top:1px;
-      bottom:1px;
-      left:2px;
-      width:1px;
-      background:rgba(125,177,225,.22);
-    }
-
-    body.modern-glass #view-auction .auction-free-fixed .auction-column-resize-handle:hover::after{
-      background:#59a7ff;
-    }
-
-    /* Nessuna nth-child deve interferire con il riordino libero. */
-    body.modern-glass #view-auction .auction-free-fixed .player-table th,
-    body.modern-glass #view-auction .auction-free-fixed .player-table td{
-      box-sizing:border-box!important;
-    }
-
     /* Header delle card Rose = Alias | RIM fase | Crediti, stesso linguaggio RIM. */
     body.modern-glass #view-auction .auction-roster-team-head{
       min-height:27px!important;
@@ -13250,6 +13197,161 @@
       min-height:20px!important;
       padding:0!important;
       font-size:8px!important;
+    }
+
+
+
+    /* =====================================================
+       V6X · header/rose/log + colonne fisse
+       ===================================================== */
+
+    /* V6W column editor removed: fixed application layout only. */
+    body.modern-glass #view-auction .auction-free-fixed .auction-column-draggable{
+      cursor:default!important;
+      opacity:1!important;
+    }
+    body.modern-glass #view-auction .auction-free-fixed .auction-column-resize-handle{
+      display:none!important;
+    }
+    body.modern-glass #view-auction .auction-free-fixed .is-column-drop-target{
+      box-shadow:none!important;
+    }
+
+    /* President live KPIs: credits and max offer are the first visual anchors. */
+    body.modern-glass #view-auction .auction-status-team-kpis .auction-status-kpi-credit,
+    body.modern-glass #view-auction .auction-status-team-kpis .auction-status-kpi-max{
+      border-color:rgba(83,170,255,.48)!important;
+      background:linear-gradient(180deg,rgba(21,68,109,.88),rgba(10,42,71,.88))!important;
+      padding-inline:7px!important;
+    }
+    body.modern-glass #view-auction .auction-status-team-kpis .auction-status-kpi-credit b{
+      color:#75e9b5!important;
+      font-size:10px!important;
+      font-weight:1000!important;
+    }
+    body.modern-glass #view-auction .auction-status-team-kpis .auction-status-kpi-max b{
+      color:#79bcff!important;
+      font-size:10px!important;
+      font-weight:1000!important;
+    }
+
+    /* Personal roster header: team left, optional queue projection, toggle right. */
+    body.modern-glass #view-auction .auction-team-column-roster-only .auction-team-roster-head{
+      display:flex!important;
+      align-items:center!important;
+      justify-content:space-between!important;
+      gap:5px!important;
+    }
+    body.modern-glass #view-auction .auction-team-column-roster-only .auction-team-roster-head>strong{
+      min-width:0!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+      white-space:nowrap!important;
+      font-size:8px!important;
+    }
+    body.modern-glass #view-auction .auction-roster-projected-summary{
+      color:#a9c6df!important;
+      font-size:8px!important;
+      font-weight:950!important;
+      font-variant-numeric:tabular-nums!important;
+    }
+
+    /* All rosters: alias on the left; RIM | credits | pencil packed right. */
+    body.modern-glass #view-auction .auction-roster-team-head{
+      display:flex!important;
+      align-items:center!important;
+      justify-content:space-between!important;
+      gap:5px!important;
+    }
+    body.modern-glass #view-auction .auction-roster-card-alias{
+      min-width:0!important;
+      flex:1 1 auto!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+      white-space:nowrap!important;
+      text-align:left!important;
+      font-size:8px!important;
+      font-weight:950!important;
+    }
+    body.modern-glass #view-auction .auction-roster-card-meta{
+      flex:0 0 auto!important;
+      display:flex!important;
+      align-items:center!important;
+      justify-content:flex-end!important;
+      gap:4px!important;
+      margin-left:auto!important;
+      font-size:8px!important;
+      font-variant-numeric:tabular-nums!important;
+      white-space:nowrap!important;
+    }
+    body.modern-glass #view-auction .auction-roster-card-meta i{
+      color:#6d879f!important;
+      font-style:normal!important;
+    }
+    body.modern-glass #view-auction .auction-roster-card-rim-value{
+      color:#b8cde0!important;
+      font-weight:900!important;
+    }
+    body.modern-glass #view-auction .auction-roster-card-credit-value{
+      color:#68e0aa!important;
+      font-size:9px!important;
+      font-weight:1000!important;
+    }
+
+    /* Logs: same compact rhythm as Rosa rows. Main message bold + detail inline. */
+    body.modern-glass #view-auction .auction-award-row,
+    body.modern-glass #view-auction .auction-award-operation-row,
+    body.modern-glass #view-auction .auction-credit-log-row{
+      min-height:29px!important;
+      height:auto!important;
+      padding:4px 5px!important;
+      border-radius:5px!important;
+      font-size:8px!important;
+      line-height:1!important;
+    }
+    body.modern-glass #view-auction .auction-award-player,
+    body.modern-glass #view-auction .auction-award-team,
+    body.modern-glass #view-auction .auction-award-price,
+    body.modern-glass #view-auction .auction-award-operation-row .auction-activity-text,
+    body.modern-glass #view-auction .auction-credit-log-message{
+      font-size:8px!important;
+      line-height:1!important;
+    }
+    body.modern-glass #view-auction .auction-award-operation-row .auction-activity-text,
+    body.modern-glass #view-auction .auction-credit-log-row>.auction-credit-log-message{
+      min-width:0!important;
+      display:flex!important;
+      align-items:center!important;
+      gap:5px!important;
+      overflow:hidden!important;
+      white-space:nowrap!important;
+    }
+    body.modern-glass #view-auction .auction-award-operation-row .auction-activity-text strong,
+    body.modern-glass #view-auction .auction-credit-log-row>.auction-credit-log-message strong{
+      flex:0 1 auto!important;
+      min-width:0!important;
+      font-size:8px!important;
+      font-weight:1000!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+      white-space:nowrap!important;
+    }
+    body.modern-glass #view-auction .auction-award-operation-row .auction-activity-text small,
+    body.modern-glass #view-auction .auction-credit-log-row>.auction-credit-log-message small{
+      flex:1 1 auto!important;
+      min-width:0!important;
+      margin:0!important;
+      color:#829db4!important;
+      font-size:7px!important;
+      font-weight:500!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+      white-space:nowrap!important;
+    }
+    /* Preserve special monospace language for admin/controller operations. */
+    body.modern-glass #view-auction .auction-award-operation-row.is-admin-operation,
+    body.modern-glass #view-auction .auction-credit-log-row.is-admin-operation{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace!important;
     }
 
 </style>
@@ -13705,6 +13807,7 @@
       <div class="modern-command-foot">Solo navigazione locale: nessuna scrittura sul database.</div>
     </div>
   </dialog>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     'use strict';
 
@@ -13713,6 +13816,30 @@
        ===================================================== */
 
     const SUPABASE_URL = 'https://yyklmhzjxzkvycmxkegx.supabase.co';
+
+    const SUPABASE_PUBLISHABLE_KEY =
+      'sb_publishable_8ZvSuQ5IJl454DLLSgbc1g_FCZxHZow';
+
+    const auctionRealtimeClient =
+      window.supabase?.createClient
+        ? window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_PUBLISHABLE_KEY,
+            {
+              auth: {
+                persistSession: false,
+                autoRefreshToken: false
+              }
+            }
+          )
+        : null;
+
+    let auctionRealtimeChannel = null;
+    let auctionRealtimeTopic = '';
+    let auctionRealtimeSubscribed = false;
+    let auctionReconcileTimer = null;
+    let auctionBidDeadlineSyncKey = '';
+    let auctionNominationDeadlineSyncKey = '';
 
     const AUTH_URL =
       `${SUPABASE_URL}/functions/v1/simple-auth`;
@@ -13809,6 +13936,8 @@
       auctionTimerTransitionPending: false,
 
       lastAuctionFetchAt: 0,
+      lastAuctionReconcileAt: 0,
+      auctionRealtimeVersion: 0,
       serverOffsetMs: 0,
       serverOffsetReady: false
     };
@@ -14244,6 +14373,10 @@
 
       state.view =
         route;
+
+      if (!['auction', 'tv'].includes(route)) {
+        disconnectAuctionRealtime();
+      }
 
       document
         .querySelectorAll('.view')
@@ -15939,7 +16072,7 @@
           }
         );
 
-        await loadAuction({ quiet: true });
+        scheduleAuctionReconcile(350);
       } catch (error) {
         msg(error.message, 'error');
       }
@@ -17028,12 +17161,34 @@
           ? 'Vice'
           : 'Presidente';
 
-      const maxBid =
+      const liveSession =
+        state.auction?.auctionSession
+        || {};
+
+      const ownLiveBid =
+        liveSession.current_bidder_team_id === info.teamId
+          ? Math.max(0, Number(liveSession.current_bid || 0))
+          : 0;
+
+      const liveRemainingCredits =
+        Math.max(0, Number(info.remaining || 0) - ownLiveBid);
+
+      const numericMaxBid =
         info.maxBid === null
-        ||
-        info.maxBid === undefined
+        || info.maxBid === undefined
+          ? null
+          : Number(info.maxBid);
+
+      const liveMaxBid =
+        numericMaxBid === null
+        || !Number.isFinite(numericMaxBid)
+          ? null
+          : Math.max(0, numericMaxBid - ownLiveBid);
+
+      const maxBid =
+        liveMaxBid === null
           ? '—'
-          : info.maxBid;
+          : liveMaxBid;
 
       const rolesHtml =
         info.roleBadges
@@ -17067,6 +17222,44 @@
         state.auctionShowQueueInRoster
           ? allQueueEntries
           : [];
+
+      const projectedQueueSpend =
+        state.auctionShowQueueInRoster
+          ? queueEntries.reduce(
+              (sum, entry) => sum + Number(entry.price || 0),
+              0
+            )
+          : 0;
+
+      const projectedRosterCountForHeader =
+        info.assignments.length
+        + (state.auctionShowQueueInRoster ? queueEntries.length : 0);
+
+      const projectedMinRemainingForHeader =
+        Math.max(
+          0,
+          Number(info.rosterMin || 0)
+          - projectedRosterCountForHeader
+        );
+
+      const projectedMaxRemainingForHeader =
+        Math.max(
+          0,
+          Number(info.rosterMax || info.rosterLimit || 0)
+          - projectedRosterCountForHeader
+        );
+
+      const projectedRimForHeader =
+        projectedMinRemainingForHeader > 0
+          ? projectedMinRemainingForHeader
+          : projectedMaxRemainingForHeader;
+
+      const projectedCreditsForHeader =
+        Math.max(
+          0,
+          liveRemainingCredits
+          - projectedQueueSpend
+        );
 
       const queuePrivate =
         state.auction?.callQueueSettings?.private === true;
@@ -17323,7 +17516,7 @@
 
               <div class="auction-team-big-kpi">
                 <span>Crediti disponibili</span>
-                <strong>${info.remaining}</strong>
+                <strong>${liveRemainingCredits}</strong>
               </div>
 
               <div class="auction-team-big-kpi">
@@ -17374,8 +17567,8 @@
       const teamStatusKpisHtml = `
         <div class="auction-status-team-kpis" aria-label="Riepilogo squadra">
           <strong>${esc(info.teamName)}</strong>
-          <span><small>Crediti</small><b>${info.remaining}</b></span>
-          <span><small>Max</small><b>${maxBid}</b></span>
+          <span class="auction-status-kpi-credit"><small>Crediti</small><b id="auction-live-my-credits">${liveRemainingCredits}</b></span>
+          <span class="auction-status-kpi-max"><small>Max</small><b id="auction-live-my-max">${maxBid}</b></span>
           <span><small>Min rim.</small><b>${minimumRemaining}</b></span>
           <span><small>Max rim.</small><b>${maximumRemaining}</b></span>
           <span><small>Media</small><b>${formatNumber(averagePurchase)}</b></span>
@@ -17389,11 +17582,15 @@
           <section class="auction-team-roster">
 
             <div class="auction-team-roster-head">
-              <strong>Rosa · ${esc(info.teamName)}</strong>
+              <strong>${esc(info.teamName)}</strong>
 
               <div class="auction-roster-head-actions">
-                <span class="auction-roster-remaining">
-                  MIN ${minimumRemaining} · MAX ${maximumRemaining}
+                <span class="auction-roster-remaining auction-roster-projected-summary">
+                  ${
+                    state.auctionShowQueueInRoster
+                      ? `| ${projectedRimForHeader} | ${projectedCreditsForHeader}`
+                      : ''
+                  }
                 </span>
 
                 <label
@@ -18887,9 +19084,9 @@
               );
             }
 
-            await loadAuction({
-              quiet: true
-            });
+            if (!auctionRealtimeSubscribed) {
+              scheduleAuctionReconcile(5000);
+            }
           }
 
         } catch (error) {
@@ -19111,7 +19308,9 @@
                   private: next
                 }
               );
-              await loadAuction({ quiet: true });
+                    if (!auctionRealtimeSubscribed) {
+                scheduleAuctionReconcile(5000);
+              }
             } catch (error) {
               state.auction.callQueueSettings = {
                 ...(state.auction.callQueueSettings || {}),
@@ -19143,7 +19342,7 @@
                     queueId
                   }
                 );
-                await loadAuction();
+                scheduleAuctionReconcile(80);
               } catch (error) {
                 msg(error.message, 'error');
               }
@@ -19945,7 +20144,7 @@
           'MANUAL_AWARD'
         ]);
 
-      const operationText = event => {
+      const operationParts = event => {
         const payload = event.payload || {};
         const teamName = auctionTeamReference(event.team, event.team?.name || 'SQUADRA');
         const playerName = event.player?.name || 'GIOCATORE';
@@ -19955,27 +20154,33 @@
           const before = Number(payload.before_remaining ?? payload.previous_remaining ?? payload.old_remaining ?? 0);
           const after = Number(payload.after_remaining ?? payload.new_remaining ?? payload.remaining ?? 0);
           const delta = Number(payload.delta ?? (after - before));
-          return `${teamName} · CREDITI ${before} → ${after} (${delta >= 0 ? '+' : ''}${delta})${reason ? ` · ${reason}` : ''}`;
+          return {
+            main: `${teamName} · CREDITI`,
+            detail: `${before} → ${after} (${delta >= 0 ? '+' : ''}${delta})${reason ? ` · ${reason}` : ''}`
+          };
         }
 
         if (event.event_type === 'NOMINATION_TIMEOUT') {
           const applied = Number(payload.applied_penalty || 0);
-          return `PENALITÀ CHIAMATA · ${teamName} · -${applied} CR`;
+          return { main: 'PENALITÀ CHIAMATA', detail: `${teamName} · -${applied} CR` };
         }
 
         if (event.event_type === 'ROSTER_PRICE_EDITED') {
-          return `PREZZO · ${playerName} · ${Number(payload.old_price || 0)} → ${Number(payload.new_price || 0)} CR`;
+          return { main: `PREZZO · ${playerName}`, detail: `${Number(payload.old_price || 0)} → ${Number(payload.new_price || 0)} CR` };
         }
 
         if (event.event_type === 'ROSTER_PLAYER_REMOVED') {
-          return `RIMOSSO · ${playerName} · ${teamName}`;
+          return { main: `RIMOSSO · ${playerName}`, detail: teamName };
         }
 
         if (['ROSTER_TEAM_TRANSFERRED','ROSTER_PLAYER_TRANSFERRED'].includes(event.event_type)) {
-          return `CAMBIO SQUADRA · ${playerName} · ${auctionTeamReference(event.fromTeam, event.fromTeam?.name || '—')} → ${auctionTeamReference(event.toTeam, event.toTeam?.name || teamName)}`;
+          return {
+            main: `CAMBIO SQUADRA · ${playerName}`,
+            detail: `${auctionTeamReference(event.fromTeam, event.fromTeam?.name || '—')} → ${auctionTeamReference(event.toTeam, event.toTeam?.name || teamName)}`
+          };
         }
 
-        return `${event.event_type} · ${teamName}`;
+        return { main: event.event_type, detail: teamName };
       };
 
       const items =
@@ -20048,11 +20253,14 @@
               }
 
               return `
-                <div class="auction-award-operation-row ${isCredit ? 'is-credit' : ''} ${undone ? 'is-undone' : ''}">
+                <div class="auction-award-operation-row is-admin-operation ${isCredit ? 'is-credit' : ''} ${undone ? 'is-undone' : ''}">
                   <span class="auction-activity-text">
-                    ${esc(operationText(event))}
-                    ${event.actorUsername ? `<small> · ${esc(event.actorUsername)}</small>` : ''}
-                    ${undone ? '<small> · ANNULLATA</small>' : ''}
+                    <strong>${esc(operationParts(event).main)}</strong>
+                    <small>${esc([
+                      operationParts(event).detail,
+                      event.actorUsername,
+                      undone ? 'ANNULLATA' : ''
+                    ].filter(Boolean).join(' · '))}</small>
                   </span>
 
                   ${
@@ -21175,29 +21383,28 @@
                 class="auction-roster-team-head"
                 title="${esc(teamReference)} · ${phaseRemaining} rimasti (${esc(phaseLabel)}) · ${remaining} crediti · Presidente ${esc(presidentUsername)}"
               >
-                <div class="auction-roster-card-rim">
-                  <strong>${esc(teamReference)}</strong>
-                  <i>|</i>
-                  <b>${phaseRemaining}</b>
-                  <i>|</i>
-                  <b>${remaining}</b>
-                </div>
+                <strong class="auction-roster-card-alias">${esc(teamReference)}</strong>
 
-                ${
-                  canEdit
-                    ? `
-                        <button
-                          type="button"
-                          class="auction-roster-credit-edit"
-                          data-edit-roster-credits="${esc(team.id)}"
-                          data-team-name="${esc(team.name)}"
-                          data-current-credits="${remaining}"
-                          title="Modifica crediti residui e apri log"
-                          aria-label="Modifica crediti residui di ${esc(team.name)}"
-                        >✎</button>
-                      `
-                    : ''
-                }
+                <div class="auction-roster-card-meta">
+                  <span class="auction-roster-card-rim-value">${phaseRemaining}</span>
+                  <i>|</i>
+                  <strong class="auction-roster-card-credit-value">${remaining}</strong>
+                  ${
+                    canEdit
+                      ? `
+                          <button
+                            type="button"
+                            class="auction-roster-credit-edit"
+                            data-edit-roster-credits="${esc(team.id)}"
+                            data-team-name="${esc(team.name)}"
+                            data-current-credits="${remaining}"
+                            title="Modifica crediti residui e apri log"
+                            aria-label="Modifica crediti residui di ${esc(team.name)}"
+                          >✎</button>
+                        `
+                      : ''
+                  }
+                </div>
               </div>
 
 
@@ -21520,9 +21727,11 @@
                                 minute: '2-digit'
                               })
                             : '';
+                          const adminOperation =
+                            !['PLAYER_AWARDED', 'MANUAL_AWARD'].includes(entry.event_type);
                           return `
-                            <div class="auction-credit-log-row ${entry.undone_at ? 'is-undone' : ''}">
-                              <div>
+                            <div class="auction-credit-log-row ${adminOperation ? 'is-admin-operation' : ''} ${entry.undone_at ? 'is-undone' : ''}">
+                              <div class="auction-credit-log-message">
                                 <strong>${esc(auctionCreditLogLabel(entry))}</strong>
                                 <small>${esc([entry.actorUsername, when].filter(Boolean).join(' · '))}</small>
                               </div>
@@ -21625,9 +21834,8 @@
 
             state.auctionCreditLogTeamId = null;
             state.auctionCreditLogEntries = [];
-            await loadAuctionPersonalRoster(true);
-            await loadAuction();
             msg('Crediti aggiornati.', 'success');
+            scheduleAuctionReconcile(80);
           } catch (error) {
             msg(error.message, 'error');
           }
@@ -22014,7 +22222,7 @@
           try {
             /* NO lascia il lotto aperto e congela la ripartenza automatica
                della chiamata successiva dopo l'eventuale aggiudicazione manuale. */
-            await api(
+            const response = await api(
               ENDPOINTS.auction,
               {
                 action: 'setAuctionPause',
@@ -22023,7 +22231,10 @@
               }
             );
 
-            await loadAuction();
+            if (response?.state) {
+              applyAuctionHotState(response.state, { fromMutation: true });
+            }
+            scheduleAuctionReconcile(500);
           } catch (error) {
             msg(error.message, 'error');
           } finally {
@@ -22918,6 +23129,434 @@
     }
 
 
+    /* =====================================================
+       V6X · REALTIME EVENT BUS / RECONCILIATION
+       ===================================================== */
+
+    function disconnectAuctionRealtime() {
+      if (auctionReconcileTimer) {
+        clearTimeout(auctionReconcileTimer);
+        auctionReconcileTimer = null;
+      }
+
+      if (
+        auctionRealtimeClient
+        && auctionRealtimeChannel
+      ) {
+        try {
+          auctionRealtimeClient.removeChannel(
+            auctionRealtimeChannel
+          );
+        } catch {}
+      }
+
+      auctionRealtimeChannel = null;
+      auctionRealtimeTopic = '';
+      auctionRealtimeSubscribed = false;
+    }
+
+
+    function scheduleAuctionReconcile(delay = 80) {
+      if (
+        !state.session?.token
+        || !['auction', 'tv'].includes(state.view)
+      ) {
+        return;
+      }
+
+      if (auctionReconcileTimer) {
+        clearTimeout(auctionReconcileTimer);
+      }
+
+      auctionReconcileTimer = setTimeout(async () => {
+        auctionReconcileTimer = null;
+
+        if (
+          refreshBusy
+          || document.hidden
+          || !['auction', 'tv'].includes(state.view)
+        ) {
+          scheduleAuctionReconcile(500);
+          return;
+        }
+
+        refreshBusy = true;
+
+        try {
+          await loadAuction({
+            quiet: true,
+            onlyIfChanged: true
+          });
+
+          state.lastAuctionReconcileAt = Date.now();
+        } catch (error) {
+          console.error('AUCTION RECONCILE:', error);
+        } finally {
+          refreshBusy = false;
+        }
+      }, Math.max(0, Number(delay || 0)));
+    }
+
+
+    function patchAuctionMyTeamLiveKpis() {
+      const info =
+        auctionMyTeamDashboardData();
+
+      if (!info) {
+        return;
+      }
+
+      const s =
+        state.auction?.auctionSession
+        || {};
+
+      const ownBid =
+        s.current_bidder_team_id === info.teamId
+          ? Math.max(0, Number(s.current_bid || 0))
+          : 0;
+
+      const credits =
+        Math.max(0, Number(info.remaining || 0) - ownBid);
+
+      const baseMax =
+        info.maxBid === null
+        || info.maxBid === undefined
+          ? null
+          : Number(info.maxBid);
+
+      const max =
+        baseMax === null
+        || !Number.isFinite(baseMax)
+          ? null
+          : Math.max(0, baseMax - ownBid);
+
+      const creditNode =
+        $('auction-live-my-credits');
+
+      if (creditNode) {
+        creditNode.textContent = String(credits);
+      }
+
+      const maxNode =
+        $('auction-live-my-max');
+
+      if (maxNode) {
+        maxNode.textContent =
+          max === null ? '—' : String(max);
+      }
+
+      const ownSummary =
+        document.querySelector(
+          `[data-team-summary-id="${CSS.escape(info.teamId)}"]`
+        );
+
+      const summaryMax =
+        ownSummary?.querySelector(
+          '.auction-team-summary-max'
+        );
+
+      if (summaryMax) {
+        summaryMax.textContent =
+          max === null ? '—' : String(max);
+      }
+    }
+
+
+    function applyAuctionHotState(
+      nextState,
+      { fromMutation = false } = {}
+    ) {
+      const d = state.auction;
+      const current = d?.auctionSession;
+
+      if (
+        !d
+        || !current
+        || !nextState
+        || (
+          nextState.id
+          && nextState.id !== current.id
+        )
+        || (
+          nextState.session_id
+          && nextState.session_id !== current.id
+        )
+      ) {
+        return;
+      }
+
+      const previous = { ...current };
+      const nextVersion =
+        Number(nextState.version || current.version || 0);
+      const previousVersion =
+        Number(current.version || 0);
+
+      const normalized = { ...nextState };
+      delete normalized.session_id;
+      delete normalized.updated_at;
+
+      Object.assign(current, normalized);
+
+      if (nextState.current_bidder_team_id !== undefined) {
+        d.currentBidderTeam =
+          (d.teams || []).find(
+            team => team.id === current.current_bidder_team_id
+          ) || null;
+      }
+
+      if (nextState.current_turn_team_id !== undefined) {
+        d.currentTurnTeam =
+          (d.teams || []).find(
+            team => team.id === current.current_turn_team_id
+          ) || null;
+      }
+
+      if (nextState.current_nomination_team_id !== undefined) {
+        d.currentNominationTeam =
+          (d.teams || []).find(
+            team => team.id === current.current_nomination_team_id
+          ) || null;
+      }
+
+      state.auctionRealtimeVersion =
+        Math.max(
+          Number(state.auctionRealtimeVersion || 0),
+          nextVersion
+        );
+
+      const playerChanged =
+        previous.current_player_id
+        !== current.current_player_id;
+
+      const nominationChanged =
+        previous.current_nomination_team_id
+        !== current.current_nomination_team_id;
+
+      const phaseChanged =
+        previous.role_phase_index
+        !== current.role_phase_index
+        || previous.role_phase_status
+          !== current.role_phase_status;
+
+      const statusChanged =
+        previous.status !== current.status;
+
+      const pauseChanged =
+        previous.pause_after_award
+        !== current.pause_after_award;
+
+      const versionGap =
+        previousVersion > 0
+        && nextVersion > previousVersion + 1;
+
+      if (state.auctionTimerTransitionPending) {
+        state.auctionTimerTransitionPending = false;
+        state.auctionTimerDisplayKey = '';
+        state.auctionTimerDisplayStartsAt = 0;
+      }
+
+      patchAuctionLiveDynamic();
+      patchAuctionMyTeamLiveKpis();
+      renderAuctionTimer();
+      renderTvTimer();
+
+      if (
+        playerChanged
+        || nominationChanged
+        || phaseChanged
+        || statusChanged
+        || pauseChanged
+        || versionGap
+      ) {
+        scheduleAuctionReconcile(
+          fromMutation ? 60 : 100
+        );
+      }
+    }
+
+
+    function handleAuctionRealtimeState(message) {
+      const payload =
+        message?.payload
+        || message
+        || {};
+
+      applyAuctionHotState(payload);
+    }
+
+
+    function handleAuctionRealtimeEvent(message) {
+      const event =
+        message?.payload
+        || message
+        || {};
+
+      if (
+        !state.auction?.auctionSession?.id
+        || event.session_id
+          !== state.auction.auctionSession.id
+      ) {
+        return;
+      }
+
+      const eventType =
+        String(event.event_type || '');
+
+      const eventPayload =
+        event.payload || {};
+
+      /* I rilanci possono aggiornare subito il piccolo log senza
+         ricostruire l'intero cockpit. */
+      if (
+        ['BID', 'AUCTIONEER_BID_SET'].includes(eventType)
+        && event.team_id
+      ) {
+        const amount =
+          Number(
+            eventPayload.bid
+            ?? eventPayload.amount
+            ?? state.auction.auctionSession.current_bid
+            ?? 0
+          );
+
+        const team =
+          (state.auction.teams || [])
+            .find(item => item.id === event.team_id)
+          || null;
+
+        const nextBid = {
+          id: event.event_id,
+          team_id: event.team_id,
+          amount,
+          created_at: event.created_at,
+          team
+        };
+
+        state.auction.recentBids = [
+          nextBid,
+          ...(state.auction.recentBids || [])
+            .filter(item => item.id !== nextBid.id)
+        ].slice(0, 3);
+
+        renderRecentBidChips();
+      }
+
+      const rosterMutationTypes = new Set([
+        'PLAYER_AWARDED',
+        'MANUAL_AWARD',
+        'ROSTER_PRICE_EDITED',
+        'ROSTER_PLAYER_REMOVED',
+        'ROSTER_TEAM_TRANSFERRED',
+        'ROSTER_PLAYER_TRANSFERRED',
+        'OPERATION_UNDONE'
+      ]);
+
+      if (rosterMutationTypes.has(eventType)) {
+        state.auctionPersonalRosterFetchedAt = 0;
+      }
+
+      const immediateStructural =
+        new Set([
+          'PLAYER_CALLED',
+          'PLAYER_CALL_CANCELLED',
+          'PLAYER_AWARDED',
+          'MANUAL_AWARD',
+          'ROSTER_PRICE_EDITED',
+          'ROSTER_PLAYER_REMOVED',
+          'ROSTER_TEAM_TRANSFERRED',
+          'ROSTER_PLAYER_TRANSFERRED',
+          'CREDITS_ADJUSTED',
+          'NOMINATION_TIMEOUT',
+          'OPERATION_UNDONE',
+          'ROLE_PHASE_READY',
+          'ROLE_PHASE_REOPENED',
+          'TIMER_EXPIRED'
+        ]);
+
+      if (immediateStructural.has(eventType)) {
+        scheduleAuctionReconcile(70);
+        return;
+      }
+
+      if (
+        [
+          'CALL_QUEUE_UPDATED',
+          'CALL_QUEUE_AUTOPLAY_PAUSED',
+          'CALL_QUEUE_PRIVACY_CHANGED',
+          'TEAM_PRIVATE_DIRTY'
+        ].includes(eventType)
+      ) {
+        const sameTeam =
+          Boolean(
+            event.team_id
+            && event.team_id === auctionMyTeamId()
+          );
+
+        const fromMe =
+          Boolean(
+            event.actor_user_id
+            && event.actor_user_id === state.session?.user?.id
+          );
+
+        if (sameTeam && !fromMe) {
+          scheduleAuctionReconcile(250);
+        }
+      }
+    }
+
+
+    function ensureAuctionRealtime(data) {
+      const topic =
+        String(data?.realtimeTopic || '');
+
+      if (
+        !auctionRealtimeClient
+        || !topic
+      ) {
+        return;
+      }
+
+      if (
+        auctionRealtimeChannel
+        && auctionRealtimeTopic === topic
+      ) {
+        return;
+      }
+
+      disconnectAuctionRealtime();
+      auctionRealtimeTopic = topic;
+
+      auctionRealtimeChannel =
+        auctionRealtimeClient
+          .channel(topic)
+          .on(
+            'broadcast',
+            { event: 'state' },
+            handleAuctionRealtimeState
+          )
+          .on(
+            'broadcast',
+            { event: 'event' },
+            handleAuctionRealtimeEvent
+          )
+          .subscribe(status => {
+            auctionRealtimeSubscribed =
+              status === 'SUBSCRIBED';
+
+            if (status === 'SUBSCRIBED') {
+              /* Recupero una sola volta ciò che può essere accaduto
+                 mentre il WebSocket si collegava. */
+              scheduleAuctionReconcile(50);
+            } else if (
+              status === 'CHANNEL_ERROR'
+              || status === 'TIMED_OUT'
+            ) {
+              scheduleAuctionReconcile(500);
+            }
+          });
+    }
+
+
     async function loadAuction({
       quiet = false,
       onlyIfChanged = false
@@ -23006,6 +23645,17 @@
 
       state.auction =
         data;
+
+      state.auctionRealtimeVersion =
+        Number(data.auctionSession?.version || 0);
+
+      ensureAuctionRealtime(data);
+
+      if (state.auctionTimerTransitionPending) {
+        state.auctionTimerTransitionPending = false;
+        state.auctionTimerDisplayKey = '';
+        state.auctionTimerDisplayStartsAt = 0;
+      }
 
 
       const nextRolePhaseFilterKey =
@@ -24154,13 +24804,14 @@
         return `
           <div
             class="${classes}"
+            data-team-summary-id="${esc(team.id)}"
             title="${esc(teamReference)} · offerta massima ${maxBid} · ${remainingPlayers} giocatori rimasti ${targetLabel}"
           >
             <strong>${esc(teamReference)}</strong>
             <span class="auction-team-summary-values">
-              <b>${maxBid}</b>
+              <b class="auction-team-summary-max">${maxBid}</b>
               <i>|</i>
-              <b>${remainingPlayers}</b>
+              <b class="auction-team-summary-rim">${remainingPlayers}</b>
             </span>
           </div>
         `;
@@ -25504,6 +26155,7 @@
       bindAuctionCreditLogModal();
       bindAuctionAwardValidationModal();
       bindAuctionPresidentStatusExpiry();
+      patchAuctionMyTeamLiveKpis();
 
 
       $('auction-toggle-role-ready')
@@ -25630,7 +26282,7 @@
               state.auctionOpeningBid =
                 1;
 
-              await loadAuction();
+              scheduleAuctionReconcile(80);
 
             } catch (error) {
               msg(
@@ -25952,8 +26604,7 @@
                 );
 
                 msg('Operazione annullata.', 'success');
-                await loadAuctionPersonalRoster(true);
-                await loadAuction();
+                scheduleAuctionReconcile(80);
               } catch (error) {
                 button.disabled = false;
                 msg(error.message, 'error');
@@ -26060,7 +26711,7 @@
 
               state.auctionAdminConsoleOpen = true;
               msg('Asta avviata definitivamente.', 'success');
-              await loadAuction();
+              scheduleAuctionReconcile(80);
             } catch (error) {
               button.disabled = false;
               msg(error.message, 'error');
@@ -26114,7 +26765,8 @@
 
               state.auctionAdminPlayerSearch = '';
               state.auctionAdminPlayerId = null;
-              await loadAuction();
+              scheduleAuctionReconcile(80);
+
             } catch (error) {
               msg(error.message, 'error');
             }
@@ -27228,161 +27880,6 @@
         );
     }
 
-    function auctionFreeColumnPreferenceKey() {
-      const userId =
-        state.session?.user?.id
-        || state.dashboard?.currentUser?.id
-        || 'anon';
-
-      const leagueId =
-        state.selectedLeague?.id
-        || 'no-league';
-
-      const mode =
-        state.auction?.settings?.fantasy_mode
-        || 'classic';
-
-      return `fantacalcio_auction_free_columns_v1:${userId}:${leagueId}:${mode}`;
-    }
-
-
-    function auctionFreeVisibleColumns() {
-      const columns = [
-        'role',
-        'name',
-        'signals',
-        'pfc',
-        'fm',
-        'pma'
-      ];
-
-      if (auctionIsSuperAdmin()) {
-        columns.push('supreme');
-      }
-
-      if (
-        auctionCallMode()
-        && auctionHasPresidentRole()
-      ) {
-        columns.push('action');
-      }
-
-      return columns;
-    }
-
-
-    function auctionFreeColumnClass(key) {
-      return ({
-        role: 'auction-player-col-role',
-        name: 'auction-player-col-name',
-        signals: 'auction-player-col-signals',
-        pfc: 'auction-player-col-pfc',
-        fm: 'auction-player-col-fm',
-        pma: 'auction-player-col-pma',
-        supreme: 'auction-player-col-supreme',
-        action: 'auction-player-col-action'
-      })[key] || '';
-    }
-
-
-    function auctionFreeDefaultWidths(containerWidth = 0) {
-      const visible =
-        auctionFreeVisibleColumns();
-
-      const fixed = {
-        role: 50,
-        signals: 48,
-        pfc: 44,
-        fm: 44,
-        pma: 44,
-        supreme: 52,
-        action: 62
-      };
-
-      const fixedTotal =
-        visible
-          .filter(key => key !== 'name')
-          .reduce(
-            (sum, key) =>
-              sum + Number(fixed[key] || 44),
-            0
-          );
-
-      const nameWidth =
-        Math.max(
-          118,
-          Number(containerWidth || 0)
-          - fixedTotal
-        );
-
-      return {
-        ...fixed,
-        name: nameWidth
-      };
-    }
-
-
-    function auctionFreeColumnPreferences() {
-      const visible =
-        auctionFreeVisibleColumns();
-
-      const saved =
-        getLocalJson(
-          auctionFreeColumnPreferenceKey()
-        )
-        || {};
-
-      const savedOrder =
-        Array.isArray(saved.order)
-          ? saved.order.filter(key => visible.includes(key))
-          : [];
-
-      const order = [
-        ...savedOrder,
-        ...visible.filter(key => !savedOrder.includes(key))
-      ];
-
-      return {
-        order,
-        widths:
-          saved.widths
-          && typeof saved.widths === 'object'
-            ? { ...saved.widths }
-            : {}
-      };
-    }
-
-
-    function saveAuctionFreeColumnPreferences(prefs) {
-      setLocalJson(
-        auctionFreeColumnPreferenceKey(),
-        {
-          order:
-            Array.isArray(prefs?.order)
-              ? prefs.order
-              : auctionFreeVisibleColumns(),
-          widths:
-            prefs?.widths || {}
-        }
-      );
-    }
-
-
-    function auctionFreeColumnKeyFromCell(cell) {
-      if (!cell) {
-        return '';
-      }
-
-      return auctionFreeVisibleColumns()
-        .find(key =>
-          cell.classList.contains(
-            auctionFreeColumnClass(key)
-          )
-        )
-        || '';
-    }
-
-
     function applyAuctionFreeColumnLayout() {
       const table =
         document.querySelector(
@@ -27393,275 +27890,38 @@
         return;
       }
 
-      const wrapper =
-        table.closest('.drawer-table');
+      /* V6X: nessun ordine/larghezza personale. Cancella anche le
+         preferenze V6W eventualmente rimaste nel browser. */
+      try {
+        for (let index = localStorage.length - 1; index >= 0; index -= 1) {
+          const key = localStorage.key(index) || '';
+          if (key.startsWith('fantacalcio_auction_free_columns_v1:')) {
+            localStorage.removeItem(key);
+          }
+        }
+      } catch {}
 
-      const visible =
-        auctionFreeVisibleColumns();
-
-      const prefs =
-        auctionFreeColumnPreferences();
-
-      const defaultWidths =
-        auctionFreeDefaultWidths(
-          wrapper?.clientWidth || table.clientWidth || 0
-        );
-
-      const widths = {};
-
-      visible.forEach(key => {
-        const saved =
-          Number(prefs.widths?.[key]);
-
-        widths[key] =
-          Number.isFinite(saved)
-          && saved >= 34
-            ? saved
-            : Number(defaultWidths[key] || 44);
-      });
-
-      const order =
-        prefs.order.filter(key => visible.includes(key));
+      table.style.removeProperty('width');
+      table.style.removeProperty('min-width');
+      table.style.setProperty('table-layout', 'fixed', 'important');
 
       table
-        .querySelectorAll('tr')
-        .forEach(row => {
-          const cells =
-            [...row.children]
-              .filter(cell =>
-                cell.matches('th,td')
-              );
-
-          const byKey =
-            new Map(
-              cells
-                .map(cell => [
-                  auctionFreeColumnKeyFromCell(cell),
-                  cell
-                ])
-                .filter(([key]) => Boolean(key))
-            );
-
-          order.forEach(key => {
-            const cell = byKey.get(key);
-            if (cell) {
-              row.appendChild(cell);
-            }
-          });
+        .querySelectorAll('th,td')
+        .forEach(cell => {
+          cell.style.removeProperty('width');
+          cell.style.removeProperty('min-width');
+          cell.style.removeProperty('max-width');
+          cell.removeAttribute('draggable');
+          cell.classList.remove(
+            'auction-column-draggable',
+            'is-column-dragging',
+            'is-column-drop-target'
+          );
+          cell
+            .querySelectorAll('.auction-column-resize-handle')
+            .forEach(handle => handle.remove());
         });
-
-      const totalWidth =
-        order.reduce(
-          (sum, key) =>
-            sum + Number(widths[key] || 44),
-          0
-        );
-
-      table.style.setProperty(
-        'table-layout',
-        'fixed',
-        'important'
-      );
-
-      table.style.setProperty(
-        'width',
-        `${Math.max(totalWidth, wrapper?.clientWidth || 0)}px`,
-        'important'
-      );
-
-      table.style.setProperty(
-        'min-width',
-        `${Math.max(totalWidth, wrapper?.clientWidth || 0)}px`,
-        'important'
-      );
-
-      order.forEach(key => {
-        const cls =
-          auctionFreeColumnClass(key);
-
-        const width =
-          Number(widths[key] || 44);
-
-        table
-          .querySelectorAll(`.${cls}`)
-          .forEach(cell => {
-            cell.style.setProperty('width', `${width}px`, 'important');
-            cell.style.setProperty('min-width', `${width}px`, 'important');
-            cell.style.setProperty('max-width', `${width}px`, 'important');
-          });
-      });
-
-      const head =
-        table.querySelector('thead');
-
-      if (!head || head.dataset.columnLayoutBound === 'true') {
-        return;
-      }
-
-      head.dataset.columnLayoutBound = 'true';
-
-      head
-        .querySelectorAll('th')
-        .forEach(th => {
-          const key =
-            auctionFreeColumnKeyFromCell(th);
-
-          if (!key) {
-            return;
-          }
-
-          th.dataset.auctionColumn = key;
-          th.draggable = true;
-          th.classList.add('auction-column-draggable');
-          th.title = `${th.title ? `${th.title} · ` : ''}Trascina per spostare la colonna`;
-
-          if (!th.querySelector('.auction-column-resize-handle')) {
-            const handle =
-              document.createElement('span');
-
-            handle.className =
-              'auction-column-resize-handle';
-
-            handle.setAttribute(
-              'aria-hidden',
-              'true'
-            );
-
-            th.appendChild(handle);
-          }
-        });
-
-      let draggingKey = '';
-
-      head.addEventListener('dragstart', event => {
-        const th = event.target.closest('th[data-auction-column]');
-        if (!th || event.target.closest('.auction-column-resize-handle')) {
-          event.preventDefault();
-          return;
-        }
-
-        draggingKey = th.dataset.auctionColumn || '';
-        th.classList.add('is-column-dragging');
-
-        try {
-          event.dataTransfer.effectAllowed = 'move';
-          event.dataTransfer.setData('text/plain', draggingKey);
-        } catch {}
-      });
-
-      head.addEventListener('dragend', event => {
-        event.target.closest('th')?.classList.remove('is-column-dragging');
-        head.querySelectorAll('.is-column-drop-target')
-          .forEach(cell => cell.classList.remove('is-column-drop-target'));
-        draggingKey = '';
-      });
-
-      head.addEventListener('dragover', event => {
-        const th = event.target.closest('th[data-auction-column]');
-        if (!th || !draggingKey) return;
-        event.preventDefault();
-        head.querySelectorAll('.is-column-drop-target')
-          .forEach(cell => cell.classList.remove('is-column-drop-target'));
-        th.classList.add('is-column-drop-target');
-      });
-
-      head.addEventListener('drop', event => {
-        const target = event.target.closest('th[data-auction-column]');
-        if (!target || !draggingKey) return;
-
-        event.preventDefault();
-
-        const targetKey =
-          target.dataset.auctionColumn;
-
-        const next =
-          auctionFreeColumnPreferences();
-
-        const sourceIndex =
-          next.order.indexOf(draggingKey);
-
-        const targetIndex =
-          next.order.indexOf(targetKey);
-
-        if (
-          sourceIndex < 0
-          || targetIndex < 0
-          || sourceIndex === targetIndex
-        ) {
-          return;
-        }
-
-        next.order.splice(sourceIndex, 1);
-        next.order.splice(targetIndex, 0, draggingKey);
-        saveAuctionFreeColumnPreferences(next);
-        applyAuctionFreeColumnLayout();
-      });
-
-      head.addEventListener('pointerdown', event => {
-        const handle =
-          event.target.closest('.auction-column-resize-handle');
-
-        if (!handle) {
-          return;
-        }
-
-        const th =
-          handle.closest('th[data-auction-column]');
-
-        if (!th) {
-          return;
-        }
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        const key =
-          th.dataset.auctionColumn;
-
-        const startX =
-          event.clientX;
-
-        const startWidth =
-          th.getBoundingClientRect().width;
-
-        const pointerId =
-          event.pointerId;
-
-        try {
-          handle.setPointerCapture(pointerId);
-        } catch {}
-
-        const move = moveEvent => {
-          const width =
-            Math.max(
-              key === 'name' ? 90 : 34,
-              Math.round(
-                startWidth
-                + moveEvent.clientX
-                - startX
-              )
-            );
-
-          const current =
-            auctionFreeColumnPreferences();
-
-          current.widths[key] = width;
-          saveAuctionFreeColumnPreferences(current);
-          applyAuctionFreeColumnLayout();
-        };
-
-        const end = () => {
-          window.removeEventListener('pointermove', move);
-          window.removeEventListener('pointerup', end);
-          window.removeEventListener('pointercancel', end);
-        };
-
-        window.addEventListener('pointermove', move);
-        window.addEventListener('pointerup', end, { once: true });
-        window.addEventListener('pointercancel', end, { once: true });
-      });
     }
-
 
     function auctionPlayerRow(
       player,
@@ -28205,10 +28465,51 @@
       );
     }
 
-    async function placeBid(teamId,amount,source){
-      if(!teamId)return msg('Squadra non disponibile.','error');
-      if(!auctionBidTimerIsActive())return msg('Il timer non è attivo: non sono consentiti altri rilanci.','warning');
-      try{await api(ENDPOINTS.auction,{action:'placeBid',sessionId:auctionSession().id,teamId,amount:Number(amount),source});await loadAuction()}catch(error){msg(error.message,'error')}
+    async function placeBid(teamId, amount, source) {
+      if (!teamId) {
+        return msg('Squadra non disponibile.', 'error');
+      }
+
+      if (!auctionBidTimerIsActive()) {
+        return msg(
+          'Il timer non è attivo: non sono consentiti altri rilanci.',
+          'warning'
+        );
+      }
+
+      const numericAmount = Number(amount);
+
+      try {
+        const response = await api(
+          ENDPOINTS.auction,
+          {
+            action: 'placeBid',
+            sessionId: auctionSession().id,
+            teamId,
+            amount: numericAmount,
+            source
+          }
+        );
+
+        /* Il chiamante vede subito l'esito autorevole della mutation.
+           Gli altri client ricevono lo stesso stato via Realtime. */
+        if (response?.state) {
+          applyAuctionHotState(response.state, { fromMutation: true });
+        } else if (state.auction?.auctionSession) {
+          state.auction.auctionSession.current_bid = numericAmount;
+          state.auction.auctionSession.current_bidder_team_id = teamId;
+          state.auction.currentBidderTeam =
+            (state.auction.teams || []).find(team => team.id === teamId) || null;
+          patchAuctionLiveDynamic();
+          patchAuctionMyTeamLiveKpis();
+        }
+
+        if (!auctionRealtimeSubscribed) {
+          scheduleAuctionReconcile(2500);
+        }
+      } catch (error) {
+        msg(error.message, 'error');
+      }
     }
 
     async function leaveCurrentAuctionPlayer() {
@@ -28259,7 +28560,8 @@
           }
         );
 
-        await loadAuction();
+        scheduleAuctionReconcile(800);
+
 
         msg(
           wasLeft
@@ -28312,7 +28614,7 @@
         });
     }
 
-    async function auctionAction(payload,successText=''){
+    async function auctionAction(payload, successText = '') {
       const smoothTimerTransition =
         [
           'awardPlayer',
@@ -28324,73 +28626,54 @@
         beginAuctionTimerTransition();
       }
 
-      try{
-        await api(
+      try {
+        const response = await api(
           ENDPOINTS.auction,
           payload
         );
 
-        if (
-          [
-            'awardPlayer',
-            'manualAward',
-            'editRosterPrice',
-            'removeRosterPlayer',
-            'transferRosterPlayer',
-            'undoLastAssignment',
-            'resetAuction'
-          ].includes(
-            payload?.action
-          )
-        ) {
-          await loadAuctionPersonalRoster(
-            true
-          );
+        if (response?.state) {
+          applyAuctionHotState(response.state, { fromMutation: true });
         }
 
-        if(successText){
-          msg(
-            successText,
-            'success'
-          );
+        if (successText) {
+          msg(successText, 'success');
         }
 
-        await loadAuction();
+        const structuralActions = new Set([
+          'awardPlayer',
+          'manualAward',
+          'editRosterPrice',
+          'removeRosterPlayer',
+          'transferRosterPlayer',
+          'undoLastAssignment',
+          'resetAuction',
+          'cancelCall',
+          'passNominationTurn',
+          'advanceRolePhase',
+          'finishAuction'
+        ]);
 
-        if (smoothTimerTransition) {
-          state.auctionTimerTransitionPending =
-            false;
-
-          state.auctionTimerDisplayKey =
-            '';
-
-          state.auctionTimerDisplayStartsAt =
-            0;
-
-          renderAuctionTimer();
+        /* Nessun doppio round-trip bloccante: la mutation termina qui.
+           Il riallineamento strutturale avviene fuori dal percorso del click. */
+        if (structuralActions.has(payload?.action)) {
+          state.auctionPersonalRosterFetchedAt = 0;
+          scheduleAuctionReconcile(80);
+        } else if (!auctionRealtimeSubscribed) {
+          scheduleAuctionReconcile(2500);
         }
 
         return true;
 
-      }catch(error){
+      } catch (error) {
         if (smoothTimerTransition) {
-          state.auctionTimerTransitionPending =
-            false;
-
-          state.auctionTimerDisplayKey =
-            '';
-
-          state.auctionTimerDisplayStartsAt =
-            0;
-
+          state.auctionTimerTransitionPending = false;
+          state.auctionTimerDisplayKey = '';
+          state.auctionTimerDisplayStartsAt = 0;
           renderAuctionTimer();
         }
 
-        msg(
-          error.message,
-          'error'
-        );
-
+        msg(error.message, 'error');
         return false;
       }
     }
@@ -29501,101 +29784,112 @@
       finally{refreshBusy=false}
     }
 
-    setInterval(async()=>{
-      if(
+    setInterval(async () => {
+      if (
         document.hidden
-        ||
-        refreshBusy
-      ){
+        || !['auction', 'tv'].includes(state.view)
+        || auctionSession()?.status !== 'live'
+      ) {
         return;
       }
 
-      try{
-        if(
-          (
-            state.view==='auction'
-            ||
-            state.view==='tv'
-          )
-          &&
-          auctionSession()?.status==='live'
-        ){
-          /*
-           * Controlliamo spesso il server per vedere rilanci/chiamate,
-           * ma loadAuction ridisegna la schermata SOLO se cambia
-           * session.version / offerta / lotto / assegnazioni.
-           *
-           * Risultato:
-           * - tutti vedono il rilancio entro ~0,7 s
-           * - nessun refresh DOM continuo mentre si cerca un giocatore
-           */
-          if(
-            Date.now()
-            -
-            state.lastAuctionFetchAt
-            >
-            500
-          ){
-            state.lastAuctionFetchAt=
-              Date.now();
+      const s = auctionSession();
+      const now = Date.now() + Number(state.serverOffsetMs || 0);
 
-            refreshBusy=true;
+      /* Solo watchdog delle scadenze: nessun getLobby periodico. */
+      if (
+        s?.current_player_id
+        && s.timer_deadline
+        && !s.hold_active
+        && !s.timer_expired_at
+        && Date.parse(s.timer_deadline) <= now
+      ) {
+        const key = `${s.id}|${s.timer_deadline}`;
 
-            try{
-              await loadAuction({
-                quiet:true,
-                onlyIfChanged:true
-              });
-            }finally{
-              refreshBusy=false;
-            }
-          }
+        if (auctionBidDeadlineSyncKey !== key) {
+          auctionBidDeadlineSyncKey = key;
 
-          const s=
-            auctionSession();
-
-          if(
-            s?.timer_deadline
-            &&
-            !s.hold_active
-            &&
-            Date.parse(s.timer_deadline)
-              <=
-              Date.now()
-              +
-              state.serverOffsetMs
-          ){
-            try{
-              await api(
-                ENDPOINTS.auction,
-                {
-                  action:'syncTimer',
-                  sessionId:s.id
-                },
-                {
-                  quiet:true
-                }
-              );
-            }catch{}
-          }
+          api(
+            ENDPOINTS.auction,
+            {
+              action: 'syncTimer',
+              sessionId: s.id
+            },
+            { quiet: true }
+          ).catch(() => {
+            auctionBidDeadlineSyncKey = '';
+          });
         }
-      }catch(error){
-        console.error(error);
-        refreshBusy=false;
+      } else if (
+        s?.timer_deadline
+        && Date.parse(s.timer_deadline) > now
+      ) {
+        auctionBidDeadlineSyncKey = '';
       }
-    },200);
 
-    setInterval(()=>{
-      if(document.hidden||refreshBusy)return;
-      if(['leagues','home','manage','rosters'].includes(state.view))loadCurrentView(false);
-    },5000);
+      if (
+        !s?.current_player_id
+        && s?.nomination_deadline
+        && s.nomination_deadline !== 'infinity'
+        && Date.parse(s.nomination_deadline) <= now
+      ) {
+        const key = `${s.id}|${s.nomination_deadline}`;
+
+        if (auctionNominationDeadlineSyncKey !== key) {
+          auctionNominationDeadlineSyncKey = key;
+
+          api(
+            ENDPOINTS.auction,
+            {
+              action: 'syncNomination',
+              sessionId: s.id
+            },
+            { quiet: true }
+          ).catch(() => {
+            auctionNominationDeadlineSyncKey = '';
+          });
+        }
+      } else if (
+        s?.nomination_deadline
+        && s.nomination_deadline !== 'infinity'
+        && Date.parse(s.nomination_deadline) > now
+      ) {
+        auctionNominationDeadlineSyncKey = '';
+      }
+    }, 200);
+
+    setInterval(() => {
+      if (document.hidden || refreshBusy) return;
+
+      if (['auction', 'tv'].includes(state.view)) {
+        if (auctionSession()?.status === 'live') {
+          scheduleAuctionReconcile(0);
+        }
+        return;
+      }
+
+      /* Pagine gestionali non vengono ricostruite mentre si scrive. */
+      if (['leagues', 'home', 'rosters'].includes(state.view)) {
+        loadCurrentView(false);
+      }
+    }, 30000);
 
     /* Il Listone non viene più ricaricato automaticamente:
        filtri, ricerca e posizione di scroll restano stabili.
        Resta disponibile il pulsante Aggiorna globale. */
 
-    document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadCurrentView(true)});
-    window.addEventListener('focus',()=>loadCurrentView(true));
+    const reconcileAfterForeground = () => {
+      if (document.hidden) return;
+
+      if (['auction', 'tv'].includes(state.view)) {
+        scheduleAuctionReconcile(0);
+      } else {
+        loadCurrentView(true);
+      }
+    };
+
+    document.addEventListener('visibilitychange', reconcileAfterForeground);
+    window.addEventListener('focus', reconcileAfterForeground);
 
     let auctionMobileModeLast =
       window.matchMedia(
