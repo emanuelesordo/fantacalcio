@@ -1,0 +1,62 @@
+name: Inline V6Y+ runtime into canonical home
+
+on:
+  push:
+    paths:
+      - .github/workflows/inline-v6y-v7-home.yml
+
+permissions:
+  contents: write
+
+jobs:
+  inline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Inline runtime into home.html
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          home = Path('home.html')
+          runtime = Path('v6y-v7.runtime.js')
+          text = home.read_text(encoding='utf-8')
+          js = runtime.read_text(encoding='utf-8')
+          external = '  <script src="v6y-v7.runtime.js"></script>\n'
+          if external not in text:
+              raise SystemExit('external runtime tag not found')
+          inline = '  <script>\n' + js.rstrip() + '\n  </script>\n'
+          text = text.replace(external, inline, 1)
+          home.write_text(text, encoding='utf-8')
+          PY
+          rm v6y-v7.runtime.js
+
+      - name: Validate all inline scripts
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          text = Path('home.html').read_text(encoding='utf-8')
+          scripts = re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>', text, flags=re.S)
+          inline = [s for s in scripts if s.strip()]
+          for idx, source in enumerate(inline):
+              Path(f'/tmp/home-inline-{idx}.js').write_text(source, encoding='utf-8')
+          print(len(inline))
+          PY
+          for f in /tmp/home-inline-*.js; do node --check "$f"; done
+          git diff --check
+
+      - name: Commit canonical monolithic home
+        shell: bash
+        run: |
+          rm -f .github/workflows/inline-v6y-v7-home.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add home.html v6y-v7.runtime.js .github/workflows/inline-v6y-v7-home.yml
+          git commit -m "feat: consolidate V6Y+ directly into home.html"
+          git push origin HEAD:main
