@@ -1,0 +1,69 @@
+name: Apply V9 strategic drawer
+
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-v9-strategic-drawer.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Patch and validate V9 runtime
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          js_path = Path('tools/v9-strategic-drawer.js')
+          js = js_path.read_text(encoding='utf-8')
+          fixes = {
+              '(pfc!=null?.55:0)': '(pfc!=null ? .55 : 0)',
+              '(pma!=null?.30:0)': '(pma!=null ? .30 : 0)',
+              '(q!=null?.15:0)': '(q!=null ? .15 : 0)',
+              "starter?.76:.24": "starter ? .76 : .24",
+              'benchGoals:77': 'benchGoals:17',
+          }
+          for old,new in fixes.items():
+              js = js.replace(old,new)
+
+          # Il cambio Classic/Mantra nel Setup deve aggiornare immediatamente
+          # le etichette Modificatore Difesa / D-Factor.
+          needle = "const oldUpdateVisibility=updateSetupVisibility;updateSetupVisibility=function(...a){const r=oldUpdateVisibility(...a);patchSetup();return r};"
+          replacement = needle + "\ndocument.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>queueMicrotask(patchSetup));"
+          js = js.replace(needle,replacement)
+
+          Path('/tmp/v9.js').write_text(js,encoding='utf-8')
+
+          home_path = Path('home.html')
+          home = home_path.read_text(encoding='utf-8')
+          start='<!-- V9_STRATEGIC_DRAWER_START -->'
+          end='<!-- V9_STRATEGIC_DRAWER_END -->'
+          home = re.sub(re.escape(start)+r'.*?'+re.escape(end)+r'\s*','',home,flags=re.S)
+          block = f"\n{start}\n<script>\n{js}\n</script>\n{end}\n"
+          if '</body>' not in home:
+              raise SystemExit('home.html: tag </body> non trovato')
+          home = home.replace('</body>',block+'\n</body>',1)
+          home_path.write_text(home,encoding='utf-8')
+
+          # Rimuove gli staging: il runtime definitivo vive nel canonico home.html.
+          for p in [Path('tools/v9-strategic-drawer.js'),Path('v9-strategy.part00.js')]:
+              if p.exists(): p.unlink()
+          PY
+          node --check /tmp/v9.js
+          git diff --check
+      - name: Commit canonical home
+        run: |
+          rm -f .github/workflows/apply-v9-strategic-drawer.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "feat: add strategic drawer statistics and scoring setup" || exit 0
+          git push origin main
