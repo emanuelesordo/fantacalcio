@@ -13374,6 +13374,105 @@
     .strategic-index-value[title]{cursor:help}
   </style>
 
+  <style id="v10-suggester-row-fix">
+    html body.modern-glass #view-auction .auction-free-suggestions .auction-suggested-calls{
+      max-height:170px!important;
+      overflow:hidden!important;
+    }
+    html body.modern-glass #view-auction .auction-free-suggestions .auction-suggested-calls .auction-suggested-list{
+      display:grid!important;
+      grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))!important;
+      grid-auto-flow:row!important;
+      gap:3px!important;
+      max-height:138px!important;
+      overflow-y:auto!important;
+      overflow-x:hidden!important;
+    }
+    html body.modern-glass #view-auction .auction-free-suggestions .auction-suggested-row{
+      width:100%!important;
+      min-width:0!important;
+      min-height:29px!important;
+      display:grid!important;
+      grid-template-columns:auto minmax(0,1fr) auto auto!important;
+      grid-template-rows:1fr!important;
+      align-items:center!important;
+      gap:4px!important;
+      padding:3px 4px!important;
+      overflow:hidden!important;
+    }
+    html body.modern-glass #view-auction .auction-free-suggestions .auction-suggested-row > *{
+      min-width:0!important;
+      grid-row:1!important;
+    }
+    html body.modern-glass #view-auction .auction-free-suggestions .auction-suggested-roles{
+      display:flex!important;
+      flex-wrap:nowrap!important;
+      align-items:center!important;
+      gap:2px!important;
+      overflow:hidden!important;
+    }
+    html body.modern-glass #view-auction .auction-free-suggestions .auction-suggested-copy{
+      min-width:0!important;
+      overflow:hidden!important;
+    }
+    html body.modern-glass #view-auction .auction-free-suggestions .v8n{
+      min-width:0!important;
+      overflow:hidden!important;
+      flex-wrap:nowrap!important;
+    }
+    html body.modern-glass #view-auction .auction-free-suggestions .v8n strong,
+    html body.modern-glass #view-auction .auction-free-suggestions .auction-suggested-copy > small{
+      min-width:0!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+      white-space:nowrap!important;
+    }
+    html body.modern-glass #view-auction .auction-free-suggestions .v8n em{
+      max-width:108px!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+      white-space:nowrap!important;
+      flex:0 1 auto!important;
+    }
+    html body.modern-glass #view-auction .auction-free-suggestions .auction-v7-prices{
+      min-width:45px!important;
+      width:auto!important;
+      display:grid!important;
+      justify-items:end!important;
+      white-space:nowrap!important;
+      flex:0 0 auto!important;
+    }
+    html body.modern-glass #view-auction .auction-free-suggestions .auction-v7-suggest-actions{
+      min-width:0!important;
+      display:flex!important;
+      flex-wrap:nowrap!important;
+      align-items:center!important;
+      justify-content:flex-end!important;
+      gap:2px!important;
+      white-space:nowrap!important;
+      overflow:visible!important;
+    }
+    html body.modern-glass #view-auction .auction-free-suggestions .auction-v7-dismiss{
+      width:17px!important;
+      min-width:17px!important;
+      height:17px!important;
+      min-height:17px!important;
+    }
+    html body.modern-glass #view-auction .auction-free-suggestions .auction-suggested-action{
+      width:auto!important;
+      min-width:39px!important;
+      height:21px!important;
+      min-height:21px!important;
+      padding:2px 4px!important;
+      font-size:5.5px!important;
+      white-space:nowrap!important;
+    }
+    @media (max-width:420px){
+      html body.modern-glass #view-auction .auction-free-suggestions .v8n em{display:none!important}
+      html body.modern-glass #view-auction .auction-free-suggestions .auction-v7-prices{min-width:40px!important}
+    }
+  </style>
+
 </head>
 <body class="modern-glass">
   <div id="global-message" class="message" aria-live="polite"></div>
@@ -27041,6 +27140,10 @@
               },
               'Asta terminata. Riepilogo rose disponibile.'
             );
+
+            await loadAuction({
+              quiet: true
+            });
           }
         );
 
@@ -30844,7 +30947,7 @@
  function impact(p){const info=auctionMyTeamDashboardData();if(!info)return quick(p);const before=baseMetric(info),after=metrics(info,p),aa=anchors(info);let af=0;if(aa.length){if(after.completion>before.completion)af+=7;if(after.fantasy>before.fantasy+.03)af+=5;if(after.solidity>before.solidity)af+=4;const rr=new Set(roles(p)),ov=aa.some(x=>roles(x.player).some(r=>rr.has(r)));if(ov&&after.completion===before.completion&&after.fantasy<=before.fantasy+.02)af-=4}return{completionDelta:after.completion-before.completion,fantasyDelta:after.fantasy-before.fantasy,solidityDelta:after.solidity-before.solidity,anchorFit:af,before,after}}
  function market(p){const rr=new Set(roles(p)),a=(state.auction?.recentAwards||[]).filter(x=>{const q=x.player||{},ref=Number(q.pfc||q.pma||q.quotation||0),pr=Number(x.price||x.amount||0);return ref>0&&pr>0&&roles(q).some(r=>rr.has(r))}).slice(0,12).map(x=>cl(Number(x.price||x.amount)/Number(x.player?.pfc||x.player?.pma||x.player?.quotation||1),.55,1.65));return a.length?cl(a.reduce((s,x)=>s+x,0)/a.length,.75,1.3):1}
  function opp(p,i){const pf=pref(p),mk=market(p),sl=Number(p.slot||99);return Math.round(cl(43+trend(p)*13+(prs(p)-60)*.16+(sl<=1?9:sl===2?6:sl===3?3:0)+Math.max(0,i.completionDelta)*.55+Math.max(-8,Math.min(12,i.fantasyDelta*18))+i.anchorFit+(mk<.95?(.95-mk)*35:-(mk-1.05)*16)+(pf?.strategy==='top'?9:pf?.is_favorite?4:pf?.strategy==='avoid'?-35:0),0,100))}
- function prices(p,score,o){const info=auctionMyTeamDashboardData(),pf=pref(p),ref=Math.max(1,Number(p.pfc||p.pma||p.quotation||1)),mk=market(p),prf=state.v8Profile?.profile||'balanced',mult=prf==='aggressive'?1.06:prf==='conservative'?.95:1,q=1+cl(trend(p),-.15,.15)*.25+(prs(p)/100-.65)*.08;let s=Math.max(1,Math.round(ref*mk*q*(.93+o/100*.15)*mult)),c=Math.max(s,Math.round(s*(1.10+Math.max(0,score-65)/500)));if(pf?.expected_spend!=null)s=Math.max(1,Math.round((s*2+Number(pf.expected_spend))/3));if(pf?.max_price!=null)c=Math.min(c,Math.max(1,Number(pf.max_price)));const mb=Number(info?.maxBid);if(Number.isFinite(mb)){c=Math.min(c,Math.max(0,mb));s=Math.min(s,c)}return{suggested:s,ceiling:c,marketFactor:mk}}
+ function prices(p,score,o){const info=auctionMyTeamDashboardData(),pf=pref(p),ref=Math.max(1,Number(p.pfc||p.pma||p.quotation||1)),mk=market(p),prf=state.v8Profile?.profile||'balanced',mult=prf==='aggressive'?1.06:prf==='conservative'?.95:1,q=1+cl(trend(p),-.15,.15)*.25+(prs(p)/100-.65)*.08;let s=Math.max(1,Math.round(ref*mk*q*(.93+o/100*.15)*mult)),c=Math.max(s,Math.round(s*(1.10+Math.max(0,score-65)/500)));if(pf?.expected_spend!=null&&String(pf.expected_spend).trim()!=='')s=Math.max(1,Math.round((s*2+Number(pf.expected_spend))/3));if(pf?.max_price!=null&&String(pf.max_price).trim()!=='')c=Math.min(c,Math.max(1,Number(pf.max_price)));const rawMb=info?.maxBid,mb=rawMb===null||rawMb===undefined||String(rawMb).trim()===''?null:Number(rawMb);if(Number.isFinite(mb)&&mb>0){c=Math.min(c,mb);s=Math.min(s,c)}return{suggested:Math.max(1,s),ceiling:Math.max(1,c),marketFactor:mk}}
  const oldScore=auctionSuggestedCallScore;auctionSuggestedCallScore=function(p){state.v7Stats=new Map();const x=oldScore(p);if(!x)return null;const i=quick(p),o=opp(p,i);x.score=cl(x.score+Math.round(trend(p)*15)+Math.round((prs(p)-60)*.08)+Math.round(Math.max(0,i.completionDelta)*.22)+Math.round(i.fantasyDelta*12)+Math.round(i.solidityDelta*.16)+i.anchorFit+Math.round((o-50)*.12),0,100);x.opportunity=o;x.rosterImpact=i;x.features=feat(p);x.prices=prices(p,x.score,o);return x};
  const oldCalls=auctionSuggestedCalls;function rows(limit){const a=oldCalls(Math.max(12,limit)).map(x=>{const i=impact(x.player),o=opp(x.player,i);x.rosterImpact=i;x.opportunity=o;x.score=cl(Number(x.score||0)+Math.round(Math.max(0,i.completionDelta)*.30)+Math.round(i.fantasyDelta*14)+Math.round(i.solidityDelta*.18)+i.anchorFit,0,100);x.prices=prices(x.player,x.score,o);return x}).sort((a,b)=>b.score-a.score||b.opportunity-a.opportunity);if(!a.length)return[];const info=auctionMyTeamDashboardData(),ctx=[auctionSession()?.id||'',state.auction?.auctionSession?.role_phase_index||0,info?.assignments?.length||0].join('|'),cur=a.find(x=>String(x.player?.id)===String(state.v8Moment||'')),ch=a[0];if(state.v8MomentCtx!==ctx||!cur||ch.score>=cur.score+9){state.v8MomentCtx=ctx;state.v8Moment=ch.player?.id}const m=a.find(x=>String(x.player?.id)===String(state.v8Moment||''))||ch;return[m,...a.filter(x=>x!==m)].slice(0,limit)}
  function conv(x,y){const gap=Math.max(0,Number(x?.score||0)-Number(y?.score||0)),v=Math.round(cl(48+Number(x?.opportunity||50)*.28+gap*2.1+Number(x?.rosterImpact?.completionDelta||0)*.22,0,100));return{v,label:v>=82?'MOLTO ALTA':v>=68?'ALTA':v>=52?'MEDIA':'PRUDENTE'}}
