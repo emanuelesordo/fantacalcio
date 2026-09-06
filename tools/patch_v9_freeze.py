@@ -1,0 +1,104 @@
+from pathlib import Path
+import re
+
+p = Path('home.html')
+s = p.read_text(encoding='utf-8')
+
+old = "function activateTab(name){state.v9ActiveDrawerTab=name;document.querySelectorAll('.v9-drawer-tab').forEach(b=>b.classList.toggle('active',b.dataset.v9Tab===name));document.querySelectorAll('.v9-pane').forEach(p=>p.hidden=p.dataset.v9Pane!==name);}"
+new = """function activateTab(name){
+    const tab=name==='stats'?'stats':'strategy';
+    state.v9ActiveDrawerTab=tab;
+    const drawer=document.querySelector('.v9-strategy-drawer');
+    if(!drawer)return;
+    drawer.querySelectorAll('.v9-drawer-tab').forEach(b=>b.classList.toggle('active',b.dataset.v9Tab===tab));
+    drawer.querySelectorAll('.v9-pane').forEach(p=>p.hidden=p.dataset.v9Pane!==tab);
+    if(!drawer.open)return;
+    if(tab==='stats')renderStats();else renderStrategy();
+  }"""
+if old not in s:
+    raise SystemExit('activateTab marker not found')
+s = s.replace(old, new, 1)
+
+old_patch = """  function patchDrawer(){
+    const root=document.getElementById('auction-root');if(!root)return;
+    let drawer=root.querySelector('.v9-strategy-drawer');
+    if(!drawer){
+      drawer=document.createElement('details');
+      drawer.className='v9-strategy-drawer';
+      drawer.innerHTML=`<summary>STRATEGIA</summary><div class="v9-drawer-shell"><nav class="v9-drawer-tabs"><button type="button" class="v9-drawer-tab" data-v9-tab="strategy">CENTRO STRATEGICO</button><button type="button" class="v9-drawer-tab" data-v9-tab="stats">STATISTICHE</button></nav><div class="v9-pane v9-pane-strategy" data-v9-pane="strategy"></div><div class="v9-pane v9-pane-stats" data-v9-pane="stats"></div></div>`;
+      root.appendChild(drawer);
+      drawer.querySelectorAll('[data-v9-tab]').forEach(b=>b.addEventListener('click',()=>activateTab(b.dataset.v9Tab)));
+      drawer.addEventListener('toggle',()=>{state.v9DrawerOpen=drawer.open;if(drawer.open){renderStrategy();renderStats();}});
+    }
+    drawer.open=state.v9DrawerOpen===true;
+    renderStrategy();renderStats();
+    activateTab(state.v9ActiveDrawerTab==='stats'?'stats':'strategy');
+  }
+"""
+new_patch = """  function patchDrawer(){
+    const root=document.getElementById('auction-root');if(!root)return;
+    let drawer=root.querySelector('.v9-strategy-drawer');
+    if(!drawer){
+      drawer=document.createElement('details');
+      drawer.className='v9-strategy-drawer';
+      drawer.innerHTML=`<summary>STRATEGIA</summary><div class="v9-drawer-shell"><nav class="v9-drawer-tabs"><button type="button" class="v9-drawer-tab" data-v9-tab="strategy">CENTRO STRATEGICO</button><button type="button" class="v9-drawer-tab" data-v9-tab="stats">STATISTICHE</button></nav><div class="v9-pane v9-pane-strategy" data-v9-pane="strategy"></div><div class="v9-pane v9-pane-stats" data-v9-pane="stats"></div></div>`;
+      root.appendChild(drawer);
+      drawer.querySelectorAll('[data-v9-tab]').forEach(b=>b.addEventListener('click',()=>activateTab(b.dataset.v9Tab)));
+      drawer.addEventListener('toggle',()=>{
+        state.v9DrawerOpen=drawer.open;
+        if(drawer.open)activateTab(state.v9ActiveDrawerTab==='stats'?'stats':'strategy');
+      });
+    }
+    const shouldOpen=state.v9DrawerOpen===true;
+    if(drawer.open!==shouldOpen)drawer.open=shouldOpen;
+    const tab=state.v9ActiveDrawerTab==='stats'?'stats':'strategy';
+    drawer.querySelectorAll('.v9-drawer-tab').forEach(b=>b.classList.toggle('active',b.dataset.v9Tab===tab));
+    drawer.querySelectorAll('.v9-pane').forEach(p=>p.hidden=p.dataset.v9Pane!==tab);
+    if(drawer.open){
+      if(tab==='stats')renderStats();else renderStrategy();
+    }
+  }
+"""
+if old_patch not in s:
+    raise SystemExit('patchDrawer marker not found')
+s = s.replace(old_patch, new_patch, 1)
+
+pattern = re.compile(r"\n  const obs=new MutationObserver\(\(\)=>\{if\(state\.view==='auction'\)\{document\.querySelector\('\.v8center'\)\?\.remove\(\);patchDrawer\(\)\}\}\);const ar=document\.getElementById\('auction-root'\);if\(ar\)obs\.observe\(ar,\{childList:true,subtree:true\}\);")
+s, count = pattern.subn('', s, count=1)
+if count != 1:
+    raise SystemExit(f'MutationObserver removal count={count}')
+
+marker = "  function buildBestRoster(){\n"
+if marker not in s:
+    raise SystemExit('buildBestRoster marker not found')
+s = s.replace(marker, """  function v9BestRosterCacheKey(){
+    const players=state.v9Center?.players||state.list?.players||[];
+    const latest=players.reduce((m,p)=>String(p?.updated_at||p?.source_updated_at||'')>m?String(p?.updated_at||p?.source_updated_at||''):m,'');
+    const prefStamp=[...favMap().values()].map(x=>`${x.source_player_id}:${x.is_favorite?1:0}:${x.strategy||''}:${x.max_price??''}:${x.updated_at||''}`).sort().join('|');
+    return [state.selectedLeague?.id||'',mode(),latest,state.v8Profile?.updated_at||'',state.v9Rules?.updated_at||'',state.v9BestIncludeFav?1:0,prefStamp].join('::');
+  }
+
+  function buildBestRoster(){
+    const cacheKey=v9BestRosterCacheKey();
+    if(state.v9BestRosterCacheKey===cacheKey&&state.v9BestRosterCache)return state.v9BestRosterCache;
+""", 1)
+
+classic = "      return {mode:'classic',module:state.v9Rules?.defense_rule_enabled?'4-3-3/4-4-2':'3-4-3',players:picked,spent,budget:credits,starterBudget:null};\n"
+if classic not in s:
+    raise SystemExit('classic return not found')
+s = s.replace(classic, "      const result={mode:'classic',module:state.v9Rules?.defense_rule_enabled?'4-3-3/4-4-2':'3-4-3',players:picked,spent,budget:credits,starterBudget:null};\n      state.v9BestRosterCacheKey=cacheKey;state.v9BestRosterCache=result;return result;\n", 1)
+
+mantra = "    return {mode:'mantra',module:first?.id||'—',players:[...starters,...chosen],spent:(first?.spent||0)+bs,budget:credits,starterBudget};\n"
+if mantra not in s:
+    raise SystemExit('mantra return not found')
+s = s.replace(mantra, "    const result={mode:'mantra',module:first?.id||'—',players:[...starters,...chosen],spent:(first?.spent||0)+bs,budget:credits,starterBudget};\n    state.v9BestRosterCacheKey=cacheKey;state.v9BestRosterCache=result;return result;\n", 1)
+
+init = "    v9ActiveDrawerTab:state.v9ActiveDrawerTab||'strategy'\n"
+if init in s:
+    s = s.replace(init, "    v9ActiveDrawerTab:state.v9ActiveDrawerTab||'strategy',\n    v9BestRosterCacheKey:state.v9BestRosterCacheKey||'',\n    v9BestRosterCache:state.v9BestRosterCache||null\n", 1)
+
+p.write_text(s, encoding='utf-8')
+
+block = s.split('<!-- V9_STRATEGIC_DRAWER_START -->',1)[1].split('<!-- V9_STRATEGIC_DRAWER_END -->',1)[0]
+scripts = re.findall(r'<script>(.*?)</script>', block, flags=re.S)
+Path('/tmp/v9-fixed.js').write_text(scripts[-1], encoding='utf-8')
