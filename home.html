@@ -14,6 +14,7 @@
     home.html#/setup
     home.html#/list
     home.html#/rosters
+    home.html#/strategy
     home.html#/auction
     home.html#/tv
 
@@ -13437,6 +13438,7 @@
       <a id="nav-setup" class="nav-btn" data-view="setup" href="#/setup"><span class="nav-glyph">⌘</span><span>Setup</span></a>
       <a class="nav-btn" data-view="list" href="#/list"><span class="nav-glyph">☷</span><span>Listone</span></a>
       <a class="nav-btn" data-view="rosters" href="#/rosters"><span class="nav-glyph">◫</span><span>Rose</span></a>
+      <a class="nav-btn" data-view="strategy" href="#/strategy"><span class="nav-glyph">◇</span><span>Strategia</span></a>
       <a class="nav-btn" data-view="auction" href="#/auction"><span class="nav-glyph">◆</span><span>Asta</span></a>
       <a id="nav-tv" class="nav-btn" data-view="tv" href="#/tv"><span class="nav-glyph">▣</span><span>TV</span></a>
       <div class="modern-sidebar-footer">
@@ -13755,6 +13757,20 @@
       <section id="view-rosters" class="view">
         <div id="roster-kpis" class="kpis" style="margin-bottom:6px"></div>
         <div id="rosters-grid" class="rosters-grid"></div>
+      </section>
+
+      <!-- STRATEGIA -->
+      <section id="view-strategy" class="view no-page-scroll">
+        <div class="v9-strategy-page">
+          <nav class="v9-drawer-tabs v9-strategy-tabs" aria-label="Strategia e statistiche">
+            <button type="button" class="v9-drawer-tab active" data-v9-tab="strategy">CENTRO STRATEGICO</button>
+            <button type="button" class="v9-drawer-tab" data-v9-tab="stats">STATISTICHE</button>
+          </nav>
+          <div class="v9-strategy-content">
+            <div class="v9-pane v9-pane-strategy" data-v9-pane="strategy"></div>
+            <div class="v9-pane v9-pane-stats" data-v9-pane="stats" hidden></div>
+          </div>
+        </div>
       </section>
 
       <!-- ASTA -->
@@ -14213,6 +14229,7 @@
       setup: { id: 'setup', hash: '#/setup', leagueRequired: true },
       list: { id: 'list', hash: '#/list', leagueRequired: true },
       rosters: { id: 'rosters', hash: '#/rosters', leagueRequired: true },
+      strategy: { id: 'strategy', hash: '#/strategy', leagueRequired: true },
       auction: { id: 'auction', hash: '#/auction', leagueRequired: true },
       tv: { id: 'tv', hash: '#/tv', leagueRequired: true }
     });
@@ -14225,6 +14242,7 @@
       setup: { title: 'Configurazione', subtitle: 'Regole Classic/Mantra, timer, chiamate, rilanci e vincoli della rosa.' },
       list: { title: 'Listone', subtitle: 'Ricerca, filtri e dati statistici del dataset giocatori attivo.' },
       rosters: { title: 'Rose', subtitle: 'Crediti, assegnazioni e capacità residua di tutte le squadre.' },
+      strategy: { title: 'Strategia', subtitle: 'Centro Strategico privato, preferiti, benchmark e statistiche pre-asta.' },
       auction: { title: 'Asta live', subtitle: 'Cockpit operativo collegato allo stato autorevole del server.' },
       tv: { title: 'Vista TV', subtitle: 'Presentazione essenziale e leggibile dello stato live dell’asta.' }
     });
@@ -29779,6 +29797,7 @@
         else if(state.view==='setup')await loadSetup();
         else if(state.view==='list')await loadList();
         else if(state.view==='rosters')await loadRosters();
+        else if(state.view==='strategy'&&typeof window.loadStrategyView==='function')await window.loadStrategyView(force);
         else if(state.view==='auction'||state.view==='tv')await loadAuction({quiet:!force});
       }catch(error){if(force)msg(error.message,'error');else console.error(error)}
       finally{refreshBusy=false}
@@ -30251,6 +30270,7 @@
                   item.route === 'setup' ? '⌘' :
                   item.route === 'list' ? '☷' :
                   item.route === 'rosters' ? '◫' :
+                  item.route === 'strategy' ? '◇' :
                   item.route === 'auction' ? '◆' : '▣'
                 }</span>
                 <span><b>${esc(meta.title || item.label)}</b><small>${esc(meta.subtitle || '')}</small></span>
@@ -31042,36 +31062,26 @@
   function activateTab(name){
     const tab=name==='stats'?'stats':'strategy';
     state.v9ActiveDrawerTab=tab;
-    const drawer=document.querySelector('.v9-strategy-drawer');
-    if(!drawer)return;
-    drawer.querySelectorAll('.v9-drawer-tab').forEach(b=>b.classList.toggle('active',b.dataset.v9Tab===tab));
-    drawer.querySelectorAll('.v9-pane').forEach(p=>p.hidden=p.dataset.v9Pane!==tab);
-    if(!drawer.open)return;
+    const view=document.getElementById('view-strategy');
+    if(!view)return;
+    view.querySelectorAll('[data-v9-tab]').forEach(b=>b.classList.toggle('active',b.dataset.v9Tab===tab));
+    view.querySelectorAll('[data-v9-pane]').forEach(p=>p.hidden=p.dataset.v9Pane!==tab);
+    if(state.view!=='strategy')return;
     if(tab==='stats')renderStats();else renderStrategy();
   }
-  function patchDrawer(){
-    const root=document.getElementById('auction-root');if(!root)return;
-    let drawer=root.querySelector('.v9-strategy-drawer');
-    if(!drawer){
-      drawer=document.createElement('details');
-      drawer.className='v9-strategy-drawer';
-      drawer.innerHTML=`<summary>STRATEGIA</summary><div class="v9-drawer-shell"><nav class="v9-drawer-tabs"><button type="button" class="v9-drawer-tab" data-v9-tab="strategy">CENTRO STRATEGICO</button><button type="button" class="v9-drawer-tab" data-v9-tab="stats">STATISTICHE</button></nav><div class="v9-pane v9-pane-strategy" data-v9-pane="strategy"></div><div class="v9-pane v9-pane-stats" data-v9-pane="stats"></div></div>`;
-      root.appendChild(drawer);
-      drawer.querySelectorAll('[data-v9-tab]').forEach(b=>b.addEventListener('click',()=>activateTab(b.dataset.v9Tab)));
-      drawer.addEventListener('toggle',()=>{
-        state.v9DrawerOpen=drawer.open;
-        if(drawer.open)activateTab(state.v9ActiveDrawerTab==='stats'?'stats':'strategy');
-      });
-    }
-    const shouldOpen=state.v9DrawerOpen===true;
-    if(drawer.open!==shouldOpen)drawer.open=shouldOpen;
-    const tab=state.v9ActiveDrawerTab==='stats'?'stats':'strategy';
-    drawer.querySelectorAll('.v9-drawer-tab').forEach(b=>b.classList.toggle('active',b.dataset.v9Tab===tab));
-    drawer.querySelectorAll('.v9-pane').forEach(p=>p.hidden=p.dataset.v9Pane!==tab);
-    if(drawer.open){
-      if(tab==='stats')renderStats();else renderStrategy();
-    }
+
+  function bindStrategyView(){
+    const view=document.getElementById('view-strategy');
+    if(!view||view.dataset.v9Bound==='1')return;
+    view.dataset.v9Bound='1';
+    view.querySelectorAll('[data-v9-tab]').forEach(b=>b.addEventListener('click',()=>activateTab(b.dataset.v9Tab)));
   }
+
+  window.loadStrategyView=async function(force=false){
+    bindStrategyView();
+    await loadV9(force===true);
+    activateTab(state.v9ActiveDrawerTab==='stats'?'stats':'strategy');
+  };
 
   async function loadRulesIntoSetup(){
     if(!document.getElementById('setup-form'))return;
@@ -31092,29 +31102,40 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
   const oldLoadSetup=loadSetup;loadSetup=async function(...a){const r=await oldLoadSetup(...a);await loadRulesIntoSetup();return r};
   document.getElementById('setup-form')?.addEventListener('submit',async()=>{const box=document.getElementById('v9-scoring-setup');if(!box)return;try{const res=await api(ENDPOINTS.scoring,{action:'saveRules',defenseRuleEnabled:box.querySelector('#v9-defense')?.checked===true,defenseIncludeGoalkeeper:box.querySelector('#v9-defense-gk')?.checked!==false,cleanSheetBonusEnabled:box.querySelector('#v9-clean')?.checked===true,cleanSheetBonusValue:Number(box.querySelector('#v9-clean-value')?.value||1)},{quiet:true});if(res?.rules)state.v9Rules=res.rules;}catch(e){msg(e.message||'Errore salvataggio regole punteggio.','error')}},false);
 
-  const oldLive=renderAuctionLive;renderAuctionLive=function(...a){const r=oldLive(...a);queueMicrotask(()=>{document.querySelector('.v8center')?.remove();patchDrawer()});return r};
-  const oldLobby=renderAuctionLobby;renderAuctionLobby=function(...a){const r=oldLobby(...a);queueMicrotask(()=>{document.querySelector('.v8center')?.remove();patchDrawer()});return r};
-  const oldPrepared=renderAuctionPrepared;renderAuctionPrepared=function(...a){const r=oldPrepared(...a);queueMicrotask(()=>{document.querySelector('.v8center')?.remove();patchDrawer()});return r};
-  const oldLoadAuction=loadAuction;loadAuction=async function(...a){const r=await oldLoadAuction(...a);await loadV9();document.querySelector('.v8center')?.remove();patchDrawer();return r};
+  const oldLive=renderAuctionLive;renderAuctionLive=function(...a){const r=oldLive(...a);queueMicrotask(()=>document.querySelector('.v8center')?.remove());return r};
+  const oldLobby=renderAuctionLobby;renderAuctionLobby=function(...a){const r=oldLobby(...a);queueMicrotask(()=>document.querySelector('.v8center')?.remove());return r};
+  const oldPrepared=renderAuctionPrepared;renderAuctionPrepared=function(...a){const r=oldPrepared(...a);queueMicrotask(()=>document.querySelector('.v8center')?.remove());return r};
+  const oldLoadAuction=loadAuction;loadAuction=async function(...a){const r=await oldLoadAuction(...a);document.querySelector('.v8center')?.remove();return r};
 
 
   const st=document.createElement('style');st.textContent=`
     .auction-free-fixed.v9-tabbed{grid-template-rows:25px minmax(0,1fr)!important;overflow:hidden!important}.v9-drawer-tabs{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:2px;padding:2px;background:rgba(7,25,44,.96);border-bottom:1px solid rgba(91,151,216,.25)}.v9-drawer-tab{min-height:20px!important;height:20px!important;padding:1px 4px!important;background:rgba(34,64,96,.45)!important;border:1px solid rgba(91,151,216,.18)!important;font-size:6.5px!important}.v9-drawer-tab.active{background:var(--primary)!important}.v9-pane{min-height:0;overflow:hidden}.v9-pane-free{display:grid;grid-template-rows:auto auto minmax(0,1fr);height:100%;min-height:0}.v9-tabbed.has-status-card.has-caller-controls .v9-pane-free{grid-template-rows:auto auto auto minmax(0,1fr) auto}.v9-tabbed.has-status-card.no-caller-controls .v9-pane-free{grid-template-rows:auto auto minmax(0,1fr) auto}.v9-pane-strategy,.v9-pane-stats{height:100%;overflow:auto;overscroll-behavior:contain;padding:4px}.v9scroll{display:grid;gap:5px;align-content:start}.v9card{min-height:0;padding:6px;border:1px solid rgba(91,151,216,.24);border-radius:7px;background:linear-gradient(145deg,rgba(27,56,86,.58),rgba(8,28,48,.64));display:grid;gap:5px}.v9card-scroll{min-height:0;max-height:190px;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable}.v9block{display:grid;gap:3px}.v9block>b,.v9card>strong{font-size:8px}.v9block>small{color:var(--soft);font-size:6px}.v9mods{display:flex;flex-wrap:wrap;gap:2px}.v9mods label{display:flex;align-items:center;gap:2px;padding:2px 4px;border:1px solid var(--line);border-radius:5px;font-size:6px}.v9mods input{width:11px;min-width:11px;height:11px;min-height:11px}.v9budgets{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}.v9fav{display:grid;grid-template-columns:minmax(0,1fr) 58px 20px;gap:3px;align-items:center;padding:4px;border-bottom:1px solid rgba(91,151,216,.14)}.v9fav strong,.v9fav small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.v9fav strong{font-size:7px}.v9fav small{font-size:5.5px;color:var(--soft)}.v9fav label{font-size:5px}.v9fav input{min-height:23px;height:23px;padding:2px 4px}.v9fav button{width:20px!important;min-width:20px!important;height:20px!important;min-height:20px!important;padding:0!important}.v9top{display:grid;grid-template-columns:minmax(0,1fr) 38px 32px 32px;gap:3px;align-items:center;min-height:24px;border-bottom:1px solid rgba(91,151,216,.14);font-size:6px}.v9top.mom{border:1px solid rgba(220,180,70,.45);border-radius:5px;padding:0 3px}.v9top span{text-align:right}.v9empty{padding:8px;color:var(--soft);font-size:6px}.v9kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}.v9kpi span{padding:5px;border:1px solid rgba(91,151,216,.18);border-radius:5px;background:rgba(11,42,77,.55)}.v9kpi small,.v9kpi b{display:block}.v9kpi small{font-size:5px;color:var(--soft)}.v9kpi b{font-size:11px}.v9bar{display:grid;grid-template-columns:24px minmax(0,1fr) 84px;gap:4px;align-items:center;font-size:6px}.v9bar span{height:8px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}.v9bar i{display:block;height:100%;background:linear-gradient(90deg,#3478f6,#43d6b5);border-radius:99px}.v9bar em{font-style:normal;text-align:right;color:var(--soft)}.v9slotgroup{display:grid;grid-template-columns:24px repeat(auto-fit,minmax(62px,1fr));gap:3px;padding:3px 0;border-bottom:1px solid rgba(91,151,216,.14)}.v9slotgroup span{display:grid;font-size:5.5px}.v9slotgroup em{font-style:normal;color:var(--soft)}.v9statsgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px}.v9statsgrid span{padding:4px;border:1px solid rgba(91,151,216,.16);border-radius:5px;font-size:5.5px}.v9statsgrid b{display:block;font-size:10px;margin-top:2px}.v9switch{display:flex!important;align-items:center;gap:3px!important;font-size:6px!important}.v9switch input{width:14px;min-width:14px;height:14px;min-height:14px}.v9besthead{display:flex;align-items:center;gap:6px;font-size:6px}.v9besthead b{font-size:8px}.v9besthead em{font-style:normal;color:var(--soft)}.v9bestcols{display:grid;grid-template-columns:1fr 1fr;gap:4px;min-height:0}.v9bestcols>div{min-height:0;border:1px solid rgba(91,151,216,.15);border-radius:5px;padding:4px}.v9bestcols>div>strong{font-size:7px}.v9bestcols .v9card-scroll{max-height:220px}.v9bestcols .v9card-scroll>span{display:block;padding:3px;border-bottom:1px solid rgba(91,151,216,.12)}.v9bestcols b,.v9bestcols small{display:block}.v9bestcols b{font-size:6px}.v9bestcols small{font-size:5px;color:var(--soft)}@media(max-width:700px){.v9-drawer-tabs{grid-template-columns:1fr}.v9-drawer-tab{height:18px!important;min-height:18px!important}.auction-free-fixed.v9-tabbed{grid-template-rows:58px minmax(0,1fr)!important}.v9kpi,.v9statsgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.v9bestcols{grid-template-columns:1fr}.v9budgets{grid-template-columns:repeat(2,minmax(0,1fr))}}
   `;document.head.appendChild(st);
 
-  const v9DrawerStyle=document.createElement('style');v9DrawerStyle.textContent=`
-    .v9-strategy-drawer{position:absolute;z-index:88;top:3px;right:0;bottom:3px;width:min(58vw,720px);min-width:430px;border:1px solid rgba(91,151,216,.38);border-radius:9px;background:rgba(6,24,43,.97);box-shadow:-14px 0 34px rgba(0,0,0,.38);overflow:hidden}
-    .v9-strategy-drawer:not([open]){width:31px;min-width:31px;max-width:31px;box-shadow:none}
-    .v9-strategy-drawer>summary{position:absolute;left:0;top:0;bottom:0;width:31px;list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;text-orientation:mixed;font-size:7px;font-weight:950;letter-spacing:.08em;background:rgba(44,78,112,.78);border-right:1px solid rgba(91,151,216,.28);z-index:3}
-    .v9-strategy-drawer>summary::-webkit-details-marker{display:none}.v9-strategy-drawer:not([open])>*:not(summary){display:none!important}
-    .v9-drawer-shell{height:100%;min-height:0;margin-left:31px;padding:4px;display:grid;grid-template-rows:25px minmax(0,1fr);gap:3px;overflow:hidden}
-    .v9-strategy-drawer .v9-drawer-tabs{display:grid;grid-template-columns:1.2fr 1fr;gap:3px;padding:0;background:transparent;border:0}
-    .v9-strategy-drawer .v9-pane{height:100%;min-height:0;overflow:auto;overscroll-behavior:contain}
-    .v9-strategy-drawer .v9-pane[hidden]{display:none!important}
-    @media(max-width:760px){.v9-strategy-drawer{width:min(94vw,620px);min-width:0}.v9-strategy-drawer:not([open]){width:29px;min-width:29px;max-width:29px}.v9-strategy-drawer>summary{width:29px}.v9-drawer-shell{margin-left:29px}.v9-strategy-drawer .v9-drawer-tabs{grid-template-columns:1fr 1fr}}
-  `;document.head.appendChild(v9DrawerStyle);
+  const v9PageStyle=document.createElement('style');v9PageStyle.textContent=`
+    #view-strategy{overflow:hidden!important}
+    .v9-strategy-page{height:100%;min-height:0;display:grid;grid-template-rows:44px minmax(0,1fr);gap:8px}
+    .v9-strategy-tabs{display:grid;grid-template-columns:minmax(150px,240px) minmax(150px,240px);justify-content:start;gap:5px;padding:5px;border:1px solid rgba(109,167,255,.16);border-radius:14px;background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.022))}
+    .v9-strategy-tabs .v9-drawer-tab{height:32px!important;min-height:32px!important;padding:4px 10px!important;border-radius:9px!important;font-size:8px!important}
+    .v9-strategy-content{min-height:0;height:100%;overflow:hidden}
+    #view-strategy .v9-pane{height:100%;min-height:0;overflow:auto;overscroll-behavior:contain;padding:0 2px 12px}
+    #view-strategy .v9-pane[hidden]{display:none!important}
+    #view-strategy .v9scroll{grid-template-columns:repeat(12,minmax(0,1fr));align-items:start;gap:8px}
+    #view-strategy .v9card{grid-column:span 4;padding:14px;border-radius:14px}
+    #view-strategy .v9card:first-child{grid-column:span 5}
+    #view-strategy .v9card:nth-child(2){grid-column:span 3}
+    #view-strategy .v9card:nth-child(3){grid-column:span 4}
+    #view-strategy .v9-pane-stats .v9card{grid-column:span 6}
+    #view-strategy .v9-pane-stats .v9card:last-child{grid-column:1/-1}
+    #view-strategy .v9card-scroll{max-height:360px}
+    #view-strategy .v9bestcols .v9card-scroll{max-height:420px}
+    @media(max-width:1050px){#view-strategy .v9card,#view-strategy .v9card:first-child,#view-strategy .v9card:nth-child(2),#view-strategy .v9card:nth-child(3),#view-strategy .v9-pane-stats .v9card{grid-column:span 6}}
+    @media(max-width:700px){.v9-strategy-page{grid-template-rows:42px minmax(0,1fr)}.v9-strategy-tabs{grid-template-columns:1fr 1fr;padding:4px}.v9-strategy-tabs .v9-drawer-tab{font-size:7px!important}#view-strategy .v9scroll{grid-template-columns:1fr}#view-strategy .v9card,#view-strategy .v9card:first-child,#view-strategy .v9card:nth-child(2),#view-strategy .v9card:nth-child(3),#view-strategy .v9-pane-stats .v9card,#view-strategy .v9-pane-stats .v9card:last-child{grid-column:1}}
+  `;document.head.appendChild(v9PageStyle);
 
-  void loadV9(true).then(()=>{if(state.view==='auction')patchDrawer();if(state.view==='setup')loadRulesIntoSetup()});
+  bindStrategyView();
+  if(state.view==='strategy')void window.loadStrategyView(true);
+  if(state.view==='setup')void loadRulesIntoSetup();
 })();
 
 </script>
