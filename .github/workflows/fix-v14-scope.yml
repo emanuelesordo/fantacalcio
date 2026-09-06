@@ -1,0 +1,37 @@
+name: Fix V14 scope
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-v14-scope.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Fix
+        run: python3 .github/fix_v14_scope.py
+      - name: Validate
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('home.html').read_text(encoding='utf-8')
+          Path('/tmp/js').write_text('\n'.join(re.findall(r'<script(?: [^>]*)?>(.*?)</script>',s,flags=re.S)),encoding='utf-8')
+          PY
+          node --check /tmp/js
+          ! grep -q 'id="v14-list-strategy-player-runtime"' home.html
+          grep -q 'v14-called-player-detail-runtime' home.html
+          grep -q 'v13RenderBody' home.html
+      - name: Commit
+        run: |
+          rm -f .github/workflows/fix-v14-scope.yml .github/fix_v14_scope.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: keep list filter focus and strategy route stable"
+          git push origin main
