@@ -1,0 +1,36 @@
+name: Apply V14 list strategy player
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-v14-list-strategy-player.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Apply
+        run: python3 .github/apply_v14_filters_strategy_playercard.py
+      - name: Validate
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('home.html').read_text(encoding='utf-8')
+          Path('/tmp/js').write_text('\n'.join(re.findall(r'<script(?: [^>]*)?>(.*?)</script>',s,flags=re.S)),encoding='utf-8')
+          PY
+          node --check /tmp/js
+          grep -q 'v14-called-details' home.html
+          grep -q 'roleOrder' home.html
+      - name: Commit
+        run: |
+          rm -f .github/workflows/apply-v14-list-strategy-player.yml .github/workflows/inspect-v14-targets.yml .github/apply_v14_filters_strategy_playercard.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "feat: keep list filters focused and add private called-player detail"
+          git push origin main
