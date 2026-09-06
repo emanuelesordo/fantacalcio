@@ -13026,6 +13026,232 @@
       filter:saturate(.45)!important;
     }
 
+
+
+    /* =====================================================
+       GLASS V6W · Svincolati = linguaggio Rosa + colonne personalizzabili
+       ===================================================== */
+
+    /* Riga Svincolati: stessa scala visiva della Rosa personale. */
+    body.modern-glass #view-auction .auction-free-fixed .player-table tbody tr{
+      height:29px!important;
+      min-height:29px!important;
+      background:#0a2748!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed .player-table tbody td{
+      height:29px!important;
+      min-height:29px!important;
+      padding-top:1px!important;
+      padding-bottom:1px!important;
+      border-bottom:1px solid rgba(40,89,142,.55)!important;
+      vertical-align:middle!important;
+      font-size:7px!important;
+      line-height:1!important;
+      font-variant-numeric:tabular-nums!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed .player-main{
+      gap:3px!important;
+      min-width:0!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed .player-name{
+      font-size:8px!important;
+      line-height:1!important;
+      font-weight:900!important;
+      letter-spacing:0!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed .auction-player-team-small{
+      font-size:5.5px!important;
+      line-height:1!important;
+      margin-top:1px!important;
+    }
+
+    /* Ruoli delle row = stessi chip della Rosa. */
+    body.modern-glass #view-auction .auction-free-fixed .player-role-cell{
+      display:flex!important;
+      align-items:center!important;
+      justify-content:center!important;
+      gap:1px!important;
+      white-space:nowrap!important;
+      text-align:center!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed .player-role-cell .rolebadge,
+    body.modern-glass #view-auction .auction-free-fixed .rolebar .rolebtn:not([data-role="all"]){
+      min-width:15px!important;
+      width:auto!important;
+      min-height:12px!important;
+      height:12px!important;
+      padding:0 2px!important;
+      border-radius:4px!important;
+      font-size:5px!important;
+      line-height:12px!important;
+      font-weight:950!important;
+      margin:0!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed .rolebar{
+      gap:1px!important;
+      align-items:center!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed .rolebar .rolebtn[data-role="all"]{
+      min-width:24px!important;
+      width:auto!important;
+      min-height:12px!important;
+      height:12px!important;
+      padding:0 3px!important;
+      border-radius:4px!important;
+      font-size:5px!important;
+      line-height:12px!important;
+      font-weight:950!important;
+    }
+
+    /* Header e valori: tutto centrato salvo il nome. */
+    body.modern-glass #view-auction .auction-free-fixed .player-table thead th,
+    body.modern-glass #view-auction .auction-free-fixed .player-table thead th [data-auction-sort]{
+      text-align:center!important;
+      justify-content:center!important;
+      align-items:center!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed .player-table thead .auction-player-col-name,
+    body.modern-glass #view-auction .auction-free-fixed .player-table thead .auction-player-col-name [data-auction-sort],
+    body.modern-glass #view-auction .auction-free-fixed .player-table tbody .auction-player-col-name{
+      text-align:left!important;
+      justify-content:flex-start!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed .player-table tbody .auction-player-col-role,
+    body.modern-glass #view-auction .auction-free-fixed .player-table tbody .auction-player-col-signals,
+    body.modern-glass #view-auction .auction-free-fixed .player-table tbody .auction-player-col-pfc,
+    body.modern-glass #view-auction .auction-free-fixed .player-table tbody .auction-player-col-fm,
+    body.modern-glass #view-auction .auction-free-fixed .player-table tbody .auction-player-col-pma,
+    body.modern-glass #view-auction .auction-free-fixed .player-table tbody .auction-player-col-supreme,
+    body.modern-glass #view-auction .auction-free-fixed .player-table tbody .auction-player-col-action{
+      text-align:center!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed .auction-signal-list{
+      width:100%!important;
+      justify-content:center!important;
+      gap:1px!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed .auction-signal-badge{
+      margin:0!important;
+      font-size:7px!important;
+      line-height:1!important;
+    }
+
+    /* Colonne: trascinabili e ridimensionabili. */
+    body.modern-glass #view-auction .auction-free-fixed .player-table thead th{
+      position:sticky!important;
+      top:0!important;
+      overflow:visible!important;
+      user-select:none!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed .auction-column-draggable{
+      cursor:grab!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed .auction-column-draggable:active,
+    body.modern-glass #view-auction .auction-free-fixed .auction-column-draggable.is-column-dragging{
+      cursor:grabbing!important;
+      opacity:.62!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed .is-column-drop-target{
+      box-shadow:inset 2px 0 0 #59a7ff!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed .auction-column-resize-handle{
+      position:absolute!important;
+      z-index:8!important;
+      top:3px!important;
+      right:-2px!important;
+      bottom:3px!important;
+      width:5px!important;
+      cursor:col-resize!important;
+      touch-action:none!important;
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed .auction-column-resize-handle::after{
+      content:"";
+      position:absolute;
+      top:1px;
+      bottom:1px;
+      left:2px;
+      width:1px;
+      background:rgba(125,177,225,.22);
+    }
+
+    body.modern-glass #view-auction .auction-free-fixed .auction-column-resize-handle:hover::after{
+      background:#59a7ff;
+    }
+
+    /* Nessuna nth-child deve interferire con il riordino libero. */
+    body.modern-glass #view-auction .auction-free-fixed .player-table th,
+    body.modern-glass #view-auction .auction-free-fixed .player-table td{
+      box-sizing:border-box!important;
+    }
+
+    /* Header delle card Rose = Alias | RIM fase | Crediti, stesso linguaggio RIM. */
+    body.modern-glass #view-auction .auction-roster-team-head{
+      min-height:27px!important;
+      height:27px!important;
+      padding:3px 5px!important;
+      display:flex!important;
+      align-items:center!important;
+      justify-content:space-between!important;
+      gap:4px!important;
+      overflow:hidden!important;
+    }
+
+    body.modern-glass #view-auction .auction-roster-card-rim{
+      min-width:0!important;
+      display:flex!important;
+      align-items:center!important;
+      gap:3px!important;
+      overflow:hidden!important;
+      white-space:nowrap!important;
+    }
+
+    body.modern-glass #view-auction .auction-roster-card-rim strong,
+    body.modern-glass #view-auction .auction-roster-card-rim b{
+      font-size:8px!important;
+      line-height:1!important;
+      font-weight:900!important;
+      font-variant-numeric:tabular-nums!important;
+    }
+
+    body.modern-glass #view-auction .auction-roster-card-rim strong{
+      min-width:0!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+    }
+
+    body.modern-glass #view-auction .auction-roster-card-rim i{
+      font-size:7px!important;
+      line-height:1!important;
+      color:#718ba5!important;
+      font-style:normal!important;
+    }
+
+    body.modern-glass #view-auction .auction-roster-team-head .auction-roster-credit-edit{
+      flex:0 0 auto!important;
+      width:20px!important;
+      min-width:20px!important;
+      height:20px!important;
+      min-height:20px!important;
+      padding:0!important;
+      font-size:8px!important;
+    }
+
 </style>
 </head>
 <body class="modern-glass">
@@ -19605,35 +19831,35 @@
               <thead>
                 <tr>
 
-                  <th class="auction-player-col-role">
-                    <button data-auction-sort="role">
-                      Ruolo <span>↕</span>
+                  <th class="auction-player-col-role" data-auction-column="role">
+                    <button data-auction-sort="role" title="Ordina per ruolo" aria-label="Ordina per ruolo">
+                      <span aria-hidden="true">↕</span>
                     </button>
                   </th>
 
-                  <th class="auction-player-col-name">
+                  <th class="auction-player-col-name" data-auction-column="name">
                     <button data-auction-sort="name">
                       Calciatore <span>↑</span>
                     </button>
                   </th>
 
-                  <th class="auction-player-col-signals">
+                  <th class="auction-player-col-signals" data-auction-column="signals">
                     <span title="Segnalazioni">Badge</span>
                   </th>
 
-                  <th class="num-head auction-player-col-pfc">
+                  <th class="num-head auction-player-col-pfc" data-auction-column="pfc">
                     <button data-auction-sort="pfc" title="Prezzo Fantaculo consigliato">
                       PFC <span>↕</span>
                     </button>
                   </th>
 
-                  <th class="num-head auction-player-col-fm">
+                  <th class="num-head auction-player-col-fm" data-auction-column="fm">
                     <button data-auction-sort="fm" title="Fanta media attesa importata dal listone">
                       FM <span>↕</span>
                     </button>
                   </th>
 
-                  <th class="num-head auction-player-col-pma">
+                  <th class="num-head auction-player-col-pma" data-auction-column="pma">
                     <button data-auction-sort="pma" title="Prezzo medio asta">
                       PMA <span>↕</span>
                     </button>
@@ -19643,7 +19869,7 @@
                     showSupremeMetric
                       ? `
                           <th
-                            class="num-head auction-player-col-supreme"
+                            class="num-head auction-player-col-supreme" data-auction-column="supreme"
                             title="Indice riservato: formula crediti e Fanta media da definire"
                           >
                             INDICE
@@ -19655,7 +19881,7 @@
                   ${
                     showQueue
                       ? `
-                          <th class="queue-head auction-player-col-action">
+                          <th class="queue-head auction-player-col-action" data-auction-column="action">
                             AZIONE
                           </th>
                         `
@@ -20890,42 +21116,88 @@
               - effectiveDebits
             );
 
+          const metrics =
+            auctionControllerTeamMetrics(team.id);
+
+          const rosterCount =
+            Number(metrics.rosterCount || rows.length || 0);
+
+          const rosterMin =
+            Math.max(0, Number(metrics.rosterMin || 0));
+
+          const rosterMax =
+            Math.max(
+              rosterMin,
+              Number(metrics.rosterMax || rosterMin || 0)
+            );
+
+          const remainingToMin =
+            Math.max(0, rosterMin - rosterCount);
+
+          const phaseActive =
+            Boolean(
+              state.auction?.rolePhase?.key
+              && Number(metrics.phaseMax || 0) > 0
+            );
+
+          const phaseRemainingToMin =
+            Math.max(
+              0,
+              Number(metrics.phaseMin || 0)
+              - Number(metrics.phaseCurrent || 0)
+            );
+
+          const phaseRemaining =
+            phaseActive
+              ? phaseRemainingToMin > 0
+                ? phaseRemainingToMin
+                : Math.max(
+                    0,
+                    Number(metrics.phaseMax || 0)
+                    - Number(metrics.phaseCurrent || 0)
+                  )
+              : remainingToMin > 0
+                ? remainingToMin
+                : Math.max(0, rosterMax - rosterCount);
+
+          const phaseLabel =
+            phaseActive
+              ? auctionRolePhaseLabel(state.auction?.rolePhase?.key)
+              : 'Rosa';
+
           return `
             <section
               class="auction-roster-team-card"
               data-roster-drop-team="${esc(team.id)}"
             >
 
-              <div class="auction-roster-team-head">
-
-                <div class="auction-roster-team-identity">
+              <div
+                class="auction-roster-team-head"
+                title="${esc(teamReference)} · ${phaseRemaining} rimasti (${esc(phaseLabel)}) · ${remaining} crediti · Presidente ${esc(presidentUsername)}"
+              >
+                <div class="auction-roster-card-rim">
                   <strong>${esc(teamReference)}</strong>
-                  ${team.auction_alias ? '' : `<small>${esc(presidentUsername)}</small>`}
+                  <i>|</i>
+                  <b>${phaseRemaining}</b>
+                  <i>|</i>
+                  <b>${remaining}</b>
                 </div>
 
-                <div class="auction-roster-team-credit">
-                  <span>
-                    <small>Crediti</small>
-                    <strong>${remaining}</strong>
-                  </span>
-
-                  ${
-                    canEdit
-                      ? `
-                          <button
-                            type="button"
-                            class="auction-roster-credit-edit"
-                            data-edit-roster-credits="${esc(team.id)}"
-                            data-team-name="${esc(team.name)}"
-                            data-current-credits="${remaining}"
-                            title="Modifica crediti residui"
-                            aria-label="Modifica crediti residui di ${esc(team.name)}"
-                          >✎</button>
-                        `
-                      : ''
-                  }
-                </div>
-
+                ${
+                  canEdit
+                    ? `
+                        <button
+                          type="button"
+                          class="auction-roster-credit-edit"
+                          data-edit-roster-credits="${esc(team.id)}"
+                          data-team-name="${esc(team.name)}"
+                          data-current-credits="${remaining}"
+                          title="Modifica crediti residui e apri log"
+                          aria-label="Modifica crediti residui di ${esc(team.name)}"
+                        >✎</button>
+                      `
+                    : ''
+                }
               </div>
 
 
@@ -26956,6 +27228,441 @@
         );
     }
 
+    function auctionFreeColumnPreferenceKey() {
+      const userId =
+        state.session?.user?.id
+        || state.dashboard?.currentUser?.id
+        || 'anon';
+
+      const leagueId =
+        state.selectedLeague?.id
+        || 'no-league';
+
+      const mode =
+        state.auction?.settings?.fantasy_mode
+        || 'classic';
+
+      return `fantacalcio_auction_free_columns_v1:${userId}:${leagueId}:${mode}`;
+    }
+
+
+    function auctionFreeVisibleColumns() {
+      const columns = [
+        'role',
+        'name',
+        'signals',
+        'pfc',
+        'fm',
+        'pma'
+      ];
+
+      if (auctionIsSuperAdmin()) {
+        columns.push('supreme');
+      }
+
+      if (
+        auctionCallMode()
+        && auctionHasPresidentRole()
+      ) {
+        columns.push('action');
+      }
+
+      return columns;
+    }
+
+
+    function auctionFreeColumnClass(key) {
+      return ({
+        role: 'auction-player-col-role',
+        name: 'auction-player-col-name',
+        signals: 'auction-player-col-signals',
+        pfc: 'auction-player-col-pfc',
+        fm: 'auction-player-col-fm',
+        pma: 'auction-player-col-pma',
+        supreme: 'auction-player-col-supreme',
+        action: 'auction-player-col-action'
+      })[key] || '';
+    }
+
+
+    function auctionFreeDefaultWidths(containerWidth = 0) {
+      const visible =
+        auctionFreeVisibleColumns();
+
+      const fixed = {
+        role: 50,
+        signals: 48,
+        pfc: 44,
+        fm: 44,
+        pma: 44,
+        supreme: 52,
+        action: 62
+      };
+
+      const fixedTotal =
+        visible
+          .filter(key => key !== 'name')
+          .reduce(
+            (sum, key) =>
+              sum + Number(fixed[key] || 44),
+            0
+          );
+
+      const nameWidth =
+        Math.max(
+          118,
+          Number(containerWidth || 0)
+          - fixedTotal
+        );
+
+      return {
+        ...fixed,
+        name: nameWidth
+      };
+    }
+
+
+    function auctionFreeColumnPreferences() {
+      const visible =
+        auctionFreeVisibleColumns();
+
+      const saved =
+        getLocalJson(
+          auctionFreeColumnPreferenceKey()
+        )
+        || {};
+
+      const savedOrder =
+        Array.isArray(saved.order)
+          ? saved.order.filter(key => visible.includes(key))
+          : [];
+
+      const order = [
+        ...savedOrder,
+        ...visible.filter(key => !savedOrder.includes(key))
+      ];
+
+      return {
+        order,
+        widths:
+          saved.widths
+          && typeof saved.widths === 'object'
+            ? { ...saved.widths }
+            : {}
+      };
+    }
+
+
+    function saveAuctionFreeColumnPreferences(prefs) {
+      setLocalJson(
+        auctionFreeColumnPreferenceKey(),
+        {
+          order:
+            Array.isArray(prefs?.order)
+              ? prefs.order
+              : auctionFreeVisibleColumns(),
+          widths:
+            prefs?.widths || {}
+        }
+      );
+    }
+
+
+    function auctionFreeColumnKeyFromCell(cell) {
+      if (!cell) {
+        return '';
+      }
+
+      return auctionFreeVisibleColumns()
+        .find(key =>
+          cell.classList.contains(
+            auctionFreeColumnClass(key)
+          )
+        )
+        || '';
+    }
+
+
+    function applyAuctionFreeColumnLayout() {
+      const table =
+        document.querySelector(
+          '.auction-free-fixed .player-table'
+        );
+
+      if (!table) {
+        return;
+      }
+
+      const wrapper =
+        table.closest('.drawer-table');
+
+      const visible =
+        auctionFreeVisibleColumns();
+
+      const prefs =
+        auctionFreeColumnPreferences();
+
+      const defaultWidths =
+        auctionFreeDefaultWidths(
+          wrapper?.clientWidth || table.clientWidth || 0
+        );
+
+      const widths = {};
+
+      visible.forEach(key => {
+        const saved =
+          Number(prefs.widths?.[key]);
+
+        widths[key] =
+          Number.isFinite(saved)
+          && saved >= 34
+            ? saved
+            : Number(defaultWidths[key] || 44);
+      });
+
+      const order =
+        prefs.order.filter(key => visible.includes(key));
+
+      table
+        .querySelectorAll('tr')
+        .forEach(row => {
+          const cells =
+            [...row.children]
+              .filter(cell =>
+                cell.matches('th,td')
+              );
+
+          const byKey =
+            new Map(
+              cells
+                .map(cell => [
+                  auctionFreeColumnKeyFromCell(cell),
+                  cell
+                ])
+                .filter(([key]) => Boolean(key))
+            );
+
+          order.forEach(key => {
+            const cell = byKey.get(key);
+            if (cell) {
+              row.appendChild(cell);
+            }
+          });
+        });
+
+      const totalWidth =
+        order.reduce(
+          (sum, key) =>
+            sum + Number(widths[key] || 44),
+          0
+        );
+
+      table.style.setProperty(
+        'table-layout',
+        'fixed',
+        'important'
+      );
+
+      table.style.setProperty(
+        'width',
+        `${Math.max(totalWidth, wrapper?.clientWidth || 0)}px`,
+        'important'
+      );
+
+      table.style.setProperty(
+        'min-width',
+        `${Math.max(totalWidth, wrapper?.clientWidth || 0)}px`,
+        'important'
+      );
+
+      order.forEach(key => {
+        const cls =
+          auctionFreeColumnClass(key);
+
+        const width =
+          Number(widths[key] || 44);
+
+        table
+          .querySelectorAll(`.${cls}`)
+          .forEach(cell => {
+            cell.style.setProperty('width', `${width}px`, 'important');
+            cell.style.setProperty('min-width', `${width}px`, 'important');
+            cell.style.setProperty('max-width', `${width}px`, 'important');
+          });
+      });
+
+      const head =
+        table.querySelector('thead');
+
+      if (!head || head.dataset.columnLayoutBound === 'true') {
+        return;
+      }
+
+      head.dataset.columnLayoutBound = 'true';
+
+      head
+        .querySelectorAll('th')
+        .forEach(th => {
+          const key =
+            auctionFreeColumnKeyFromCell(th);
+
+          if (!key) {
+            return;
+          }
+
+          th.dataset.auctionColumn = key;
+          th.draggable = true;
+          th.classList.add('auction-column-draggable');
+          th.title = `${th.title ? `${th.title} · ` : ''}Trascina per spostare la colonna`;
+
+          if (!th.querySelector('.auction-column-resize-handle')) {
+            const handle =
+              document.createElement('span');
+
+            handle.className =
+              'auction-column-resize-handle';
+
+            handle.setAttribute(
+              'aria-hidden',
+              'true'
+            );
+
+            th.appendChild(handle);
+          }
+        });
+
+      let draggingKey = '';
+
+      head.addEventListener('dragstart', event => {
+        const th = event.target.closest('th[data-auction-column]');
+        if (!th || event.target.closest('.auction-column-resize-handle')) {
+          event.preventDefault();
+          return;
+        }
+
+        draggingKey = th.dataset.auctionColumn || '';
+        th.classList.add('is-column-dragging');
+
+        try {
+          event.dataTransfer.effectAllowed = 'move';
+          event.dataTransfer.setData('text/plain', draggingKey);
+        } catch {}
+      });
+
+      head.addEventListener('dragend', event => {
+        event.target.closest('th')?.classList.remove('is-column-dragging');
+        head.querySelectorAll('.is-column-drop-target')
+          .forEach(cell => cell.classList.remove('is-column-drop-target'));
+        draggingKey = '';
+      });
+
+      head.addEventListener('dragover', event => {
+        const th = event.target.closest('th[data-auction-column]');
+        if (!th || !draggingKey) return;
+        event.preventDefault();
+        head.querySelectorAll('.is-column-drop-target')
+          .forEach(cell => cell.classList.remove('is-column-drop-target'));
+        th.classList.add('is-column-drop-target');
+      });
+
+      head.addEventListener('drop', event => {
+        const target = event.target.closest('th[data-auction-column]');
+        if (!target || !draggingKey) return;
+
+        event.preventDefault();
+
+        const targetKey =
+          target.dataset.auctionColumn;
+
+        const next =
+          auctionFreeColumnPreferences();
+
+        const sourceIndex =
+          next.order.indexOf(draggingKey);
+
+        const targetIndex =
+          next.order.indexOf(targetKey);
+
+        if (
+          sourceIndex < 0
+          || targetIndex < 0
+          || sourceIndex === targetIndex
+        ) {
+          return;
+        }
+
+        next.order.splice(sourceIndex, 1);
+        next.order.splice(targetIndex, 0, draggingKey);
+        saveAuctionFreeColumnPreferences(next);
+        applyAuctionFreeColumnLayout();
+      });
+
+      head.addEventListener('pointerdown', event => {
+        const handle =
+          event.target.closest('.auction-column-resize-handle');
+
+        if (!handle) {
+          return;
+        }
+
+        const th =
+          handle.closest('th[data-auction-column]');
+
+        if (!th) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const key =
+          th.dataset.auctionColumn;
+
+        const startX =
+          event.clientX;
+
+        const startWidth =
+          th.getBoundingClientRect().width;
+
+        const pointerId =
+          event.pointerId;
+
+        try {
+          handle.setPointerCapture(pointerId);
+        } catch {}
+
+        const move = moveEvent => {
+          const width =
+            Math.max(
+              key === 'name' ? 90 : 34,
+              Math.round(
+                startWidth
+                + moveEvent.clientX
+                - startX
+              )
+            );
+
+          const current =
+            auctionFreeColumnPreferences();
+
+          current.widths[key] = width;
+          saveAuctionFreeColumnPreferences(current);
+          applyAuctionFreeColumnLayout();
+        };
+
+        const end = () => {
+          window.removeEventListener('pointermove', move);
+          window.removeEventListener('pointerup', end);
+          window.removeEventListener('pointercancel', end);
+        };
+
+        window.addEventListener('pointermove', move);
+        window.addEventListener('pointerup', end, { once: true });
+        window.addEventListener('pointercancel', end, { once: true });
+      });
+    }
+
+
     function auctionPlayerRow(
       player,
       mode
@@ -27063,7 +27770,7 @@
           } ${rolePhaseAllowed ? '' : 'outside-role-phase'}"
         >
 
-          <td class="player-role-cell auction-player-col-role">
+          <td class="player-role-cell auction-player-col-role" data-auction-column="role">
             ${
               roles.map(role => `
                 <span
@@ -27077,7 +27784,7 @@
           </td>
 
 
-          <td class="auction-player-col-name">
+          <td class="auction-player-col-name" data-auction-column="name">
             <div class="player-main">
 
               <span class="auction-player-name-line">
@@ -27104,24 +27811,24 @@
           </td>
 
 
-          <td class="auction-signal-cell auction-player-col-signals">
+          <td class="auction-signal-cell auction-player-col-signals" data-auction-column="signals">
             ${auctionPlayerSignalBadges(player)}
           </td>
 
-          <td class="num auction-player-col-pfc">
+          <td class="num auction-player-col-pfc" data-auction-column="pfc">
             <strong>
               ${formatAuctionPrice(player.pfc)}
             </strong>
           </td>
 
           <td
-            class="num auction-player-col-fm"
+            class="num auction-player-col-fm" data-auction-column="fm"
             title="Fanta media attesa"
           >
             ${formatNumber(player.expected_fantasy_avg)}
           </td>
 
-          <td class="num auction-player-col-pma">
+          <td class="num auction-player-col-pma" data-auction-column="pma">
             ${formatAuctionPrice(player.pma)}
           </td>
 
@@ -27129,7 +27836,7 @@
             showSupremeMetric
               ? `
                   <td
-                    class="num auction-player-col-supreme"
+                    class="num auction-player-col-supreme" data-auction-column="supreme"
                     data-supreme-metric-player="${esc(player.id)}"
                     title="Formula crediti e Fanta media da definire"
                   >
@@ -27143,7 +27850,7 @@
           ${
             showQueue
               ? `
-                  <td class="queue-cell auction-player-col-action">
+                  <td class="queue-cell auction-player-col-action" data-auction-column="action">
                     ${queueAction}
                   </td>
                 `
@@ -27247,7 +27954,7 @@
           <tr>
             <td
               colspan="${
-                5
+                6
                 + (showQueue ? 1 : 0)
                 + (showSupremeMetric ? 1 : 0)
               }"
@@ -27358,6 +28065,7 @@
         });
 
       bindAuctionViceInterestControls(body);
+      applyAuctionFreeColumnLayout();
 
     }
 
