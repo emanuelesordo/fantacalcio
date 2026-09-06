@@ -1,0 +1,41 @@
+name: Remove unavailable quotation controls
+
+on:
+  push:
+    paths:
+      - '.github/workflows/remove-quotation-ui.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Patch UI
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          for name in ['home.html','league-setup.html']:
+              p=Path(name)
+              if not p.exists(): continue
+              s=p.read_text(encoding='utf-8')
+              s=s.replace('<option value="quotation">Quotazione Fantacalcio.it</option>','')
+              s=s.replace('<option value="quotation">Quotazione</option>','')
+              s=s.replace("<option value='quotation'>Quotazione Fantacalcio.it</option>",'')
+              s=s.replace("<option value='quotation'>Quotazione</option>",'')
+              p.write_text(s,encoding='utf-8')
+          PY
+          git diff --check
+      - name: Commit
+        run: |
+          rm -f .github/workflows/remove-quotation-ui.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: remove unavailable quotation controls" || exit 0
+          git push origin main
