@@ -1,0 +1,19 @@
+name: Inspect main nav
+on:
+  push:
+    paths: ['.github/workflows/inspect-main-nav.yml']
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Context
+        run: |
+          echo '--- main-nav ---'
+          grep -n -C 14 'main-nav' home.html | head -n 120 || true
+          echo '--- nav-btn ---'
+          grep -n -C 10 'nav-btn' home.html | tail -n 160 || true
+          echo '--- views markup ---'
+          grep -n -E -C 5 'view-(home|manage|setup|list|rosters|auction|tv)' home.html | tail -n 220 || true
+          echo '--- router ---'
+          grep -n -E -C 12 'hashchange|location.hash|state.view|renderView|route' home.html | tail -n 320 || true
