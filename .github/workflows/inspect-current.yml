@@ -1,0 +1,30 @@
+name: Inspect current integration points
+on:
+  push:
+    paths:
+      - '.github/workflows/inspect-current.yml'
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Locate
+        run: |
+          for p in \
+            'function auctionPlayerSignalBadges' \
+            'function auctionPlayerRow' \
+            'function renderAuctionLobby' \
+            'team-order' \
+            'setTeamOrder' \
+            'saveTeamOrder' \
+            'auction-order' \
+            'data-order' \
+            'function normalizeImported' \
+            'function normalizeList' \
+            'market_flag' \
+            'penalty_probability' \
+            'sourcePlayerId' \
+            'function loadAuction'; do
+            echo "=== $p ==="
+            grep -n -F "$p" home.html | head -n 30 || true
+          done
