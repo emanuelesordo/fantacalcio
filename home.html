@@ -30826,7 +30826,9 @@
     v9Center:state.v9Center||null,
     v9LoadedLeague:state.v9LoadedLeague||'',
     v9BestIncludeFav:state.v9BestIncludeFav||false,
-    v9ActiveDrawerTab:state.v9ActiveDrawerTab||'strategy'
+    v9ActiveDrawerTab:state.v9ActiveDrawerTab||'strategy',
+    v9BestRosterCacheKey:state.v9BestRosterCacheKey||'',
+    v9BestRosterCache:state.v9BestRosterCache||null
   });
 
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -30944,7 +30946,16 @@
     return best;
   }
 
+  function v9BestRosterCacheKey(){
+    const players=state.v9Center?.players||state.list?.players||[];
+    const latest=players.reduce((m,p)=>String(p?.updated_at||p?.source_updated_at||'')>m?String(p?.updated_at||p?.source_updated_at||''):m,'');
+    const prefStamp=[...favMap().values()].map(x=>`${x.source_player_id}:${x.is_favorite?1:0}:${x.strategy||''}:${x.max_price??''}:${x.updated_at||''}`).sort().join('|');
+    return [state.selectedLeague?.id||'',mode(),latest,state.v8Profile?.updated_at||'',state.v9Rules?.updated_at||'',state.v9BestIncludeFav?1:0,prefStamp].join('::');
+  }
+
   function buildBestRoster(){
+    const cacheKey=v9BestRosterCacheKey();
+    if(state.v9BestRosterCacheKey===cacheKey&&state.v9BestRosterCache)return state.v9BestRosterCache;
     const all=(state.v9Center?.players||state.list?.players||[]).filter(p=>p.status==='available'||!p.status);
     const credits=Number(state.auction?.settings?.initial_credits||state.setup?.initial_credits||500);
     const includeFav=state.v9BestIncludeFav;
@@ -30969,7 +30980,8 @@
         }
         spent+=rs;
       });
-      return {mode:'classic',module:state.v9Rules?.defense_rule_enabled?'4-3-3/4-4-2':'3-4-3',players:picked,spent,budget:credits,starterBudget:null};
+      const result={mode:'classic',module:state.v9Rules?.defense_rule_enabled?'4-3-3/4-4-2':'3-4-3',players:picked,spent,budget:credits,starterBudget:null};
+      state.v9BestRosterCacheKey=cacheKey;state.v9BestRosterCache=result;return result;
     }
     const starterPct=clamp(Number(state.v8Profile?.starter_budget_percent||60),40,80);
     const starterBudget=credits*starterPct/100;
@@ -30984,7 +30996,8 @@
     const chosen=[];let bs=0;
     for(const c of bench){if((first?.line.length||0)+chosen.length>=targetCount)break;if(bs+c.pr>benchBudget)continue;chosen.push({...c,starter:false,group:roles(c.p).join('/')});bs+=c.pr;}
     const starters=(first?.line||[]).map(x=>({...x,starter:true,group:x.slot}));
-    return {mode:'mantra',module:first?.id||'—',players:[...starters,...chosen],spent:(first?.spent||0)+bs,budget:credits,starterBudget};
+    const result={mode:'mantra',module:first?.id||'—',players:[...starters,...chosen],spent:(first?.spent||0)+bs,budget:credits,starterBudget};
+    state.v9BestRosterCacheKey=cacheKey;state.v9BestRosterCache=result;return result;
   }
 
   function barRows(dist,credits){return Object.entries(dist).map(([k,v])=>`<div class="v9bar"><b>${k}</b><span><i style="width:${Math.min(100,Number(v))}%"></i></span><em>${pct(v)} · ${Math.round(credits*Number(v)/100)} cr</em></div>`).join('')}
@@ -31026,7 +31039,16 @@
     host.querySelector('#v9-best-fav')?.addEventListener('change',async e=>{state.v9BestIncludeFav=e.target.checked;const res=await api(ENDPOINTS.strategy,{action:'saveProfile',preferredModules:state.v8Profile?.preferred_modules||[],profile:state.v8Profile?.profile||'balanced',roleBudgets:state.v8Profile?.role_budgets||{},notes:state.v8Profile?.notes||'',starterBudgetPercent:Number(state.v8Profile?.starter_budget_percent||60),includeFavoritesInBestRosters:state.v9BestIncludeFav},{quiet:true});if(res?.profile){state.v8Profile=res.profile;state.v9Center.profile=res.profile}renderStats();});
   }
 
-  function activateTab(name){state.v9ActiveDrawerTab=name;document.querySelectorAll('.v9-drawer-tab').forEach(b=>b.classList.toggle('active',b.dataset.v9Tab===name));document.querySelectorAll('.v9-pane').forEach(p=>p.hidden=p.dataset.v9Pane!==name);}
+  function activateTab(name){
+    const tab=name==='stats'?'stats':'strategy';
+    state.v9ActiveDrawerTab=tab;
+    const drawer=document.querySelector('.v9-strategy-drawer');
+    if(!drawer)return;
+    drawer.querySelectorAll('.v9-drawer-tab').forEach(b=>b.classList.toggle('active',b.dataset.v9Tab===tab));
+    drawer.querySelectorAll('.v9-pane').forEach(p=>p.hidden=p.dataset.v9Pane!==tab);
+    if(!drawer.open)return;
+    if(tab==='stats')renderStats();else renderStrategy();
+  }
   function patchDrawer(){
     const root=document.getElementById('auction-root');if(!root)return;
     let drawer=root.querySelector('.v9-strategy-drawer');
@@ -31036,11 +31058,19 @@
       drawer.innerHTML=`<summary>STRATEGIA</summary><div class="v9-drawer-shell"><nav class="v9-drawer-tabs"><button type="button" class="v9-drawer-tab" data-v9-tab="strategy">CENTRO STRATEGICO</button><button type="button" class="v9-drawer-tab" data-v9-tab="stats">STATISTICHE</button></nav><div class="v9-pane v9-pane-strategy" data-v9-pane="strategy"></div><div class="v9-pane v9-pane-stats" data-v9-pane="stats"></div></div>`;
       root.appendChild(drawer);
       drawer.querySelectorAll('[data-v9-tab]').forEach(b=>b.addEventListener('click',()=>activateTab(b.dataset.v9Tab)));
-      drawer.addEventListener('toggle',()=>{state.v9DrawerOpen=drawer.open;if(drawer.open){renderStrategy();renderStats();}});
+      drawer.addEventListener('toggle',()=>{
+        state.v9DrawerOpen=drawer.open;
+        if(drawer.open)activateTab(state.v9ActiveDrawerTab==='stats'?'stats':'strategy');
+      });
     }
-    drawer.open=state.v9DrawerOpen===true;
-    renderStrategy();renderStats();
-    activateTab(state.v9ActiveDrawerTab==='stats'?'stats':'strategy');
+    const shouldOpen=state.v9DrawerOpen===true;
+    if(drawer.open!==shouldOpen)drawer.open=shouldOpen;
+    const tab=state.v9ActiveDrawerTab==='stats'?'stats':'strategy';
+    drawer.querySelectorAll('.v9-drawer-tab').forEach(b=>b.classList.toggle('active',b.dataset.v9Tab===tab));
+    drawer.querySelectorAll('.v9-pane').forEach(p=>p.hidden=p.dataset.v9Pane!==tab);
+    if(drawer.open){
+      if(tab==='stats')renderStats();else renderStrategy();
+    }
   }
 
   async function loadRulesIntoSetup(){
@@ -31067,7 +31097,6 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
   const oldPrepared=renderAuctionPrepared;renderAuctionPrepared=function(...a){const r=oldPrepared(...a);queueMicrotask(()=>{document.querySelector('.v8center')?.remove();patchDrawer()});return r};
   const oldLoadAuction=loadAuction;loadAuction=async function(...a){const r=await oldLoadAuction(...a);await loadV9();document.querySelector('.v8center')?.remove();patchDrawer();return r};
 
-  const obs=new MutationObserver(()=>{if(state.view==='auction'){document.querySelector('.v8center')?.remove();patchDrawer()}});const ar=document.getElementById('auction-root');if(ar)obs.observe(ar,{childList:true,subtree:true});
 
   const st=document.createElement('style');st.textContent=`
     .auction-free-fixed.v9-tabbed{grid-template-rows:25px minmax(0,1fr)!important;overflow:hidden!important}.v9-drawer-tabs{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:2px;padding:2px;background:rgba(7,25,44,.96);border-bottom:1px solid rgba(91,151,216,.25)}.v9-drawer-tab{min-height:20px!important;height:20px!important;padding:1px 4px!important;background:rgba(34,64,96,.45)!important;border:1px solid rgba(91,151,216,.18)!important;font-size:6.5px!important}.v9-drawer-tab.active{background:var(--primary)!important}.v9-pane{min-height:0;overflow:hidden}.v9-pane-free{display:grid;grid-template-rows:auto auto minmax(0,1fr);height:100%;min-height:0}.v9-tabbed.has-status-card.has-caller-controls .v9-pane-free{grid-template-rows:auto auto auto minmax(0,1fr) auto}.v9-tabbed.has-status-card.no-caller-controls .v9-pane-free{grid-template-rows:auto auto minmax(0,1fr) auto}.v9-pane-strategy,.v9-pane-stats{height:100%;overflow:auto;overscroll-behavior:contain;padding:4px}.v9scroll{display:grid;gap:5px;align-content:start}.v9card{min-height:0;padding:6px;border:1px solid rgba(91,151,216,.24);border-radius:7px;background:linear-gradient(145deg,rgba(27,56,86,.58),rgba(8,28,48,.64));display:grid;gap:5px}.v9card-scroll{min-height:0;max-height:190px;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable}.v9block{display:grid;gap:3px}.v9block>b,.v9card>strong{font-size:8px}.v9block>small{color:var(--soft);font-size:6px}.v9mods{display:flex;flex-wrap:wrap;gap:2px}.v9mods label{display:flex;align-items:center;gap:2px;padding:2px 4px;border:1px solid var(--line);border-radius:5px;font-size:6px}.v9mods input{width:11px;min-width:11px;height:11px;min-height:11px}.v9budgets{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}.v9fav{display:grid;grid-template-columns:minmax(0,1fr) 58px 20px;gap:3px;align-items:center;padding:4px;border-bottom:1px solid rgba(91,151,216,.14)}.v9fav strong,.v9fav small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.v9fav strong{font-size:7px}.v9fav small{font-size:5.5px;color:var(--soft)}.v9fav label{font-size:5px}.v9fav input{min-height:23px;height:23px;padding:2px 4px}.v9fav button{width:20px!important;min-width:20px!important;height:20px!important;min-height:20px!important;padding:0!important}.v9top{display:grid;grid-template-columns:minmax(0,1fr) 38px 32px 32px;gap:3px;align-items:center;min-height:24px;border-bottom:1px solid rgba(91,151,216,.14);font-size:6px}.v9top.mom{border:1px solid rgba(220,180,70,.45);border-radius:5px;padding:0 3px}.v9top span{text-align:right}.v9empty{padding:8px;color:var(--soft);font-size:6px}.v9kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}.v9kpi span{padding:5px;border:1px solid rgba(91,151,216,.18);border-radius:5px;background:rgba(11,42,77,.55)}.v9kpi small,.v9kpi b{display:block}.v9kpi small{font-size:5px;color:var(--soft)}.v9kpi b{font-size:11px}.v9bar{display:grid;grid-template-columns:24px minmax(0,1fr) 84px;gap:4px;align-items:center;font-size:6px}.v9bar span{height:8px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}.v9bar i{display:block;height:100%;background:linear-gradient(90deg,#3478f6,#43d6b5);border-radius:99px}.v9bar em{font-style:normal;text-align:right;color:var(--soft)}.v9slotgroup{display:grid;grid-template-columns:24px repeat(auto-fit,minmax(62px,1fr));gap:3px;padding:3px 0;border-bottom:1px solid rgba(91,151,216,.14)}.v9slotgroup span{display:grid;font-size:5.5px}.v9slotgroup em{font-style:normal;color:var(--soft)}.v9statsgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px}.v9statsgrid span{padding:4px;border:1px solid rgba(91,151,216,.16);border-radius:5px;font-size:5.5px}.v9statsgrid b{display:block;font-size:10px;margin-top:2px}.v9switch{display:flex!important;align-items:center;gap:3px!important;font-size:6px!important}.v9switch input{width:14px;min-width:14px;height:14px;min-height:14px}.v9besthead{display:flex;align-items:center;gap:6px;font-size:6px}.v9besthead b{font-size:8px}.v9besthead em{font-style:normal;color:var(--soft)}.v9bestcols{display:grid;grid-template-columns:1fr 1fr;gap:4px;min-height:0}.v9bestcols>div{min-height:0;border:1px solid rgba(91,151,216,.15);border-radius:5px;padding:4px}.v9bestcols>div>strong{font-size:7px}.v9bestcols .v9card-scroll{max-height:220px}.v9bestcols .v9card-scroll>span{display:block;padding:3px;border-bottom:1px solid rgba(91,151,216,.12)}.v9bestcols b,.v9bestcols small{display:block}.v9bestcols b{font-size:6px}.v9bestcols small{font-size:5px;color:var(--soft)}@media(max-width:700px){.v9-drawer-tabs{grid-template-columns:1fr}.v9-drawer-tab{height:18px!important;min-height:18px!important}.auction-free-fixed.v9-tabbed{grid-template-rows:58px minmax(0,1fr)!important}.v9kpi,.v9statsgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.v9bestcols{grid-template-columns:1fr}.v9budgets{grid-template-columns:repeat(2,minmax(0,1fr))}}
