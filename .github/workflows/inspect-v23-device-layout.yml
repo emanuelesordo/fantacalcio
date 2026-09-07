@@ -1,0 +1,20 @@
+name: Inspect V23 device layout
+on:
+  push:
+    paths:
+      - '.github/workflows/inspect-v23-device-layout.yml'
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect
+        run: |
+          echo '=== MANAGE VIEW ==='
+          grep -n -C 35 -E 'view-manage|manage-layout|Gestione utenti|Membri|league members|member-role|team-membership' home.html | head -n 900 || true
+          echo '=== MANAGEMENT RENDER/ACTIONS ==='
+          grep -n -C 30 -E 'loadManage|renderManage|manageMembers|member.*role|save.*member|leagueRole|president|vice' home.html | head -n 1200 || true
+          echo '=== MOBILE AUCTION ==='
+          grep -n -C 35 -E '@media.*900|auction-live-shell|auction-team-column-roster-only|auction-free-fixed|auction-command|console rilanci|drawer' home.html | tail -n 1400 || true
+          echo '=== ENDPOINTS ==='
+          grep -n -C 10 -E 'ENDPOINTS.*league|league-api|manage-api|team-api' home.html | head -n 500 || true
