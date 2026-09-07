@@ -13473,6 +13473,83 @@
     }
   </style>
 
+
+  <style id="auction-free-table-consolidated-style">
+    #view-auction .auction-caller-controls{
+      display:grid!important;
+      grid-template-columns:minmax(0,1fr) minmax(58px,76px) minmax(70px,88px)!important;
+      gap:4px!important;
+      align-items:end!important;
+      width:100%!important;
+      min-width:0!important;
+    }
+    #view-auction .auction-caller-controls .auction-top-call{
+      width:100%!important;height:32px!important;min-height:32px!important;margin:0!important;padding:2px 6px!important;
+      background:var(--good)!important;font-size:8.5px!important;
+    }
+    #view-auction .auction-free-fixed{
+      width:100%!important;min-width:0!important;max-width:100%!important;
+      grid-template-rows:auto auto minmax(0,1fr) auto!important;
+    }
+    #view-auction .auction-free-role-row{min-width:0!important;overflow:hidden!important}
+    #view-auction .auction-free-fixed .drawer-table,
+    #view-auction .auction-free-table-wrap{position:relative!important;width:100%!important;min-width:0!important;max-width:100%!important;overflow:auto!important;isolation:isolate!important}
+    #view-auction .auction-free-fixed .player-table,
+    #view-auction .auction-free-table{width:100%!important;min-width:0!important;max-width:100%!important;table-layout:fixed!important;border-collapse:separate!important;border-spacing:0!important}
+    #view-auction .auction-free-table col.auction-col-role{width:7%}
+    #view-auction .auction-free-table col.auction-col-name{width:22%}
+    #view-auction .auction-free-table col.auction-col-badge{width:10%}
+    #view-auction .auction-free-table col.auction-col-presence,
+    #view-auction .auction-free-table col.auction-col-pfc,
+    #view-auction .auction-free-table col.auction-col-pma,
+    #view-auction .auction-free-table col.auction-col-delta,
+    #view-auction .auction-free-table col.auction-col-fm,
+    #view-auction .auction-free-table col.auction-col-index{width:7%}
+    #view-auction .auction-free-table col.auction-col-favorite{width:5%}
+    #view-auction .auction-free-table col.auction-col-action{width:14%}
+    #view-auction .auction-free-table th,#view-auction .auction-free-table td{box-sizing:border-box!important;min-width:0!important;max-width:none!important;overflow:hidden!important}
+    #view-auction .auction-free-table thead{position:relative!important;z-index:40!important}
+    #view-auction .auction-free-head-row th{position:sticky!important;top:0!important;z-index:42!important;height:30px!important;padding:2px 3px!important;background:#0d2b46!important;border-bottom:1px solid rgba(91,151,216,.38)!important}
+    #view-auction .auction-free-filter-row th{position:sticky!important;top:30px!important;z-index:41!important;height:30px!important;padding:2px 3px!important;background:#0a253e!important;border-bottom:1px solid rgba(91,151,216,.38)!important;overflow:visible!important}
+    #view-auction .auction-free-head-row [data-auction-sort]{width:100%!important;height:24px!important;min-height:24px!important;padding:1px 2px!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:var(--soft)!important;font-size:6.5px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:2px!important;white-space:nowrap!important}
+    #view-auction .auction-free-head-row .auction-player-col-name [data-auction-sort]{justify-content:flex-start!important;text-align:left!important}
+    #view-auction .auction-free-filter-row input,
+    #view-auction .auction-free-filter-row select,
+    #view-auction .auction-range-toggle{width:100%!important;min-width:0!important;height:23px!important;min-height:23px!important;margin:0!important;padding:1px 3px!important;border-radius:5px!important;border:1px solid rgba(91,151,216,.28)!important;background:rgba(5,22,38,.96)!important;color:var(--text)!important;font-size:6.8px!important;text-overflow:ellipsis!important}
+    #view-auction .auction-free-filter-row input[type=search]{text-align:left!important}
+    #view-auction .auction-role-filter-note{display:block!important;text-align:center!important;color:var(--muted)!important;font-size:5.4px!important;white-space:nowrap!important}
+    #view-auction .auction-range{position:relative!important;min-width:0!important}
+    #view-auction .auction-range-toggle{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:2px!important;white-space:nowrap!important}
+    #view-auction .auction-range-toggle i{font-style:normal!important;color:var(--soft)!important;transition:transform .15s ease!important}
+    #view-auction .auction-range.open .auction-range-toggle i{transform:rotate(180deg)!important}
+    #view-auction .auction-range-popover{position:absolute!important;top:25px!important;left:50%!important;transform:translateX(-50%)!important;width:190px!important;padding:8px!important;border:1px solid rgba(104,164,225,.48)!important;border-radius:8px!important;background:#081f35!important;box-shadow:0 12px 32px rgba(0,0,0,.48)!important;z-index:120!important}
+    #view-auction .auction-free-filter-row th:nth-child(n+8) .auction-range-popover{left:auto!important;right:0!important;transform:none!important}
+    #view-auction .auction-range-values{display:grid!important;grid-template-columns:48px 1fr 48px!important;gap:4px!important;align-items:center!important;margin-bottom:7px!important;font-size:8px!important}
+    #view-auction .auction-range-values b:last-child{text-align:right!important}
+    #view-auction .auction-range-values span{text-align:center!important;color:var(--soft)!important;font-size:6px!important;text-transform:uppercase!important}
+    #view-auction .auction-dual-range{position:relative!important;height:24px!important;margin:0 7px!important}
+    #view-auction .auction-range-base,#view-auction .auction-range-fill{position:absolute!important;left:0!important;right:0!important;top:11px!important;height:3px!important;border-radius:99px!important;background:rgba(255,255,255,.14)!important}
+    #view-auction .auction-range-fill{right:auto!important;background:#4f9bea!important}
+    #view-auction .auction-dual-range input[type=range]{position:absolute!important;left:0!important;top:3px!important;width:100%!important;height:18px!important;min-height:18px!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;pointer-events:none!important;-webkit-appearance:none!important;appearance:none!important}
+    #view-auction .auction-dual-range input[type=range]::-webkit-slider-runnable-track{height:3px!important;background:transparent!important}
+    #view-auction .auction-dual-range input[type=range]::-webkit-slider-thumb{-webkit-appearance:none!important;width:14px!important;height:14px!important;margin-top:-5px!important;border-radius:50%!important;border:2px solid #9ed0ff!important;background:#1765ad!important;pointer-events:auto!important;cursor:ew-resize!important}
+    #view-auction .auction-dual-range input[type=range]::-moz-range-track{height:3px!important;background:transparent!important}
+    #view-auction .auction-dual-range input[type=range]::-moz-range-thumb{width:12px!important;height:12px!important;border-radius:50%!important;border:2px solid #9ed0ff!important;background:#1765ad!important;pointer-events:auto!important;cursor:ew-resize!important}
+    #view-auction .auction-range-ends{display:grid!important;grid-template-columns:1fr auto 1fr!important;align-items:center!important;gap:4px!important;font-size:6px!important;color:var(--soft)!important}
+    #view-auction .auction-range-ends small:last-child{text-align:right!important}
+    #view-auction .auction-range-ends button{height:18px!important;min-height:18px!important;padding:1px 4px!important;font-size:6px!important}
+    #view-auction .auction-free-table tbody td{height:34px!important;padding:3px 4px!important;white-space:nowrap!important;font-size:8.5px!important;vertical-align:middle!important}
+    #view-auction .auction-free-table tbody td.num{text-align:right!important;font-variant-numeric:tabular-nums!important;font-size:9.2px!important}
+    #view-auction .auction-free-table .auction-player-col-name{text-align:left!important}
+    #view-auction .auction-free-table .auction-player-col-name .player-main{min-width:0!important;width:100%!important}
+    #view-auction .auction-free-table .auction-player-col-name .player-name{display:block!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+    #view-auction .auction-free-table .auction-player-col-signals,#view-auction .auction-free-table .auction-player-col-favorite,#view-auction .auction-free-table .auction-player-col-action{text-align:center!important}
+    #view-auction .auction-heart{width:25px!important;min-width:25px!important;height:24px!important;min-height:24px!important;padding:0!important;border-radius:50%!important;border:1px solid rgba(111,171,224,.28)!important;background:rgba(8,31,54,.5)!important;color:#7994ae!important;font-size:16px!important;line-height:1!important}
+    #view-auction .auction-heart.active{color:#ff688c!important;border-color:#ff688c!important;background:rgba(100,24,50,.28)!important}
+    #view-auction .auction-action-empty{color:var(--muted)!important}
+    body.v10-index-owner #view-auction tr.auction-market-value-row{background:linear-gradient(90deg,hsl(var(--auction-market-hue) 70% 46% / var(--auction-market-alpha)),transparent 82%)!important;box-shadow:inset 3px 0 0 hsl(var(--auction-market-hue) 78% 50% / .78)!important}
+  </style>
+
 </head>
 <body class="modern-glass">
   <div id="global-message" class="message" aria-live="polite"></div>
@@ -20151,151 +20228,441 @@
     }
 
 
+    const AUCTION_FREE_NUMERIC = {
+      presence: { label: '%Tit', step: 1 },
+      pfc: { label: 'PFC', step: 1 },
+      pma: { label: 'PMA', step: 1 },
+      delta: { label: 'Delta', step: 1 },
+      fm: { label: 'FM', step: .01 },
+      index: { label: 'Indice', step: 1 }
+    };
+
+    function auctionFreeFinite(value) {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function auctionFreePresence(player) {
+      const value = typeof strategicPresencePercent === 'function'
+        ? strategicPresencePercent(player)
+        : player?.expected_titolarity;
+      return auctionFreeFinite(value) ?? 0;
+    }
+
+    function auctionFreeFantasyAverage(player) {
+      const value = typeof strategicExpectedFantasyAverage === 'function'
+        ? strategicExpectedFantasyAverage(player)
+        : player?.expected_fantasy_avg;
+      return auctionFreeFinite(value) ?? 0;
+    }
+
+    function auctionFreeDelta(player) {
+      const imported = auctionFreeFinite(player?.pfc_pma_delta);
+      if (imported !== null) return imported;
+      const pfc = auctionFreeFinite(player?.pfc);
+      const pma = auctionFreeFinite(player?.pma);
+      return pfc !== null && pma !== null ? pfc - pma : null;
+    }
+
+    function auctionFreeIndex(player) {
+      const value = typeof strategicValueIndex === 'function'
+        ? strategicValueIndex(player)
+        : 0;
+      return auctionFreeFinite(value) ?? 0;
+    }
+
+    function auctionFreeNumericValue(player, key) {
+      if (key === 'presence') return auctionFreePresence(player);
+      if (key === 'pfc') return auctionFreeFinite(player?.pfc);
+      if (key === 'pma') return auctionFreeFinite(player?.pma);
+      if (key === 'delta') return auctionFreeDelta(player);
+      if (key === 'fm') return auctionFreeFantasyAverage(player);
+      if (key === 'index') return auctionFreeIndex(player);
+      return null;
+    }
+
+    function auctionFreePreference(player) {
+      const source = String(player?.source_player_id || player?.id || '');
+      return state.v7Preferences?.get?.(source) || null;
+    }
+
+    function auctionFreeFavorite(player) {
+      const pref = auctionFreePreference(player);
+      return Boolean(pref?.is_favorite || pref?.strategy === 'top');
+    }
+
+    function auctionFreeSignalMatches(player, key) {
+      if (!key) return true;
+      if (typeof matchesFlag === 'function') return matchesFlag(player, key);
+      if (key === 'market') return player?.market_flag === true;
+      if (key === 'new') return player?.new_arrival === true;
+      if (key === 'injury') {
+        return player?.uncertain_return === true
+|| Number(player?.unavailable_until_round || 0) >= Number(state.v13NextRound || 1);
+      }
+      if (key === 'penalties') {
+        const n = typeof importedProbabilityPercent === 'function'
+? importedProbabilityPercent(player?.penalty_probability)
+: Number(player?.penalty_probability || 0);
+        return Number(n || 0) > 0;
+      }
+      if (key === 'free_kicks') {
+        const n = typeof importedProbabilityPercent === 'function'
+? importedProbabilityPercent(player?.free_kick_probability)
+: Number(player?.free_kick_probability || 0);
+        return Number(n || 0) > 0;
+      }
+      return false;
+    }
+
+    function auctionFreeSignalSort(player) {
+      return ['market', 'injury', 'new', 'penalties', 'free_kicks']
+        .filter(key => auctionFreeSignalMatches(player, key))
+        .join(',');
+    }
+
+    function auctionFreeRangeBounds(key, players) {
+      const def = AUCTION_FREE_NUMERIC[key];
+      const values = players
+        .map(player => auctionFreeNumericValue(player, key))
+        .filter(Number.isFinite);
+      let min = values.length ? Math.min(...values) : 0;
+      let max = values.length ? Math.max(...values) : def.step;
+      if (def.step < 1) {
+        min = Math.floor(min / def.step) * def.step;
+        max = Math.ceil(max / def.step) * def.step;
+      } else {
+        min = Math.floor(min);
+        max = Math.ceil(max);
+      }
+      if (min === max) max = min + def.step;
+      return { min, max, step: def.step };
+    }
+
+    function auctionFreeEnsureRanges(players = state.auction?.callCandidates || []) {
+      state.auctionColumnFilters = state.auctionColumnFilters || { name: '', badge: '', favorite: '' };
+      state.auctionColumnRanges = state.auctionColumnRanges || {};
+      const signature = [
+        state.selectedLeague?.id || '',
+        state.auction?.auctionSession?.id || '',
+        state.v13NextRound || 1,
+        players.length,
+        players.slice(0, 16).map(player => [
+player.id,
+player.source_updated_at || player.updated_at || '',
+player.pfc,
+player.pma,
+player.expected_titolarity,
+player.expected_fantasy_avg
+        ].join(':')).join('|')
+      ].join('::');
+      if (state.auctionColumnRangeKey === signature && Object.keys(state.auctionColumnRanges).length) return;
+      const previous = state.auctionColumnRanges || {};
+      const next = {};
+      Object.keys(AUCTION_FREE_NUMERIC).forEach(key => {
+        const bounds = auctionFreeRangeBounds(key, players);
+        const old = previous[key];
+        let lo = old ? Math.max(bounds.min, Math.min(bounds.max, Number(old.lo))) : bounds.min;
+        let hi = old ? Math.max(bounds.min, Math.min(bounds.max, Number(old.hi))) : bounds.max;
+        if (!Number.isFinite(lo)) lo = bounds.min;
+        if (!Number.isFinite(hi)) hi = bounds.max;
+        if (lo > hi) { lo = bounds.min; hi = bounds.max; }
+        next[key] = { ...bounds, lo, hi };
+      });
+      state.auctionColumnRanges = next;
+      state.auctionColumnRangeKey = signature;
+    }
+
+    function auctionFreeFormatRange(value, step = 1) {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return '—';
+      return step < 1
+        ? n.toFixed(step <= .01 ? 2 : 1).replace('.', ',')
+        : String(Math.round(n));
+    }
+
+    function auctionFreeRangeIsFull(key) {
+      const r = state.auctionColumnRanges?.[key];
+      return !r
+        || (Math.abs(r.lo - r.min) < 1e-9 && Math.abs(r.hi - r.max) < 1e-9);
+    }
+
+    function auctionFreeRangeLabel(key) {
+      const r = state.auctionColumnRanges?.[key];
+      const def = AUCTION_FREE_NUMERIC[key];
+      if (!r || auctionFreeRangeIsFull(key)) return 'tutto';
+      return `${auctionFreeFormatRange(r.lo, def.step)}–${auctionFreeFormatRange(r.hi, def.step)}`;
+    }
+
+    function auctionFreeRangeControl(key) {
+      const r = state.auctionColumnRanges?.[key];
+      const def = AUCTION_FREE_NUMERIC[key];
+      if (!r) return '';
+      return `
+        <div class="auction-range" data-auction-range-box="${key}">
+<button type="button" class="auction-range-toggle" data-auction-range-toggle="${key}" title="Intervallo ${esc(def.label)}">
+  <span data-auction-range-label="${key}">${auctionFreeRangeLabel(key)}</span><i>⌄</i>
+</button>
+<div class="auction-range-popover" data-auction-range-popover="${key}" hidden>
+  <div class="auction-range-values">
+    <b data-auction-range-lo-label="${key}">${auctionFreeFormatRange(r.lo, def.step)}</b>
+    <span>${esc(def.label)}</span>
+    <b data-auction-range-hi-label="${key}">${auctionFreeFormatRange(r.hi, def.step)}</b>
+  </div>
+  <div class="auction-dual-range">
+    <div class="auction-range-base"></div>
+    <div class="auction-range-fill" data-auction-range-fill="${key}"></div>
+    <input type="range" data-auction-range="${key}" data-bound="lo" min="${r.min}" max="${r.max}" step="${r.step}" value="${r.lo}" aria-label="Minimo ${esc(def.label)}">
+    <input type="range" data-auction-range="${key}" data-bound="hi" min="${r.min}" max="${r.max}" step="${r.step}" value="${r.hi}" aria-label="Massimo ${esc(def.label)}">
+  </div>
+  <div class="auction-range-ends">
+    <small>${auctionFreeFormatRange(r.min, def.step)}</small>
+    <button type="button" data-auction-range-reset="${key}">azzera</button>
+    <small>${auctionFreeFormatRange(r.max, def.step)}</small>
+  </div>
+</div>
+        </div>
+      `;
+    }
+
+    function updateAuctionFreeRangeVisual(key) {
+      const r = state.auctionColumnRanges?.[key];
+      const def = AUCTION_FREE_NUMERIC[key];
+      if (!r) return;
+      document.querySelectorAll(`[data-auction-range-label="${key}"]`).forEach(node => {
+        node.textContent = auctionFreeRangeLabel(key);
+      });
+      document.querySelectorAll(`[data-auction-range-lo-label="${key}"]`).forEach(node => {
+        node.textContent = auctionFreeFormatRange(r.lo, def.step);
+      });
+      document.querySelectorAll(`[data-auction-range-hi-label="${key}"]`).forEach(node => {
+        node.textContent = auctionFreeFormatRange(r.hi, def.step);
+      });
+      const span = Math.max(r.step, r.max - r.min);
+      const left = (r.lo - r.min) / span * 100;
+      const right = (r.hi - r.min) / span * 100;
+      document.querySelectorAll(`[data-auction-range-fill="${key}"]`).forEach(node => {
+        node.style.left = `${left}%`;
+        node.style.width = `${Math.max(0, right - left)}%`;
+      });
+    }
+
+    function closeAuctionFreeRanges(except = '') {
+      document.querySelectorAll('#view-auction [data-auction-range-popover]').forEach(node => {
+        if (node.dataset.auctionRangePopover !== except) node.hidden = true;
+      });
+      document.querySelectorAll('#view-auction [data-auction-range-box]').forEach(node => {
+        const popover = node.querySelector('[data-auction-range-popover]');
+        node.classList.toggle(
+'open',
+node.dataset.auctionRangeBox === except && popover?.hidden === false
+        );
+      });
+    }
+
+    function auctionFreeRoleRank(player, mode) {
+      const order = mode === 'mantra'
+        ? ['Por', 'B', 'Dd', 'Dc', 'Ds', 'E', 'M', 'C', 'T', 'W', 'A', 'Pc']
+        : ['P', 'D', 'C', 'A'];
+      const ranks = playerRoles(player, mode)
+        .map(role => order.findIndex(item => item.toLowerCase() === String(role).toLowerCase()))
+        .filter(index => index >= 0);
+      return ranks.length ? Math.min(...ranks) : 999;
+    }
+
+    function auctionFreeMatches(player, mode) {
+      const filters = state.auctionColumnFilters || {};
+      const selectedRoles = state.auctionRoles;
+      if (selectedRoles && !selectedRoles.has('all')) {
+        const wanted = new Set([...selectedRoles].map(role => String(role).toLowerCase()));
+        if (!playerRoles(player, mode).some(role => wanted.has(String(role).toLowerCase()))) return false;
+      }
+
+      const topSearch = String(state.auctionFilterSearch || '').trim();
+      const columnSearch = String(filters.name || '').trim();
+      for (const query of [topSearch, columnSearch].filter(Boolean)) {
+        const matched = typeof playerSearchRank === 'function'
+? playerSearchRank(player, query, mode) !== null
+: String(player?.name || '').toLowerCase().includes(query.toLowerCase());
+        if (!matched) return false;
+      }
+
+      if (filters.badge && !auctionFreeSignalMatches(player, filters.badge)) return false;
+      if (filters.favorite === 'on' && !auctionFreeFavorite(player)) return false;
+      if (filters.favorite === 'off' && auctionFreeFavorite(player)) return false;
+
+      return Object.keys(AUCTION_FREE_NUMERIC).every(key => {
+        const r = state.auctionColumnRanges?.[key];
+        if (!r) return true;
+        const value = auctionFreeNumericValue(player, key);
+        return Number.isFinite(value) && value >= r.lo - 1e-9 && value <= r.hi + 1e-9;
+      });
+    }
+
+    function auctionFreeSortValue(player, key, mode) {
+      if (key === 'role') return auctionFreeRoleRank(player, mode);
+      if (key === 'name') return player?.name || '';
+      if (key === 'badge') return auctionFreeSignalSort(player);
+      if (key === 'favorite') return auctionFreeFavorite(player) ? 1 : 0;
+      if (AUCTION_FREE_NUMERIC[key]) return auctionFreeNumericValue(player, key);
+      return player?.name || '';
+    }
+
+    function auctionFreePlayers(mode) {
+      const rows = (state.auction?.callCandidates || []).filter(player => auctionFreeMatches(player, mode));
+      const key = state.auctionSort?.key || 'name';
+      const direction = state.auctionSort?.direction === 'desc' ? -1 : 1;
+      return rows.sort((a, b) => {
+        const av = auctionFreeSortValue(a, key, mode);
+        const bv = auctionFreeSortValue(b, key, mode);
+        let compare;
+        if (typeof av === 'number' && typeof bv === 'number') {
+compare = (Number.isFinite(av) ? av : -Infinity) - (Number.isFinite(bv) ? bv : -Infinity);
+        } else {
+compare = String(av ?? '').localeCompare(String(bv ?? ''), 'it', { sensitivity: 'base' });
+        }
+        if (!compare) compare = String(a?.name || '').localeCompare(String(b?.name || ''), 'it', { sensitivity: 'base' });
+        return compare * direction;
+      });
+    }
+
+    function paintAuctionFreeEconomicRows(root, players) {
+      if (!root) return;
+      const username = String(state.dashboard?.currentUser?.username || state.session?.user?.username || '').toLowerCase();
+      const enabled = document.body.classList.contains('v10-index-owner') || username === 'emanuelesordo';
+      const byId = new Map(players.map(player => [String(player.id), player]));
+      root.querySelectorAll('tr[data-player-id]').forEach(row => {
+        row.classList.remove('v22-market-value-row', 'auction-market-value-row');
+        row.style.removeProperty('--v22-hue');
+        row.style.removeProperty('--v22-alpha');
+        row.style.removeProperty('--auction-market-hue');
+        row.style.removeProperty('--auction-market-alpha');
+        if (!enabled) return;
+        const player = byId.get(String(row.dataset.playerId));
+        if (!player) return;
+        const index = auctionFreeIndex(player);
+        const pfc = auctionFreeFinite(player?.pfc);
+        const pma = auctionFreeFinite(player?.pma);
+        const values = [pfc, pma].filter(value => value !== null && value > 0);
+        if (!(index > 0) || !values.length) return;
+        const allAbove = values.every(value => value > index);
+        const allBelow = values.every(value => value < index);
+        const hue = allAbove ? 2 : allBelow ? 132 : 48;
+        const distance = values.reduce((sum, value) => sum + Math.abs(value - index), 0)
+/ values.length / Math.max(1, index);
+        const alpha = .05 + .09 * Math.max(0, Math.min(1, distance));
+        row.classList.add('auction-market-value-row');
+        row.style.setProperty('--auction-market-hue', String(hue));
+        row.style.setProperty('--auction-market-alpha', alpha.toFixed(3));
+        row.title = `Indice ${Math.round(index)} cr · PFC ${pfc ?? '—'} · PMA ${pma ?? '—'} · ${allAbove ? 'prezzi sopra Indice' : allBelow ? 'prezzi sotto Indice' : 'prezzi discordanti'}`;
+      });
+    }
+
+    async function toggleAuctionFreeFavorite(player, button) {
+      if (!player || !button) return;
+      button.disabled = true;
+      try {
+        const sourcePlayerId = player.source_player_id || player.id;
+        const response = await api(
+ENDPOINTS.v6y,
+{ action: 'toggleFavorite', sourcePlayerId },
+{ quiet: true }
+        );
+        if (response?.preference) {
+state.v7Preferences = state.v7Preferences || new Map();
+state.v7Preferences.set(
+  String(response.preference.source_player_id || sourcePlayerId),
+  response.preference
+);
+        }
+        renderAuctionPlayers();
+      } catch (error) {
+        msg(error.message || 'Errore aggiornamento preferito.', 'error');
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    function auctionFreeSortButton(key, label, title = '') {
+      const active = state.auctionSort?.key === key;
+      const arrow = active ? (state.auctionSort.direction === 'desc' ? '↓' : '↑') : '↕';
+      return `<button type="button" data-auction-sort="${key}" ${title ? `title="${esc(title)}"` : ''}>${label} <span>${arrow}</span></button>`;
+    }
+
     function renderAuctionFixedFreeAgents(hasPlayer, callerControlsHtml = '') {
-      const showQueue =
-        auctionCallMode()
-        &&
-        auctionHasPresidentRole();
-
-      const showSupremeMetric = true;
-
-      const hasCallerControls =
-        Boolean(String(callerControlsHtml || '').trim());
-
-      const statusCardHtml =
-        renderAuctionPresidentStatusBanner();
-
-      const hasStatusCard =
-        Boolean(String(statusCardHtml || '').trim());
+      const hasCallerControls = Boolean(String(callerControlsHtml || '').trim());
+      const statusCardHtml = renderAuctionPresidentStatusBanner();
+      const hasStatusCard = Boolean(String(statusCardHtml || '').trim());
+      auctionFreeEnsureRanges(state.auction?.callCandidates || []);
+      const filters = state.auctionColumnFilters || {};
 
       return `
         <aside class="auction-free-fixed ${hasCallerControls ? 'has-caller-controls' : 'no-caller-controls'} ${hasStatusCard ? 'has-status-card' : 'no-status-card'}">
+${statusCardHtml}
+${callerControlsHtml}
 
-          ${statusCardHtml}
+<div class="auction-free-role-row">
+  <div id="auction-rolebar" class="rolebar"></div>
+</div>
 
-          ${callerControlsHtml}
+<div class="drawer-table auction-free-table-wrap">
+  <table class="player-table auction-free-table">
+    <colgroup>
+      <col class="auction-col-role"><col class="auction-col-name"><col class="auction-col-badge">
+      <col class="auction-col-presence"><col class="auction-col-pfc"><col class="auction-col-pma">
+      <col class="auction-col-delta"><col class="auction-col-fm"><col class="auction-col-index">
+      <col class="auction-col-favorite"><col class="auction-col-action">
+    </colgroup>
+    <thead>
+      <tr class="auction-free-head-row">
+        <th class="auction-player-col-role">${auctionFreeSortButton('role', 'Ruolo', 'Ordina per ruolo')}</th>
+        <th class="auction-player-col-name">${auctionFreeSortButton('name', 'Calciatore')}</th>
+        <th class="auction-player-col-signals">${auctionFreeSortButton('badge', 'Badge')}</th>
+        <th class="num-head auction-player-col-presence">${auctionFreeSortButton('presence', '%Tit')}</th>
+        <th class="num-head auction-player-col-pfc">${auctionFreeSortButton('pfc', 'PFC')}</th>
+        <th class="num-head auction-player-col-pma">${auctionFreeSortButton('pma', 'PMA')}</th>
+        <th class="num-head auction-player-col-delta">${auctionFreeSortButton('delta', 'Delta')}</th>
+        <th class="num-head auction-player-col-fm">${auctionFreeSortButton('fm', 'FM')}</th>
+        <th class="num-head auction-player-col-supreme">${auctionFreeSortButton('index', 'Indice')}</th>
+        <th class="auction-player-col-favorite">${auctionFreeSortButton('favorite', '♥', 'Ordina per preferiti')}</th>
+        <th class="queue-head auction-player-col-action">AZIONE</th>
+      </tr>
+      <tr class="auction-free-filter-row">
+        <th><span class="auction-role-filter-note">ruoli sopra</span></th>
+        <th><input type="search" data-auction-filter="name" value="${esc(filters.name || '')}" placeholder="nome simile…" autocomplete="off"></th>
+        <th>
+          <select data-auction-filter="badge">
+            <option value="">tutti</option>
+            <option value="market" ${filters.badge === 'market' ? 'selected' : ''}>mercato</option>
+            <option value="injury" ${filters.badge === 'injury' ? 'selected' : ''}>indisp.</option>
+            <option value="new" ${filters.badge === 'new' ? 'selected' : ''}>nuovo</option>
+            <option value="penalties" ${filters.badge === 'penalties' ? 'selected' : ''}>rigori</option>
+            <option value="free_kicks" ${filters.badge === 'free_kicks' ? 'selected' : ''}>piazzati</option>
+          </select>
+        </th>
+        <th>${auctionFreeRangeControl('presence')}</th>
+        <th>${auctionFreeRangeControl('pfc')}</th>
+        <th>${auctionFreeRangeControl('pma')}</th>
+        <th>${auctionFreeRangeControl('delta')}</th>
+        <th>${auctionFreeRangeControl('fm')}</th>
+        <th>${auctionFreeRangeControl('index')}</th>
+        <th>
+          <select data-auction-filter="favorite" aria-label="Preferiti">
+            <option value="" ${!filters.favorite ? 'selected' : ''}>tutti</option>
+            <option value="on" ${filters.favorite === 'on' ? 'selected' : ''}>♥</option>
+            <option value="off" ${filters.favorite === 'off' ? 'selected' : ''}>♡</option>
+          </select>
+        </th>
+        <th aria-hidden="true"></th>
+      </tr>
+    </thead>
+    <tbody id="auction-player-body"></tbody>
+  </table>
+</div>
 
-
-          <div>
-
-            <div
-              id="auction-rolebar"
-              class="rolebar"
-            ></div>
-
-
-            <div
-              class="drawer-filters"
-              style="margin-top:4px"
-            >
-
-              <label>
-                Squadra
-                <select id="auction-team-filter">
-                  <option value="all">Tutte</option>
-                </select>
-              </label>
-
-              <label>
-                Slot
-                <select id="auction-slot-filter">
-                  <option value="all">Tutti</option>
-                </select>
-              </label>
-
-              <label>
-                Segnalazioni
-                <select id="auction-flag-filter">
-                  <option value="all">Tutte</option>
-                  <option value="market">Mercato</option>
-                  <option value="injury">Indisponibili</option>
-                  <option value="new">Nuovi arrivi</option>
-                  <option value="penalties">Rigoristi</option>
-                </select>
-              </label>
-
-            </div>
-
-          </div>
-
-
-          <div class="drawer-table">
-
-            <table class="player-table">
-
-              <thead>
-                <tr>
-
-                  <th class="auction-player-col-role" data-auction-column="role">
-                    <button data-auction-sort="role" title="Ordina per ruolo" aria-label="Ordina per ruolo">
-                      <span aria-hidden="true">↕</span>
-                    </button>
-                  </th>
-
-                  <th class="auction-player-col-name" data-auction-column="name">
-                    <button data-auction-sort="name">
-                      Calciatore <span>↑</span>
-                    </button>
-                  </th>
-
-                  <th class="auction-player-col-signals" data-auction-column="signals">
-                    <span title="Segnalazioni">Badge</span>
-                  </th>
-
-                  <th class="num-head auction-player-col-pfc" data-auction-column="pfc">
-                    <button data-auction-sort="pfc" title="Prezzo Fantaculo consigliato">
-                      PFC <span>↕</span>
-                    </button>
-                  </th>
-
-                  <th class="num-head auction-player-col-fm" data-auction-column="fm">
-                    <button data-auction-sort="fm" title="Fanta media attesa importata dal listone">
-                      FM <span>↕</span>
-                    </button>
-                  </th>
-
-                  <th class="num-head auction-player-col-pma" data-auction-column="pma">
-                    <button data-auction-sort="pma" title="Prezzo medio asta">
-                      PMA <span>↕</span>
-                    </button>
-                  </th>
-
-                  ${
-                    showSupremeMetric
-                      ? `
-                          <th
-                            class="num-head auction-player-col-supreme" data-auction-column="supreme"
-                            title="Indice valore/prezzo: 100 = soglia sostenibile uguale al prezzo atteso"
-                          >
-                            INDICE
-                          </th>
-                        `
-                      : ''
-                  }
-
-                  ${
-                    showQueue
-                      ? `
-                          <th class="queue-head auction-player-col-action" data-auction-column="action">
-                            AZIONE
-                          </th>
-                        `
-                      : ''
-                  }
-
-                </tr>
-              </thead>
-
-              <tbody id="auction-player-body"></tbody>
-
-            </table>
-
-          </div>
-
-          <div class="auction-free-suggestions">
-            ${renderAuctionSuggestedCalls()}
-          </div>
-
+<div class="auction-free-suggestions">
+  ${renderAuctionSuggestedCalls()}
+</div>
         </aside>
       `;
     }
@@ -23075,6 +23442,19 @@ await auctionAction(
             )
           );
       }
+      const callButton = $('auction-call-confirm');
+      if (callButton) {
+        const session = auctionSession();
+        callButton.disabled = !(
+          selected
+          && session?.status === 'live'
+          && !session.current_player_id
+          && session.prestart_hold !== true
+          && auctionHasPresidentRole()
+          && auctionOwnCallTurn()
+        );
+      }
+
     }
 
 
@@ -25382,27 +25762,15 @@ await auctionAction(
 
       const callerControlsHtml = `
         <section class="auction-caller-controls">
-          <label class="auction-command-search">
-            <span class="auction-command-label">Ricerca giocatore</span>
-            <input
-              id="auction-top-search"
-              type="search"
-              placeholder="Nome o squadra..."
-              autocomplete="off"
-              value="${esc(selectedCall?.name || state.auctionFilterSearch)}"
-            >
-          </label>
-
-          <label class="auction-command-base">
-            <span class="auction-command-label">Base</span>
-            <input
-              id="auction-top-base"
-              type="number"
-              min="1"
-              step="1"
-              value="${Math.max(1, Number(state.auctionOpeningBid || 1))}"
-            >
-          </label>
+<label class="auction-command-search">
+  <span class="auction-command-label">Ricerca giocatore</span>
+  <input id="auction-top-search" type="search" placeholder="Nome o squadra..." autocomplete="off" value="${esc(selectedCall?.name || state.auctionFilterSearch)}">
+</label>
+<label class="auction-command-base">
+  <span class="auction-command-label">Base</span>
+  <input id="auction-top-base" type="number" min="1" step="1" value="${Math.max(1, Number(state.auctionOpeningBid || 1))}">
+</label>
+<button id="auction-call-confirm" class="auction-top-call good" type="button" ${!selectedCall || !canCall ? 'disabled' : ''}>CHIAMA</button>
         </section>
       `;
 
@@ -27944,123 +28312,108 @@ await auctionAction(
     function renderAuctionDrawerControls() {
       const players = state.auction?.callCandidates || [];
       const mode = state.auction?.settings?.fantasy_mode || 'classic';
-
-      const teams = [
-        ...new Set(
-          players
-            .map(player => player.serie_a_team)
-            .filter(Boolean)
-        )
-      ].sort((a, b) => a.localeCompare(b, 'it'));
-
-      const slots = [
-        ...new Set(
-          players
-            .map(player => player.slot)
-            .filter(value =>
-              value !== null &&
-              value !== undefined &&
-              String(value).trim() !== ''
-            )
-            .map(String)
-        )
-      ].sort((a, b) =>
-        a.localeCompare(
-          b,
-          'it',
-          { numeric: true }
-        )
-      );
-
-      setOptions(
-        $('auction-team-filter'),
-        teams,
-        'Tutte'
-      );
-
-      setOptions(
-        $('auction-slot-filter'),
-        slots,
-        'Tutti'
-      );
-
-      $('auction-team-filter').value =
-        [...$('auction-team-filter').options]
-          .some(option => option.value === state.auctionFilterTeam)
-            ? state.auctionFilterTeam
-            : 'all';
-
-      $('auction-slot-filter').value =
-        [...$('auction-slot-filter').options]
-          .some(option => option.value === state.auctionFilterSlot)
-            ? state.auctionFilterSlot
-            : 'all';
-
-      $('auction-flag-filter').value =
-        state.auctionFilterFlag || 'all';
+      auctionFreeEnsureRanges(players);
 
       renderRoleBar(
         $('auction-rolebar'),
         state.auctionRoles,
         mode,
         next => {
-          state.auctionRoles = next;
-          renderAuctionLive();
+state.auctionRoles = next;
+renderAuctionPlayers();
         }
       );
 
-      $('auction-team-filter').addEventListener('change', event => {
-        state.auctionFilterTeam = event.target.value;
+      const fixed = document.querySelector('#view-auction .auction-free-fixed');
+      if (!fixed) return;
+
+      fixed.addEventListener('click', event => {
+        const sortButton = event.target.closest('[data-auction-sort]');
+        if (sortButton) {
+event.preventDefault();
+event.stopPropagation();
+const key = sortButton.dataset.auctionSort;
+state.auctionSort = state.auctionSort?.key === key
+  ? { key, direction: state.auctionSort.direction === 'asc' ? 'desc' : 'asc' }
+  : { key, direction: 'asc' };
+renderAuctionPlayers();
+updateAuctionSortIndicators();
+return;
+        }
+
+        const toggle = event.target.closest('[data-auction-range-toggle]');
+        if (toggle) {
+event.preventDefault();
+event.stopPropagation();
+const key = toggle.dataset.auctionRangeToggle;
+const popover = fixed.querySelector(`[data-auction-range-popover="${key}"]`);
+const open = popover?.hidden !== false;
+closeAuctionFreeRanges(open ? key : '');
+if (popover) popover.hidden = !open;
+toggle.closest('[data-auction-range-box]')?.classList.toggle('open', open);
+if (open) updateAuctionFreeRangeVisual(key);
+return;
+        }
+
+        const reset = event.target.closest('[data-auction-range-reset]');
+        if (reset) {
+event.preventDefault();
+event.stopPropagation();
+const key = reset.dataset.auctionRangeReset;
+const range = state.auctionColumnRanges?.[key];
+if (!range) return;
+range.lo = range.min;
+range.hi = range.max;
+fixed.querySelectorAll(`[data-auction-range="${key}"]`).forEach(input => {
+  input.value = input.dataset.bound === 'lo' ? range.lo : range.hi;
+});
+updateAuctionFreeRangeVisual(key);
+renderAuctionPlayers();
+return;
+        }
+
+        if (!event.target.closest('[data-auction-range-box]')) closeAuctionFreeRanges('');
+      });
+
+      fixed.addEventListener('input', event => {
+        const rangeInput = event.target.closest('[data-auction-range]');
+        if (rangeInput) {
+event.stopPropagation();
+const key = rangeInput.dataset.auctionRange;
+const bound = rangeInput.dataset.bound;
+const range = state.auctionColumnRanges?.[key];
+if (!range) return;
+const value = Number(rangeInput.value);
+if (bound === 'lo') {
+  range.lo = Math.min(value, range.hi);
+  rangeInput.value = range.lo;
+} else {
+  range.hi = Math.max(value, range.lo);
+  rangeInput.value = range.hi;
+}
+updateAuctionFreeRangeVisual(key);
+renderAuctionPlayers();
+return;
+        }
+
+        const filter = event.target.closest('[data-auction-filter]');
+        if (filter && filter.tagName !== 'SELECT') {
+state.auctionColumnFilters = state.auctionColumnFilters || {};
+state.auctionColumnFilters[filter.dataset.auctionFilter] = filter.value;
+renderAuctionPlayers();
+        }
+      });
+
+      fixed.addEventListener('change', event => {
+        const filter = event.target.closest('[data-auction-filter]');
+        if (!filter) return;
+        state.auctionColumnFilters = state.auctionColumnFilters || {};
+        state.auctionColumnFilters[filter.dataset.auctionFilter] = filter.value;
         renderAuctionPlayers();
       });
 
-      $('auction-slot-filter').addEventListener('change', event => {
-        state.auctionFilterSlot = event.target.value;
-        renderAuctionPlayers();
-      });
-
-      $('auction-flag-filter').addEventListener('change', event => {
-        state.auctionFilterFlag = event.target.value;
-        renderAuctionPlayers();
-      });
-
-
-      document
-        .querySelector(
-          '.auction-free-fixed thead'
-        )
-        ?.addEventListener(
-          'click',
-          event => {
-            const button =
-              event.target.closest(
-                '[data-auction-sort]'
-              );
-
-            if (!button) {
-              return;
-            }
-
-            const key =
-              button.dataset.auctionSort;
-
-            state.auctionSort =
-              state.auctionSort.key === key
-                ? {
-                    key,
-                    direction:
-                      state.auctionSort.direction === 'asc'
-                        ? 'desc'
-                        : 'asc'
-                  }
-                : {
-                    key,
-                    direction: 'asc'
-                  };
-
-            renderAuctionPlayers();
-          }
-        );
+      requestAnimationFrame(() => Object.keys(AUCTION_FREE_NUMERIC).forEach(updateAuctionFreeRangeVisual));
+      updateAuctionSortIndicators();
     }
 
 
@@ -28136,408 +28489,111 @@ await auctionAction(
         });
     }
 
-    function auctionPlayerRow(
-      player,
-      mode
-    ) {
-      const roles =
-        playerRoles(
-          player,
-          mode
-        );
-
-      const queuedIndex =
-        auctionQueueRows()
-          .findIndex(
-            item =>
-              item.player_id
-              === player.id
-          );
-
-      const showQueue =
-        auctionCallMode()
-        &&
-        auctionHasPresidentRole();
-
-      const showSupremeMetric = true;
-
-      const queueCapacity =
-        auctionQueueCapacityForPlayer(
-          player
-        );
-
-      const rolePhaseAllowed =
-        auctionPlayerMatchesCurrentRolePhase(
-          player
-        );
-
-      const queueAllowed =
-        queueCapacity.allowed
-        && rolePhaseAllowed;
-
-      const queueBlockedMessage =
-        !rolePhaseAllowed
-          ? `Giocatore fuori dalla fase ${auctionRolePhaseLabel(state.auction?.rolePhase?.key)}: puoi consultarlo, ma non accodarlo o chiamarlo.`
-          : queueCapacity.message;
-
-      const queueBackupHint =
-        queueCapacity.backup
-          ? ` Verrà inserito come backup: ${queueCapacity.message}`
-          : '';
-
-      const queueIsEmpty =
-        auctionQueueRows().length === 0;
-
-      const queueActionLabel =
-        queueIsEmpty
-          ? 'CHIAMA'
-          : 'CODA';
-
-      const queueAction =
-        queuedIndex >= 0
-        &&
-        auctionHasPresidentRole()
-          ? `
-              <span
-                class="auction-queue-added"
-                title="Già in coda"
-              >
-                #${queuedIndex + 1}
-              </span>
-            `
-          : `
-              <button
-                type="button"
-                class="auction-queue-add ${queueIsEmpty ? 'call-now' : ''}"
-                data-queue-add="${esc(player.id)}"
-                ${
-                  auctionCanManageCallQueue()
-                  && queueAllowed
-                    ? ''
-                    : 'disabled'
-                }
-                title="${
-                  !queueAllowed
-                    ? esc(queueBlockedMessage)
-                    : auctionHasPresidentRole()
-                    ? (
-                        queueIsEmpty
-                          ? `Inserisci come prima chiamata: verrà elaborato automaticamente dalla coda.${queueBackupHint}`
-                          : `Aggiungi subito alla coda.${queueBackupHint}`
-                      )
-                    : 'Solo il Presidente può usare la coda'
-                }"
-              >
-                ${queueActionLabel}
-              </button>
-            `;
+    function auctionPlayerRow(player, mode) {
+      const roles = playerRoles(player, mode);
+      const queuedIndex = auctionQueueRows().findIndex(item => item.player_id === player.id);
+      const showQueue = auctionCallMode() && auctionHasPresidentRole();
+      const queueCapacity = auctionQueueCapacityForPlayer(player);
+      const rolePhaseAllowed = auctionPlayerMatchesCurrentRolePhase(player);
+      const queueAllowed = queueCapacity.allowed && rolePhaseAllowed;
+      const queueBlockedMessage = !rolePhaseAllowed
+        ? `Giocatore fuori dalla fase ${auctionRolePhaseLabel(state.auction?.rolePhase?.key)}: puoi consultarlo, ma non accodarlo o chiamarlo.`
+        : queueCapacity.message;
+      const queueBackupHint = queueCapacity.backup ? ` Verrà inserito come backup: ${queueCapacity.message}` : '';
+      const queueIsEmpty = auctionQueueRows().length === 0;
+      const queueActionLabel = queueIsEmpty ? 'CHIAMA' : 'CODA';
+      const queueAction = queuedIndex >= 0 && auctionHasPresidentRole()
+        ? `<span class="auction-queue-added" title="Già in coda">#${queuedIndex + 1}</span>`
+        : `<button type="button" class="auction-queue-add ${queueIsEmpty ? 'call-now' : ''}" data-queue-add="${esc(player.id)}" ${auctionCanManageCallQueue() && queueAllowed ? '' : 'disabled'} title="${!queueAllowed ? esc(queueBlockedMessage) : auctionHasPresidentRole() ? (queueIsEmpty ? `Inserisci come prima chiamata: verrà elaborato automaticamente dalla coda.${queueBackupHint}` : `Aggiungi subito alla coda.${queueBackupHint}`) : 'Solo il Presidente può usare la coda'}">${queueActionLabel}</button>`;
+      const delta = auctionFreeDelta(player);
+      const favorite = auctionFreeFavorite(player);
 
       return `
-        <tr
-          data-player-id="${esc(player.id)}"
-          class="${
-            player.id === state.auctionSelectedPlayerId
-              ? 'selected-player'
-              : ''
-          } ${rolePhaseAllowed ? '' : 'outside-role-phase'}"
-        >
-
-          <td class="player-role-cell auction-player-col-role" data-auction-column="role">
-            ${
-              roles.map(role => `
-                <span
-                  class="rolebadge"
-                  data-role="${esc(role)}"
-                >
-                  ${esc(role)}
-                </span>
-              `).join('')
-            }
-          </td>
-
-
-          <td class="auction-player-col-name" data-auction-column="name">
-            <div class="player-main">
-
-              <span class="auction-player-name-line">
-                <span class="player-name">
-                  ${esc(player.name)}
-                </span>
-
-                ${
-                  auctionHasViceRole()
-                    ? renderAuctionViceInterestEditor(player.id, { compact: true })
-                    : (
-                        queuedIndex < 0
-                          ? renderAuctionViceInterestReadout(player.id, { compact: true })
-                          : ''
-                      )
-                }
-              </span>
-
-              <small class="auction-player-team-small">
-                ${esc(player.serie_a_team || '—')}
-              </small>
-
-            </div>
-          </td>
-
-
-          <td class="auction-signal-cell auction-player-col-signals" data-auction-column="signals">
-            ${auctionPlayerSignalBadges(player)}
-          </td>
-
-          <td class="num auction-player-col-pfc" data-auction-column="pfc">
-            <strong>
-              ${formatAuctionPrice(player.pfc)}
-            </strong>
-          </td>
-
-          <td
-            class="num auction-player-col-fm" data-auction-column="fm"
-            title="Fanta media attesa"
-          >
-            ${formatNumber(player.expected_fantasy_avg)}
-          </td>
-
-          <td class="num auction-player-col-pma" data-auction-column="pma">
-            ${formatAuctionPrice(player.pma)}
-          </td>
-
-          ${
-            showSupremeMetric
-              ? `
-                  <td
-                    class="num auction-player-col-supreme strategic-index-value" data-auction-column="supreme"
-                    data-supreme-metric-player="${esc(player.id)}"
-                    title="${esc(strategicIndexTitle(player))}"
-                  >
-                    ${strategicValueIndex(player)}
-                  </td>
-                `
-              : ''
-          }
-
-
-          ${
-            showQueue
-              ? `
-                  <td class="queue-cell auction-player-col-action" data-auction-column="action">
-                    ${queueAction}
-                  </td>
-                `
-              : ''
-          }
-
+        <tr data-player-id="${esc(player.id)}" class="${player.id === state.auctionSelectedPlayerId ? 'selected-player' : ''} ${rolePhaseAllowed ? '' : 'outside-role-phase'}">
+<td class="player-role-cell auction-player-col-role" data-auction-column="role">
+  ${roles.map(role => `<span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>`).join('')}
+</td>
+<td class="auction-player-col-name" data-auction-column="name">
+  <div class="player-main">
+    <span class="auction-player-name-line">
+      <span class="player-name">${esc(player.name)}</span>
+      ${auctionHasViceRole() ? renderAuctionViceInterestEditor(player.id, { compact: true }) : (queuedIndex < 0 ? renderAuctionViceInterestReadout(player.id, { compact: true }) : '')}
+    </span>
+    <small class="auction-player-team-small">${esc(player.serie_a_team || '—')}</small>
+  </div>
+</td>
+<td class="auction-signal-cell auction-player-col-signals" data-auction-column="signals">${auctionPlayerSignalBadges(player)}</td>
+<td class="num auction-player-col-presence" data-auction-column="presence">${Math.round(auctionFreePresence(player))}%</td>
+<td class="num auction-player-col-pfc" data-auction-column="pfc"><strong>${formatAuctionPrice(player.pfc)}</strong></td>
+<td class="num auction-player-col-pma" data-auction-column="pma">${formatAuctionPrice(player.pma)}</td>
+<td class="num auction-player-col-delta ${delta > 0 ? 'positive' : delta < 0 ? 'negative' : ''}" data-auction-column="delta">${delta === null ? '—' : `${delta > 0 ? '+' : ''}${auctionFreeFormatRange(delta, 1)}`}</td>
+<td class="num auction-player-col-fm" data-auction-column="fm" title="Fanta media attesa">${formatNumber(auctionFreeFantasyAverage(player))}</td>
+<td class="num auction-player-col-supreme strategic-index-value" data-auction-column="supreme" data-supreme-metric-player="${esc(player.id)}" title="${esc(strategicIndexTitle(player))}">${auctionFreeIndex(player)}</td>
+<td class="auction-player-col-favorite" data-auction-column="favorite">
+  <button type="button" class="auction-heart ${favorite ? 'active' : ''}" data-auction-favorite="${esc(player.id)}" aria-pressed="${favorite ? 'true' : 'false'}" title="${favorite ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}">${favorite ? '♥' : '♡'}</button>
+</td>
+<td class="queue-cell auction-player-col-action" data-auction-column="action">${showQueue ? queueAction : '<span class="auction-action-empty">—</span>'}</td>
         </tr>
       `;
     }
 
 
     function renderAuctionPlayers() {
-      const body =
-        $('auction-player-body');
-
-      if (!body) {
-        return;
-      }
-
-      const data =
-        state.auction;
-
-      const mode =
-        data.settings?.fantasy_mode
-        ||
-        'classic';
-
-      const controls = {
-        search: {
-          value:
-            state.auctionFilterSearch
-            ||
-            ''
-        },
-
-        team:
-          $('auction-team-filter'),
-
-        slot:
-          $('auction-slot-filter'),
-
-        flag:
-          $('auction-flag-filter')
-      };
-
-      const filteredPlayers =
-        filterPlayers(
-          data.callCandidates || [],
-          controls,
-          state.auctionRoles,
-          mode
-        );
-
-      const searchQuery =
-        String(
-          state.auctionFilterSearch
-          || ''
-        ).trim();
-
-      const players =
-        sortedPlayers(
-          filteredPlayers,
-          state.auctionSort,
-          mode
-        );
-
-      if (searchQuery) {
-        players.sort((a, b) =>
-          comparePlayerSearchRanks(
-            playerSearchRank(a, searchQuery, mode),
-            playerSearchRank(b, searchQuery, mode)
-          )
-        );
-      }
-
+      const body = $('auction-player-body');
+      if (!body) return;
+      const data = state.auction || {};
+      const mode = data.settings?.fantasy_mode || 'classic';
+      auctionFreeEnsureRanges(data.callCandidates || []);
+      const players = auctionFreePlayers(mode);
 
       updateAuctionSortIndicators();
+      body.innerHTML = players.map(player => auctionPlayerRow(player, mode)).join('')
+        || `<tr><td colspan="11" class="soft" style="text-align:center;height:70px">Nessun giocatore.</td></tr>`;
 
-
-      const showQueue =
-        auctionCallMode()
-        &&
-        auctionHasPresidentRole();
-
-      const showSupremeMetric = true;
-
-
-      body.innerHTML =
-        players
-          .map(
-            player =>
-              auctionPlayerRow(
-                player,
-                mode
-              )
-          )
-          .join('')
-        ||
-        `
-          <tr>
-            <td
-              colspan="${
-                6
-                + (showQueue ? 1 : 0)
-                + (showSupremeMetric ? 1 : 0)
-              }"
-              class="soft"
-              style="text-align:center;height:70px"
-            >
-              Nessun giocatore.
-            </td>
-          </tr>
-        `;
-
-
-      body
-        .querySelectorAll(
-          '[data-queue-add]'
-        )
-        .forEach(button => {
-          button.addEventListener(
-            'click',
-            event => {
-              event.stopPropagation();
-
-              addPlayerToAuctionQueue(
-                button.dataset.queueAdd,
-                Math.max(
-                  1,
-                  Number(
-                    state.auctionOpeningBid
-                    || 1
-                  )
-                )
-              );
-            }
-          );
+      body.querySelectorAll('[data-queue-add]').forEach(button => {
+        button.addEventListener('click', event => {
+event.stopPropagation();
+addPlayerToAuctionQueue(
+  button.dataset.queueAdd,
+  Math.max(1, Number(state.auctionOpeningBid || 1))
+);
         });
+      });
 
-
-      /*
-       * Una riga compatibile con la fase seleziona il giocatore nella fascia superiore.
-       * NON effettua mai una chiamata direttamente:
-       * - CHIAMA/CODA vive soltanto nella singola riga
-       * - anche CHIAMA inserisce prima il giocatore nella coda
-       * - Vice/Admin                  -> sola selezione/ricerca
-       */
-      body
-        .querySelectorAll(
-          '[data-player-id]'
-        )
-        .forEach(row => {
-          row.addEventListener(
-            'click',
-            event => {
-              if (
-                event.target.closest(
-                  '[data-queue-add], .auction-vice-interest-editor'
-                )
-              ) {
-                return;
-              }
-
-              const player =
-                (data.callCandidates || [])
-                  .find(
-                    item =>
-                      item.id
-                      === row.dataset.playerId
-                  );
-
-              if (!player) {
-                return;
-              }
-
-              if (!auctionPlayerMatchesCurrentRolePhase(player)) {
-                return msg(
-                  `Durante la fase ${auctionRolePhaseLabel(state.auction?.rolePhase?.key)} puoi consultare questo giocatore, ma non inserirlo in coda.`,
-                  'warning'
-                );
-              }
-
-              state.auctionSelectedPlayerId =
-                player.id;
-
-              state.auctionFilterSearch =
-                '';
-
-              state.auctionOpeningBid =
-                1;
-
-              const topSearch =
-                $('auction-top-search');
-
-              if (topSearch) {
-                topSearch.value =
-                  player.name;
-              }
-
-              const base =
-                $('auction-top-base');
-
-              if (base) {
-                base.value = '1';
-              }
-
-              renderAuctionPlayers();
-              patchAuctionTopSelection();
-            }
-          );
+      body.querySelectorAll('[data-auction-favorite]').forEach(button => {
+        button.addEventListener('click', event => {
+event.preventDefault();
+event.stopPropagation();
+const player = (data.callCandidates || []).find(item => item.id === button.dataset.auctionFavorite);
+if (player) void toggleAuctionFreeFavorite(player, button);
         });
+      });
+
+      body.querySelectorAll('[data-player-id]').forEach(row => {
+        row.addEventListener('click', event => {
+if (event.target.closest('[data-queue-add], [data-auction-favorite], .auction-vice-interest-editor')) return;
+const player = (data.callCandidates || []).find(item => item.id === row.dataset.playerId);
+if (!player) return;
+if (!auctionPlayerMatchesCurrentRolePhase(player)) {
+  return msg(
+    `Durante la fase ${auctionRolePhaseLabel(state.auction?.rolePhase?.key)} puoi consultare questo giocatore, ma non inserirlo in coda.`,
+    'warning'
+  );
+}
+state.auctionSelectedPlayerId = player.id;
+state.auctionFilterSearch = '';
+state.auctionOpeningBid = 1;
+const topSearch = $('auction-top-search');
+if (topSearch) topSearch.value = player.name;
+const base = $('auction-top-base');
+if (base) base.value = '1';
+renderAuctionPlayers();
+patchAuctionTopSelection();
+        });
+      });
 
       bindAuctionViceInterestControls(body);
-      applyAuctionFreeColumnLayout();
-
+      paintAuctionFreeEconomicRows(body, players);
     }
 
 
@@ -33040,65 +33096,15 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
   }
 
   /* =========================================================
-     FILTRI PER COLONNA NELLA LISTA SVINCOLATI
+     LISTA SVINCOLATI: renderer unico nel core asta
      ========================================================= */
-  const NUM={
-    pfc:{label:'PFC',step:1,get:p=>Number(p?.pfc)},
-    fm:{label:'FM',step:.01,get:p=>Number(typeof strategicExpectedFantasyAverage==='function'?strategicExpectedFantasyAverage(p):p?.expected_fantasy_avg)},
-    pma:{label:'PMA',step:1,get:p=>Number(p?.pma)},
-    index:{label:'Indice',step:1,get:p=>Number(typeof strategicValueIndex==='function'?strategicValueIndex(p):0)}
-  };
-  state.v18AuctionFilters=state.v18AuctionFilters||{name:'',badge:'all',ranges:{},key:''};
-  const finite=v=>Number.isFinite(Number(v))?Number(v):null;
-  const fmt=(v,step=1)=>step<1?Number(v).toFixed(step<=.01?2:1).replace('.',','):String(Math.round(Number(v)));
-  function bounds(key,players){const d=NUM[key],vals=players.map(d.get).filter(Number.isFinite);let min=vals.length?Math.min(...vals):0,max=vals.length?Math.max(...vals):d.step;if(d.step>=1){min=Math.floor(min);max=Math.ceil(max)}else{min=Math.floor(min/d.step)*d.step;max=Math.ceil(max/d.step)*d.step}if(min===max)max=min+d.step;return{min,max,lo:min,hi:max,step:d.step}}
-  function ensureRanges(){
-    const ps=state.auction?.callCandidates||[],k=`${state.auction?.auctionSession?.id||''}|${ps.length}|${ps.slice(0,5).map(p=>p.id).join(',')}`;
-    if(state.v18AuctionFilters.key===k&&Object.keys(state.v18AuctionFilters.ranges||{}).length)return;
-    const old=state.v18AuctionFilters.ranges||{},next={};
-    Object.keys(NUM).forEach(x=>{const b=bounds(x,ps),o=old[x];next[x]={...b,lo:o?Math.max(b.min,Math.min(b.max,o.lo)):b.min,hi:o?Math.max(b.min,Math.min(b.max,o.hi)):b.max};if(next[x].lo>next[x].hi){next[x].lo=b.min;next[x].hi=b.max}});
-    state.v18AuctionFilters.ranges=next;state.v18AuctionFilters.key=k;
-  }
-  function rangeHtml(key){const r=state.v18AuctionFilters.ranges[key],d=NUM[key];if(!r)return'';const full=r.lo===r.min&&r.hi===r.max,label=full?'tutto':`${fmt(r.lo,d.step)}–${fmt(r.hi,d.step)}`;return `<div class="v18-range" data-v18-box="${key}"><button type="button" class="v18-range-toggle" data-v18-toggle="${key}">${label}<i>⌄</i></button><div class="v18-range-pop" data-v18-pop="${key}" hidden><div class="v18-range-values"><b data-v18-lo="${key}">${fmt(r.lo,d.step)}</b><span>${d.label}</span><b data-v18-hi="${key}">${fmt(r.hi,d.step)}</b></div><div class="v18-dual"><div class="base"></div><div class="fill" data-v18-fill="${key}"></div><input type="range" data-v18-range="${key}" data-bound="lo" min="${r.min}" max="${r.max}" step="${r.step}" value="${r.lo}"><input type="range" data-v18-range="${key}" data-bound="hi" min="${r.min}" max="${r.max}" step="${r.step}" value="${r.hi}"></div><div class="ends"><small>${fmt(r.min,d.step)}</small><button type="button" data-v18-reset="${key}">azzera</button><small>${fmt(r.max,d.step)}</small></div></div></div>`}
-  function updateRangeVisual(key){const r=state.v18AuctionFilters.ranges[key],d=NUM[key];if(!r)return;const span=Math.max(r.step,r.max-r.min),a=(r.lo-r.min)/span*100,b=(r.hi-r.min)/span*100;document.querySelectorAll(`[data-v18-fill="${key}"]`).forEach(x=>{x.style.left=`${a}%`;x.style.width=`${Math.max(0,b-a)}%`});document.querySelectorAll(`[data-v18-lo="${key}"]`).forEach(x=>x.textContent=fmt(r.lo,d.step));document.querySelectorAll(`[data-v18-hi="${key}"]`).forEach(x=>x.textContent=fmt(r.hi,d.step));const full=r.lo===r.min&&r.hi===r.max,label=full?'tutto':`${fmt(r.lo,d.step)}–${fmt(r.hi,d.step)}`;document.querySelectorAll(`[data-v18-toggle="${key}"]`).forEach(x=>{x.childNodes[0].nodeValue=label})}
-  function closeRange(except=''){document.querySelectorAll('[data-v18-pop]').forEach(x=>{if(x.dataset.v18Pop!==except)x.hidden=true})}
-  function matchPlayer(p){
-    const f=state.v18AuctionFilters,q=String(f.name||'').trim();
-    if(q){const ok=typeof playerSearchRank==='function'?playerSearchRank(p,q,state.auction?.settings?.fantasy_mode||'classic')!==null:String(p?.name||'').toLowerCase().includes(q.toLowerCase());if(!ok)return false}
-    if(f.badge&&f.badge!=='all'&&typeof matchesFlag==='function'&&!matchesFlag(p,f.badge))return false;
-    for(const key of Object.keys(NUM)){const r=f.ranges[key],v=NUM[key].get(p);if(!r||!Number.isFinite(v)||v<r.lo-1e-9||v>r.hi+1e-9)return false}
-    return true;
-  }
-  function applyAuctionColumnFilters(){
-    const body=document.getElementById('auction-player-body');if(!body)return;
-    const by=new Map((state.auction?.callCandidates||[]).map(p=>[String(p.id),p]));
-    body.querySelectorAll('tr[data-player-id]').forEach(row=>{const p=by.get(String(row.dataset.playerId));row.hidden=Boolean(p&&!matchPlayer(p))});
-  }
-  function mountAuctionColumnFilters(){
-    const box=document.querySelector('#view-auction .auction-free-fixed');if(!box)return;
-    box.querySelector('.drawer-filters')?.setAttribute('hidden','');ensureRanges();
-    const thead=box.querySelector('.player-table thead');if(!thead)return;
-    thead.querySelector('.v18-auction-filter-row')?.remove();
-    const row=document.createElement('tr');row.className='v18-auction-filter-row';row.innerHTML=`<th><span class="v18-role-filter-note">ruoli sopra</span></th><th><input type="search" class="v18-name-filter" value="${String(state.v18AuctionFilters.name||'').replace(/"/g,'&quot;')}" placeholder="nome simile…" autocomplete="off"></th><th><select class="v18-badge-filter"><option value="all">tutti</option><option value="market">mercato</option><option value="injury">indisp.</option><option value="new">nuovo</option><option value="penalties">rigori</option><option value="free_kicks">piazzati</option></select></th><th>${rangeHtml('pfc')}</th><th>${rangeHtml('fm')}</th><th>${rangeHtml('pma')}</th><th>${rangeHtml('index')}</th><th></th>`;
-    thead.appendChild(row);row.querySelector('.v18-badge-filter').value=state.v18AuctionFilters.badge||'all';Object.keys(NUM).forEach(updateRangeVisual);applyAuctionColumnFilters();
-  }
-
-  document.addEventListener('input',e=>{
-    const name=e.target.closest?.('.v18-name-filter');if(name){e.stopImmediatePropagation();state.v18AuctionFilters.name=name.value;applyAuctionColumnFilters();return}
-    const range=e.target.closest?.('[data-v18-range]');if(range){e.stopImmediatePropagation();const key=range.dataset.v18Range,bound=range.dataset.bound,r=state.v18AuctionFilters.ranges[key];let v=Number(range.value);if(bound==='lo'){r.lo=Math.min(v,r.hi);range.value=r.lo}else{r.hi=Math.max(v,r.lo);range.value=r.hi}updateRangeVisual(key);applyAuctionColumnFilters()}
-  },true);
-  document.addEventListener('change',e=>{const badge=e.target.closest?.('.v18-badge-filter');if(badge){e.stopImmediatePropagation();state.v18AuctionFilters.badge=badge.value;applyAuctionColumnFilters()}},true);
-  document.addEventListener('click',e=>{
-    const toggle=e.target.closest?.('[data-v18-toggle]');if(toggle){e.preventDefault();e.stopPropagation();const key=toggle.dataset.v18Toggle,pop=document.querySelector(`[data-v18-pop="${key}"]`),open=pop?.hidden!==false;closeRange(open?key:'');if(pop)pop.hidden=!open;updateRangeVisual(key);return}
-    const reset=e.target.closest?.('[data-v18-reset]');if(reset){e.preventDefault();e.stopPropagation();const key=reset.dataset.v18Reset,r=state.v18AuctionFilters.ranges[key];r.lo=r.min;r.hi=r.max;document.querySelectorAll(`[data-v18-range="${key}"][data-bound="lo"]`).forEach(x=>x.value=r.lo);document.querySelectorAll(`[data-v18-range="${key}"][data-bound="hi"]`).forEach(x=>x.value=r.hi);updateRangeVisual(key);applyAuctionColumnFilters();return}
-    if(!e.target.closest?.('.v18-range'))closeRange('');
-  });
-
-  if(typeof renderAuctionPlayers==='function'){
-    const old=renderAuctionPlayers;renderAuctionPlayers=function(...a){const r=old(...a);mountAuctionColumnFilters();return r};
-  }
   if(typeof renderAuctionLive==='function'){
-    const old=renderAuctionLive;renderAuctionLive=function(...a){const r=old(...a);queueMicrotask(()=>{patchCalledDetails();mountAssignTurn();moveCallButtonTop();mountAuctionColumnFilters()});return r};
+    const old=renderAuctionLive;
+    renderAuctionLive=function(...a){
+      const r=old(...a);
+      queueMicrotask(()=>{patchCalledDetails();mountAssignTurn();moveCallButtonTop();});
+      return r;
+    };
   }
 
   /* Squadra operativa cambiata: aggiorna subito abilitazione/tooltip ASSEGNA TURNO. */
@@ -33114,176 +33120,13 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
     body.v10-index-owner #view-auction .v14-called-details.v18-called-horizontal .v14-called-grid b{display:inline!important;font-size:9.4px!important;font-weight:900!important;margin:0!important;text-align:right!important}
     body.v10-index-owner #view-auction .v14-called-details.v18-called-horizontal .v14-called-title{font-size:7.5px!important}
 
-    #view-auction .auction-caller-controls{grid-template-columns:minmax(110px,1fr) minmax(50px,72px) minmax(58px,78px)!important;align-items:end!important}
-    #view-auction .auction-caller-controls .v18-top-call{width:100%!important;height:32px!important;min-height:32px!important;margin:0!important;font-size:8.5px!important;background:var(--good)!important}
-    #view-auction .auction-free-fixed .drawer-filters{display:none!important}
-    #view-auction .auction-free-fixed{grid-template-rows:auto auto minmax(0,1fr)!important}
-    #view-auction .auction-free-fixed .drawer-table{position:relative!important;overflow:auto!important}
-    #view-auction .auction-free-fixed .player-table thead tr:first-child th{position:sticky!important;top:0!important;z-index:32!important;background:#0d2b46!important}
-    #view-auction .v18-auction-filter-row th{position:sticky!important;top:27px!important;z-index:31!important;height:27px!important;padding:2px 2px!important;background:#09243d!important;overflow:visible!important;border-bottom:1px solid rgba(91,151,216,.35)!important}
-    #view-auction .v18-name-filter,#view-auction .v18-badge-filter,#view-auction .v18-range-toggle{width:100%!important;height:22px!important;min-height:22px!important;padding:1px 3px!important;margin:0!important;border-radius:4px!important;border:1px solid rgba(91,151,216,.28)!important;background:#061b2f!important;color:var(--text)!important;font-size:6.5px!important}
-    #view-auction .v18-role-filter-note{display:block;text-align:center;color:var(--muted);font-size:5px;white-space:nowrap}
-    #view-auction .v18-range{position:relative;min-width:46px}#view-auction .v18-range-toggle{display:flex!important;justify-content:space-between!important;align-items:center!important;gap:2px!important;white-space:nowrap!important}#view-auction .v18-range-toggle i{font-style:normal;color:var(--muted)}
-    #view-auction .v18-range-pop{position:absolute;top:24px;left:50%;transform:translateX(-50%);width:180px;padding:7px;border:1px solid rgba(104,164,225,.48);border-radius:8px;background:#071e34;box-shadow:0 12px 32px rgba(0,0,0,.5);z-index:90}
-    #view-auction .v18-auction-filter-row th:nth-child(n+6) .v18-range-pop{left:auto;right:0;transform:none}
-    #view-auction .v18-range-values{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:3px;font-size:8px;margin-bottom:6px}#view-auction .v18-range-values span{text-align:center;color:var(--soft);font-size:6px}#view-auction .v18-range-values b:last-child{text-align:right}
-    #view-auction .v18-dual{height:22px;position:relative;margin:0 6px}#view-auction .v18-dual .base,#view-auction .v18-dual .fill{position:absolute;top:10px;left:0;right:0;height:3px;border-radius:99px;background:rgba(255,255,255,.14)}#view-auction .v18-dual .fill{right:auto;background:#4f9bea}
-    #view-auction .v18-dual input[type=range]{position:absolute;left:0;top:2px;width:100%!important;height:18px!important;margin:0!important;padding:0!important;background:transparent!important;pointer-events:none;-webkit-appearance:none;appearance:none}#view-auction .v18-dual input[type=range]::-webkit-slider-runnable-track{height:3px;background:transparent}#view-auction .v18-dual input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;margin-top:-5px;border-radius:50%;border:2px solid #9ed0ff;background:#1765ad;pointer-events:auto;cursor:ew-resize}
-    #view-auction .v18-range-pop .ends{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:4px;font-size:6px;color:var(--soft)}#view-auction .v18-range-pop .ends small:last-child{text-align:right}#view-auction .v18-range-pop .ends button{height:18px!important;min-height:18px!important;padding:1px 4px!important;font-size:6px!important}
+
     #view-auction .auctioneer-functions-section>.auctioneer-head-actions{grid-template-columns:repeat(5,minmax(0,1fr))!important;grid-template-rows:repeat(2,minmax(0,1fr))!important}
     @media(max-width:1250px){#view-auction .auctioneer-functions-section>.auctioneer-head-actions{grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-template-rows:repeat(3,minmax(0,1fr))!important}}
   `;document.head.appendChild(style);
 
-  queueMicrotask(()=>{patchCalledDetails();mountAssignTurn();moveCallButtonTop();mountAuctionColumnFilters()});
+  queueMicrotask(()=>{patchCalledDetails();mountAssignTurn();moveCallButtonTop();});
 })();
-</script>
-
-
-
-<script id="v19-auction-list-controls-runtime">
-(()=>{
-  'use strict';
-  if(window.__FANTA_V19_AUCTION_LIST__)return;
-  window.__FANTA_V19_AUCTION_LIST__=1;
-
-  const view=()=>document.querySelector('#view-auction');
-  const box=()=>document.querySelector('#view-auction .auction-free-fixed');
-  const candidates=()=>state.auction?.callCandidates||[];
-  const num=v=>Number.isFinite(Number(v))?Number(v):null;
-  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-  const fmt=(v,step=1)=>{const n=Number(v);if(!Number.isFinite(n))return '—';return step<1?n.toFixed(step<=.01?2:1).replace('.',','):String(Math.round(n));};
-  const esc19=v=>typeof esc==='function'?esc(v):String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-  const presence=p=>{const v=typeof strategicPresencePercent==='function'?strategicPresencePercent(p):p?.expected_titolarity;return num(v)??0;};
-  const fmv=p=>{const v=typeof strategicExpectedFantasyAverage==='function'?strategicExpectedFantasyAverage(p):p?.expected_fantasy_avg;return num(v)??0;};
-  const delta=p=>num(p?.pfc_pma_delta)??((num(p?.pfc)??0)-(num(p?.pma)??0));
-  const index=p=>num(typeof strategicValueIndex==='function'?strategicValueIndex(p):null)??0;
-  const pref=p=>state.v7Preferences?.get?.(String(p?.source_player_id||p?.id))||null;
-  const favorite=p=>pref(p)?.is_favorite===true;
-
-  const NUM={
-    presence:{label:'%Tit',step:1,get:presence},
-    pfc:{label:'PFC',step:1,get:p=>num(p?.pfc)},
-    pma:{label:'PMA',step:1,get:p=>num(p?.pma)},
-    delta:{label:'Delta',step:1,get:delta},
-    fm:{label:'FM',step:.01,get:fmv},
-    index:{label:'Indice',step:1,get:index}
-  };
-
-  state.v19AuctionText=state.v19AuctionText||{name:'',badge:'',favorite:''};
-  state.v19AuctionRanges=state.v19AuctionRanges||{};
-  state.v19AuctionRangeKey=state.v19AuctionRangeKey||'';
-  state.auctionFilterTeam='all';state.auctionFilterSlot='all';state.auctionFilterFlag='all';
-
-  function rangeBounds(key,players){
-    const d=NUM[key],vals=players.map(d.get).filter(Number.isFinite);let min=vals.length?Math.min(...vals):0,max=vals.length?Math.max(...vals):d.step;
-    min=d.step<1?Math.floor(min/d.step)*d.step:Math.floor(min);max=d.step<1?Math.ceil(max/d.step)*d.step:Math.ceil(max);if(min===max)max=min+d.step;return{min,max,step:d.step};
-  }
-  function ensureRanges(){
-    const ps=candidates(),key=ps.map(p=>`${p.id}:${p.updated_at||p.source_updated_at||''}`).join('|');
-    if(state.v19AuctionRangeKey===key&&Object.keys(state.v19AuctionRanges||{}).length)return;
-    const old=state.v19AuctionRanges||{},next={};
-    Object.keys(NUM).forEach(k=>{const b=rangeBounds(k,ps),o=old[k];next[k]={...b,lo:o?clamp(Number(o.lo),b.min,b.max):b.min,hi:o?clamp(Number(o.hi),b.min,b.max):b.max};if(next[k].lo>next[k].hi){next[k].lo=b.min;next[k].hi=b.max;}});
-    state.v19AuctionRanges=next;state.v19AuctionRangeKey=key;
-  }
-  function rangeFull(k){const r=state.v19AuctionRanges[k];return !r||(Math.abs(r.lo-r.min)<1e-9&&Math.abs(r.hi-r.max)<1e-9);}
-  function rangeLabel(k){const r=state.v19AuctionRanges[k],d=NUM[k];return !r||rangeFull(k)?'tutto':`${fmt(r.lo,d.step)}–${fmt(r.hi,d.step)}`;}
-  function rangeControl(k){const r=state.v19AuctionRanges[k],d=NUM[k];if(!r)return'';return `<div class="v19-range" data-v19-range-box="${k}"><button type="button" class="v19-range-toggle" data-v19-range-toggle="${k}" title="Seleziona intervallo ${esc19(d.label)}"><span data-v19-range-label="${k}">${rangeLabel(k)}</span><i>⌄</i></button><div class="v19-range-popover" data-v19-range-popover="${k}" hidden><div class="v19-range-values"><b data-v19-lo-label="${k}">${fmt(r.lo,d.step)}</b><span>${esc19(d.label)}</span><b data-v19-hi-label="${k}">${fmt(r.hi,d.step)}</b></div><div class="v19-dual-range"><div class="v19-range-base"></div><div class="v19-range-fill" data-v19-range-fill="${k}"></div><input type="range" data-v19-range="${k}" data-bound="lo" min="${r.min}" max="${r.max}" step="${r.step}" value="${r.lo}"><input type="range" data-v19-range="${k}" data-bound="hi" min="${r.min}" max="${r.max}" step="${r.step}" value="${r.hi}"></div><div class="v19-range-ends"><small>${fmt(r.min,d.step)}</small><button type="button" data-v19-range-reset="${k}">azzera</button><small>${fmt(r.max,d.step)}</small></div></div></div>`;}
-  function updateRange(k){const r=state.v19AuctionRanges[k],d=NUM[k];if(!r)return;document.querySelectorAll(`[data-v19-range-label="${k}"]`).forEach(x=>x.textContent=rangeLabel(k));document.querySelectorAll(`[data-v19-lo-label="${k}"]`).forEach(x=>x.textContent=fmt(r.lo,d.step));document.querySelectorAll(`[data-v19-hi-label="${k}"]`).forEach(x=>x.textContent=fmt(r.hi,d.step));const span=Math.max(r.step,r.max-r.min),a=(r.lo-r.min)/span*100,b=(r.hi-r.min)/span*100;document.querySelectorAll(`[data-v19-range-fill="${k}"]`).forEach(x=>{x.style.left=`${a}%`;x.style.width=`${Math.max(0,b-a)}%`;});}
-  function closeRanges(except=''){document.querySelectorAll('[data-v19-range-popover]').forEach(x=>{if(x.dataset.v19RangePopover!==except)x.hidden=true;});document.querySelectorAll('[data-v19-range-box]').forEach(x=>x.classList.toggle('open',x.dataset.v19RangeBox===except&&!x.querySelector('[data-v19-range-popover]')?.hidden));}
-  function rangeMatch(p,k){const r=state.v19AuctionRanges[k],v=NUM[k].get(p);return !r||(Number.isFinite(v)&&v>=r.lo-1e-9&&v<=r.hi+1e-9);}
-  function fuzzyMatch(p,q){if(!q)return true;if(typeof playerSearchRank==='function')return playerSearchRank(p,q,state.auction?.settings?.fantasy_mode||'classic')!==null;return String(p?.name||'').toLocaleLowerCase('it').includes(String(q).toLocaleLowerCase('it'));}
-  function badgeMatch(p,k){if(!k||k==='all')return true;return typeof matchesFlag==='function'?matchesFlag(p,k):true;}
-  function match(p){const f=state.v19AuctionText||{};if(!fuzzyMatch(p,String(f.name||'').trim()))return false;if(!badgeMatch(p,f.badge))return false;if(f.favorite==='on'&&!favorite(p))return false;if(f.favorite==='off'&&favorite(p))return false;return Object.keys(NUM).every(k=>rangeMatch(p,k));}
-
-  function ensureHeader(){
-    const thead=box()?.querySelector('.player-table thead');if(!thead)return null;
-    thead.querySelector('.v18-auction-filter-row')?.remove();thead.querySelector('.v19-auction-filter-row')?.remove();
-    const head=[...thead.querySelectorAll('tr')].find(r=>!r.classList.contains('v18-auction-filter-row')&&!r.classList.contains('v19-auction-filter-row'));if(!head)return thead;
-    const cells=[...head.children];
-    if(!head.dataset.v19Decorated&&cells.length>=8){
-      const [role,name,badge,pfc,fm,pma,idx,action]=cells;
-      role.classList.add('v19-col-role');name.classList.add('v19-col-name');badge.classList.add('v19-col-badge');pfc.classList.add('v19-col-pfc');fm.classList.add('v19-col-fm');pma.classList.add('v19-col-pma');idx.classList.add('v19-col-index');action.classList.add('v19-col-action');
-      const mk=(cls,label)=>{const th=document.createElement('th');th.className=cls;th.textContent=label;return th;};
-      const pr=mk('v19-col-presence num-head','% TIT');const de=mk('v19-col-delta num-head','DELTA');const fav=mk('v19-col-favorite','♥');
-      const frag=document.createDocumentFragment();[role,name,badge,pr,pfc,pma,de,fm,idx,fav,action].forEach(x=>frag.appendChild(x));head.appendChild(frag);head.dataset.v19Decorated='1';
-    }
-    return thead;
-  }
-  function decorateRows(){
-    const body=document.getElementById('auction-player-body');if(!body)return;const by=new Map(candidates().map(p=>[String(p.id),p]));
-    body.querySelectorAll('tr[data-player-id]').forEach(row=>{const p=by.get(String(row.dataset.playerId));if(!p)return;
-      if(!row.querySelector('.v19-col-delta')){
-        const cells=[...row.children];if(cells.length<8)return;const [role,name,badge,pfc,fm,pma,idx,action]=cells;
-        role.classList.add('v19-col-role');name.classList.add('v19-col-name');badge.classList.add('v19-col-badge');pfc.classList.add('v19-col-pfc');fm.classList.add('v19-col-fm');pma.classList.add('v19-col-pma');idx.classList.add('v19-col-index');action.classList.add('v19-col-action');
-        const pr=document.createElement('td'),de=document.createElement('td'),fav=document.createElement('td');pr.className='v19-col-presence num';de.className='v19-col-delta num';fav.className='v19-col-favorite';const frag=document.createDocumentFragment();[role,name,badge,pr,pfc,pma,de,fm,idx,fav,action].forEach(x=>frag.appendChild(x));row.appendChild(frag);
-      }
-      const pr=row.querySelector('.v19-col-presence'),de=row.querySelector('.v19-col-delta'),fv=row.querySelector('.v19-col-favorite');
-      if(pr)pr.textContent=`${Math.round(presence(p))}%`;if(de){const d=delta(p);de.textContent=`${d>0?'+':''}${fmt(d,1)}`;de.classList.toggle('positive',d>0);de.classList.toggle('negative',d<0);}if(fv){const on=favorite(p);fv.innerHTML=`<button type="button" class="v19-heart ${on?'on':''}" data-v19-heart="${esc19(p.id)}" title="${on?'Rimuovi dai preferiti':'Aggiungi ai preferiti'}">${on?'♥':'♡'}</button>`;}
-    });
-  }
-  function mountFilters(){
-    const thead=ensureHeader();if(!thead)return;ensureRanges();const f=state.v19AuctionText||{};const row=document.createElement('tr');row.className='v19-auction-filter-row';row.innerHTML=`<th><span class="v19-role-note">ruoli sopra</span></th><th><input type="search" class="v19-text-filter" data-v19-text="name" value="${esc19(f.name||'')}" placeholder="nome simile…" autocomplete="off"></th><th><select class="v19-text-filter v19-select" data-v19-text="badge"><option value="">tutti</option><option value="market" ${f.badge==='market'?'selected':''}>mercato</option><option value="injury" ${f.badge==='injury'?'selected':''}>indisp.</option><option value="new" ${f.badge==='new'?'selected':''}>nuovo</option><option value="penalties" ${f.badge==='penalties'?'selected':''}>rigori</option><option value="free_kicks" ${f.badge==='free_kicks'?'selected':''}>piazzati</option></select></th><th>${rangeControl('presence')}</th><th>${rangeControl('pfc')}</th><th>${rangeControl('pma')}</th><th>${rangeControl('delta')}</th><th>${rangeControl('fm')}</th><th>${rangeControl('index')}</th><th><select class="v19-text-filter v19-select" data-v19-text="favorite"><option value="">tutti</option><option value="on" ${f.favorite==='on'?'selected':''}>♥</option><option value="off" ${f.favorite==='off'?'selected':''}>♡</option></select></th><th></th>`;thead.appendChild(row);requestAnimationFrame(()=>Object.keys(NUM).forEach(updateRange));
-  }
-  function applyFilters(){const body=document.getElementById('auction-player-body');if(!body)return;const by=new Map(candidates().map(p=>[String(p.id),p]));body.querySelectorAll('tr[data-player-id]').forEach(r=>{const p=by.get(String(r.dataset.playerId));r.hidden=Boolean(p&&!match(p));});}
-
-  async function toggleFavorite19(p,button){button.disabled=true;try{const z=await api(ENDPOINTS.v6y,{action:'toggleFavorite',sourcePlayerId:p.source_player_id||p.id},{quiet:true});if(z?.preference)state.v7Preferences?.set?.(String(z.preference.source_player_id),z.preference);decorateRows();applyFilters();}catch(e){msg(e.message||'Errore aggiornamento preferito.','error');}finally{button.disabled=false;}}
-
-  function bestSearchMatch(q){const ps=candidates();if(!q)return null;const mode=state.auction?.settings?.fantasy_mode||'classic';if(typeof playerSearchRank!=='function')return ps.find(p=>String(p?.name||'').toLowerCase()===q.toLowerCase())||null;return ps.map(p=>({p,r:playerSearchRank(p,q,mode)})).filter(x=>x.r!==null).sort((a,b)=>(Number.isFinite(Number(a.r))?Number(a.r):0)-(Number.isFinite(Number(b.r))?Number(b.r):0))[0]?.p||null;}
-  async function proxyCall(){
-    const s=typeof auctionSession==='function'?auctionSession():state.auction?.auctionSession;if(!s||s.status!=='live')return;let player=candidates().find(p=>String(p.id)===String(state.auctionSelectedPlayerId||''));if(!player){player=bestSearchMatch(String(document.getElementById('auction-top-search')?.value||'').trim());if(player)state.auctionSelectedPlayerId=player.id;}if(!player)return msg('Seleziona prima il giocatore da chiamare.','warning');if(s.current_player_id)return msg('C’è già un giocatore in asta.','warning');
-    const mode=state.auction?.settings?.auction_base_mode;const openingBid=['pfc','quotation'].includes(mode)?null:Math.max(1,Number(state.auctionOpeningBid||1));const b=document.getElementById('v19-top-call');if(b)b.disabled=true;
-    try{const response=await api(ENDPOINTS.auction,{action:'callPlayer',sessionId:s.id,playerId:player.id,openingBid});if(response?.state&&typeof applyAuctionHotState==='function')applyAuctionHotState(response.state,{fromMutation:true});state.auctionSelectedPlayerId=null;state.auctionFilterSearch='';state.auctionOpeningBid=1;if(typeof window.v11ScheduleAuctionRefresh==='function')window.v11ScheduleAuctionRefresh('callPlayer',45);else if(typeof scheduleAuctionReconcile==='function')scheduleAuctionReconcile(80);}catch(e){msg(e.message||'Chiamata non riuscita.','error');}finally{if(b)b.disabled=false;}
-  }
-  function ensureTopCall(){
-    const top=document.querySelector('#view-auction .auction-caller-controls');if(!top)return;let original=document.getElementById('auction-call-confirm');let proxy=document.getElementById('v19-top-call');
-    if(original){if(proxy)proxy.remove();if(original.parentElement!==top)top.appendChild(original);original.classList.add('v18-top-call','v19-top-call');return;}
-    if(!proxy){proxy=document.createElement('button');proxy.type='button';proxy.id='v19-top-call';proxy.className='v19-top-call good';proxy.textContent='CHIAMA';proxy.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();proxyCall();});top.appendChild(proxy);}
-    const s=typeof auctionSession==='function'?auctionSession():state.auction?.auctionSession;const q=String(document.getElementById('auction-top-search')?.value||'').trim();proxy.disabled=Boolean(s?.current_player_id)||(!state.auctionSelectedPlayerId&&!q);proxy.title='Conferma la chiamata del giocatore selezionato';
-  }
-  function mount(){if(state.view!=='auction')return;const b=box();if(!b)return;b.querySelector('.drawer-filters')?.setAttribute('hidden','');ensureTopCall();ensureHeader();decorateRows();mountFilters();applyFilters();}
-
-  const auctionView=view();
-  auctionView?.addEventListener('click',e=>{
-    const toggle=e.target.closest?.('[data-v19-range-toggle]');if(toggle){e.preventDefault();e.stopPropagation();const k=toggle.dataset.v19RangeToggle,pop=auctionView.querySelector(`[data-v19-range-popover="${k}"]`),open=pop?.hidden!==false;closeRanges(open?k:'');if(pop)pop.hidden=!open;toggle.closest('.v19-range')?.classList.toggle('open',open);if(open)updateRange(k);return;}
-    const reset=e.target.closest?.('[data-v19-range-reset]');if(reset){e.preventDefault();e.stopPropagation();const k=reset.dataset.v19RangeReset,r=state.v19AuctionRanges[k];if(r){r.lo=r.min;r.hi=r.max;auctionView.querySelectorAll(`[data-v19-range="${k}"][data-bound="lo"]`).forEach(x=>x.value=r.lo);auctionView.querySelectorAll(`[data-v19-range="${k}"][data-bound="hi"]`).forEach(x=>x.value=r.hi);updateRange(k);applyFilters();}return;}
-    const heart=e.target.closest?.('[data-v19-heart]');if(heart){e.preventDefault();e.stopImmediatePropagation();const p=candidates().find(x=>String(x.id)===String(heart.dataset.v19Heart));if(p)toggleFavorite19(p,heart);return;}
-    if(!e.target.closest?.('.v19-range'))closeRanges('');
-  },true);
-  auctionView?.addEventListener('input',e=>{const range=e.target.closest?.('[data-v19-range]');if(range){e.stopImmediatePropagation();const k=range.dataset.v19Range,bound=range.dataset.bound,r=state.v19AuctionRanges[k];if(!r)return;const v=Number(range.value);if(bound==='lo'){r.lo=Math.min(v,r.hi);range.value=r.lo;}else{r.hi=Math.max(v,r.lo);range.value=r.hi;}updateRange(k);applyFilters();return;}const text=e.target.closest?.('[data-v19-text]');if(text&&text.tagName!=='SELECT'){e.stopImmediatePropagation();state.v19AuctionText[text.dataset.v19Text]=text.value;applyFilters();}},true);
-  auctionView?.addEventListener('change',e=>{const text=e.target.closest?.('[data-v19-text]');if(text){e.stopImmediatePropagation();state.v19AuctionText[text.dataset.v19Text]=text.value;applyFilters();}},true);
-  auctionView?.addEventListener('input',e=>{if(e.target?.id==='auction-top-search'||e.target?.id==='auction-top-base')queueMicrotask(ensureTopCall);},true);
-
-  if(typeof renderAuctionPlayers==='function'){const old=renderAuctionPlayers;renderAuctionPlayers=function(...a){const r=old(...a);mount();return r;};}
-  if(typeof renderAuctionLive==='function'){const old=renderAuctionLive;renderAuctionLive=function(...a){const r=old(...a);queueMicrotask(mount);return r;};}
-
-  const css=document.createElement('style');css.id='v19-auction-list-style';css.textContent=`
-    #view-auction .auction-caller-controls{grid-template-columns:minmax(110px,1fr) minmax(52px,72px) minmax(62px,82px)!important;align-items:end!important}
-    #view-auction .auction-caller-controls .v19-top-call{width:100%!important;height:32px!important;min-height:32px!important;margin:0!important;padding:2px 6px!important;font-size:8.5px!important;background:var(--good)!important}
-    #view-auction .auction-free-fixed .drawer-filters{display:none!important}
-    #view-auction .auction-free-fixed .drawer-table{position:relative!important;overflow:auto!important;isolation:isolate}
-    #view-auction .auction-free-fixed .player-table{width:100%!important;min-width:850px!important;table-layout:auto!important;border-collapse:separate!important;border-spacing:0!important}
-    #view-auction .auction-free-fixed .player-table thead{position:relative;z-index:30}
-    #view-auction .auction-free-fixed .player-table thead>tr:first-child>th{position:sticky!important;top:0!important;z-index:32!important;height:30px!important;background:#0d2b46!important}
-    #view-auction .v19-auction-filter-row th{position:sticky!important;top:30px!important;z-index:31!important;height:30px!important;padding:2px 3px!important;background:#0a253e!important;border-bottom:1px solid rgba(91,151,216,.38)!important;overflow:visible!important}
-    #view-auction .v19-text-filter,#view-auction .v19-range-toggle{width:100%!important;height:23px!important;min-height:23px!important;margin:0!important;padding:1px 4px!important;border-radius:5px!important;border:1px solid rgba(91,151,216,.28)!important;background:rgba(5,22,38,.96)!important;color:var(--text)!important;font-size:7px!important}
-    #view-auction input[type=search].v19-text-filter{text-align:left!important}
-    #view-auction .v19-role-note{display:block;text-align:center;color:var(--muted);font-size:5.5px;white-space:nowrap}
-    #view-auction .v19-range{position:relative;min-width:52px}
-    #view-auction .v19-range-toggle{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:3px!important;white-space:nowrap!important}
-    #view-auction .v19-range-toggle i{font-style:normal;color:var(--soft);transition:transform .15s ease}#view-auction .v19-range.open .v19-range-toggle i{transform:rotate(180deg)}
-    #view-auction .v19-range-popover{position:absolute;top:25px;left:50%;transform:translateX(-50%);width:190px;padding:8px;border:1px solid rgba(104,164,225,.48);border-radius:8px;background:#081f35;box-shadow:0 12px 32px rgba(0,0,0,.48);z-index:100}
-    #view-auction .v19-auction-filter-row th:nth-child(n+8) .v19-range-popover{left:auto;right:0;transform:none}
-    #view-auction .v19-range-values{display:grid;grid-template-columns:48px 1fr 48px;gap:4px;align-items:center;margin-bottom:7px;font-size:8px}#view-auction .v19-range-values b:last-child{text-align:right}#view-auction .v19-range-values span{text-align:center;color:var(--soft);font-size:6px;text-transform:uppercase}
-    #view-auction .v19-dual-range{position:relative;height:24px;margin:0 7px}#view-auction .v19-range-base,#view-auction .v19-range-fill{position:absolute;left:0;right:0;top:11px;height:3px;border-radius:99px;background:rgba(255,255,255,.14)}#view-auction .v19-range-fill{right:auto;background:#4f9bea}
-    #view-auction .v19-dual-range input[type=range]{position:absolute;left:0;top:3px;width:100%!important;height:18px!important;min-height:18px!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;pointer-events:none;-webkit-appearance:none;appearance:none}#view-auction .v19-dual-range input[type=range]::-webkit-slider-runnable-track{height:3px;background:transparent}#view-auction .v19-dual-range input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;margin-top:-5px;border-radius:50%;border:2px solid #9ed0ff;background:#1765ad;pointer-events:auto;cursor:ew-resize}
-    #view-auction .v19-range-ends{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:4px;font-size:6px;color:var(--soft)}#view-auction .v19-range-ends small:last-child{text-align:right}#view-auction .v19-range-ends button{height:18px!important;min-height:18px!important;padding:1px 4px!important;font-size:6px!important}
-    #view-auction .v19-col-role{width:58px!important}#view-auction .v19-col-name{min-width:170px!important}#view-auction .v19-col-badge{width:72px!important}#view-auction .v19-col-presence{width:58px!important;text-align:right!important}#view-auction .v19-col-pfc,#view-auction .v19-col-pma,#view-auction .v19-col-delta,#view-auction .v19-col-fm{width:58px!important;text-align:right!important}#view-auction .v19-col-index{width:62px!important;text-align:right!important}#view-auction .v19-col-favorite{width:46px!important;text-align:center!important}#view-auction .v19-col-action{width:62px!important;text-align:center!important}
-    #view-auction .v19-heart{width:26px!important;min-width:26px!important;height:24px!important;min-height:24px!important;padding:0!important;border-radius:50%!important;border:1px solid rgba(111,171,224,.28)!important;background:rgba(8,31,54,.5)!important;color:#7994ae!important;font-size:16px!important;line-height:1!important}#view-auction .v19-heart.on{color:#ff688c!important;border-color:#ff688c!important;background:rgba(100,24,50,.28)!important}
-    @container free-agents (max-width:760px){#view-auction .auction-free-fixed .player-table{min-width:760px!important}#view-auction .v19-col-badge{display:none!important}}
-  `;document.head.appendChild(css);
-  queueMicrotask(mount);
-})();
-
 </script>
 
 <script id="v20-fixed-contribution-index-runtime">
@@ -33538,54 +33381,36 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
   function paintRows22(root,players){
     if(!owner22()||!root)return;
     const by=new Map(players.map(p=>[String(p.id),p]));
-    root.querySelectorAll('tr[data-player-id]').forEach(row=>{const p=by.get(String(row.dataset.playerId));if(!p)return;const idx=index22(p),ref=marketReference22(p);row.classList.remove('v22-market-value-row');if(!idx||ref===null)return;const ratio=ref/idx;let hue=48;if(ratio<1)hue=48+82*clamp22((1-ratio)/.35,0,1);else hue=48*(1-clamp22((ratio-1)/.35,0,1));const intensity=.04+.07*clamp22(Math.abs(ratio-1)/.35,0,1);row.classList.add('v22-market-value-row');row.style.setProperty('--v22-hue',String(hue.toFixed(1)));row.style.setProperty('--v22-alpha',String(intensity.toFixed(3)));row.title=`Indice ${Math.round(idx)} cr · PFC ${num22(p.pfc)??'—'} · PMA ${num22(p.pma)??'—'} · riferimento medio ${ref.toFixed(1)} cr`;});
+    root.querySelectorAll('tr[data-player-id]').forEach(row=>{
+      const p=by.get(String(row.dataset.playerId));if(!p)return;
+      const idx=index22(p),pfc=num22(p?.pfc),pma=num22(p?.pma);
+      const vals=[pfc,pma].filter(v=>v!==null&&v>0);
+      row.classList.remove('v22-market-value-row');
+      row.style.removeProperty('--v22-hue');row.style.removeProperty('--v22-alpha');
+      if(!idx||!vals.length)return;
+      const allAbove=vals.every(v=>v>idx),allBelow=vals.every(v=>v<idx);
+      const hue=allAbove?2:allBelow?132:48;
+      const distance=vals.reduce((sum,v)=>sum+Math.abs(v-idx),0)/vals.length/Math.max(1,idx);
+      const alpha=.05+.08*clamp22(distance,0,1);
+      row.classList.add('v22-market-value-row');
+      row.style.setProperty('--v22-hue',String(hue));
+      row.style.setProperty('--v22-alpha',String(alpha.toFixed(3)));
+      row.title=`Indice ${Math.round(idx)} cr · PFC ${pfc??'—'} · PMA ${pma??'—'} · ${allAbove?'sopra indice':allBelow?'sotto indice':'valori discordanti'}`;
+    });
   }
 
-  const NUM22={presence:{label:'%Tit',step:1,get:presence22},pfc:{label:'PFC',step:1,get:p=>num22(p.pfc)},pma:{label:'PMA',step:1,get:p=>num22(p.pma)},delta:{label:'Delta',step:1,get:delta22},fm:{label:'FM',step:.01,get:fmv22},index:{label:'Indice',step:1,get:index22}};
-  state.v22AuctionText=state.v22AuctionText||{name:'',badge:'',favorite:''};state.v22AuctionRanges=state.v22AuctionRanges||{};state.v22AuctionSort=state.v22AuctionSort||{key:'name',direction:'asc'};
-  function bounds22(k){const d=NUM22[k],vals=allPlayers22().map(d.get).filter(Number.isFinite);let min=vals.length?Math.min(...vals):0,max=vals.length?Math.max(...vals):d.step;if(d.step<1){min=Math.floor(min/d.step)*d.step;max=Math.ceil(max/d.step)*d.step}else{min=Math.floor(min);max=Math.ceil(max)}if(min===max)max=min+d.step;return{min,max,step:d.step};}
-  function ensureRanges22(){Object.keys(NUM22).forEach(k=>{const b=bounds22(k),r=state.v22AuctionRanges[k];state.v22AuctionRanges[k]=r?{...b,lo:clamp22(Number(r.lo),b.min,b.max),hi:clamp22(Number(r.hi),b.min,b.max)}:{...b,lo:b.min,hi:b.max};});}
-  function rangeLabel22(k){const r=state.v22AuctionRanges[k],d=NUM22[k];if(!r)return'tutto';const full=Math.abs(r.lo-r.min)<1e-9&&Math.abs(r.hi-r.max)<1e-9;const f=v=>d.step<1?Number(v).toFixed(2).replace('.',','):String(Math.round(v));return full?'tutto':`${f(r.lo)}–${f(r.hi)}`;}
-  function rangeHtml22(k){const r=state.v22AuctionRanges[k],d=NUM22[k];if(!r)return'';const f=v=>d.step<1?Number(v).toFixed(2).replace('.',','):String(Math.round(v));return `<details class="v22-range" data-v22-details="${k}"><summary><span data-v22-summary="${k}">${rangeLabel22(k)}</span><i>⌄</i></summary><div class="v22-pop"><div class="v22-values"><b data-v22-lo-label="${k}">${f(r.lo)}</b><span>${d.label}</span><b data-v22-hi-label="${k}">${f(r.hi)}</b></div><div class="v22-track"><div class="v22-base"></div><div class="v22-fill" data-v22-fill="${k}"></div><input type="range" data-v22-range="${k}" data-bound="lo" min="${r.min}" max="${r.max}" step="${r.step}" value="${r.lo}"><input type="range" data-v22-range="${k}" data-bound="hi" min="${r.min}" max="${r.max}" step="${r.step}" value="${r.hi}"></div><div class="v22-ends"><small>${f(r.min)}</small><button type="button" data-v22-reset="${k}">azzera</button><small>${f(r.max)}</small></div></div></details>`;}
-  function updateRangeUi22(k){const r=state.v22AuctionRanges[k],d=NUM22[k];if(!r)return;const f=v=>d.step<1?Number(v).toFixed(2).replace('.',','):String(Math.round(v));document.querySelectorAll(`[data-v22-summary="${k}"]`).forEach(x=>x.textContent=rangeLabel22(k));document.querySelectorAll(`[data-v22-lo-label="${k}"]`).forEach(x=>x.textContent=f(r.lo));document.querySelectorAll(`[data-v22-hi-label="${k}"]`).forEach(x=>x.textContent=f(r.hi));const span=Math.max(r.step,r.max-r.min),a=(r.lo-r.min)/span*100,b=(r.hi-r.min)/span*100;document.querySelectorAll(`[data-v22-fill="${k}"]`).forEach(x=>{x.style.left=`${a}%`;x.style.width=`${Math.max(0,b-a)}%`;});}
-  function fuzzy22(p,q){if(!q)return true;if(typeof playerSearchRank==='function')return playerSearchRank(p,q,mode22())!==null;return String(p?.name||'').toLowerCase().includes(String(q).toLowerCase());}
-  function match22(p){const f=state.v22AuctionText;if(!fuzzy22(p,String(f.name||'').trim()))return false;if(f.badge&&typeof matchesFlag==='function'&&!matchesFlag(p,f.badge))return false;if(f.favorite==='on'&&!fav22(p))return false;if(f.favorite==='off'&&fav22(p))return false;return Object.keys(NUM22).every(k=>{const r=state.v22AuctionRanges[k],v=NUM22[k].get(p);return !r||(Number.isFinite(v)&&v>=r.lo-1e-9&&v<=r.hi+1e-9);});}
-  function applyFilter22(){const body=document.getElementById('auction-player-body');if(!body)return;const by=new Map(allPlayers22().map(p=>[String(p.id),p]));body.querySelectorAll('tr[data-player-id]').forEach(r=>{const p=by.get(String(r.dataset.playerId));r.hidden=Boolean(p&&!match22(p));});}
-  function signalSort22(p){const keys=['market','injury','new','penalties','free_kicks'];return keys.find(k=>typeof matchesFlag==='function'&&matchesFlag(p,k))||'';}
-  function roleRank22(p){const rr=roles22(p);return rr.length?Math.min(...rr.map(r=>{const i=roleOrder22.findIndex(x=>x.toLowerCase()===String(r).toLowerCase());return i<0?999:i;})):999;}
-  function sortValue22(p,k){if(k==='role')return roleRank22(p);if(k==='name')return p.name||'';if(k==='badge')return signalSort22(p);if(k==='favorite')return fav22(p)?1:0;return NUM22[k]?NUM22[k].get(p):'';}
-  function applySort22(){const body=document.getElementById('auction-player-body');if(!body)return;const by=new Map(allPlayers22().map(p=>[String(p.id),p])),dir=state.v22AuctionSort.direction==='desc'?-1:1,key=state.v22AuctionSort.key;[...body.querySelectorAll('tr[data-player-id]')].sort((a,b)=>{const pa=by.get(String(a.dataset.playerId)),pb=by.get(String(b.dataset.playerId));if(!pa||!pb)return 0;const av=sortValue22(pa,key),bv=sortValue22(pb,key);let c=typeof av==='number'&&typeof bv==='number'?av-bv:String(av).localeCompare(String(bv),'it',{sensitivity:'base'});if(!c)c=String(pa.name||'').localeCompare(String(pb.name||''),'it',{sensitivity:'base'});return c*dir;}).forEach(r=>body.appendChild(r));}
-
-  function mountTable22(){
-    const fixed=document.querySelector('#view-auction .auction-free-fixed'),thead=fixed?.querySelector('.player-table thead');if(!fixed||!thead)return;ensureRanges22();thead.querySelectorAll('.v19-auction-filter-row,.v22-filter-row').forEach(x=>x.remove());const head=[...thead.querySelectorAll('tr')][0];if(!head)return;
-    const specs=[['v19-col-role','role','Ruolo'],['v19-col-name','name','Calciatore'],['v19-col-badge','badge','Badge'],['v19-col-presence','presence','%Tit'],['v19-col-pfc','pfc','PFC'],['v19-col-pma','pma','PMA'],['v19-col-delta','delta','Delta'],['v19-col-fm','fm','FM'],['v19-col-index','index','Indice'],['v19-col-favorite','favorite','♥']];
-    specs.forEach(([cls,key,label])=>{const th=head.querySelector('.'+cls);if(!th)return;const arrow=state.v22AuctionSort.key===key?(state.v22AuctionSort.direction==='desc'?'↓':'↑'):'↕';th.innerHTML=`<button type="button" class="v22-sort" data-v22-sort="${key}">${label}<span>${arrow}</span></button>`;});
-    const f=state.v22AuctionText,row=document.createElement('tr');row.className='v22-filter-row';row.innerHTML=`<th><span class="v22-role-note">ruoli sopra</span></th><th><input type="search" data-v22-text="name" value="${String(f.name||'').replace(/"/g,'&quot;')}" placeholder="nome simile…" autocomplete="off"></th><th><select data-v22-text="badge"><option value="">tutti</option><option value="market" ${f.badge==='market'?'selected':''}>mercato</option><option value="injury" ${f.badge==='injury'?'selected':''}>indisp.</option><option value="new" ${f.badge==='new'?'selected':''}>nuovo</option><option value="penalties" ${f.badge==='penalties'?'selected':''}>rigori</option><option value="free_kicks" ${f.badge==='free_kicks'?'selected':''}>piazzati</option></select></th><th>${rangeHtml22('presence')}</th><th>${rangeHtml22('pfc')}</th><th>${rangeHtml22('pma')}</th><th>${rangeHtml22('delta')}</th><th>${rangeHtml22('fm')}</th><th>${rangeHtml22('index')}</th><th><select data-v22-text="favorite"><option value="">tutti</option><option value="on" ${f.favorite==='on'?'selected':''}>♥</option><option value="off" ${f.favorite==='off'?'selected':''}>♡</option></select></th><th></th>`;thead.appendChild(row);
-    row.querySelectorAll('[data-v22-range]').forEach(input=>input.addEventListener('input',e=>{const k=e.currentTarget.dataset.v22Range,b=e.currentTarget.dataset.bound,r=state.v22AuctionRanges[k],v=Number(e.currentTarget.value);if(b==='lo'){r.lo=Math.min(v,r.hi);e.currentTarget.value=r.lo}else{r.hi=Math.max(v,r.lo);e.currentTarget.value=r.hi}updateRangeUi22(k);applyFilter22();}));
-    row.querySelectorAll('[data-v22-reset]').forEach(btn=>btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const k=e.currentTarget.dataset.v22Reset,r=state.v22AuctionRanges[k];r.lo=r.min;r.hi=r.max;row.querySelectorAll(`[data-v22-range="${k}"]`).forEach(x=>x.value=x.dataset.bound==='lo'?r.lo:r.hi);updateRangeUi22(k);applyFilter22();}));
-    row.querySelectorAll('[data-v22-text]').forEach(el=>{const ev=el.tagName==='SELECT'?'change':'input';el.addEventListener(ev,e=>{state.v22AuctionText[e.currentTarget.dataset.v22Text]=e.currentTarget.value;applyFilter22();});});
-    head.querySelectorAll('[data-v22-sort]').forEach(btn=>btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const key=e.currentTarget.dataset.v22Sort;state.v22AuctionSort=state.v22AuctionSort.key===key?{key,direction:state.v22AuctionSort.direction==='asc'?'desc':'asc'}:{key,direction:'asc'};mountTable22();applySort22();applyFilter22();}));
-    Object.keys(NUM22).forEach(updateRangeUi22);applySort22();applyFilter22();paintRows22(document.getElementById('auction-player-body'),allPlayers22());
-  }
+  /* Auction filters consolidated into the core renderer. */
 
   function patchListSort22(){
     const thead=document.querySelector('#view-list .player-table thead');if(!thead)return;const head=thead.querySelector('tr');if(!head)return;const specs=[['role','Ruoli'],['name','Nome'],['team','Squadra'],['badge','Badge'],['slot','Slot'],['presence','%Tit'],['pfc','PFC'],['pma','PMA'],['delta','Delta'],['index','Indice'],['threshold','Soglia'],['expected','Prezzo atteso'],['fmv','FMV'],['favorite','Preferito']];[...head.children].forEach((th,i)=>{const spec=specs[i];if(!spec)return;th.innerHTML=`<button type="button" class="v15-sort" data-v15-sort="${spec[0]}">${spec[1]} <span>↕</span></button>`;});paintRows22(document.getElementById('list-body'),state.list?.players||[]);
   }
 
-  if(typeof renderAuctionPlayers==='function'){const old22=renderAuctionPlayers;renderAuctionPlayers=function(...a){const r=old22(...a);queueMicrotask(mountTable22);return r;};}
-  if(typeof renderAuctionLive==='function'){const old22=renderAuctionLive;renderAuctionLive=function(...a){const r=old22(...a);queueMicrotask(mountTable22);return r;};}
   if(typeof renderListTable==='function'){const old22=renderListTable;renderListTable=function(...a){const r=old22(...a);queueMicrotask(patchListSort22);return r;};}
 
   const style=document.createElement('style');style.id='v22-index-pricing-style';style.textContent=`
-    body.v10-index-owner #view-auction tr.v22-market-value-row,body.v10-index-owner #view-list tr.v22-market-value-row{background:linear-gradient(90deg,hsl(var(--v22-hue) 70% 46% / var(--v22-alpha)),transparent 82%)!important;box-shadow:inset 3px 0 0 hsl(var(--v22-hue) 75% 50% / .58)!important}
-    #view-auction .v22-sort{width:100%!important;height:26px!important;min-height:26px!important;padding:1px 2px!important;border:0!important;background:transparent!important;box-shadow:none!important;color:var(--soft)!important;font-size:6.3px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:2px!important;white-space:nowrap!important}
-    #view-auction .v22-filter-row th{position:sticky!important;top:30px!important;z-index:35!important;height:30px!important;padding:2px 3px!important;background:#0a253e!important;overflow:visible!important}
-    #view-auction .v22-filter-row input,#view-auction .v22-filter-row select,#view-auction .v22-range>summary{width:100%!important;height:23px!important;min-height:23px!important;padding:1px 4px!important;border:1px solid rgba(91,151,216,.28)!important;border-radius:5px!important;background:rgba(5,22,38,.96)!important;color:var(--text)!important;font-size:7px!important;list-style:none!important}
-    #view-auction .v22-range{position:relative!important}.v22-range>summary::-webkit-details-marker{display:none}.v22-range>summary{display:flex!important;align-items:center!important;justify-content:space-between!important;cursor:pointer!important}.v22-range[open]>summary i{transform:rotate(180deg)}
-    #view-auction .v22-pop{position:absolute!important;top:25px!important;left:50%!important;transform:translateX(-50%)!important;width:190px!important;padding:8px!important;border:1px solid rgba(104,164,225,.48)!important;border-radius:8px!important;background:#081f35!important;box-shadow:0 12px 32px rgba(0,0,0,.48)!important;z-index:120!important}
-    #view-auction .v22-filter-row th:nth-child(n+8) .v22-pop{left:auto!important;right:0!important;transform:none!important}.v22-values{display:grid;grid-template-columns:48px 1fr 48px;gap:4px;align-items:center;margin-bottom:7px;font-size:8px}.v22-values b:last-child{text-align:right}.v22-values span{text-align:center;color:var(--soft);font-size:6px}.v22-track{position:relative;height:24px;margin:0 7px}.v22-base,.v22-fill{position:absolute;left:0;right:0;top:11px;height:3px;border-radius:99px;background:rgba(255,255,255,.14)}.v22-fill{right:auto;background:#4f9bea}.v22-track input[type=range]{position:absolute;left:0;top:3px;width:100%!important;height:18px!important;min-height:18px!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;pointer-events:none!important;-webkit-appearance:none!important;appearance:none!important}.v22-track input[type=range]::-webkit-slider-runnable-track{height:3px;background:transparent}.v22-track input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;margin-top:-5px;border-radius:50%;border:2px solid #9ed0ff;background:#1765ad;pointer-events:auto;cursor:ew-resize}.v22-ends{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:4px;font-size:6px;color:var(--soft)}.v22-ends small:last-child{text-align:right}.v22-ends button{height:18px!important;min-height:18px!important;padding:1px 4px!important;font-size:6px!important}.v22-role-note{font-size:5.5px;color:var(--muted);white-space:nowrap}
+    body.v10-index-owner #view-list tr.v22-market-value-row{background:linear-gradient(90deg,hsl(var(--v22-hue) 70% 46% / var(--v22-alpha)),transparent 82%)!important;box-shadow:inset 3px 0 0 hsl(var(--v22-hue) 75% 50% / .72)!important}
   `;document.head.appendChild(style);
-  queueMicrotask(()=>{if(state.view==='auction')mountTable22();if(state.view==='list')patchListSort22();});
+  queueMicrotask(()=>{if(state.view==='list')patchListSort22();});
 })();
 
 </script>
@@ -33759,11 +33584,10 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
 
   function applyMobileMode23(){
     const active=mobile23()&&state.view==='auction'&&session23()?.status==='live'&&president23();
-    document.body.classList.toggle('v23-mobile-auction-active',active);
-    document.body.classList.toggle('v23-mobile-smartphone-only',active&&state.v23DeviceProfile==='smartphone_only');
-    document.body.classList.toggle('v23-mobile-pc-phone',active&&state.v23DeviceProfile==='pc_plus_phone');
-    const root=ensureShell23();root.hidden=!active;
-    if(active)updateShell23();else root.querySelectorAll('.v23-mobile-drawer.open').forEach(x=>x.classList.remove('open'));
+    document.body.classList.remove('v23-mobile-auction-active','v23-mobile-smartphone-only','v23-mobile-pc-phone');
+    document.body.classList.toggle('v23-device-smartphone-only',active&&state.v23DeviceProfile==='smartphone_only');
+    document.body.classList.toggle('v23-device-pc-phone',active&&state.v23DeviceProfile==='pc_plus_phone');
+    const legacy=document.getElementById('v23-mobile-auction');if(legacy)legacy.hidden=true;
   }
 
   document.addEventListener('click',async e=>{
@@ -33898,6 +33722,22 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
     if(ui)ui.hidden=!(document.body.classList.contains('v23-roster-open')||document.body.classList.contains('v23-free-open'));
   }
 
+  function ensureHeaderMode(){
+    let box=qs('.v23-header-mode');
+    if(box)return box;
+    const host=qs('.app-head .head-actions')||qs('.head-actions');
+    if(!host)return null;
+    box=document.createElement('div');
+    box.className='v23-header-mode';
+    box.hidden=true;
+    box.setAttribute('role','group');
+    box.setAttribute('aria-label','Modalità smartphone asta live');
+    box.innerHTML='<button type="button" data-v23-mode="full">COMPLETA</button><button type="button" data-v23-mode="compact">RIDOTTA</button>';
+    box.addEventListener('click',event=>{const button=event.target.closest('[data-v23-mode]');if(button)setMode(button.dataset.v23Mode);});
+    host.prepend(box);
+    return box;
+  }
+
   function ensureShell(){
     let shell=qs('.v23-mobile-shell');
     if(shell)return shell;
@@ -33906,10 +33746,6 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
     shell.hidden=true;
     shell.innerHTML=`
       <header class="v23-mobile-head">
-        <div class="v23-mobile-mode" role="group" aria-label="Modalità smartphone">
-          <button type="button" data-v23-mode="full">COMPLETA</button>
-          <button type="button" data-v23-mode="compact">RIDOTTA</button>
-        </div>
         <div class="v23-mobile-credit"><small>CREDITI</small><strong data-v23-credits>—</strong><span>MAX <b data-v23-max>—</b></span></div>
       </header>
       <div class="v23-mobile-player">
@@ -33958,12 +33794,12 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
     const free=findFreeInput(),localFree=qs('[data-v23-free]',shell);if(localFree&&free&&!localFree.matches(':focus'))localFree.value=String(Math.max(1,Number(free.value)||1));
   }
   function sync(){
-    const shell=ensureShell();ensureDrawerUi();
-    const active=isPhone()&&isLive();shell.hidden=!active;
+    const shell=ensureShell();ensureDrawerUi();const headerMode=ensureHeaderMode();
+    const active=isPhone()&&isLive();shell.hidden=!active;if(headerMode)headerMode.hidden=!active;
     document.body.classList.toggle('v23-mobile-auction',active);
     if(!active){document.body.classList.remove('v23-mobile-full','v23-mobile-compact','v23-roster-open','v23-free-open');syncDrawerTargets();return;}
     const mode=getMode();document.body.classList.toggle('v23-mobile-full',mode==='full');document.body.classList.toggle('v23-mobile-compact',mode==='compact');
-    qsa('[data-v23-mode]',shell).forEach(b=>b.classList.toggle('active',b.dataset.v23Mode===mode));
+    qsa('[data-v23-mode]',headerMode||document).forEach(b=>b.classList.toggle('active',b.dataset.v23Mode===mode));
     if(mode==='compact')closeDrawer();
     const info=myInfo(),p=currentPlayer(),s=session();
     qs('[data-v23-credits]',shell).textContent=info?.remaining??'—';qs('[data-v23-max]',shell).textContent=info?.maxBid??'—';
@@ -33983,13 +33819,16 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
   setInterval(()=>{if(isPhone()&&isLive()){const shell=ensureShell();const t=qs('[data-v23-timer]',shell);if(t)t.textContent=timerText();syncButtons(shell);}},250);
 
   const css=document.createElement('style');css.id='v23-mobile-auction-style';css.textContent=`
-    .v23-mobile-shell,.v23-mobile-drawer-ui{display:none}
+    .v23-mobile-shell,.v23-mobile-drawer-ui,.v23-header-mode{display:none}
     @media(max-width:820px){
       body.v23-mobile-auction{overflow:hidden!important}
-      body.v23-mobile-auction .v23-mobile-shell{display:grid!important;position:fixed!important;inset:0!important;z-index:1900!important;background:#061426!important;padding:max(7px,env(safe-area-inset-top)) 7px max(8px,env(safe-area-inset-bottom))!important;grid-template-rows:auto auto auto minmax(0,1fr)!important;gap:7px!important;color:var(--text)!important}
-      .v23-mobile-head{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:7px!important;align-items:center!important}
-      .v23-mobile-mode{display:grid!important;grid-template-columns:1fr 1fr!important;gap:3px!important;padding:3px!important;border:1px solid var(--line)!important;border-radius:10px!important;background:var(--panel)!important}
-      .v23-mobile-mode button{min-height:34px!important;background:transparent!important;border-color:transparent!important;color:var(--soft)!important;font-size:10px!important}.v23-mobile-mode button.active{background:var(--primary)!important;color:#fff!important}
+
+      body.v23-mobile-auction .app-head{position:fixed!important;top:4px!important;left:4px!important;right:4px!important;z-index:2050!important;height:var(--header-h)!important;min-height:var(--header-h)!important}
+      body.v23-mobile-auction .v23-header-mode{display:grid!important;grid-template-columns:1fr 1fr!important;gap:2px!important;min-width:116px!important;padding:2px!important;border:1px solid var(--line)!important;border-radius:8px!important;background:var(--panel2)!important}
+      body.v23-mobile-auction .v23-header-mode button{height:29px!important;min-height:29px!important;padding:2px 5px!important;background:transparent!important;border-color:transparent!important;color:var(--soft)!important;font-size:7.5px!important;white-space:nowrap!important}
+      body.v23-mobile-auction .v23-header-mode button.active{background:var(--primary)!important;color:#fff!important}
+      body.v23-mobile-auction .v23-mobile-shell{display:grid!important;position:fixed!important;inset:calc(var(--header-h) + 8px) 0 0 0!important;z-index:1900!important;background:#061426!important;padding:max(7px,env(safe-area-inset-top)) 7px max(8px,env(safe-area-inset-bottom))!important;grid-template-rows:auto auto auto minmax(0,1fr)!important;gap:7px!important;color:var(--text)!important}
+      .v23-mobile-head{display:grid!important;grid-template-columns:1fr!important;gap:7px!important;align-items:center!important}
       .v23-mobile-credit{min-height:42px!important;display:grid!important;grid-template-columns:auto auto!important;grid-template-rows:auto auto!important;align-items:center!important;column-gap:6px!important;padding:4px 8px!important;border:1px solid var(--line)!important;border-radius:10px!important;background:var(--panel)!important}.v23-mobile-credit small{grid-column:1;font-size:6px!important;color:var(--muted)!important}.v23-mobile-credit strong{grid-column:1;font-size:18px!important;color:#7ce6bc!important}.v23-mobile-credit span{grid-column:2;grid-row:1/3;font-size:8px!important;color:var(--soft)!important}.v23-mobile-credit b{display:block!important;font-size:12px!important;color:var(--text)!important}
       .v23-mobile-player{display:grid!important;grid-template-columns:minmax(0,1fr) 72px 84px!important;gap:5px!important}.v23-mobile-player>div{min-height:58px!important;padding:6px 8px!important;border:1px solid var(--line)!important;border-radius:10px!important;background:var(--panel)!important;display:flex!important;flex-direction:column!important;justify-content:center!important}.v23-mobile-player small{font-size:6px!important;color:var(--muted)!important}.v23-mobile-player strong{font-size:18px!important;line-height:1.05!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}.v23-mobile-player span{font-size:8px!important;color:var(--soft)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}.v23-mobile-timer strong{text-align:center!important;font-size:22px!important}.v23-mobile-bid strong{text-align:center!important;font-size:22px!important}.v23-mobile-bid span{text-align:center!important}
       .v23-mobile-drawers{display:grid!important;grid-template-columns:1fr 1fr!important;gap:5px!important}.v23-mobile-drawers button{min-height:38px!important;background:var(--panel3)!important;border-color:var(--line2)!important;font-size:11px!important}
