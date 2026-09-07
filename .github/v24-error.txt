@@ -1,4 +1,8 @@
 Traceback (most recent call last):
-  File "/home/runner/work/fantacalcio/fantacalcio/.github/apply_v24_from_workflow.py", line 43, in <module>
-    raise RuntimeError(f'Unable to replace brittle top-call patch fragment: {n}')
-RuntimeError: Unable to replace brittle top-call patch fragment: 0
+  File "/home/runner/work/fantacalcio/fantacalcio/.github/apply_v24_from_workflow.py", line 45, in <module>
+    compile(code, '<v24-consolidator>', 'exec')
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<v24-consolidator>", line 878
+    patch_close = text.rfind('
+                             ^
+SyntaxError: unterminated string literal (detected at line 878)
