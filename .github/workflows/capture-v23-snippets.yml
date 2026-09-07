@@ -1,0 +1,32 @@
+name: Capture V23 snippets
+on:
+  push:
+    paths:
+      - '.github/workflows/capture-v23-snippets.yml'
+permissions:
+  contents: write
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Capture snippets
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('home.html').read_text(encoding='utf-8').splitlines()
+          needles=['id="view-manage"','function renderManage','async function loadManage','getManagementData','manage-member','auction-live-shell','auction-command-panel','auction-team-column-roster-only']
+          out=[]
+          for needle in needles:
+            hits=[i for i,l in enumerate(s) if needle in l]
+            for i in hits[:3]:
+              a=max(0,i-80);b=min(len(s),i+180)
+              out.append(f'===== {needle} @ {i+1} =====')
+              out.extend(f'{j+1}: {s[j]}' for j in range(a,b))
+          Path('.github/v23-snippets.txt').write_text('\n'.join(out),encoding='utf-8')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/v23-snippets.txt
+          git commit -m 'build: capture V23 snippets'
+          git push
