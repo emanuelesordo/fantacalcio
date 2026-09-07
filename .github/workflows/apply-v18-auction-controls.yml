@@ -1,0 +1,39 @@
+name: Apply V18 auction controls
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-v18-auction-controls.yml'
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Apply patch
+        run: python .github/apply_v18_auction_controls.py
+      - name: Validate embedded JS
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('home.html').read_text(encoding='utf-8')
+          js='\n'.join(re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',s,re.S))
+          Path('/tmp/home-v18.js').write_text(js,encoding='utf-8')
+          PY
+          node --check /tmp/home-v18.js
+      - name: Verify browser dialogs removed
+        run: |
+          ! grep -n -E '\b(confirm|prompt|alert)\(' home.html
+      - name: Diff check
+        run: git diff --check
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add home.html
+          git commit -m 'feat: refine live auction controls and in-app modals'
+          git push
