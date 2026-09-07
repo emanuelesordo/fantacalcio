@@ -1,0 +1,25 @@
+name: Diagnose V26 TV and home
+on:
+  push:
+    paths:
+      - '.github/diag_v26_tv_home.py'
+      - '.github/workflows/diag-v26-tv-home.yml'
+  workflow_dispatch:
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: python .github/diag_v26_tv_home.py
+      - name: Commit diagnostic
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/V26_TV_HOME_DIAG.txt
+          git commit -m 'debug: capture V26 TV/home structure' || exit 0
+          git push
