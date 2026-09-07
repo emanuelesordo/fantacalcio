@@ -1,8 +1,6 @@
 Traceback (most recent call last):
-  File "/home/runner/work/fantacalcio/fantacalcio/.github/apply_v24_from_workflow.py", line 45, in <module>
-    compile(code, '<v24-consolidator>', 'exec')
-    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<v24-consolidator>", line 878
-    patch_close = text.rfind('
-                             ^
-SyntaxError: unterminated string literal (detected at line 878)
+  File "/home/runner/work/fantacalcio/fantacalcio/.github/apply_v24_from_workflow.py", line 46, in <module>
+    exec(code, {'__name__': '__main__'})
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 1014, in <module>
+RuntimeError: mobile shell mode markup not found
