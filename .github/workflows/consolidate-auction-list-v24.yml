@@ -19,6 +19,16 @@ jobs:
           python-version: '3.x'
       - name: Consolidate auction table and smartphone mode
         run: python .github/apply_v24_from_workflow.py
+      - name: Persist diagnostics if consolidation failed
+        run: |
+          if [ -f .github/v24-error.txt ]; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add .github/v24-error.txt
+            git commit -m 'debug: capture V24 consolidation failure'
+            git push
+            exit 1
+          fi
       - name: Validate embedded JS
         run: |
           python - <<'PY'
