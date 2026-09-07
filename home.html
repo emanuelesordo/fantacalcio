@@ -17779,7 +17779,7 @@
           <section class="auction-team-roster">
 
             <div class="auction-team-roster-head">
-              <strong>${esc(info.teamName)}</strong>
+              <strong>ROSA</strong>
 
               <div class="auction-roster-head-actions">
                 <span class="auction-roster-remaining auction-roster-projected-summary">
@@ -23971,14 +23971,27 @@
           : null;
 
 
-      if (rosterChanged) {
-        await loadAuctionPersonalRoster(
-          true
+      const rosterRefreshPromise =
+        loadAuctionPersonalRoster(
+          firstLoad ? true : Boolean(rosterChanged)
         );
+
+      /*
+       * V17 · percorso critico live.
+       * Al primo ingresso aspettiamo la rosa. Durante l'asta utilizziamo
+       * subito la copia già in memoria e aggiorniamo soltanto il pannello
+       * Rosa quando il fetch termina, senza tenere ferma la console.
+       */
+      if (firstLoad) {
+        await rosterRefreshPromise;
       } else {
-        await loadAuctionPersonalRoster(
-          false
-        );
+        Promise.resolve(rosterRefreshPromise)
+          .then(() => {
+            if (typeof window.v17RefreshRosterFragments === 'function') {
+              window.v17RefreshRosterFragments();
+            }
+          })
+          .catch(() => {});
       }
 
 
@@ -30995,8 +31008,8 @@
  function pname(s){return known().find(p=>String(p.source_player_id||p.id)===String(s))?.name||'Giocatore'}
  function center(){const pr=state.v8Profile||{},sel=new Set(pr.preferred_modules||[]),ps=[...(state.v7Preferences?.values?.()||[])].filter(x=>x.is_favorite||x.strategy==='top'),top=state.auction?.callCandidates?.length?rows(5):[],mantra=(state.auction?.settings?.fantasy_mode||'classic')==='mantra';return`<details class="v8center" open><summary><div><strong>Centro Strategico pre-asta</strong><small>moduli · budget · profilo · preferiti</small></div><span class="badge primary">PRIVATO</span></summary><div class="v8cb"><section><label>Profilo<select id="v8prof"><option value="conservative">Conservativo</option><option value="balanced">Bilanciato</option><option value="aggressive">Aggressivo</option></select></label>${mantra?`<div class="v8mods"><b>Moduli preferiti</b><small>nessuno = tutti</small><div>${Object.keys(state.v8Modules).map(id=>`<label><input type="checkbox" data-v8m="${id}" ${sel.has(id)?'checked':''}>${id}</label>`).join('')}</div></div>`:''}<div class="v8buds"><b>Budget per ruolo</b><div>${budgets().map(([l,k])=>`<label>${l}<input type="number" min="0" data-v8bud="${k}" value="${Number(pr.role_budgets?.[k]||0)||''}"></label>`).join('')}</div></div><label>Note<textarea id="v8notes" rows="2">${esc(pr.notes||'')}</textarea></label><button id="v8save" type="button">SALVA STRATEGIA</button></section><section><div class="between"><strong>Preferiti / Top</strong><span class="badge">${ps.length}</span></div><div class="v8prefs">${ps.length?ps.slice(0,12).map(x=>`<span><b>${esc(pname(x.source_player_id))}</b><small>${x.strategy==='top'?'TOP':'♥'}${x.max_price!=null?` · max ${x.max_price}`:''}</small></span>`).join(''):'<small class="soft">Aggiungili dal Listone con il cuore.</small>'}</div></section><section><div class="v8th"><strong>Top 5 pre-asta</strong><span>Score</span><span>Sugg</span><span>Max</span></div>${top.length?top.map((x,i)=>`<div class="v8tr ${i?'':'mom'}"><b>${i+1}. ${esc(x.player?.name||'')}</b><span>${Math.round(x.score)}</span><span>${x.prices?.suggested??'—'}</span><span>${x.prices?.ceiling??'—'}</span></div>`).join(''):'<small class="soft">Catalogo non ancora disponibile.</small>'}</section></div></details>`}
  function patchCenter(){const root=document.getElementById('auction-root');if(!root)return;root.querySelector('.auction-v7-center')?.remove();if(root.querySelector('.v8center')||auctionSession()?.status==='live')return;(root.querySelector('.auction-lobby')||root).insertAdjacentHTML('afterbegin',center());const s=document.getElementById('v8prof');if(s)s.value=state.v8Profile?.profile||'balanced';document.getElementById('v8save')?.addEventListener('click',async e=>{const b=e.currentTarget;b.disabled=true;try{const roleBudgets={};document.querySelectorAll('[data-v8bud]').forEach(i=>{const v=Number(i.value);if(Number.isFinite(v)&&v>=0)roleBudgets[i.dataset.v8bud]=Math.floor(v)});const z=await sapi({action:'saveProfile',preferredModules:[...document.querySelectorAll('[data-v8m]:checked')].map(i=>i.dataset.v8m),profile:s?.value||'balanced',roleBudgets,notes:document.getElementById('v8notes')?.value||''});if(z?.profile)state.v8Profile=z.profile;if(z?.mantraModules)state.v8Modules=z.mantraModules;state.v8MetricKey='';msg('Strategia pre-asta salvata.','success');root.querySelector('.v8center')?.remove();patchCenter()}catch(er){msg(er.message||'Errore salvataggio strategia.','error')}finally{b.disabled=false}})}
- function patchLive(){const info=auctionMyTeamDashboardData();if(info){const m=metrics(info),o=objective(info),h=document.querySelector('.auction-team-column-roster-only .auction-team-roster-head');if(h){h.querySelector('.auction-v7-roster-metrics')?.remove();h.querySelector('.v8rm')?.remove();h.querySelector('.auction-roster-head-actions')?.insertAdjacentHTML('afterbegin',`<span class="v8rm" title="Completamento modulo · Fantavoto previsto · Obiettivo · Solidità">COMP ${m.completion}% <i>|</i> FV ${fmt(m.fantasy)} <i>|</i> OBJ ${fmt(o.fantasy)} <i>|</i> SOL ${m.solidity}</span>`)}}const p=state.auction?.currentPlayer;if(p){const x=auctionSuggestedCallScore(p);document.querySelectorAll('.auction-command-player small').forEach(h=>{h.querySelector('.auction-v7-live-price')?.remove();h.querySelector('.v8lp')?.remove();h.insertAdjacentHTML('beforeend',`<span class="v8lp"> · SUGG ${x?.prices?.suggested??'—'} · MAX ${x?.prices?.ceiling??'—'}</span>`)})}bind()}
- const oldLive=renderAuctionLive;renderAuctionLive=function(...a){const r=oldLive(...a);patchLive();return r};const oldLobby=renderAuctionLobby;renderAuctionLobby=function(...a){const r=oldLobby(...a);patchCenter();return r};const oldPrep=renderAuctionPrepared;renderAuctionPrepared=function(...a){const r=oldPrep(...a);patchCenter();return r};const oldLA=loadAuction;loadAuction=async function(...a){const r=await oldLA(...a);await hydrate();state.v7Stats=new Map();merge();const dx=[auctionSession()?.id||'',state.auction?.auctionSession?.role_phase_index||0,auctionMyTeamDashboardData()?.assignments?.length||0].join('|');if(state.v8DismissCtx!==undefined&&state.v8DismissCtx!==dx){state.v7SuggestedDismissed=[];state.v7SuggestedDismissKey='';state.v8Moment=null}state.v8DismissCtx=dx;auctionSession()?.status==='live'?renderAuctionLive():patchCenter();return r};
+ function patchLive(){const h=document.querySelector('.auction-team-column-roster-only .auction-team-roster-head');if(h){h.querySelector('.auction-v7-roster-metrics')?.remove();h.querySelector('.v8rm')?.remove();}const p=state.auction?.currentPlayer;if(p){const x=auctionSuggestedCallScore(p);document.querySelectorAll('.auction-command-player small').forEach(h=>{h.querySelector('.auction-v7-live-price')?.remove();h.querySelector('.v8lp')?.remove();h.insertAdjacentHTML('beforeend',`<span class="v8lp"> · SUGG ${x?.prices?.suggested??'—'} · MAX ${x?.prices?.ceiling??'—'}</span>`)})}bind()}
+ const oldLive=renderAuctionLive;renderAuctionLive=function(...a){const r=oldLive(...a);patchLive();return r};const oldLobby=renderAuctionLobby;renderAuctionLobby=function(...a){const r=oldLobby(...a);patchCenter();return r};const oldPrep=renderAuctionPrepared;renderAuctionPrepared=function(...a){const r=oldPrep(...a);patchCenter();return r};const oldLA=loadAuction;loadAuction=async function(...a){const r=await oldLA(...a);await hydrate();state.v7Stats=new Map();merge();const dx=[auctionSession()?.id||'',state.auction?.auctionSession?.role_phase_index||0,auctionMyTeamDashboardData()?.assignments?.length||0].join('|');if(state.v8DismissCtx!==undefined&&state.v8DismissCtx!==dx){state.v7SuggestedDismissed=[];state.v7SuggestedDismissKey='';state.v8Moment=null}state.v8DismissCtx=dx;auctionSession()?.status==='live'?patchLive():patchCenter();return r};
  const st=document.createElement('style');st.textContent=`.v8heart{width:22px!important;min-width:22px!important;height:22px!important;min-height:22px!important;padding:0!important;margin-left:auto!important;border:0!important;background:transparent!important;color:#718aa3!important;font-size:16px!important}.v8heart.on{color:#ff6681!important}.v8n{display:flex;align-items:center;gap:3px;min-width:0}.v8n strong{min-width:0;flex:1}.v8n em{font-style:normal;font-size:5px;font-weight:1000;color:#f0d276;border:1px solid rgba(220,180,70,.52);border-radius:99px;padding:1px 3px;white-space:nowrap}.v8n i{font-style:normal;color:#ff6f88}.v8lp{color:#79bcff;font-weight:950}.v8rm{color:#c6d8e8;font-size:6.5px;font-weight:1000;white-space:nowrap}.v8rm i{color:#56738d;font-style:normal;margin:0 2px}.v8center{margin-bottom:6px;border:1px solid rgba(91,151,216,.34);border-radius:10px;background:rgba(8,30,52,.92);overflow:hidden}.v8center>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;gap:8px;padding:7px 9px}.v8center>summary strong,.v8center>summary small{display:block}.v8center>summary small{color:var(--soft);font-size:7px}.v8cb{display:grid;grid-template-columns:1.1fr .75fr 1fr;gap:6px;padding:7px}.v8cb>section{padding:7px;border:1px solid rgba(91,151,216,.2);border-radius:8px;background:rgba(5,25,44,.56);display:grid;gap:6px}.v8mods>div{display:flex;flex-wrap:wrap;gap:3px}.v8mods label{display:flex;align-items:center;gap:3px;padding:3px 5px;border:1px solid var(--line);border-radius:6px}.v8mods input{width:13px;min-width:13px;height:13px;min-height:13px}.v8buds>div{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}.v8prefs{max-height:190px;overflow:auto;display:grid;gap:3px}.v8prefs>span{display:flex;justify-content:space-between;padding:4px 5px;background:rgba(37,79,119,.42);border-radius:5px;font-size:7px}.v8th,.v8tr{display:grid;grid-template-columns:minmax(0,1fr) 42px 54px 54px;gap:4px;align-items:center}.v8th{color:var(--soft);font-size:6px}.v8tr{min-height:27px;padding:3px 4px;border-bottom:1px solid rgba(91,151,216,.14);font-size:7px}.v8tr.mom{border:1px solid rgba(220,180,70,.44);border-radius:5px}.v8tr span{text-align:right}.v8ana{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}.v8ana>span{padding:6px;border:1px solid #28598e;border-radius:7px;background:#0d2b4a}.v8ana small,.v8ana b{display:block}@media(max-width:1050px){.v8cb{grid-template-columns:1fr 1fr}.v8cb>section:last-child{grid-column:1/-1}}@media(max-width:680px){.v8cb{grid-template-columns:1fr}.v8cb>section:last-child{grid-column:auto}.v8buds>div,.v8ana{grid-template-columns:repeat(2,minmax(0,1fr))}.v8rm{font-size:5.5px}}`;document.head.appendChild(st);
  void hydrate(true).then(()=>{if(state.view==='list')hearts();if(state.view==='auction')(auctionSession()?.status==='live'?patchLive():patchCenter())});
 })();
@@ -32635,7 +32648,10 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
     loadAuction=async function(...args){
       const r=await oldLoad(...args);
       v16PreselectQueue();
-      if(state.view==='auction'&&state.auction?.auctionSession?.status==='live')renderAuctionLive();
+      queueMicrotask(()=>{
+        if(typeof patchAuctionTopSelection==='function')patchAuctionTopSelection();
+        v16AfterRender();
+      });
       return r;
     };
   }
@@ -32663,6 +32679,239 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
   `;document.head.appendChild(css);
 
   if(state.view==='auction'){v16PreselectQueue();queueMicrotask(v16AfterRender);}
+})();
+</script>
+
+
+<script id="v17-live-performance-runtime">
+(()=>{
+  'use strict';
+  if(window.__FANTA_V17_LIVE_PERF__)return;
+  window.__FANTA_V17_LIVE_PERF__=1;
+
+  const v17Now=()=>Date.now()+Number(state.serverOffsetMs||0);
+  const v17Session=()=>typeof auctionSession==='function'?auctionSession():state.auction?.auctionSession;
+  const v17IsLive=()=>state.view==='auction'&&v17Session()?.status==='live';
+
+  /* =========================================================
+     1. SUGGERITORE FUORI DAL PERCORSO CRITICO
+     ========================================================= */
+  const v17HeavySuggestions=typeof renderAuctionSuggestedCalls==='function'?renderAuctionSuggestedCalls:null;
+  let v17SuggestionHtml='';
+  let v17SuggestionKey='';
+  let v17SuggestionPendingKey='';
+  let v17SuggestionTimer=null;
+
+  function v17SuggestionContextKey(){
+    const s=v17Session()||{},info=typeof auctionMyTeamDashboardData==='function'?auctionMyTeamDashboardData():null;
+    return [
+      s.id||'',s.current_player_id||'',s.role_phase_index||0,
+      info?.assignments?.length||0,info?.remaining||0,info?.maxBid??'',
+      state.auction?.callCandidates?.length||0,
+      document.fullscreenElement?'FULL':'NORMAL',
+      (state.v7SuggestedDismissed||[]).join(','),
+      state.v8Moment||''
+    ].join('|');
+  }
+
+  function v17BindSuggestionHost(){
+    try{if(typeof attachAuctionCallQueueEvents==='function')attachAuctionCallQueueEvents();}catch(e){console.warn('V17 suggestion bind',e);}
+  }
+
+  function v17ScheduleSuggestions(key=v17SuggestionContextKey()){
+    if(!v17HeavySuggestions||v17SuggestionPendingKey===key)return;
+    v17SuggestionPendingKey=key;
+    if(v17SuggestionTimer){clearTimeout(v17SuggestionTimer);v17SuggestionTimer=null;}
+    const run=()=>{
+      v17SuggestionTimer=null;
+      if(v17SuggestionContextKey()!==key){v17SuggestionPendingKey='';v17ScheduleSuggestions();return;}
+      try{
+        const html=v17HeavySuggestions();
+        v17SuggestionHtml=html||'';
+        v17SuggestionKey=key;
+        v17SuggestionPendingKey='';
+        const host=document.querySelector('#view-auction .auction-free-suggestions');
+        if(host&&v17IsLive()){
+          host.innerHTML=v17SuggestionHtml;
+          v17BindSuggestionHost();
+        }
+      }catch(error){
+        v17SuggestionPendingKey='';
+        console.warn('V17 strategic suggestions',error);
+      }
+    };
+    if('requestIdleCallback' in window){
+      requestIdleCallback(run,{timeout:220});
+    }else{
+      v17SuggestionTimer=setTimeout(run,0);
+    }
+  }
+
+  if(v17HeavySuggestions){
+    renderAuctionSuggestedCalls=function(){
+      const key=v17SuggestionContextKey();
+      if(v17SuggestionKey===key&&v17SuggestionHtml)return v17SuggestionHtml;
+      v17ScheduleSuggestions(key);
+      return v17SuggestionHtml||`<section class="auction-suggested-calls v17-suggestions-loading" aria-label="Consulente Strategico"><div class="auction-suggested-head"><div><strong>Consulente Strategico</strong><small>aggiornamento in background</small></div><span>LIVE</span></div></section>`;
+    };
+  }
+
+  function v17InvalidateSuggestions(){
+    v17SuggestionKey='';
+    v17SuggestionPendingKey='';
+    v17ScheduleSuggestions();
+  }
+
+  /* =========================================================
+     2. PATCH DELLA SOLA ROSA DOPO FETCH ASINCRONO
+     ========================================================= */
+  window.v17RefreshRosterFragments=function(){
+    if(!v17IsLive()||typeof renderAuctionCockpitTeamPanel!=='function')return;
+    const current=document.querySelector('.auction-team-column-roster-only');
+    if(current){
+      const box=document.createElement('div');
+      box.innerHTML=renderAuctionCockpitTeamPanel('roster').trim();
+      const next=box.firstElementChild;
+      if(next){current.replaceWith(next);if(typeof attachAuctionRosterQueueToggle==='function')attachAuctionRosterQueueToggle();}
+    }
+    document.querySelectorAll('.auction-v7-roster-metrics,.v8rm,.auction-roster-projected-summary').forEach(x=>x.remove());
+    if(typeof patchAuctionMyTeamLiveKpis==='function')patchAuctionMyTeamLiveKpis();
+    v17InvalidateSuggestions();
+  };
+
+  /* =========================================================
+     3. REALTIME: RENDER STRUTTURALE IMMEDIATO DA HOT STATE
+     ========================================================= */
+  const v17OldApply=typeof applyAuctionHotState==='function'?applyAuctionHotState:null;
+  if(v17OldApply){
+    applyAuctionHotState=function(nextState,opts={}){
+      const before=v17Session()?{...v17Session()}:null;
+      const incomingPlayerId=nextState?.current_player_id;
+      if(state.auction&&incomingPlayerId!==undefined){
+        if(incomingPlayerId){
+          const cached=(state.auction.callCandidates||[]).find(p=>String(p.id)===String(incomingPlayerId));
+          if(cached)state.auction.currentPlayer=cached;
+        }else{
+          state.auction.currentPlayer=null;
+        }
+      }
+      state.v17ApplyingHot=true;
+      let result;
+      try{result=v17OldApply(nextState,opts);}finally{state.v17ApplyingHot=false;}
+      const after=v17Session();
+      const structural=Boolean(before&&after&&(
+        before.current_player_id!==after.current_player_id||
+        before.current_nomination_team_id!==after.current_nomination_team_id||
+        before.role_phase_index!==after.role_phase_index||
+        before.role_phase_status!==after.role_phase_status||
+        before.status!==after.status||
+        before.pause_after_award!==after.pause_after_award
+      ));
+      if(structural&&state.view==='auction'&&after?.status==='live'){
+        state.v17CriticalPaint=true;
+        try{renderAuctionLive();}finally{state.v17CriticalPaint=false;}
+        if(typeof renderAuctionTimer==='function')renderAuctionTimer();
+        v17ScheduleSuggestions();
+        if(typeof window.v11ScheduleAuctionRefresh==='function')window.v11ScheduleAuctionRefresh('hot-structural',180);
+      }
+      return result;
+    };
+  }
+
+  /* =========================================================
+     4. RECONCILE LEGGERO: V6Y HOT PRIMA, PAYLOAD COMPLETO DOPO
+     ========================================================= */
+  const v17OldSchedule=typeof scheduleAuctionReconcile==='function'?scheduleAuctionReconcile:null;
+  let v17HotTimer=null,v17HotBusy=false,v17HotAgain=false;
+
+  async function v17FastHotReconcile(){
+    if(v17HotBusy){v17HotAgain=true;return;}
+    const s=v17Session();
+    if(!s?.id||s.status!=='live'||!state.session?.token)return;
+    v17HotBusy=true;
+    const started=performance.now();
+    try{
+      const hot=await api(ENDPOINTS.v6y,{action:'getHotState',sessionId:s.id},{quiet:true});
+      if(hot?.serverNow){
+        const measured=Date.parse(hot.serverNow)-Date.now();
+        if(Number.isFinite(measured))state.serverOffsetMs=state.serverOffsetReady?(state.serverOffsetMs*.8+measured*.2):measured;
+        state.serverOffsetReady=true;
+      }
+      if(hot?.currentPlayer)state.auction.currentPlayer=hot.currentPlayer;
+      else if(hot?.state?.current_player_id==null)state.auction.currentPlayer=null;
+      if(hot?.state&&typeof applyAuctionHotState==='function')applyAuctionHotState(hot.state,{fromMutation:false});
+      if(Array.isArray(hot?.recentBids)){
+        const teams=state.auction?.teams||[];
+        state.auction.recentBids=hot.recentBids.map(b=>({...b,team:teams.find(t=>t.id===b.team_id)||null}));
+        if(typeof renderRecentBidChips==='function')renderRecentBidChips();
+      }
+      state.v17LastHotMs=Math.round(performance.now()-started);
+    }catch(error){
+      console.warn('V17 hot reconcile',error);
+    }finally{
+      v17HotBusy=false;
+      if(v17HotAgain){v17HotAgain=false;setTimeout(()=>void v17FastHotReconcile(),40);}
+    }
+  }
+
+  if(v17OldSchedule){
+    scheduleAuctionReconcile=function(delay=60){
+      if(state.v17ApplyingHot)return;
+      const s=v17Session();
+      if(!s?.id||s.status!=='live')return v17OldSchedule(delay);
+      if(v17HotTimer)clearTimeout(v17HotTimer);
+      v17HotTimer=setTimeout(()=>{v17HotTimer=null;void v17FastHotReconcile();},Math.max(0,Math.min(180,Number(delay)||0)));
+    };
+  }
+
+  /* =========================================================
+     5. REFRESH CANONICO: MAI DURANTE UN COUNTDOWN DI RILANCIO
+     ========================================================= */
+  let v17FullTimer=null,v17FullBusy=false,v17FullAgain=false;
+  window.v11ScheduleAuctionRefresh=function(reason='mutation',delay=180){
+    if(v17FullTimer)clearTimeout(v17FullTimer);
+    const run=async()=>{
+      v17FullTimer=null;
+      if(!state.session?.token||!state.selectedLeague?.id||state.view!=='auction')return;
+      const s=v17Session();
+      if(s?.current_player_id&&typeof auctionBidTimerIsActive==='function'&&auctionBidTimerIsActive(s)){
+        const deadline=Date.parse(s.timer_deadline||'');
+        const wait=Number.isFinite(deadline)?Math.max(140,deadline-v17Now()+140):500;
+        v17FullTimer=setTimeout(run,Math.min(5000,wait));
+        return;
+      }
+      if(v17FullBusy){v17FullAgain=true;return;}
+      v17FullBusy=true;
+      try{
+        await loadAuction({quiet:true,onlyIfChanged:true});
+      }catch(error){
+        console.warn('V17 canonical refresh',reason,error);
+      }finally{
+        v17FullBusy=false;
+        if(v17FullAgain){v17FullAgain=false;window.v11ScheduleAuctionRefresh('coalesced',180);}
+      }
+    };
+    v17FullTimer=setTimeout(run,Math.max(120,Number(delay)||0));
+  };
+
+  const style=document.createElement('style');
+  style.id='v17-live-performance-style';
+  style.textContent=`
+    /* Header Rosa: niente KPI duplicati, toggle Coda sempre visibile. */
+    #view-auction .auction-team-roster-head .auction-v7-roster-metrics,
+    #view-auction .auction-team-roster-head .v8rm,
+    #view-auction .auction-team-roster-head .auction-roster-projected-summary{display:none!important}
+    #view-auction .auction-team-roster-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:5px!important}
+    #view-auction .auction-roster-head-actions{margin-left:auto!important;display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:4px!important;min-width:max-content!important}
+    #view-auction .auction-roster-queue-toggle{display:flex!important;visibility:visible!important;opacity:1!important;flex:0 0 auto!important}
+    #view-auction .v17-suggestions-loading{min-height:32px!important;opacity:.72}
+  `;
+  document.head.appendChild(style);
+
+  queueMicrotask(()=>{
+    document.querySelectorAll('.auction-v7-roster-metrics,.v8rm,.auction-roster-projected-summary').forEach(x=>x.remove());
+    if(v17IsLive())v17ScheduleSuggestions();
+  });
 })();
 </script>
 
