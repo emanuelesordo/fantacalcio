@@ -1,0 +1,211 @@
+name: Apply V23 mobile auction mode
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-v23-mobile-auction-mode.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Append V23 mobile auction runtime
+        run: |
+          cat > /tmp/v23.js <<'JS'
+          (()=>{
+            'use strict';
+            if(window.__FANTA_V23_MOBILE_AUCTION__)return;
+            window.__FANTA_V23_MOBILE_AUCTION__=1;
+
+            const PHONE_MQ=window.matchMedia('(max-width: 820px)');
+            const qs=(s,r=document)=>r.querySelector(s);
+            const qsa=(s,r=document)=>[...r.querySelectorAll(s)];
+            const norm=s=>String(s||'').replace(/\s+/g,' ').trim().toUpperCase();
+            const isPhone=()=>PHONE_MQ.matches;
+            const isLive=()=>state.view==='auction'&&state.auction?.auctionSession?.status==='live';
+            const username=()=>String(state.dashboard?.currentUser?.username||state.session?.user?.username||'user').toLowerCase();
+            const leagueId=()=>String(state.selectedLeague?.id||'league');
+            const storageKey=()=>`fanta:auction:mobile-mode:${username()}:${leagueId()}`;
+            const getMode=()=>localStorage.getItem(storageKey())==='compact'?'compact':'full';
+            const setMode=m=>{localStorage.setItem(storageKey(),m==='compact'?'compact':'full');sync();};
+
+            function myInfo(){try{return typeof auctionMyTeamDashboardData==='function'?auctionMyTeamDashboardData():null}catch{return null}}
+            function teamName(id){const t=(state.auction?.teams||[]).find(x=>String(x.id)===String(id||''));return t?.alias||t?.name||'—';}
+            function currentPlayer(){return state.auction?.currentPlayer||null;}
+            function session(){return state.auction?.auctionSession||null;}
+            function roles(p){try{return typeof playerRoles==='function'?playerRoles(p,state.auction?.settings?.fantasy_mode||'classic'):[]}catch{return[]}}
+
+            function findOriginalButton(kind){
+              const buttons=qsa('#view-auction button').filter(b=>!b.closest('.v23-mobile-shell')&&!b.closest('.v23-mobile-drawer-ui'));
+              const text=b=>norm(b.textContent);
+              const tests={
+                inc1:t=>/^\+1(?:\s|$)/.test(t),inc2:t=>/^\+2(?:\s|$)/.test(t),inc3:t=>/^\+3(?:\s|$)/.test(t),inc5:t=>/^\+5(?:\s|$)/.test(t),inc10:t=>/^\+10(?:\s|$)/.test(t),
+                ok:t=>/^OK(?:\s|·|$)/.test(t),leave:t=>t==='LASCIA'||t.startsWith('LASCIA '),done:t=>t.includes('A POSTO'),hold:t=>t==='HOLD'||t.startsWith('HOLD ')
+              };
+              return buttons.find(b=>tests[kind]?.(text(b)))||null;
+            }
+            function proxy(kind){const b=findOriginalButton(kind);if(!b||b.disabled)return false;b.click();return true;}
+            function findFreeInput(){
+              const inputs=qsa('#view-auction input').filter(i=>!i.closest('.v23-mobile-shell'));
+              return inputs.find(i=>{
+                const p=i.closest('label,.row,.auction-console,.auction-banditore-section,.panel,div');
+                const t=norm(p?.textContent);return t.includes('LIBERO')||t.includes('OFFERTA LIBERA');
+              })||null;
+            }
+            function setFreeAndOk(v){
+              const input=findFreeInput();
+              if(!input)return false;
+              input.value=String(Math.max(1,Number(v)||1));
+              input.dispatchEvent(new Event('input',{bubbles:true}));
+              input.dispatchEvent(new Event('change',{bubbles:true}));
+              return proxy('ok');
+            }
+
+            function rosterTarget(){
+              return qs('#view-auction .auction-team-column-roster-only')||qs('#view-auction [class*="roster-only"]')||qs('#view-auction .auction-team-panel-roster');
+            }
+            function freeTarget(){
+              return qs('#view-auction .auction-free-fixed')||qs('#view-auction [class*="free-fixed"]')||qs('#auction-player-body')?.closest('.panel,.auction-free-agents,.auction-free-fixed');
+            }
+            function closeDrawer(){document.body.classList.remove('v23-roster-open','v23-free-open');syncDrawerTargets();}
+            function openDrawer(which){
+              if(getMode()!=='full')return;
+              document.body.classList.toggle('v23-roster-open',which==='roster');
+              document.body.classList.toggle('v23-free-open',which==='free');
+              syncDrawerTargets();
+            }
+            function syncDrawerTargets(){
+              qsa('.v23-drawer-target').forEach(x=>x.classList.remove('v23-drawer-target','v23-drawer-roster','v23-drawer-free'));
+              const r=rosterTarget(),f=freeTarget();
+              if(r){r.classList.add('v23-drawer-target','v23-drawer-roster')}
+              if(f){f.classList.add('v23-drawer-target','v23-drawer-free')}
+              const ui=qs('.v23-mobile-drawer-ui');
+              if(ui)ui.hidden=!(document.body.classList.contains('v23-roster-open')||document.body.classList.contains('v23-free-open'));
+            }
+
+            function ensureShell(){
+              let shell=qs('.v23-mobile-shell');
+              if(shell)return shell;
+              shell=document.createElement('section');
+              shell.className='v23-mobile-shell';
+              shell.hidden=true;
+              shell.innerHTML=`
+                <header class="v23-mobile-head">
+                  <div class="v23-mobile-mode" role="group" aria-label="Modalità smartphone">
+                    <button type="button" data-v23-mode="full">COMPLETA</button>
+                    <button type="button" data-v23-mode="compact">RIDOTTA</button>
+                  </div>
+                  <div class="v23-mobile-credit"><small>CREDITI</small><strong data-v23-credits>—</strong><span>MAX <b data-v23-max>—</b></span></div>
+                </header>
+                <div class="v23-mobile-player">
+                  <div><small>GIOCATORE</small><strong data-v23-player>—</strong><span data-v23-player-meta>attesa chiamata</span></div>
+                  <div class="v23-mobile-timer"><small>TIMER</small><strong data-v23-timer>—</strong></div>
+                  <div class="v23-mobile-bid"><small>OFFERTA</small><strong data-v23-bid>—</strong><span data-v23-bidder>—</span></div>
+                </div>
+                <div class="v23-mobile-drawers">
+                  <button type="button" data-v23-open="roster">ROSA</button>
+                  <button type="button" data-v23-open="free">SVINCOLATI</button>
+                </div>
+                <div class="v23-mobile-console" aria-label="Console rilanci rapida">
+                  <div class="v23-quick-bids">
+                    <button type="button" data-v23-proxy="inc1">+1</button><button type="button" data-v23-proxy="inc2">+2</button><button type="button" data-v23-proxy="inc3">+3</button><button type="button" data-v23-proxy="inc5">+5</button><button type="button" data-v23-proxy="inc10">+10</button>
+                  </div>
+                  <div class="v23-free-bid"><label>LIBERO <input type="number" min="1" step="1" value="1" data-v23-free></label><button type="button" data-v23-free-ok>OK</button></div>
+                  <div class="v23-main-actions"><button type="button" class="secondary" data-v23-proxy="hold">HOLD</button><button type="button" class="warn" data-v23-proxy="done">A POSTO</button><button type="button" class="danger" data-v23-proxy="leave">LASCIA</button></div>
+                </div>`;
+              document.body.appendChild(shell);
+              shell.addEventListener('click',e=>{
+                const m=e.target.closest('[data-v23-mode]');if(m){setMode(m.dataset.v23Mode);return;}
+                const d=e.target.closest('[data-v23-open]');if(d){openDrawer(d.dataset.v23Open);return;}
+                const p=e.target.closest('[data-v23-proxy]');if(p){proxy(p.dataset.v23Proxy);setTimeout(sync,20);return;}
+                if(e.target.closest('[data-v23-free-ok]')){setFreeAndOk(qs('[data-v23-free]',shell)?.value);setTimeout(sync,20);}
+              });
+              return shell;
+            }
+            function ensureDrawerUi(){
+              let ui=qs('.v23-mobile-drawer-ui');if(ui)return ui;
+              ui=document.createElement('div');ui.className='v23-mobile-drawer-ui';ui.hidden=true;ui.innerHTML='<button type="button" class="v23-drawer-close" aria-label="Chiudi drawer">×</button><div class="v23-drawer-backdrop"></div>';
+              document.body.appendChild(ui);ui.addEventListener('click',e=>{if(e.target.closest('.v23-drawer-close')||e.target.classList.contains('v23-drawer-backdrop'))closeDrawer();});return ui;
+            }
+
+            function timerText(){
+              const s=session();if(!s?.current_player_id)return '—';
+              const now=Date.now()+Number(state.serverOffsetMs||0),start=Date.parse(s.timer_starts_at||''),deadline=Date.parse(s.timer_deadline||'');
+              if(Number.isFinite(start)&&now<start)return 'PRONTO';
+              if(!Number.isFinite(deadline))return '—';
+              return `${Math.max(0,Math.ceil((deadline-now)/1000))}s`;
+            }
+            function syncButtons(shell){
+              ['inc1','inc2','inc3','inc5','inc10','hold','done','leave'].forEach(k=>{
+                const local=qs(`[data-v23-proxy="${k}"]`,shell),orig=findOriginalButton(k);if(!local)return;local.disabled=!orig||orig.disabled;local.hidden=(k==='done'&&!orig)||(k==='hold'&&!orig);
+              });
+              const ok=findOriginalButton('ok');const localOk=qs('[data-v23-free-ok]',shell);if(localOk)localOk.disabled=!ok||ok.disabled;
+              const free=findFreeInput(),localFree=qs('[data-v23-free]',shell);if(localFree&&free&&!localFree.matches(':focus'))localFree.value=String(Math.max(1,Number(free.value)||1));
+            }
+            function sync(){
+              const shell=ensureShell();ensureDrawerUi();
+              const active=isPhone()&&isLive();shell.hidden=!active;
+              document.body.classList.toggle('v23-mobile-auction',active);
+              if(!active){document.body.classList.remove('v23-mobile-full','v23-mobile-compact','v23-roster-open','v23-free-open');syncDrawerTargets();return;}
+              const mode=getMode();document.body.classList.toggle('v23-mobile-full',mode==='full');document.body.classList.toggle('v23-mobile-compact',mode==='compact');
+              qsa('[data-v23-mode]',shell).forEach(b=>b.classList.toggle('active',b.dataset.v23Mode===mode));
+              if(mode==='compact')closeDrawer();
+              const info=myInfo(),p=currentPlayer(),s=session();
+              qs('[data-v23-credits]',shell).textContent=info?.remaining??'—';qs('[data-v23-max]',shell).textContent=info?.maxBid??'—';
+              qs('[data-v23-player]',shell).textContent=p?.name||'—';qs('[data-v23-player-meta]',shell).textContent=p?[roles(p).join(' · '),p.serie_a_team].filter(Boolean).join(' · '):'attesa chiamata';
+              qs('[data-v23-timer]',shell).textContent=timerText();qs('[data-v23-bid]',shell).textContent=s?.current_player_id?Math.max(1,Number(s.current_bid||1)):'—';qs('[data-v23-bidder]',shell).textContent=s?.current_player_id?teamName(s.current_bidder_team_id):'—';
+              const drawers=qs('.v23-mobile-drawers',shell);if(drawers)drawers.hidden=mode!=='full';syncButtons(shell);syncDrawerTargets();
+            }
+
+            if(typeof renderAuctionLive==='function'){
+              const old=renderAuctionLive;renderAuctionLive=function(...a){const r=old(...a);queueMicrotask(sync);return r;};
+            }
+            if(typeof applyAuctionHotState==='function'){
+              const old=applyAuctionHotState;applyAuctionHotState=function(...a){const r=old(...a);queueMicrotask(sync);return r;};
+            }
+            PHONE_MQ.addEventListener?.('change',sync);
+            window.addEventListener('hashchange',()=>setTimeout(sync,0));
+            setInterval(()=>{if(isPhone()&&isLive()){const shell=ensureShell();const t=qs('[data-v23-timer]',shell);if(t)t.textContent=timerText();syncButtons(shell);}},250);
+
+            const css=document.createElement('style');css.id='v23-mobile-auction-style';css.textContent=`
+              .v23-mobile-shell,.v23-mobile-drawer-ui{display:none}
+              @media(max-width:820px){
+                body.v23-mobile-auction{overflow:hidden!important}
+                body.v23-mobile-auction .v23-mobile-shell{display:grid!important;position:fixed!important;inset:0!important;z-index:1900!important;background:#061426!important;padding:max(7px,env(safe-area-inset-top)) 7px max(8px,env(safe-area-inset-bottom))!important;grid-template-rows:auto auto auto minmax(0,1fr)!important;gap:7px!important;color:var(--text)!important}
+                .v23-mobile-head{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:7px!important;align-items:center!important}
+                .v23-mobile-mode{display:grid!important;grid-template-columns:1fr 1fr!important;gap:3px!important;padding:3px!important;border:1px solid var(--line)!important;border-radius:10px!important;background:var(--panel)!important}
+                .v23-mobile-mode button{min-height:34px!important;background:transparent!important;border-color:transparent!important;color:var(--soft)!important;font-size:10px!important}.v23-mobile-mode button.active{background:var(--primary)!important;color:#fff!important}
+                .v23-mobile-credit{min-height:42px!important;display:grid!important;grid-template-columns:auto auto!important;grid-template-rows:auto auto!important;align-items:center!important;column-gap:6px!important;padding:4px 8px!important;border:1px solid var(--line)!important;border-radius:10px!important;background:var(--panel)!important}.v23-mobile-credit small{grid-column:1;font-size:6px!important;color:var(--muted)!important}.v23-mobile-credit strong{grid-column:1;font-size:18px!important;color:#7ce6bc!important}.v23-mobile-credit span{grid-column:2;grid-row:1/3;font-size:8px!important;color:var(--soft)!important}.v23-mobile-credit b{display:block!important;font-size:12px!important;color:var(--text)!important}
+                .v23-mobile-player{display:grid!important;grid-template-columns:minmax(0,1fr) 72px 84px!important;gap:5px!important}.v23-mobile-player>div{min-height:58px!important;padding:6px 8px!important;border:1px solid var(--line)!important;border-radius:10px!important;background:var(--panel)!important;display:flex!important;flex-direction:column!important;justify-content:center!important}.v23-mobile-player small{font-size:6px!important;color:var(--muted)!important}.v23-mobile-player strong{font-size:18px!important;line-height:1.05!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}.v23-mobile-player span{font-size:8px!important;color:var(--soft)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}.v23-mobile-timer strong{text-align:center!important;font-size:22px!important}.v23-mobile-bid strong{text-align:center!important;font-size:22px!important}.v23-mobile-bid span{text-align:center!important}
+                .v23-mobile-drawers{display:grid!important;grid-template-columns:1fr 1fr!important;gap:5px!important}.v23-mobile-drawers button{min-height:38px!important;background:var(--panel3)!important;border-color:var(--line2)!important;font-size:11px!important}
+                body.v23-mobile-compact .v23-mobile-shell{grid-template-rows:auto auto minmax(0,1fr)!important}.v23-mobile-console{align-self:end!important;display:grid!important;grid-template-rows:auto auto auto!important;gap:6px!important;padding:8px!important;border:1px solid var(--line2)!important;border-radius:12px!important;background:linear-gradient(180deg,rgba(18,52,93,.98),rgba(8,31,54,.99))!important;box-shadow:0 -10px 35px rgba(0,0,0,.28)!important}.v23-quick-bids{display:grid!important;grid-template-columns:repeat(5,1fr)!important;gap:5px!important}.v23-quick-bids button{min-height:48px!important;font-size:15px!important;border-radius:10px!important}.v23-free-bid{display:grid!important;grid-template-columns:minmax(0,1fr) 86px!important;gap:5px!important}.v23-free-bid label{display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;align-items:center!important;gap:6px!important;padding:4px 6px!important;border:1px solid var(--line)!important;border-radius:10px!important;background:#0b2a4d!important;font-size:8px!important}.v23-free-bid input{height:40px!important;min-height:40px!important;font-size:18px!important;text-align:center!important}.v23-free-bid button{min-height:48px!important;background:var(--good)!important;font-size:14px!important}.v23-main-actions{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:5px!important}.v23-main-actions button{min-height:44px!important;font-size:11px!important}
+                body.v23-mobile-auction .v23-mobile-drawer-ui:not([hidden]){display:block!important;position:fixed!important;inset:0!important;z-index:1995!important;pointer-events:none!important}.v23-drawer-backdrop{position:absolute!important;inset:0!important;background:rgba(2,10,20,.62)!important;pointer-events:auto!important}.v23-drawer-close{position:absolute!important;top:max(9px,env(safe-area-inset-top))!important;right:10px!important;z-index:2!important;width:38px!important;height:38px!important;min-height:38px!important;padding:0!important;border-radius:50%!important;background:var(--danger)!important;font-size:23px!important;pointer-events:auto!important}
+                body.v23-mobile-auction .v23-drawer-target{display:none!important}
+                body.v23-roster-open .v23-drawer-roster,body.v23-free-open .v23-drawer-free{display:block!important;position:fixed!important;z-index:2000!important;left:8px!important;right:8px!important;top:max(54px,calc(env(safe-area-inset-top) + 48px))!important;bottom:max(8px,env(safe-area-inset-bottom))!important;width:auto!important;max-width:none!important;height:auto!important;max-height:none!important;overflow:auto!important;transform:none!important;border:1px solid var(--line2)!important;border-radius:12px!important;background:var(--panel)!important;box-shadow:0 20px 70px rgba(0,0,0,.55)!important}
+              }
+            `;document.head.appendChild(css);
+            sync();
+          })();
+          JS
+          node --check /tmp/v23.js
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('home.html');s=p.read_text(encoding='utf-8')
+          if 'v23-mobile-auction-mode-runtime' in s: raise SystemExit('V23 already present')
+          js=Path('/tmp/v23.js').read_text();block='\n<script id="v23-mobile-auction-mode-runtime">\n'+js+'\n</script>\n';pos=s.rfind('</body>')
+          if pos<0: raise SystemExit('missing body close')
+          p.write_text(s[:pos]+block+s[pos:],encoding='utf-8')
+          PY
+          grep -q '<title>Fantacalcio Live</title>' home.html
+          grep -q 'Fantacalcio Live - tool per asta online' home.html
+          grep -q 'v23-mobile-auction-mode-runtime' home.html
+          git diff --check
+      - name: Commit V23
+        run: |
+          rm -f .github/workflows/apply-v23-mobile-auction-mode.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add home.html .github/workflows/apply-v23-mobile-auction-mode.yml
+          git commit -m 'feat: add full and compact smartphone auction modes'
+          git push
