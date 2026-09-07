@@ -1,0 +1,48 @@
+name: Apply V25 auction layout and mobile navigation
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-v25-auction-layout-mobile.yml'
+      - '.github/apply_v25_auction_layout_mobile.py'
+  workflow_dispatch:
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Patch consolidated auction UI
+        run: python .github/apply_v25_auction_layout_mobile.py
+      - name: Validate HTML inline JavaScript
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          text=Path('home.html').read_text(encoding='utf-8')
+          assert '<title>Fantacalcio Live</title>' in text
+          assert 'Fantacalcio Live - tool per asta online' in text
+          assert 'v25-auction-layout-mobile-runtime' in text
+          scripts=re.findall(r'<script(?![^>]*\\bsrc=)[^>]*>(.*?)</script>',text,re.S|re.I)
+          out=Path('/tmp/v25-inline');out.mkdir(exist_ok=True)
+          for i,code in enumerate(scripts):
+              (out/f'{i:03d}.js').write_text(code,encoding='utf-8')
+          PY
+          for f in /tmp/v25-inline/*.js; do node --check "$f"; done
+          git diff --check
+      - name: Commit application patch
+        run: |
+          if git diff --quiet -- home.html; then
+            echo 'No home.html changes required'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add home.html
+          git commit -m 'fix: tighten auction table and mobile navigation'
+          git push
