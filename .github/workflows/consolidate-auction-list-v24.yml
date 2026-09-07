@@ -1,0 +1,1214 @@
+name: Consolidate auction free-agent table V24
+
+on:
+  push:
+    paths:
+      - '.github/workflows/consolidate-auction-list-v24.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  consolidate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Consolidate auction table and smartphone mode
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('home.html')
+          text = path.read_text(encoding='utf-8')
+          original = text
+
+          def replace_between(src, start_marker, end_marker, replacement, label):
+              start = src.find(start_marker)
+              if start < 0:
+                  raise RuntimeError(f'{label}: start marker not found')
+              end = src.find(end_marker, start)
+              if end < 0:
+                  raise RuntimeError(f'{label}: end marker not found')
+              return src[:start] + replacement + src[end:]
+
+          # -----------------------------------------------------------------
+          # 1. Remove the intermediate V19 auction-table renderer completely.
+          # -----------------------------------------------------------------
+          text, count = re.subn(
+              r'\n*<script id="v19-auction-list-controls-runtime">.*?</script>\s*',
+              '\n\n',
+              text,
+              count=1,
+              flags=re.S,
+          )
+          if count != 1:
+              raise RuntimeError(f'V19 auction runtime removal count={count}')
+
+          # -----------------------------------------------------------------
+          # 2. V18 keeps modals/HOLD/assign-turn, but no longer owns the table.
+          # -----------------------------------------------------------------
+          v18_start = text.find('<script id="v18-auction-controls-runtime">')
+          v18_end = text.find('</script>', v18_start)
+          if v18_start < 0 or v18_end < 0:
+              raise RuntimeError('V18 runtime not found')
+          v18_end += len('</script>')
+          v18 = text[v18_start:v18_end]
+
+          filter_start = v18.find('  /* =========================================================\n     FILTRI PER COLONNA NELLA LISTA SVINCOLATI')
+          filter_end = v18.find('  /* Squadra operativa cambiata:', filter_start)
+          if filter_start < 0 or filter_end < 0:
+              raise RuntimeError('V18 filter section markers not found')
+          v18 = (
+              v18[:filter_start]
+              + '''  /* =========================================================
+     LISTA SVINCOLATI: renderer unico nel core asta
+     ========================================================= */
+  if(typeof renderAuctionLive==='function'){
+    const old=renderAuctionLive;
+    renderAuctionLive=function(...a){
+      const r=old(...a);
+      queueMicrotask(()=>{patchCalledDetails();mountAssignTurn();moveCallButtonTop();});
+      return r;
+    };
+  }
+
+'''
+              + v18[filter_end:]
+          )
+
+          # Remove the V18 CSS that used to govern caller/table/filter geometry.
+          v18, css_count = re.subn(
+              r'\n    #view-auction \.auction-caller-controls\{.*?(?=\n    #view-auction \.auctioneer-functions-section)',
+              '\n',
+              v18,
+              count=1,
+              flags=re.S,
+          )
+          if css_count != 1:
+              raise RuntimeError(f'V18 table CSS removal count={css_count}')
+          v18 = v18.replace(
+              'queueMicrotask(()=>{patchCalledDetails();mountAssignTurn();moveCallButtonTop();mountAuctionColumnFilters()});',
+              'queueMicrotask(()=>{patchCalledDetails();mountAssignTurn();moveCallButtonTop();});'
+          )
+          text = text[:v18_start] + v18 + text[v18_end:]
+
+          # -----------------------------------------------------------------
+          # 3. V22 keeps pricing/SUGG/MAX and Listone integration, but it no
+          #    longer mutates the auction table. Correct the economic coloring.
+          # -----------------------------------------------------------------
+          v22_start = text.find('<script id="v22-index-pricing-filters-runtime">')
+          v22_end = text.find('</script>', v22_start)
+          if v22_start < 0 or v22_end < 0:
+              raise RuntimeError('V22 runtime not found')
+          v22_end += len('</script>')
+          v22 = text[v22_start:v22_end]
+
+          v22, paint_count = re.subn(
+              r'  function paintRows22\(root,players\)\{.*?\n  \}',
+              '''  function paintRows22(root,players){
+    if(!owner22()||!root)return;
+    const by=new Map(players.map(p=>[String(p.id),p]));
+    root.querySelectorAll('tr[data-player-id]').forEach(row=>{
+      const p=by.get(String(row.dataset.playerId));if(!p)return;
+      const idx=index22(p),pfc=num22(p?.pfc),pma=num22(p?.pma);
+      const vals=[pfc,pma].filter(v=>v!==null&&v>0);
+      row.classList.remove('v22-market-value-row');
+      row.style.removeProperty('--v22-hue');row.style.removeProperty('--v22-alpha');
+      if(!idx||!vals.length)return;
+      const allAbove=vals.every(v=>v>idx),allBelow=vals.every(v=>v<idx);
+      const hue=allAbove?2:allBelow?132:48;
+      const distance=vals.reduce((sum,v)=>sum+Math.abs(v-idx),0)/vals.length/Math.max(1,idx);
+      const alpha=.05+.08*clamp22(distance,0,1);
+      row.classList.add('v22-market-value-row');
+      row.style.setProperty('--v22-hue',String(hue));
+      row.style.setProperty('--v22-alpha',String(alpha.toFixed(3)));
+      row.title=`Indice ${Math.round(idx)} cr · PFC ${pfc??'—'} · PMA ${pma??'—'} · ${allAbove?'sopra indice':allBelow?'sotto indice':'valori discordanti'}`;
+    });
+  }''',
+              v22,
+              count=1,
+              flags=re.S,
+          )
+          if paint_count != 1:
+              raise RuntimeError(f'V22 paintRows replacement count={paint_count}')
+
+          block_start = v22.find('  const NUM22={')
+          block_end = v22.find('  function patchListSort22(){', block_start)
+          if block_start < 0 or block_end < 0:
+              raise RuntimeError('V22 auction filter block markers not found')
+          v22 = v22[:block_start] + '  /* Auction filters consolidated into the core renderer. */\n\n' + v22[block_end:]
+
+          v22 = re.sub(
+              r"\n  if\(typeof renderAuctionPlayers==='function'\)\{[^\n]*\}\n  if\(typeof renderAuctionLive==='function'\)\{[^\n]*\}",
+              '',
+              v22,
+              count=1,
+          )
+          v22 = v22.replace(
+              "queueMicrotask(()=>{if(state.view==='auction')mountTable22();if(state.view==='list')patchListSort22();});",
+              "queueMicrotask(()=>{if(state.view==='list')patchListSort22();});"
+          )
+
+          style_start = v22.find("  const style=document.createElement('style');style.id='v22-index-pricing-style';style.textContent=`")
+          style_end_marker = '`;document.head.appendChild(style);'
+          style_end = v22.find(style_end_marker, style_start)
+          if style_start < 0 or style_end < 0:
+              raise RuntimeError('V22 style block not found')
+          style_end += len(style_end_marker)
+          v22_style = '''  const style=document.createElement('style');style.id='v22-index-pricing-style';style.textContent=`
+    body.v10-index-owner #view-list tr.v22-market-value-row{background:linear-gradient(90deg,hsl(var(--v22-hue) 70% 46% / var(--v22-alpha)),transparent 82%)!important;box-shadow:inset 3px 0 0 hsl(var(--v22-hue) 75% 50% / .72)!important}
+  `;document.head.appendChild(style);'''
+          v22 = v22[:style_start] + v22_style + v22[style_end:]
+          text = text[:v22_start] + v22 + text[v22_end:]
+
+          # -----------------------------------------------------------------
+          # 4. Core auction free-agent table: one renderer, one header/filter
+          #    system, one set of column widths and Listone-style dual ranges.
+          # -----------------------------------------------------------------
+          helpers = r'''    const AUCTION_FREE_NUMERIC = {
+      presence: { label: '%Tit', step: 1 },
+      pfc: { label: 'PFC', step: 1 },
+      pma: { label: 'PMA', step: 1 },
+      delta: { label: 'Delta', step: 1 },
+      fm: { label: 'FM', step: .01 },
+      index: { label: 'Indice', step: 1 }
+    };
+
+    function auctionFreeFinite(value) {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function auctionFreePresence(player) {
+      const value = typeof strategicPresencePercent === 'function'
+        ? strategicPresencePercent(player)
+        : player?.expected_titolarity;
+      return auctionFreeFinite(value) ?? 0;
+    }
+
+    function auctionFreeFantasyAverage(player) {
+      const value = typeof strategicExpectedFantasyAverage === 'function'
+        ? strategicExpectedFantasyAverage(player)
+        : player?.expected_fantasy_avg;
+      return auctionFreeFinite(value) ?? 0;
+    }
+
+    function auctionFreeDelta(player) {
+      const imported = auctionFreeFinite(player?.pfc_pma_delta);
+      if (imported !== null) return imported;
+      const pfc = auctionFreeFinite(player?.pfc);
+      const pma = auctionFreeFinite(player?.pma);
+      return pfc !== null && pma !== null ? pfc - pma : null;
+    }
+
+    function auctionFreeIndex(player) {
+      const value = typeof strategicValueIndex === 'function'
+        ? strategicValueIndex(player)
+        : 0;
+      return auctionFreeFinite(value) ?? 0;
+    }
+
+    function auctionFreeNumericValue(player, key) {
+      if (key === 'presence') return auctionFreePresence(player);
+      if (key === 'pfc') return auctionFreeFinite(player?.pfc);
+      if (key === 'pma') return auctionFreeFinite(player?.pma);
+      if (key === 'delta') return auctionFreeDelta(player);
+      if (key === 'fm') return auctionFreeFantasyAverage(player);
+      if (key === 'index') return auctionFreeIndex(player);
+      return null;
+    }
+
+    function auctionFreePreference(player) {
+      const source = String(player?.source_player_id || player?.id || '');
+      return state.v7Preferences?.get?.(source) || null;
+    }
+
+    function auctionFreeFavorite(player) {
+      const pref = auctionFreePreference(player);
+      return Boolean(pref?.is_favorite || pref?.strategy === 'top');
+    }
+
+    function auctionFreeSignalMatches(player, key) {
+      if (!key) return true;
+      if (typeof matchesFlag === 'function') return matchesFlag(player, key);
+      if (key === 'market') return player?.market_flag === true;
+      if (key === 'new') return player?.new_arrival === true;
+      if (key === 'injury') {
+        return player?.uncertain_return === true
+          || Number(player?.unavailable_until_round || 0) >= Number(state.v13NextRound || 1);
+      }
+      if (key === 'penalties') {
+        const n = typeof importedProbabilityPercent === 'function'
+          ? importedProbabilityPercent(player?.penalty_probability)
+          : Number(player?.penalty_probability || 0);
+        return Number(n || 0) > 0;
+      }
+      if (key === 'free_kicks') {
+        const n = typeof importedProbabilityPercent === 'function'
+          ? importedProbabilityPercent(player?.free_kick_probability)
+          : Number(player?.free_kick_probability || 0);
+        return Number(n || 0) > 0;
+      }
+      return false;
+    }
+
+    function auctionFreeSignalSort(player) {
+      return ['market', 'injury', 'new', 'penalties', 'free_kicks']
+        .filter(key => auctionFreeSignalMatches(player, key))
+        .join(',');
+    }
+
+    function auctionFreeRangeBounds(key, players) {
+      const def = AUCTION_FREE_NUMERIC[key];
+      const values = players
+        .map(player => auctionFreeNumericValue(player, key))
+        .filter(Number.isFinite);
+      let min = values.length ? Math.min(...values) : 0;
+      let max = values.length ? Math.max(...values) : def.step;
+      if (def.step < 1) {
+        min = Math.floor(min / def.step) * def.step;
+        max = Math.ceil(max / def.step) * def.step;
+      } else {
+        min = Math.floor(min);
+        max = Math.ceil(max);
+      }
+      if (min === max) max = min + def.step;
+      return { min, max, step: def.step };
+    }
+
+    function auctionFreeEnsureRanges(players = state.auction?.callCandidates || []) {
+      state.auctionColumnFilters = state.auctionColumnFilters || { name: '', badge: '', favorite: '' };
+      state.auctionColumnRanges = state.auctionColumnRanges || {};
+      const signature = [
+        state.selectedLeague?.id || '',
+        state.auction?.auctionSession?.id || '',
+        state.v13NextRound || 1,
+        players.length,
+        players.slice(0, 16).map(player => [
+          player.id,
+          player.source_updated_at || player.updated_at || '',
+          player.pfc,
+          player.pma,
+          player.expected_titolarity,
+          player.expected_fantasy_avg
+        ].join(':')).join('|')
+      ].join('::');
+      if (state.auctionColumnRangeKey === signature && Object.keys(state.auctionColumnRanges).length) return;
+      const previous = state.auctionColumnRanges || {};
+      const next = {};
+      Object.keys(AUCTION_FREE_NUMERIC).forEach(key => {
+        const bounds = auctionFreeRangeBounds(key, players);
+        const old = previous[key];
+        let lo = old ? Math.max(bounds.min, Math.min(bounds.max, Number(old.lo))) : bounds.min;
+        let hi = old ? Math.max(bounds.min, Math.min(bounds.max, Number(old.hi))) : bounds.max;
+        if (!Number.isFinite(lo)) lo = bounds.min;
+        if (!Number.isFinite(hi)) hi = bounds.max;
+        if (lo > hi) { lo = bounds.min; hi = bounds.max; }
+        next[key] = { ...bounds, lo, hi };
+      });
+      state.auctionColumnRanges = next;
+      state.auctionColumnRangeKey = signature;
+    }
+
+    function auctionFreeFormatRange(value, step = 1) {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return '—';
+      return step < 1
+        ? n.toFixed(step <= .01 ? 2 : 1).replace('.', ',')
+        : String(Math.round(n));
+    }
+
+    function auctionFreeRangeIsFull(key) {
+      const r = state.auctionColumnRanges?.[key];
+      return !r
+        || (Math.abs(r.lo - r.min) < 1e-9 && Math.abs(r.hi - r.max) < 1e-9);
+    }
+
+    function auctionFreeRangeLabel(key) {
+      const r = state.auctionColumnRanges?.[key];
+      const def = AUCTION_FREE_NUMERIC[key];
+      if (!r || auctionFreeRangeIsFull(key)) return 'tutto';
+      return `${auctionFreeFormatRange(r.lo, def.step)}–${auctionFreeFormatRange(r.hi, def.step)}`;
+    }
+
+    function auctionFreeRangeControl(key) {
+      const r = state.auctionColumnRanges?.[key];
+      const def = AUCTION_FREE_NUMERIC[key];
+      if (!r) return '';
+      return `
+        <div class="auction-range" data-auction-range-box="${key}">
+          <button type="button" class="auction-range-toggle" data-auction-range-toggle="${key}" title="Intervallo ${esc(def.label)}">
+            <span data-auction-range-label="${key}">${auctionFreeRangeLabel(key)}</span><i>⌄</i>
+          </button>
+          <div class="auction-range-popover" data-auction-range-popover="${key}" hidden>
+            <div class="auction-range-values">
+              <b data-auction-range-lo-label="${key}">${auctionFreeFormatRange(r.lo, def.step)}</b>
+              <span>${esc(def.label)}</span>
+              <b data-auction-range-hi-label="${key}">${auctionFreeFormatRange(r.hi, def.step)}</b>
+            </div>
+            <div class="auction-dual-range">
+              <div class="auction-range-base"></div>
+              <div class="auction-range-fill" data-auction-range-fill="${key}"></div>
+              <input type="range" data-auction-range="${key}" data-bound="lo" min="${r.min}" max="${r.max}" step="${r.step}" value="${r.lo}" aria-label="Minimo ${esc(def.label)}">
+              <input type="range" data-auction-range="${key}" data-bound="hi" min="${r.min}" max="${r.max}" step="${r.step}" value="${r.hi}" aria-label="Massimo ${esc(def.label)}">
+            </div>
+            <div class="auction-range-ends">
+              <small>${auctionFreeFormatRange(r.min, def.step)}</small>
+              <button type="button" data-auction-range-reset="${key}">azzera</button>
+              <small>${auctionFreeFormatRange(r.max, def.step)}</small>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateAuctionFreeRangeVisual(key) {
+      const r = state.auctionColumnRanges?.[key];
+      const def = AUCTION_FREE_NUMERIC[key];
+      if (!r) return;
+      document.querySelectorAll(`[data-auction-range-label="${key}"]`).forEach(node => {
+        node.textContent = auctionFreeRangeLabel(key);
+      });
+      document.querySelectorAll(`[data-auction-range-lo-label="${key}"]`).forEach(node => {
+        node.textContent = auctionFreeFormatRange(r.lo, def.step);
+      });
+      document.querySelectorAll(`[data-auction-range-hi-label="${key}"]`).forEach(node => {
+        node.textContent = auctionFreeFormatRange(r.hi, def.step);
+      });
+      const span = Math.max(r.step, r.max - r.min);
+      const left = (r.lo - r.min) / span * 100;
+      const right = (r.hi - r.min) / span * 100;
+      document.querySelectorAll(`[data-auction-range-fill="${key}"]`).forEach(node => {
+        node.style.left = `${left}%`;
+        node.style.width = `${Math.max(0, right - left)}%`;
+      });
+    }
+
+    function closeAuctionFreeRanges(except = '') {
+      document.querySelectorAll('#view-auction [data-auction-range-popover]').forEach(node => {
+        if (node.dataset.auctionRangePopover !== except) node.hidden = true;
+      });
+      document.querySelectorAll('#view-auction [data-auction-range-box]').forEach(node => {
+        const popover = node.querySelector('[data-auction-range-popover]');
+        node.classList.toggle(
+          'open',
+          node.dataset.auctionRangeBox === except && popover?.hidden === false
+        );
+      });
+    }
+
+    function auctionFreeRoleRank(player, mode) {
+      const order = mode === 'mantra'
+        ? ['Por', 'B', 'Dd', 'Dc', 'Ds', 'E', 'M', 'C', 'T', 'W', 'A', 'Pc']
+        : ['P', 'D', 'C', 'A'];
+      const ranks = playerRoles(player, mode)
+        .map(role => order.findIndex(item => item.toLowerCase() === String(role).toLowerCase()))
+        .filter(index => index >= 0);
+      return ranks.length ? Math.min(...ranks) : 999;
+    }
+
+    function auctionFreeMatches(player, mode) {
+      const filters = state.auctionColumnFilters || {};
+      const selectedRoles = state.auctionRoles;
+      if (selectedRoles && !selectedRoles.has('all')) {
+        const wanted = new Set([...selectedRoles].map(role => String(role).toLowerCase()));
+        if (!playerRoles(player, mode).some(role => wanted.has(String(role).toLowerCase()))) return false;
+      }
+
+      const topSearch = String(state.auctionFilterSearch || '').trim();
+      const columnSearch = String(filters.name || '').trim();
+      for (const query of [topSearch, columnSearch].filter(Boolean)) {
+        const matched = typeof playerSearchRank === 'function'
+          ? playerSearchRank(player, query, mode) !== null
+          : String(player?.name || '').toLowerCase().includes(query.toLowerCase());
+        if (!matched) return false;
+      }
+
+      if (filters.badge && !auctionFreeSignalMatches(player, filters.badge)) return false;
+      if (filters.favorite === 'on' && !auctionFreeFavorite(player)) return false;
+      if (filters.favorite === 'off' && auctionFreeFavorite(player)) return false;
+
+      return Object.keys(AUCTION_FREE_NUMERIC).every(key => {
+        const r = state.auctionColumnRanges?.[key];
+        if (!r) return true;
+        const value = auctionFreeNumericValue(player, key);
+        return Number.isFinite(value) && value >= r.lo - 1e-9 && value <= r.hi + 1e-9;
+      });
+    }
+
+    function auctionFreeSortValue(player, key, mode) {
+      if (key === 'role') return auctionFreeRoleRank(player, mode);
+      if (key === 'name') return player?.name || '';
+      if (key === 'badge') return auctionFreeSignalSort(player);
+      if (key === 'favorite') return auctionFreeFavorite(player) ? 1 : 0;
+      if (AUCTION_FREE_NUMERIC[key]) return auctionFreeNumericValue(player, key);
+      return player?.name || '';
+    }
+
+    function auctionFreePlayers(mode) {
+      const rows = (state.auction?.callCandidates || []).filter(player => auctionFreeMatches(player, mode));
+      const key = state.auctionSort?.key || 'name';
+      const direction = state.auctionSort?.direction === 'desc' ? -1 : 1;
+      return rows.sort((a, b) => {
+        const av = auctionFreeSortValue(a, key, mode);
+        const bv = auctionFreeSortValue(b, key, mode);
+        let compare;
+        if (typeof av === 'number' && typeof bv === 'number') {
+          compare = (Number.isFinite(av) ? av : -Infinity) - (Number.isFinite(bv) ? bv : -Infinity);
+        } else {
+          compare = String(av ?? '').localeCompare(String(bv ?? ''), 'it', { sensitivity: 'base' });
+        }
+        if (!compare) compare = String(a?.name || '').localeCompare(String(b?.name || ''), 'it', { sensitivity: 'base' });
+        return compare * direction;
+      });
+    }
+
+    function paintAuctionFreeEconomicRows(root, players) {
+      if (!root) return;
+      const username = String(state.dashboard?.currentUser?.username || state.session?.user?.username || '').toLowerCase();
+      const enabled = document.body.classList.contains('v10-index-owner') || username === 'emanuelesordo';
+      const byId = new Map(players.map(player => [String(player.id), player]));
+      root.querySelectorAll('tr[data-player-id]').forEach(row => {
+        row.classList.remove('v22-market-value-row', 'auction-market-value-row');
+        row.style.removeProperty('--v22-hue');
+        row.style.removeProperty('--v22-alpha');
+        row.style.removeProperty('--auction-market-hue');
+        row.style.removeProperty('--auction-market-alpha');
+        if (!enabled) return;
+        const player = byId.get(String(row.dataset.playerId));
+        if (!player) return;
+        const index = auctionFreeIndex(player);
+        const pfc = auctionFreeFinite(player?.pfc);
+        const pma = auctionFreeFinite(player?.pma);
+        const values = [pfc, pma].filter(value => value !== null && value > 0);
+        if (!(index > 0) || !values.length) return;
+        const allAbove = values.every(value => value > index);
+        const allBelow = values.every(value => value < index);
+        const hue = allAbove ? 2 : allBelow ? 132 : 48;
+        const distance = values.reduce((sum, value) => sum + Math.abs(value - index), 0)
+          / values.length / Math.max(1, index);
+        const alpha = .05 + .09 * Math.max(0, Math.min(1, distance));
+        row.classList.add('auction-market-value-row');
+        row.style.setProperty('--auction-market-hue', String(hue));
+        row.style.setProperty('--auction-market-alpha', alpha.toFixed(3));
+        row.title = `Indice ${Math.round(index)} cr · PFC ${pfc ?? '—'} · PMA ${pma ?? '—'} · ${allAbove ? 'prezzi sopra Indice' : allBelow ? 'prezzi sotto Indice' : 'prezzi discordanti'}`;
+      });
+    }
+
+    async function toggleAuctionFreeFavorite(player, button) {
+      if (!player || !button) return;
+      button.disabled = true;
+      try {
+        const sourcePlayerId = player.source_player_id || player.id;
+        const response = await api(
+          ENDPOINTS.v6y,
+          { action: 'toggleFavorite', sourcePlayerId },
+          { quiet: true }
+        );
+        if (response?.preference) {
+          state.v7Preferences = state.v7Preferences || new Map();
+          state.v7Preferences.set(
+            String(response.preference.source_player_id || sourcePlayerId),
+            response.preference
+          );
+        }
+        renderAuctionPlayers();
+      } catch (error) {
+        msg(error.message || 'Errore aggiornamento preferito.', 'error');
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    function auctionFreeSortButton(key, label, title = '') {
+      const active = state.auctionSort?.key === key;
+      const arrow = active ? (state.auctionSort.direction === 'desc' ? '↓' : '↑') : '↕';
+      return `<button type="button" data-auction-sort="${key}" ${title ? `title="${esc(title)}"` : ''}>${label} <span>${arrow}</span></button>`;
+    }
+
+'''
+
+          marker = '    function renderAuctionFixedFreeAgents(hasPlayer, callerControlsHtml = \'\') {'
+          if marker not in text:
+              raise RuntimeError('renderAuctionFixedFreeAgents marker not found')
+          text = text.replace(marker, helpers + marker, 1)
+
+          new_fixed = r'''    function renderAuctionFixedFreeAgents(hasPlayer, callerControlsHtml = '') {
+      const hasCallerControls = Boolean(String(callerControlsHtml || '').trim());
+      const statusCardHtml = renderAuctionPresidentStatusBanner();
+      const hasStatusCard = Boolean(String(statusCardHtml || '').trim());
+      auctionFreeEnsureRanges(state.auction?.callCandidates || []);
+      const filters = state.auctionColumnFilters || {};
+
+      return `
+        <aside class="auction-free-fixed ${hasCallerControls ? 'has-caller-controls' : 'no-caller-controls'} ${hasStatusCard ? 'has-status-card' : 'no-status-card'}">
+          ${statusCardHtml}
+          ${callerControlsHtml}
+
+          <div class="auction-free-role-row">
+            <div id="auction-rolebar" class="rolebar"></div>
+          </div>
+
+          <div class="drawer-table auction-free-table-wrap">
+            <table class="player-table auction-free-table">
+              <colgroup>
+                <col class="auction-col-role"><col class="auction-col-name"><col class="auction-col-badge">
+                <col class="auction-col-presence"><col class="auction-col-pfc"><col class="auction-col-pma">
+                <col class="auction-col-delta"><col class="auction-col-fm"><col class="auction-col-index">
+                <col class="auction-col-favorite"><col class="auction-col-action">
+              </colgroup>
+              <thead>
+                <tr class="auction-free-head-row">
+                  <th class="auction-player-col-role">${auctionFreeSortButton('role', 'Ruolo', 'Ordina per ruolo')}</th>
+                  <th class="auction-player-col-name">${auctionFreeSortButton('name', 'Calciatore')}</th>
+                  <th class="auction-player-col-signals">${auctionFreeSortButton('badge', 'Badge')}</th>
+                  <th class="num-head auction-player-col-presence">${auctionFreeSortButton('presence', '%Tit')}</th>
+                  <th class="num-head auction-player-col-pfc">${auctionFreeSortButton('pfc', 'PFC')}</th>
+                  <th class="num-head auction-player-col-pma">${auctionFreeSortButton('pma', 'PMA')}</th>
+                  <th class="num-head auction-player-col-delta">${auctionFreeSortButton('delta', 'Delta')}</th>
+                  <th class="num-head auction-player-col-fm">${auctionFreeSortButton('fm', 'FM')}</th>
+                  <th class="num-head auction-player-col-supreme">${auctionFreeSortButton('index', 'Indice')}</th>
+                  <th class="auction-player-col-favorite">${auctionFreeSortButton('favorite', '♥', 'Ordina per preferiti')}</th>
+                  <th class="queue-head auction-player-col-action">AZIONE</th>
+                </tr>
+                <tr class="auction-free-filter-row">
+                  <th><span class="auction-role-filter-note">ruoli sopra</span></th>
+                  <th><input type="search" data-auction-filter="name" value="${esc(filters.name || '')}" placeholder="nome simile…" autocomplete="off"></th>
+                  <th>
+                    <select data-auction-filter="badge">
+                      <option value="">tutti</option>
+                      <option value="market" ${filters.badge === 'market' ? 'selected' : ''}>mercato</option>
+                      <option value="injury" ${filters.badge === 'injury' ? 'selected' : ''}>indisp.</option>
+                      <option value="new" ${filters.badge === 'new' ? 'selected' : ''}>nuovo</option>
+                      <option value="penalties" ${filters.badge === 'penalties' ? 'selected' : ''}>rigori</option>
+                      <option value="free_kicks" ${filters.badge === 'free_kicks' ? 'selected' : ''}>piazzati</option>
+                    </select>
+                  </th>
+                  <th>${auctionFreeRangeControl('presence')}</th>
+                  <th>${auctionFreeRangeControl('pfc')}</th>
+                  <th>${auctionFreeRangeControl('pma')}</th>
+                  <th>${auctionFreeRangeControl('delta')}</th>
+                  <th>${auctionFreeRangeControl('fm')}</th>
+                  <th>${auctionFreeRangeControl('index')}</th>
+                  <th>
+                    <select data-auction-filter="favorite" aria-label="Preferiti">
+                      <option value="" ${!filters.favorite ? 'selected' : ''}>tutti</option>
+                      <option value="on" ${filters.favorite === 'on' ? 'selected' : ''}>♥</option>
+                      <option value="off" ${filters.favorite === 'off' ? 'selected' : ''}>♡</option>
+                    </select>
+                  </th>
+                  <th aria-hidden="true"></th>
+                </tr>
+              </thead>
+              <tbody id="auction-player-body"></tbody>
+            </table>
+          </div>
+
+          <div class="auction-free-suggestions">
+            ${renderAuctionSuggestedCalls()}
+          </div>
+        </aside>
+      `;
+    }
+
+
+'''
+          text = replace_between(
+              text,
+              "    function renderAuctionFixedFreeAgents(hasPlayer, callerControlsHtml = '') {",
+              '    function auctionTimeLabel(value) {',
+              new_fixed,
+              'renderAuctionFixedFreeAgents',
+          )
+
+          new_row = r'''    function auctionPlayerRow(player, mode) {
+      const roles = playerRoles(player, mode);
+      const queuedIndex = auctionQueueRows().findIndex(item => item.player_id === player.id);
+      const showQueue = auctionCallMode() && auctionHasPresidentRole();
+      const queueCapacity = auctionQueueCapacityForPlayer(player);
+      const rolePhaseAllowed = auctionPlayerMatchesCurrentRolePhase(player);
+      const queueAllowed = queueCapacity.allowed && rolePhaseAllowed;
+      const queueBlockedMessage = !rolePhaseAllowed
+        ? `Giocatore fuori dalla fase ${auctionRolePhaseLabel(state.auction?.rolePhase?.key)}: puoi consultarlo, ma non accodarlo o chiamarlo.`
+        : queueCapacity.message;
+      const queueBackupHint = queueCapacity.backup ? ` Verrà inserito come backup: ${queueCapacity.message}` : '';
+      const queueIsEmpty = auctionQueueRows().length === 0;
+      const queueActionLabel = queueIsEmpty ? 'CHIAMA' : 'CODA';
+      const queueAction = queuedIndex >= 0 && auctionHasPresidentRole()
+        ? `<span class="auction-queue-added" title="Già in coda">#${queuedIndex + 1}</span>`
+        : `<button type="button" class="auction-queue-add ${queueIsEmpty ? 'call-now' : ''}" data-queue-add="${esc(player.id)}" ${auctionCanManageCallQueue() && queueAllowed ? '' : 'disabled'} title="${!queueAllowed ? esc(queueBlockedMessage) : auctionHasPresidentRole() ? (queueIsEmpty ? `Inserisci come prima chiamata: verrà elaborato automaticamente dalla coda.${queueBackupHint}` : `Aggiungi subito alla coda.${queueBackupHint}`) : 'Solo il Presidente può usare la coda'}">${queueActionLabel}</button>`;
+      const delta = auctionFreeDelta(player);
+      const favorite = auctionFreeFavorite(player);
+
+      return `
+        <tr data-player-id="${esc(player.id)}" class="${player.id === state.auctionSelectedPlayerId ? 'selected-player' : ''} ${rolePhaseAllowed ? '' : 'outside-role-phase'}">
+          <td class="player-role-cell auction-player-col-role" data-auction-column="role">
+            ${roles.map(role => `<span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>`).join('')}
+          </td>
+          <td class="auction-player-col-name" data-auction-column="name">
+            <div class="player-main">
+              <span class="auction-player-name-line">
+                <span class="player-name">${esc(player.name)}</span>
+                ${auctionHasViceRole() ? renderAuctionViceInterestEditor(player.id, { compact: true }) : (queuedIndex < 0 ? renderAuctionViceInterestReadout(player.id, { compact: true }) : '')}
+              </span>
+              <small class="auction-player-team-small">${esc(player.serie_a_team || '—')}</small>
+            </div>
+          </td>
+          <td class="auction-signal-cell auction-player-col-signals" data-auction-column="signals">${auctionPlayerSignalBadges(player)}</td>
+          <td class="num auction-player-col-presence" data-auction-column="presence">${Math.round(auctionFreePresence(player))}%</td>
+          <td class="num auction-player-col-pfc" data-auction-column="pfc"><strong>${formatAuctionPrice(player.pfc)}</strong></td>
+          <td class="num auction-player-col-pma" data-auction-column="pma">${formatAuctionPrice(player.pma)}</td>
+          <td class="num auction-player-col-delta ${delta > 0 ? 'positive' : delta < 0 ? 'negative' : ''}" data-auction-column="delta">${delta === null ? '—' : `${delta > 0 ? '+' : ''}${auctionFreeFormatRange(delta, 1)}`}</td>
+          <td class="num auction-player-col-fm" data-auction-column="fm" title="Fanta media attesa">${formatNumber(auctionFreeFantasyAverage(player))}</td>
+          <td class="num auction-player-col-supreme strategic-index-value" data-auction-column="supreme" data-supreme-metric-player="${esc(player.id)}" title="${esc(strategicIndexTitle(player))}">${auctionFreeIndex(player)}</td>
+          <td class="auction-player-col-favorite" data-auction-column="favorite">
+            <button type="button" class="auction-heart ${favorite ? 'active' : ''}" data-auction-favorite="${esc(player.id)}" aria-pressed="${favorite ? 'true' : 'false'}" title="${favorite ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}">${favorite ? '♥' : '♡'}</button>
+          </td>
+          <td class="queue-cell auction-player-col-action" data-auction-column="action">${showQueue ? queueAction : '<span class="auction-action-empty">—</span>'}</td>
+        </tr>
+      `;
+    }
+
+
+'''
+          text = replace_between(
+              text,
+              '    function auctionPlayerRow(\n      player,\n      mode\n    ) {',
+              '    function renderAuctionPlayers() {',
+              new_row,
+              'auctionPlayerRow',
+          )
+
+          new_render_players = r'''    function renderAuctionPlayers() {
+      const body = $('auction-player-body');
+      if (!body) return;
+      const data = state.auction || {};
+      const mode = data.settings?.fantasy_mode || 'classic';
+      auctionFreeEnsureRanges(data.callCandidates || []);
+      const players = auctionFreePlayers(mode);
+
+      updateAuctionSortIndicators();
+      body.innerHTML = players.map(player => auctionPlayerRow(player, mode)).join('')
+        || `<tr><td colspan="11" class="soft" style="text-align:center;height:70px">Nessun giocatore.</td></tr>`;
+
+      body.querySelectorAll('[data-queue-add]').forEach(button => {
+        button.addEventListener('click', event => {
+          event.stopPropagation();
+          addPlayerToAuctionQueue(
+            button.dataset.queueAdd,
+            Math.max(1, Number(state.auctionOpeningBid || 1))
+          );
+        });
+      });
+
+      body.querySelectorAll('[data-auction-favorite]').forEach(button => {
+        button.addEventListener('click', event => {
+          event.preventDefault();
+          event.stopPropagation();
+          const player = (data.callCandidates || []).find(item => item.id === button.dataset.auctionFavorite);
+          if (player) void toggleAuctionFreeFavorite(player, button);
+        });
+      });
+
+      body.querySelectorAll('[data-player-id]').forEach(row => {
+        row.addEventListener('click', event => {
+          if (event.target.closest('[data-queue-add], [data-auction-favorite], .auction-vice-interest-editor')) return;
+          const player = (data.callCandidates || []).find(item => item.id === row.dataset.playerId);
+          if (!player) return;
+          if (!auctionPlayerMatchesCurrentRolePhase(player)) {
+            return msg(
+              `Durante la fase ${auctionRolePhaseLabel(state.auction?.rolePhase?.key)} puoi consultare questo giocatore, ma non inserirlo in coda.`,
+              'warning'
+            );
+          }
+          state.auctionSelectedPlayerId = player.id;
+          state.auctionFilterSearch = '';
+          state.auctionOpeningBid = 1;
+          const topSearch = $('auction-top-search');
+          if (topSearch) topSearch.value = player.name;
+          const base = $('auction-top-base');
+          if (base) base.value = '1';
+          renderAuctionPlayers();
+          patchAuctionTopSelection();
+        });
+      });
+
+      bindAuctionViceInterestControls(body);
+      paintAuctionFreeEconomicRows(body, players);
+    }
+
+
+'''
+          text = replace_between(
+              text,
+              '    function renderAuctionPlayers() {',
+              '    function auctionBidDefault() {',
+              new_render_players,
+              'renderAuctionPlayers',
+          )
+
+          new_drawer_controls = r'''    function renderAuctionDrawerControls() {
+      const players = state.auction?.callCandidates || [];
+      const mode = state.auction?.settings?.fantasy_mode || 'classic';
+      auctionFreeEnsureRanges(players);
+
+      renderRoleBar(
+        $('auction-rolebar'),
+        state.auctionRoles,
+        mode,
+        next => {
+          state.auctionRoles = next;
+          renderAuctionPlayers();
+        }
+      );
+
+      const fixed = document.querySelector('#view-auction .auction-free-fixed');
+      if (!fixed) return;
+
+      fixed.addEventListener('click', event => {
+        const sortButton = event.target.closest('[data-auction-sort]');
+        if (sortButton) {
+          event.preventDefault();
+          event.stopPropagation();
+          const key = sortButton.dataset.auctionSort;
+          state.auctionSort = state.auctionSort?.key === key
+            ? { key, direction: state.auctionSort.direction === 'asc' ? 'desc' : 'asc' }
+            : { key, direction: 'asc' };
+          renderAuctionPlayers();
+          updateAuctionSortIndicators();
+          return;
+        }
+
+        const toggle = event.target.closest('[data-auction-range-toggle]');
+        if (toggle) {
+          event.preventDefault();
+          event.stopPropagation();
+          const key = toggle.dataset.auctionRangeToggle;
+          const popover = fixed.querySelector(`[data-auction-range-popover="${key}"]`);
+          const open = popover?.hidden !== false;
+          closeAuctionFreeRanges(open ? key : '');
+          if (popover) popover.hidden = !open;
+          toggle.closest('[data-auction-range-box]')?.classList.toggle('open', open);
+          if (open) updateAuctionFreeRangeVisual(key);
+          return;
+        }
+
+        const reset = event.target.closest('[data-auction-range-reset]');
+        if (reset) {
+          event.preventDefault();
+          event.stopPropagation();
+          const key = reset.dataset.auctionRangeReset;
+          const range = state.auctionColumnRanges?.[key];
+          if (!range) return;
+          range.lo = range.min;
+          range.hi = range.max;
+          fixed.querySelectorAll(`[data-auction-range="${key}"]`).forEach(input => {
+            input.value = input.dataset.bound === 'lo' ? range.lo : range.hi;
+          });
+          updateAuctionFreeRangeVisual(key);
+          renderAuctionPlayers();
+          return;
+        }
+
+        if (!event.target.closest('[data-auction-range-box]')) closeAuctionFreeRanges('');
+      });
+
+      fixed.addEventListener('input', event => {
+        const rangeInput = event.target.closest('[data-auction-range]');
+        if (rangeInput) {
+          event.stopPropagation();
+          const key = rangeInput.dataset.auctionRange;
+          const bound = rangeInput.dataset.bound;
+          const range = state.auctionColumnRanges?.[key];
+          if (!range) return;
+          const value = Number(rangeInput.value);
+          if (bound === 'lo') {
+            range.lo = Math.min(value, range.hi);
+            rangeInput.value = range.lo;
+          } else {
+            range.hi = Math.max(value, range.lo);
+            rangeInput.value = range.hi;
+          }
+          updateAuctionFreeRangeVisual(key);
+          renderAuctionPlayers();
+          return;
+        }
+
+        const filter = event.target.closest('[data-auction-filter]');
+        if (filter && filter.tagName !== 'SELECT') {
+          state.auctionColumnFilters = state.auctionColumnFilters || {};
+          state.auctionColumnFilters[filter.dataset.auctionFilter] = filter.value;
+          renderAuctionPlayers();
+        }
+      });
+
+      fixed.addEventListener('change', event => {
+        const filter = event.target.closest('[data-auction-filter]');
+        if (!filter) return;
+        state.auctionColumnFilters = state.auctionColumnFilters || {};
+        state.auctionColumnFilters[filter.dataset.auctionFilter] = filter.value;
+        renderAuctionPlayers();
+      });
+
+      requestAnimationFrame(() => Object.keys(AUCTION_FREE_NUMERIC).forEach(updateAuctionFreeRangeVisual));
+      updateAuctionSortIndicators();
+    }
+
+
+'''
+          text = replace_between(
+              text,
+              '    function renderAuctionDrawerControls() {',
+              '    function updateAuctionSortIndicators() {',
+              new_drawer_controls,
+              'renderAuctionDrawerControls',
+          )
+
+          # CHIAMA becomes a native third cell in the caller row.
+          caller_start = text.find('      const callerControlsHtml = `')
+          caller_end = text.find('      const playerHeroHtml =', caller_start)
+          if caller_start < 0 or caller_end < 0:
+              raise RuntimeError('callerControlsHtml markers not found')
+          caller = r'''      const callerControlsHtml = `
+        <section class="auction-caller-controls">
+          <label class="auction-command-search">
+            <span class="auction-command-label">Ricerca giocatore</span>
+            <input id="auction-top-search" type="search" placeholder="Nome o squadra..." autocomplete="off" value="${esc(selectedCall?.name || state.auctionFilterSearch)}">
+          </label>
+          <label class="auction-command-base">
+            <span class="auction-command-label">Base</span>
+            <input id="auction-top-base" type="number" min="1" step="1" value="${Math.max(1, Number(state.auctionOpeningBid || 1))}">
+          </label>
+          <button id="auction-call-confirm" class="auction-top-call good" type="button" ${!selectedCall || !canCall ? 'disabled' : ''}>CHIAMA</button>
+        </section>
+      `;
+
+
+'''
+          text = text[:caller_start] + caller + text[caller_end:]
+
+          # Keep the native top button state synchronized after row selection.
+          patch_marker = '''      if (
+        base
+        &&
+        document.activeElement
+        !== base
+      ) {
+        base.value =
+          String(
+            Math.max(
+              1,
+              Number(
+                state.auctionOpeningBid
+                ||
+                1
+              )
+            )
+          );
+      }
+'''
+          patch_insert = patch_marker + '''
+      const callButton = $('auction-call-confirm');
+      if (callButton) {
+        const session = auctionSession();
+        callButton.disabled = !(
+          selected
+          && session?.status === 'live'
+          && !session.current_player_id
+          && session.prestart_hold !== true
+          && auctionHasPresidentRole()
+          && auctionOwnCallTurn()
+        );
+      }
+'''
+          if patch_marker not in text:
+              raise RuntimeError('patchAuctionTopSelection insertion marker not found')
+          text = text.replace(patch_marker, patch_insert, 1)
+
+          # -----------------------------------------------------------------
+          # 5. Canonical CSS for the unified auction table.
+          # -----------------------------------------------------------------
+          unified_css = r'''
+  <style id="auction-free-table-consolidated-style">
+    #view-auction .auction-caller-controls{
+      display:grid!important;
+      grid-template-columns:minmax(0,1fr) minmax(58px,76px) minmax(70px,88px)!important;
+      gap:4px!important;
+      align-items:end!important;
+      width:100%!important;
+      min-width:0!important;
+    }
+    #view-auction .auction-caller-controls .auction-top-call{
+      width:100%!important;height:32px!important;min-height:32px!important;margin:0!important;padding:2px 6px!important;
+      background:var(--good)!important;font-size:8.5px!important;
+    }
+    #view-auction .auction-free-fixed{
+      width:100%!important;min-width:0!important;max-width:100%!important;
+      grid-template-rows:auto auto minmax(0,1fr) auto!important;
+    }
+    #view-auction .auction-free-role-row{min-width:0!important;overflow:hidden!important}
+    #view-auction .auction-free-fixed .drawer-table,
+    #view-auction .auction-free-table-wrap{position:relative!important;width:100%!important;min-width:0!important;max-width:100%!important;overflow:auto!important;isolation:isolate!important}
+    #view-auction .auction-free-fixed .player-table,
+    #view-auction .auction-free-table{width:100%!important;min-width:0!important;max-width:100%!important;table-layout:fixed!important;border-collapse:separate!important;border-spacing:0!important}
+    #view-auction .auction-free-table col.auction-col-role{width:7%}
+    #view-auction .auction-free-table col.auction-col-name{width:22%}
+    #view-auction .auction-free-table col.auction-col-badge{width:10%}
+    #view-auction .auction-free-table col.auction-col-presence,
+    #view-auction .auction-free-table col.auction-col-pfc,
+    #view-auction .auction-free-table col.auction-col-pma,
+    #view-auction .auction-free-table col.auction-col-delta,
+    #view-auction .auction-free-table col.auction-col-fm,
+    #view-auction .auction-free-table col.auction-col-index{width:7%}
+    #view-auction .auction-free-table col.auction-col-favorite{width:5%}
+    #view-auction .auction-free-table col.auction-col-action{width:14%}
+    #view-auction .auction-free-table th,#view-auction .auction-free-table td{box-sizing:border-box!important;min-width:0!important;max-width:none!important;overflow:hidden!important}
+    #view-auction .auction-free-table thead{position:relative!important;z-index:40!important}
+    #view-auction .auction-free-head-row th{position:sticky!important;top:0!important;z-index:42!important;height:30px!important;padding:2px 3px!important;background:#0d2b46!important;border-bottom:1px solid rgba(91,151,216,.38)!important}
+    #view-auction .auction-free-filter-row th{position:sticky!important;top:30px!important;z-index:41!important;height:30px!important;padding:2px 3px!important;background:#0a253e!important;border-bottom:1px solid rgba(91,151,216,.38)!important;overflow:visible!important}
+    #view-auction .auction-free-head-row [data-auction-sort]{width:100%!important;height:24px!important;min-height:24px!important;padding:1px 2px!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:var(--soft)!important;font-size:6.5px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:2px!important;white-space:nowrap!important}
+    #view-auction .auction-free-head-row .auction-player-col-name [data-auction-sort]{justify-content:flex-start!important;text-align:left!important}
+    #view-auction .auction-free-filter-row input,
+    #view-auction .auction-free-filter-row select,
+    #view-auction .auction-range-toggle{width:100%!important;min-width:0!important;height:23px!important;min-height:23px!important;margin:0!important;padding:1px 3px!important;border-radius:5px!important;border:1px solid rgba(91,151,216,.28)!important;background:rgba(5,22,38,.96)!important;color:var(--text)!important;font-size:6.8px!important;text-overflow:ellipsis!important}
+    #view-auction .auction-free-filter-row input[type=search]{text-align:left!important}
+    #view-auction .auction-role-filter-note{display:block!important;text-align:center!important;color:var(--muted)!important;font-size:5.4px!important;white-space:nowrap!important}
+    #view-auction .auction-range{position:relative!important;min-width:0!important}
+    #view-auction .auction-range-toggle{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:2px!important;white-space:nowrap!important}
+    #view-auction .auction-range-toggle i{font-style:normal!important;color:var(--soft)!important;transition:transform .15s ease!important}
+    #view-auction .auction-range.open .auction-range-toggle i{transform:rotate(180deg)!important}
+    #view-auction .auction-range-popover{position:absolute!important;top:25px!important;left:50%!important;transform:translateX(-50%)!important;width:190px!important;padding:8px!important;border:1px solid rgba(104,164,225,.48)!important;border-radius:8px!important;background:#081f35!important;box-shadow:0 12px 32px rgba(0,0,0,.48)!important;z-index:120!important}
+    #view-auction .auction-free-filter-row th:nth-child(n+8) .auction-range-popover{left:auto!important;right:0!important;transform:none!important}
+    #view-auction .auction-range-values{display:grid!important;grid-template-columns:48px 1fr 48px!important;gap:4px!important;align-items:center!important;margin-bottom:7px!important;font-size:8px!important}
+    #view-auction .auction-range-values b:last-child{text-align:right!important}
+    #view-auction .auction-range-values span{text-align:center!important;color:var(--soft)!important;font-size:6px!important;text-transform:uppercase!important}
+    #view-auction .auction-dual-range{position:relative!important;height:24px!important;margin:0 7px!important}
+    #view-auction .auction-range-base,#view-auction .auction-range-fill{position:absolute!important;left:0!important;right:0!important;top:11px!important;height:3px!important;border-radius:99px!important;background:rgba(255,255,255,.14)!important}
+    #view-auction .auction-range-fill{right:auto!important;background:#4f9bea!important}
+    #view-auction .auction-dual-range input[type=range]{position:absolute!important;left:0!important;top:3px!important;width:100%!important;height:18px!important;min-height:18px!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;pointer-events:none!important;-webkit-appearance:none!important;appearance:none!important}
+    #view-auction .auction-dual-range input[type=range]::-webkit-slider-runnable-track{height:3px!important;background:transparent!important}
+    #view-auction .auction-dual-range input[type=range]::-webkit-slider-thumb{-webkit-appearance:none!important;width:14px!important;height:14px!important;margin-top:-5px!important;border-radius:50%!important;border:2px solid #9ed0ff!important;background:#1765ad!important;pointer-events:auto!important;cursor:ew-resize!important}
+    #view-auction .auction-dual-range input[type=range]::-moz-range-track{height:3px!important;background:transparent!important}
+    #view-auction .auction-dual-range input[type=range]::-moz-range-thumb{width:12px!important;height:12px!important;border-radius:50%!important;border:2px solid #9ed0ff!important;background:#1765ad!important;pointer-events:auto!important;cursor:ew-resize!important}
+    #view-auction .auction-range-ends{display:grid!important;grid-template-columns:1fr auto 1fr!important;align-items:center!important;gap:4px!important;font-size:6px!important;color:var(--soft)!important}
+    #view-auction .auction-range-ends small:last-child{text-align:right!important}
+    #view-auction .auction-range-ends button{height:18px!important;min-height:18px!important;padding:1px 4px!important;font-size:6px!important}
+    #view-auction .auction-free-table tbody td{height:34px!important;padding:3px 4px!important;white-space:nowrap!important;font-size:8.5px!important;vertical-align:middle!important}
+    #view-auction .auction-free-table tbody td.num{text-align:right!important;font-variant-numeric:tabular-nums!important;font-size:9.2px!important}
+    #view-auction .auction-free-table .auction-player-col-name{text-align:left!important}
+    #view-auction .auction-free-table .auction-player-col-name .player-main{min-width:0!important;width:100%!important}
+    #view-auction .auction-free-table .auction-player-col-name .player-name{display:block!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+    #view-auction .auction-free-table .auction-player-col-signals,#view-auction .auction-free-table .auction-player-col-favorite,#view-auction .auction-free-table .auction-player-col-action{text-align:center!important}
+    #view-auction .auction-heart{width:25px!important;min-width:25px!important;height:24px!important;min-height:24px!important;padding:0!important;border-radius:50%!important;border:1px solid rgba(111,171,224,.28)!important;background:rgba(8,31,54,.5)!important;color:#7994ae!important;font-size:16px!important;line-height:1!important}
+    #view-auction .auction-heart.active{color:#ff688c!important;border-color:#ff688c!important;background:rgba(100,24,50,.28)!important}
+    #view-auction .auction-action-empty{color:var(--muted)!important}
+    body.v10-index-owner #view-auction tr.auction-market-value-row{background:linear-gradient(90deg,hsl(var(--auction-market-hue) 70% 46% / var(--auction-market-alpha)),transparent 82%)!important;box-shadow:inset 3px 0 0 hsl(var(--auction-market-hue) 78% 50% / .78)!important}
+  </style>
+'''
+          if '<style id="auction-free-table-consolidated-style">' not in text:
+              text = text.replace('</head>', unified_css + '\n</head>', 1)
+
+          # -----------------------------------------------------------------
+          # 6. Device-profile runtime stays for admin/profile persistence only;
+          #    it must not cover the newer Full/Compact mobile surface.
+          # -----------------------------------------------------------------
+          dev_start = text.find('<script id="v23-device-profiles-runtime">')
+          dev_end = text.find('</script>', dev_start)
+          if dev_start < 0 or dev_end < 0:
+              raise RuntimeError('v23 device profile runtime not found')
+          dev_end += len('</script>')
+          dev = text[dev_start:dev_end]
+          dev, dev_count = re.subn(
+              r"  function applyMobileMode23\(\)\{.*?\n  \}",
+              '''  function applyMobileMode23(){
+    const active=mobile23()&&state.view==='auction'&&session23()?.status==='live'&&president23();
+    document.body.classList.remove('v23-mobile-auction-active','v23-mobile-smartphone-only','v23-mobile-pc-phone');
+    document.body.classList.toggle('v23-device-smartphone-only',active&&state.v23DeviceProfile==='smartphone_only');
+    document.body.classList.toggle('v23-device-pc-phone',active&&state.v23DeviceProfile==='pc_plus_phone');
+    const legacy=document.getElementById('v23-mobile-auction');if(legacy)legacy.hidden=true;
+  }''',
+              dev,
+              count=1,
+              flags=re.S,
+          )
+          if dev_count != 1:
+              raise RuntimeError(f'applyMobileMode23 replacement count={dev_count}')
+          text = text[:dev_start] + dev + text[dev_end:]
+
+          # -----------------------------------------------------------------
+          # 7. Full/Compact selector belongs to the real app header. The mobile
+          #    auction surface starts below it instead of covering it.
+          # -----------------------------------------------------------------
+          mob_start = text.find('<script id="v23-mobile-auction-mode-runtime">')
+          mob_end = text.find('</script>', mob_start)
+          if mob_start < 0 or mob_end < 0:
+              raise RuntimeError('v23 mobile mode runtime not found')
+          mob_end += len('</script>')
+          mob = text[mob_start:mob_end]
+
+          shell_mode_markup = '''      <header class="v23-mobile-head">
+        <div class="v23-mobile-mode" role="group" aria-label="Modalità smartphone">
+          <button type="button" data-v23-mode="full">COMPLETA</button>
+          <button type="button" data-v23-mode="compact">RIDOTTA</button>
+        </div>
+        <div class="v23-mobile-credit">'''
+          shell_credit_markup = '''      <header class="v23-mobile-head">
+        <div class="v23-mobile-credit">'''
+          if shell_mode_markup not in mob:
+              raise RuntimeError('mobile shell mode markup not found')
+          mob = mob.replace(shell_mode_markup, shell_credit_markup, 1)
+
+          ensure_header = r'''  function ensureHeaderMode(){
+    let box=qs('.v23-header-mode');
+    if(box)return box;
+    const host=qs('.app-head .head-actions')||qs('.head-actions');
+    if(!host)return null;
+    box=document.createElement('div');
+    box.className='v23-header-mode';
+    box.hidden=true;
+    box.setAttribute('role','group');
+    box.setAttribute('aria-label','Modalità smartphone asta live');
+    box.innerHTML='<button type="button" data-v23-mode="full">COMPLETA</button><button type="button" data-v23-mode="compact">RIDOTTA</button>';
+    box.addEventListener('click',event=>{const button=event.target.closest('[data-v23-mode]');if(button)setMode(button.dataset.v23Mode);});
+    host.prepend(box);
+    return box;
+  }
+
+'''
+          ensure_shell_marker = '  function ensureShell(){'
+          if ensure_shell_marker not in mob:
+              raise RuntimeError('ensureShell marker not found')
+          mob = mob.replace(ensure_shell_marker, ensure_header + ensure_shell_marker, 1)
+
+          mob = mob.replace(
+              '    const shell=ensureShell();ensureDrawerUi();\n    const active=isPhone()&&isLive();shell.hidden=!active;',
+              '    const shell=ensureShell();ensureDrawerUi();const headerMode=ensureHeaderMode();\n    const active=isPhone()&&isLive();shell.hidden=!active;if(headerMode)headerMode.hidden=!active;',
+              1,
+          )
+          mob = mob.replace(
+              "    qsa('[data-v23-mode]',shell).forEach(b=>b.classList.toggle('active',b.dataset.v23Mode===mode));",
+              "    qsa('[data-v23-mode]',headerMode||document).forEach(b=>b.classList.toggle('active',b.dataset.v23Mode===mode));",
+              1,
+          )
+          mob = mob.replace(
+              '    .v23-mobile-shell,.v23-mobile-drawer-ui{display:none}',
+              '    .v23-mobile-shell,.v23-mobile-drawer-ui,.v23-header-mode{display:none}',
+              1,
+          )
+          mob = mob.replace(
+              'body.v23-mobile-auction .v23-mobile-shell{display:grid!important;position:fixed!important;inset:0!important;z-index:1900!important;',
+              'body.v23-mobile-auction .v23-mobile-shell{display:grid!important;position:fixed!important;inset:calc(var(--header-h) + 8px) 0 0 0!important;z-index:1900!important;',
+              1,
+          )
+          mob = mob.replace(
+              '.v23-mobile-head{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:7px!important;align-items:center!important}',
+              '.v23-mobile-head{display:grid!important;grid-template-columns:1fr!important;gap:7px!important;align-items:center!important}',
+              1,
+          )
+
+          mobile_mode_css = r'''
+      body.v23-mobile-auction .app-head{position:fixed!important;top:4px!important;left:4px!important;right:4px!important;z-index:2050!important;height:var(--header-h)!important;min-height:var(--header-h)!important}
+      body.v23-mobile-auction .v23-header-mode{display:grid!important;grid-template-columns:1fr 1fr!important;gap:2px!important;min-width:116px!important;padding:2px!important;border:1px solid var(--line)!important;border-radius:8px!important;background:var(--panel2)!important}
+      body.v23-mobile-auction .v23-header-mode button{height:29px!important;min-height:29px!important;padding:2px 5px!important;background:transparent!important;border-color:transparent!important;color:var(--soft)!important;font-size:7.5px!important;white-space:nowrap!important}
+      body.v23-mobile-auction .v23-header-mode button.active{background:var(--primary)!important;color:#fff!important}
+'''
+          media_marker = '    @media(max-width:820px){\n      body.v23-mobile-auction{overflow:hidden!important}'
+          if media_marker not in mob:
+              raise RuntimeError('mobile CSS media marker not found')
+          mob = mob.replace(
+              media_marker,
+              '    @media(max-width:820px){\n      body.v23-mobile-auction{overflow:hidden!important}\n' + mobile_mode_css.rstrip('\n'),
+              1,
+          )
+          # Old shell-mode CSS is now inert, but remove it so there is one selector system.
+          mob = re.sub(
+              r'\n      \.v23-mobile-mode\{.*?\n      \.v23-mobile-credit\{',
+              '\n      .v23-mobile-credit{',
+              mob,
+              count=1,
+              flags=re.S,
+          )
+          text = text[:mob_start] + mob + text[mob_end:]
+
+          # -----------------------------------------------------------------
+          # Assertions: fail loudly rather than committing a partial patch.
+          # -----------------------------------------------------------------
+          required = [
+              'auction-free-table-consolidated-style',
+              'auction-free-filter-row',
+              "auctionFreeRangeControl('presence')",
+              "auctionFreeRangeControl('pfc')",
+              "auctionFreeRangeControl('pma')",
+              "auctionFreeRangeControl('delta')",
+              "auctionFreeRangeControl('fm')",
+              "auctionFreeRangeControl('index')",
+              'auction-player-col-favorite',
+              'data-auction-favorite',
+              'v23-header-mode',
+              'Ricerca giocatore',
+              'auction-top-call good',
+          ]
+          for token in required:
+              if token not in text:
+                  raise RuntimeError(f'missing required token: {token}')
+
+          forbidden = [
+              'v19-auction-list-controls-runtime',
+              'mountAuctionColumnFilters',
+              'mountTable22()',
+              'v22-filter-row',
+          ]
+          for token in forbidden:
+              if token in text:
+                  raise RuntimeError(f'legacy auction-table token still present: {token}')
+
+          if text == original:
+              raise RuntimeError('home.html was not changed')
+
+          path.write_text(text, encoding='utf-8')
+          print('home.html consolidated successfully')
+          PY
+
+      - name: Validate inline JavaScript and diff
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          text=Path('home.html').read_text(encoding='utf-8')
+          out=Path('/tmp/fanta-inline-scripts');out.mkdir(exist_ok=True)
+          scripts=re.findall(r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>',text,re.S|re.I)
+          for i,code in enumerate(scripts):
+              (out/f'{i:03d}.js').write_text(code,encoding='utf-8')
+          print(f'extracted {len(scripts)} inline scripts')
+          PY
+          for f in /tmp/fanta-inline-scripts/*.js; do node --check "$f"; done
+          git diff --check
+          grep -q 'auction-free-table-consolidated-style' home.html
+          grep -q 'v23-header-mode' home.html
+          ! grep -q 'v19-auction-list-controls-runtime' home.html
+          ! grep -q 'mountAuctionColumnFilters' home.html
+          ! grep -q 'mountTable22()' home.html
+
+      - name: Commit consolidation
+        shell: bash
+        run: |
+          if git diff --quiet -- home.html; then
+            echo 'No changes to commit'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add home.html
+          git commit -m 'fix: consolidate live auction free-agent table'
+          git push
