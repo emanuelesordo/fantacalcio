@@ -20799,8 +20799,8 @@ ${callerControlsHtml}
         <th class="queue-head auction-player-col-action">AZIONE</th>
       </tr>
       <tr class="auction-free-filter-row">
-        <th><span class="auction-role-filter-note">ruoli sopra</span></th>
-        <th><input type="search" data-auction-filter="name" value="${esc(filters.name || '')}" placeholder="nome simile…" autocomplete="off"></th>
+        <th><span class="auction-role-filter-note">ruoli</span></th>
+        <th><input type="search" data-auction-filter="name" value="${esc(filters.name || '')}" placeholder="cerca nome…" autocomplete="off"></th>
         <th>
           <select data-auction-filter="badge">
             <option value="">tutti</option>
@@ -34039,7 +34039,7 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
     const names=qsa('tbody td:nth-child(2) .player-name',table);
     let natural=0;
     names.forEach(node=>{natural=Math.max(natural,node.scrollWidth||0);});
-    const width=clamp(Math.ceil(natural+34),128,190);
+    const width=clamp(Math.ceil(natural+34),90,128);
     table.style.setProperty('--v25-name-width',`${width}px`);
   }
 
