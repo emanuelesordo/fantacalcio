@@ -34039,7 +34039,7 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
     const names=qsa('tbody td:nth-child(2) .player-name',table);
     let natural=0;
     names.forEach(node=>{natural=Math.max(natural,node.scrollWidth||0);});
-    const width=clamp(Math.ceil(natural+34),50,100);
+    const width=clamp(Math.ceil(natural+34),40,80);
     table.style.setProperty('--v25-name-width',`${width}px`);
   }
 
