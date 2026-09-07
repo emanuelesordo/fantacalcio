@@ -42,15 +42,11 @@ text = text[:patch_close] + call_state_block + text[patch_close:]
     if n != 1:
         raise RuntimeError(f'Unable to replace brittle top-call patch fragment: {n}')
 
-    mobile_structural = r"""mob, mode_markup_count = re.subn(
-    r'(<header class=\\"v23-mobile-head\\">\\s*)<div class=\\"v23-mobile-mode\\".*?</div>\\s*(<div class=\\"v23-mobile-credit\\">)',
-    lambda match: match.group(1) + match.group(2),
-    mob,
-    count=1,
-    flags=re.S,
-)
-if mode_markup_count != 1:
-    raise RuntimeError(f'mobile shell mode markup removal count={mode_markup_count}')
+    mobile_structural = r"""mode_start = mob.find('        <div class=\"v23-mobile-mode\"')
+mode_end = mob.find('        <div class=\"v23-mobile-credit\"', mode_start)
+if mode_start < 0 or mode_end < 0:
+    raise RuntimeError(f'mobile shell mode markers not found: start={mode_start}, end={mode_end}')
+mob = mob[:mode_start] + mob[mode_end:]
 """
     code, n = re.subn(
         r"shell_mode_markup = '''.*?mob = mob\.replace\(shell_mode_markup, shell_credit_markup, 1\)\n",
