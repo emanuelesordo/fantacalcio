@@ -1,0 +1,178 @@
+name: Apply V22 index pricing filters
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-v22-index-pricing-filters.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Append V22 runtime
+        run: |
+          cat > /tmp/v22.js <<'JS'
+          (()=>{
+            'use strict';
+            if(window.__FANTA_V22_INDEX_PRICING__)return;
+            window.__FANTA_V22_INDEX_PRICING__=1;
+
+            const clamp22=(v,a,b)=>Math.max(a,Math.min(b,v));
+            const num22=v=>Number.isFinite(Number(v))?Number(v):null;
+            const roleOrder22=['Por','B','Dd','Dc','Ds','E','M','C','T','W','A','Pc'];
+            const owner22=()=>String(state.dashboard?.currentUser?.username||'').toLowerCase()==='emanuelesordo';
+            const mode22=()=>typeof fantasyMode==='function'?fantasyMode():(state.auction?.settings?.fantasy_mode||'classic');
+            const roles22=p=>typeof playerRoles==='function'?playerRoles(p,mode22()):[];
+            const pref22=p=>state.v7Preferences?.get?.(String(p?.source_player_id||p?.id))||null;
+            const fav22=p=>pref22(p)?.is_favorite===true;
+            const index22=p=>Math.max(0,num22(typeof strategicValueIndex==='function'?strategicValueIndex(p):0)??0);
+            const presence22=p=>clamp22(num22(typeof strategicPresencePercent==='function'?strategicPresencePercent(p):p?.expected_titolarity)??0,0,100);
+            const fmv22=p=>Math.max(0,num22(typeof strategicExpectedFantasyAverage==='function'?strategicExpectedFantasyAverage(p):p?.expected_fantasy_avg)??0);
+            const delta22=p=>num22(p?.pfc_pma_delta)??((num22(p?.pfc)??0)-(num22(p?.pma)??0));
+            const allPlayers22=()=>state.auction?.callCandidates||[];
+
+            function rosterPlayers22(){
+              const info=typeof auctionMyTeamDashboardData==='function'?auctionMyTeamDashboardData():null;
+              const pool=[...(state.list?.players||[]),...(state.v9Center?.players||[]),...allPlayers22()];
+              const byId=new Map(pool.map(p=>[String(p.id),p]));
+              const bySource=new Map(pool.map(p=>[String(p.source_player_id||''),p]));
+              return (info?.assignments||[]).map(a=>a?.player||byId.get(String(a?.player_id||a?.id||''))||bySource.get(String(a?.source_player_id||''))||a).filter(Boolean);
+            }
+            function classicMacro22(p){return String(p?.classic_role||roles22(p)[0]||'').toUpperCase();}
+            function classicNeed22(p,roster){
+              let cfg={P:3,D:8,C:8,A:6};
+              try{const raw=state.auction?.settings?.roster_config||state.setup?.roster_config;const parsed=typeof parseRosterConfig==='function'?parseRosterConfig(raw):raw;cfg={...cfg,...(parsed?.classic||{})};}catch{}
+              const r=classicMacro22(p),need=Math.max(0,Number(cfg[r]||0)),have=roster.filter(x=>classicMacro22(x)===r).length;
+              return need>0?clamp22((need-have)/need,0,1):0;
+            }
+            function compatible22(p,slot){const rr=new Set(roles22(p));return slot.some(r=>rr.has(r));}
+            function matchingCoverage22(slots,players){
+              const match=Array(players.length).fill(-1);
+              function dfs(si,seen){
+                for(let pi=0;pi<players.length;pi++){
+                  if(seen.has(pi)||!compatible22(players[pi],slots[si]))continue;
+                  seen.add(pi);
+                  if(match[pi]<0||dfs(match[pi],seen)){match[pi]=si;return true;}
+                }
+                return false;
+              }
+              let covered=0;for(let si=0;si<slots.length;si++)if(dfs(si,new Set()))covered++;
+              return covered;
+            }
+            function mantraNeed22(p,roster){
+              if(typeof MODS!=='object'||!MODS)return{need:.5,gain:0};
+              const preferred=(state.v8Profile?.preferred_modules||[]).filter(x=>MODS[x]);
+              const ids=preferred.length?preferred:Object.keys(MODS);
+              let best={need:0,gain:0};
+              ids.forEach(id=>{const slots=MODS[id]||[],before=matchingCoverage22(slots,roster),after=matchingCoverage22(slots,[...roster,p]),uncovered=1-before/Math.max(1,slots.length),gain=(after-before)/Math.max(1,slots.length);const need=clamp22(uncovered*.65+gain*.75,0,1);if(need>best.need)best={need,gain};});
+              return best;
+            }
+            function pricingContext22(p,x){
+              const roster=rosterPlayers22(),info=typeof auctionMyTeamDashboardData==='function'?auctionMyTeamDashboardData():null;
+              const count=roster.length,rosterMin=Math.max(0,Number(info?.rosterMin||0)),rosterMax=Math.max(rosterMin,Number(info?.rosterMax||rosterMin||0)),mandatoryOpen=Math.max(0,rosterMin-count),slotsOpen=Math.max(mandatoryOpen,rosterMax-count);
+              const needObj=mode22()==='mantra'?mantraNeed22(p,roster):{need:classicNeed22(p,roster),gain:0};
+              const rr=new Set(roles22(p));const intrinsic=Math.max(1,index22(p));
+              const alternatives=allPlayers22().filter(q=>String(q.id)!==String(p.id)&&(q.status==='available'||!q.status)&&roles22(q).some(r=>rr.has(r))&&index22(q)>=intrinsic*.75).length;
+              const scarcity=clamp22(1-alternatives/Math.max(4,Math.max(1,slotsOpen)*1.5),0,1);
+              const score=clamp22(Number(x?.score||50)/100,0,1);
+              const oppRaw=x?.opportunity??x?.opp??x?.opportunityScore??x?.oppScore??50;
+              const opp=clamp22(Number(oppRaw||50)/100,0,1);
+              const selectivity=slotsOpen<=3&&needObj.need<.25?.86:1;
+              return{roster,info,intrinsic,mandatoryOpen,slotsOpen,alternatives,scarcity,need:needObj.need,gain:needObj.gain,score,opp,selectivity};
+            }
+
+            if(typeof auctionSuggestedCallScore==='function'){
+              const prev22=auctionSuggestedCallScore;
+              auctionSuggestedCallScore=function(p){
+                const x=prev22(p);if(!x)return x;
+                const c=pricingContext22(p,x);
+                let maxFactor=clamp22(.78+c.score*.18+c.opp*.14+c.need*.18+c.scarcity*.12+c.gain*.10,.72,1.34)*c.selectivity;
+                let ceiling=Math.max(1,Math.round(c.intrinsic*maxFactor));
+                const bidCap=num22(c.info?.maxBid);if(bidCap!==null&&bidCap>0)ceiling=Math.min(ceiling,Math.floor(bidCap));
+                const personalCap=num22(pref22(p)?.max_price);if(personalCap!==null&&personalCap>0)ceiling=Math.min(ceiling,Math.floor(personalCap));
+                const suggestFactor=clamp22(.68+c.score*.10+c.opp*.08+c.need*.08+c.scarcity*.07+c.gain*.05,.68,.96);
+                let suggested=Math.max(1,Math.min(ceiling,Math.round(ceiling*suggestFactor)));
+                x.prices={...(x.prices||{}),suggested,ceiling,indexValue:c.intrinsic,alternatives:c.alternatives,slotsOpen:c.slotsOpen,need:c.need,scarcity:c.scarcity};
+                x.priceContext=c;
+                return x;
+              };
+            }
+
+            function marketReference22(p){const vals=[num22(p?.pfc),num22(p?.pma)].filter(v=>v!==null&&v>0);return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null;}
+            function paintRows22(root,players){
+              if(!owner22()||!root)return;
+              const by=new Map(players.map(p=>[String(p.id),p]));
+              root.querySelectorAll('tr[data-player-id]').forEach(row=>{const p=by.get(String(row.dataset.playerId));if(!p)return;const idx=index22(p),ref=marketReference22(p);row.classList.remove('v22-market-value-row');if(!idx||ref===null)return;const ratio=ref/idx;let hue=48;if(ratio<1)hue=48+82*clamp22((1-ratio)/.35,0,1);else hue=48*(1-clamp22((ratio-1)/.35,0,1));const intensity=.04+.07*clamp22(Math.abs(ratio-1)/.35,0,1);row.classList.add('v22-market-value-row');row.style.setProperty('--v22-hue',String(hue.toFixed(1)));row.style.setProperty('--v22-alpha',String(intensity.toFixed(3)));row.title=`Indice ${Math.round(idx)} cr · PFC ${num22(p.pfc)??'—'} · PMA ${num22(p.pma)??'—'} · riferimento medio ${ref.toFixed(1)} cr`;});
+            }
+
+            const NUM22={presence:{label:'%Tit',step:1,get:presence22},pfc:{label:'PFC',step:1,get:p=>num22(p.pfc)},pma:{label:'PMA',step:1,get:p=>num22(p.pma)},delta:{label:'Delta',step:1,get:delta22},fm:{label:'FM',step:.01,get:fmv22},index:{label:'Indice',step:1,get:index22}};
+            state.v22AuctionText=state.v22AuctionText||{name:'',badge:'',favorite:''};state.v22AuctionRanges=state.v22AuctionRanges||{};state.v22AuctionSort=state.v22AuctionSort||{key:'name',direction:'asc'};
+            function bounds22(k){const d=NUM22[k],vals=allPlayers22().map(d.get).filter(Number.isFinite);let min=vals.length?Math.min(...vals):0,max=vals.length?Math.max(...vals):d.step;if(d.step<1){min=Math.floor(min/d.step)*d.step;max=Math.ceil(max/d.step)*d.step}else{min=Math.floor(min);max=Math.ceil(max)}if(min===max)max=min+d.step;return{min,max,step:d.step};}
+            function ensureRanges22(){Object.keys(NUM22).forEach(k=>{const b=bounds22(k),r=state.v22AuctionRanges[k];state.v22AuctionRanges[k]=r?{...b,lo:clamp22(Number(r.lo),b.min,b.max),hi:clamp22(Number(r.hi),b.min,b.max)}:{...b,lo:b.min,hi:b.max};});}
+            function rangeLabel22(k){const r=state.v22AuctionRanges[k],d=NUM22[k];if(!r)return'tutto';const full=Math.abs(r.lo-r.min)<1e-9&&Math.abs(r.hi-r.max)<1e-9;const f=v=>d.step<1?Number(v).toFixed(2).replace('.',','):String(Math.round(v));return full?'tutto':`${f(r.lo)}–${f(r.hi)}`;}
+            function rangeHtml22(k){const r=state.v22AuctionRanges[k],d=NUM22[k];if(!r)return'';const f=v=>d.step<1?Number(v).toFixed(2).replace('.',','):String(Math.round(v));return `<details class="v22-range" data-v22-details="${k}"><summary><span data-v22-summary="${k}">${rangeLabel22(k)}</span><i>⌄</i></summary><div class="v22-pop"><div class="v22-values"><b data-v22-lo-label="${k}">${f(r.lo)}</b><span>${d.label}</span><b data-v22-hi-label="${k}">${f(r.hi)}</b></div><div class="v22-track"><div class="v22-base"></div><div class="v22-fill" data-v22-fill="${k}"></div><input type="range" data-v22-range="${k}" data-bound="lo" min="${r.min}" max="${r.max}" step="${r.step}" value="${r.lo}"><input type="range" data-v22-range="${k}" data-bound="hi" min="${r.min}" max="${r.max}" step="${r.step}" value="${r.hi}"></div><div class="v22-ends"><small>${f(r.min)}</small><button type="button" data-v22-reset="${k}">azzera</button><small>${f(r.max)}</small></div></div></details>`;}
+            function updateRangeUi22(k){const r=state.v22AuctionRanges[k],d=NUM22[k];if(!r)return;const f=v=>d.step<1?Number(v).toFixed(2).replace('.',','):String(Math.round(v));document.querySelectorAll(`[data-v22-summary="${k}"]`).forEach(x=>x.textContent=rangeLabel22(k));document.querySelectorAll(`[data-v22-lo-label="${k}"]`).forEach(x=>x.textContent=f(r.lo));document.querySelectorAll(`[data-v22-hi-label="${k}"]`).forEach(x=>x.textContent=f(r.hi));const span=Math.max(r.step,r.max-r.min),a=(r.lo-r.min)/span*100,b=(r.hi-r.min)/span*100;document.querySelectorAll(`[data-v22-fill="${k}"]`).forEach(x=>{x.style.left=`${a}%`;x.style.width=`${Math.max(0,b-a)}%`;});}
+            function fuzzy22(p,q){if(!q)return true;if(typeof playerSearchRank==='function')return playerSearchRank(p,q,mode22())!==null;return String(p?.name||'').toLowerCase().includes(String(q).toLowerCase());}
+            function match22(p){const f=state.v22AuctionText;if(!fuzzy22(p,String(f.name||'').trim()))return false;if(f.badge&&typeof matchesFlag==='function'&&!matchesFlag(p,f.badge))return false;if(f.favorite==='on'&&!fav22(p))return false;if(f.favorite==='off'&&fav22(p))return false;return Object.keys(NUM22).every(k=>{const r=state.v22AuctionRanges[k],v=NUM22[k].get(p);return !r||(Number.isFinite(v)&&v>=r.lo-1e-9&&v<=r.hi+1e-9);});}
+            function applyFilter22(){const body=document.getElementById('auction-player-body');if(!body)return;const by=new Map(allPlayers22().map(p=>[String(p.id),p]));body.querySelectorAll('tr[data-player-id]').forEach(r=>{const p=by.get(String(r.dataset.playerId));r.hidden=Boolean(p&&!match22(p));});}
+            function signalSort22(p){const keys=['market','injury','new','penalties','free_kicks'];return keys.find(k=>typeof matchesFlag==='function'&&matchesFlag(p,k))||'';}
+            function roleRank22(p){const rr=roles22(p);return rr.length?Math.min(...rr.map(r=>{const i=roleOrder22.findIndex(x=>x.toLowerCase()===String(r).toLowerCase());return i<0?999:i;})):999;}
+            function sortValue22(p,k){if(k==='role')return roleRank22(p);if(k==='name')return p.name||'';if(k==='badge')return signalSort22(p);if(k==='favorite')return fav22(p)?1:0;return NUM22[k]?NUM22[k].get(p):'';}
+            function applySort22(){const body=document.getElementById('auction-player-body');if(!body)return;const by=new Map(allPlayers22().map(p=>[String(p.id),p])),dir=state.v22AuctionSort.direction==='desc'?-1:1,key=state.v22AuctionSort.key;[...body.querySelectorAll('tr[data-player-id]')].sort((a,b)=>{const pa=by.get(String(a.dataset.playerId)),pb=by.get(String(b.dataset.playerId));if(!pa||!pb)return 0;const av=sortValue22(pa,key),bv=sortValue22(pb,key);let c=typeof av==='number'&&typeof bv==='number'?av-bv:String(av).localeCompare(String(bv),'it',{sensitivity:'base'});if(!c)c=String(pa.name||'').localeCompare(String(pb.name||''),'it',{sensitivity:'base'});return c*dir;}).forEach(r=>body.appendChild(r));}
+
+            function mountTable22(){
+              const fixed=document.querySelector('#view-auction .auction-free-fixed'),thead=fixed?.querySelector('.player-table thead');if(!fixed||!thead)return;ensureRanges22();thead.querySelectorAll('.v19-auction-filter-row,.v22-filter-row').forEach(x=>x.remove());const head=[...thead.querySelectorAll('tr')][0];if(!head)return;
+              const specs=[['v19-col-role','role','Ruolo'],['v19-col-name','name','Calciatore'],['v19-col-badge','badge','Badge'],['v19-col-presence','presence','%Tit'],['v19-col-pfc','pfc','PFC'],['v19-col-pma','pma','PMA'],['v19-col-delta','delta','Delta'],['v19-col-fm','fm','FM'],['v19-col-index','index','Indice'],['v19-col-favorite','favorite','♥']];
+              specs.forEach(([cls,key,label])=>{const th=head.querySelector('.'+cls);if(!th)return;const arrow=state.v22AuctionSort.key===key?(state.v22AuctionSort.direction==='desc'?'↓':'↑'):'↕';th.innerHTML=`<button type="button" class="v22-sort" data-v22-sort="${key}">${label}<span>${arrow}</span></button>`;});
+              const f=state.v22AuctionText,row=document.createElement('tr');row.className='v22-filter-row';row.innerHTML=`<th><span class="v22-role-note">ruoli sopra</span></th><th><input type="search" data-v22-text="name" value="${String(f.name||'').replace(/"/g,'&quot;')}" placeholder="nome simile…" autocomplete="off"></th><th><select data-v22-text="badge"><option value="">tutti</option><option value="market" ${f.badge==='market'?'selected':''}>mercato</option><option value="injury" ${f.badge==='injury'?'selected':''}>indisp.</option><option value="new" ${f.badge==='new'?'selected':''}>nuovo</option><option value="penalties" ${f.badge==='penalties'?'selected':''}>rigori</option><option value="free_kicks" ${f.badge==='free_kicks'?'selected':''}>piazzati</option></select></th><th>${rangeHtml22('presence')}</th><th>${rangeHtml22('pfc')}</th><th>${rangeHtml22('pma')}</th><th>${rangeHtml22('delta')}</th><th>${rangeHtml22('fm')}</th><th>${rangeHtml22('index')}</th><th><select data-v22-text="favorite"><option value="">tutti</option><option value="on" ${f.favorite==='on'?'selected':''}>♥</option><option value="off" ${f.favorite==='off'?'selected':''}>♡</option></select></th><th></th>`;thead.appendChild(row);
+              row.querySelectorAll('[data-v22-range]').forEach(input=>input.addEventListener('input',e=>{const k=e.currentTarget.dataset.v22Range,b=e.currentTarget.dataset.bound,r=state.v22AuctionRanges[k],v=Number(e.currentTarget.value);if(b==='lo'){r.lo=Math.min(v,r.hi);e.currentTarget.value=r.lo}else{r.hi=Math.max(v,r.lo);e.currentTarget.value=r.hi}updateRangeUi22(k);applyFilter22();}));
+              row.querySelectorAll('[data-v22-reset]').forEach(btn=>btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const k=e.currentTarget.dataset.v22Reset,r=state.v22AuctionRanges[k];r.lo=r.min;r.hi=r.max;row.querySelectorAll(`[data-v22-range="${k}"]`).forEach(x=>x.value=x.dataset.bound==='lo'?r.lo:r.hi);updateRangeUi22(k);applyFilter22();}));
+              row.querySelectorAll('[data-v22-text]').forEach(el=>{const ev=el.tagName==='SELECT'?'change':'input';el.addEventListener(ev,e=>{state.v22AuctionText[e.currentTarget.dataset.v22Text]=e.currentTarget.value;applyFilter22();});});
+              head.querySelectorAll('[data-v22-sort]').forEach(btn=>btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const key=e.currentTarget.dataset.v22Sort;state.v22AuctionSort=state.v22AuctionSort.key===key?{key,direction:state.v22AuctionSort.direction==='asc'?'desc':'asc'}:{key,direction:'asc'};mountTable22();applySort22();applyFilter22();}));
+              Object.keys(NUM22).forEach(updateRangeUi22);applySort22();applyFilter22();paintRows22(document.getElementById('auction-player-body'),allPlayers22());
+            }
+
+            function patchListSort22(){
+              const thead=document.querySelector('#view-list .player-table thead');if(!thead)return;const head=thead.querySelector('tr');if(!head)return;const specs=[['role','Ruoli'],['name','Nome'],['team','Squadra'],['badge','Badge'],['slot','Slot'],['presence','%Tit'],['pfc','PFC'],['pma','PMA'],['delta','Delta'],['index','Indice'],['threshold','Soglia'],['expected','Prezzo atteso'],['fmv','FMV'],['favorite','Preferito']];[...head.children].forEach((th,i)=>{const spec=specs[i];if(!spec)return;th.innerHTML=`<button type="button" class="v15-sort" data-v15-sort="${spec[0]}">${spec[1]} <span>↕</span></button>`;});paintRows22(document.getElementById('list-body'),state.list?.players||[]);
+            }
+
+            if(typeof renderAuctionPlayers==='function'){const old22=renderAuctionPlayers;renderAuctionPlayers=function(...a){const r=old22(...a);queueMicrotask(mountTable22);return r;};}
+            if(typeof renderAuctionLive==='function'){const old22=renderAuctionLive;renderAuctionLive=function(...a){const r=old22(...a);queueMicrotask(mountTable22);return r;};}
+            if(typeof renderListTable==='function'){const old22=renderListTable;renderListTable=function(...a){const r=old22(...a);queueMicrotask(patchListSort22);return r;};}
+
+            const style=document.createElement('style');style.id='v22-index-pricing-style';style.textContent=`
+              body.v10-index-owner #view-auction tr.v22-market-value-row,body.v10-index-owner #view-list tr.v22-market-value-row{background:linear-gradient(90deg,hsl(var(--v22-hue) 70% 46% / var(--v22-alpha)),transparent 82%)!important;box-shadow:inset 3px 0 0 hsl(var(--v22-hue) 75% 50% / .58)!important}
+              #view-auction .v22-sort{width:100%!important;height:26px!important;min-height:26px!important;padding:1px 2px!important;border:0!important;background:transparent!important;box-shadow:none!important;color:var(--soft)!important;font-size:6.3px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:2px!important;white-space:nowrap!important}
+              #view-auction .v22-filter-row th{position:sticky!important;top:30px!important;z-index:35!important;height:30px!important;padding:2px 3px!important;background:#0a253e!important;overflow:visible!important}
+              #view-auction .v22-filter-row input,#view-auction .v22-filter-row select,#view-auction .v22-range>summary{width:100%!important;height:23px!important;min-height:23px!important;padding:1px 4px!important;border:1px solid rgba(91,151,216,.28)!important;border-radius:5px!important;background:rgba(5,22,38,.96)!important;color:var(--text)!important;font-size:7px!important;list-style:none!important}
+              #view-auction .v22-range{position:relative!important}.v22-range>summary::-webkit-details-marker{display:none}.v22-range>summary{display:flex!important;align-items:center!important;justify-content:space-between!important;cursor:pointer!important}.v22-range[open]>summary i{transform:rotate(180deg)}
+              #view-auction .v22-pop{position:absolute!important;top:25px!important;left:50%!important;transform:translateX(-50%)!important;width:190px!important;padding:8px!important;border:1px solid rgba(104,164,225,.48)!important;border-radius:8px!important;background:#081f35!important;box-shadow:0 12px 32px rgba(0,0,0,.48)!important;z-index:120!important}
+              #view-auction .v22-filter-row th:nth-child(n+8) .v22-pop{left:auto!important;right:0!important;transform:none!important}.v22-values{display:grid;grid-template-columns:48px 1fr 48px;gap:4px;align-items:center;margin-bottom:7px;font-size:8px}.v22-values b:last-child{text-align:right}.v22-values span{text-align:center;color:var(--soft);font-size:6px}.v22-track{position:relative;height:24px;margin:0 7px}.v22-base,.v22-fill{position:absolute;left:0;right:0;top:11px;height:3px;border-radius:99px;background:rgba(255,255,255,.14)}.v22-fill{right:auto;background:#4f9bea}.v22-track input[type=range]{position:absolute;left:0;top:3px;width:100%!important;height:18px!important;min-height:18px!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;pointer-events:none!important;-webkit-appearance:none!important;appearance:none!important}.v22-track input[type=range]::-webkit-slider-runnable-track{height:3px;background:transparent}.v22-track input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;margin-top:-5px;border-radius:50%;border:2px solid #9ed0ff;background:#1765ad;pointer-events:auto;cursor:ew-resize}.v22-ends{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:4px;font-size:6px;color:var(--soft)}.v22-ends small:last-child{text-align:right}.v22-ends button{height:18px!important;min-height:18px!important;padding:1px 4px!important;font-size:6px!important}.v22-role-note{font-size:5.5px;color:var(--muted);white-space:nowrap}
+            `;document.head.appendChild(style);
+            queueMicrotask(()=>{if(state.view==='auction')mountTable22();if(state.view==='list')patchListSort22();});
+          })();
+          JS
+          node --check /tmp/v22.js
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('home.html');s=p.read_text(encoding='utf-8')
+          if 'v22-index-pricing-filters-runtime' in s: raise SystemExit('V22 already present')
+          js=Path('/tmp/v22.js').read_text();block='\n<script id="v22-index-pricing-filters-runtime">\n'+js+'\n</script>\n';pos=s.rfind('</body>')
+          if pos<0: raise SystemExit('missing body close')
+          p.write_text(s[:pos]+block+s[pos:],encoding='utf-8')
+          PY
+          grep -q '<title>Fantacalcio Live</title>' home.html
+          grep -q 'Fantacalcio Live - tool per asta online' home.html
+          grep -q 'v22-index-pricing-filters-runtime' home.html
+          grep -q 'data-v22-range' home.html
+          grep -q 'auctionSuggestedCallScore=function' home.html
+          git diff --check
+      - name: Commit V22
+        run: |
+          rm -f .github/workflows/apply-v22-index-pricing-filters.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add home.html .github/workflows/apply-v22-index-pricing-filters.yml
+          git commit -m 'feat: price suggestions from fixed index and fix auction filters'
+          git push
