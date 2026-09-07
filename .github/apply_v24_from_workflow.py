@@ -34,7 +34,7 @@ text = text[:patch_close] + call_state_block + text[patch_close:]
 """
     code, n = re.subn(
         r"patch_marker = '''.*?text = text\.replace\(patch_marker, patch_insert, 1\)\n",
-        structural,
+        lambda _match: structural,
         code,
         count=1,
         flags=re.S,
