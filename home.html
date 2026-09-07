@@ -13551,6 +13551,8 @@
   </style>
 
 
+
+
 <style id="v25-auction-layout-mobile-style">
 /* V25: final authority for live auction selection row and free-agent table. */
 #view-auction .auction-caller-controls{
@@ -13588,7 +13590,7 @@
 }
 #view-auction .auction-free-table col{width:auto!important}
 #view-auction .auction-free-table col.auction-col-role{width:46px!important}
-#view-auction .auction-free-table col.auction-col-name{width:1%!important}
+#view-auction .auction-free-table col.auction-col-name{width:var(--v25-name-width,150px)!important}
 #view-auction .auction-free-table col.auction-col-badge{width:54px!important}
 #view-auction .auction-free-table col.auction-col-presence{width:52px!important}
 #view-auction .auction-free-table col.auction-col-pfc,
@@ -13607,15 +13609,54 @@
 }
 #view-auction .auction-free-table th:nth-child(2),
 #view-auction .auction-free-table td:nth-child(2){
-  width:1%!important;max-width:190px!important;
+  width:var(--v25-name-width,150px)!important;
+  min-width:var(--v25-name-width,150px)!important;
+  max-width:190px!important;
+  text-align:left!important;
 }
 #view-auction .auction-free-table td:nth-child(2) .player-main{
-  min-width:0!important;width:max-content!important;max-width:185px!important;
+  min-width:0!important;width:100%!important;max-width:100%!important;
 }
 #view-auction .auction-free-table td:nth-child(2) .player-name,
 #view-auction .auction-free-table td:nth-child(2) strong{
-  max-width:150px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
+  display:block!important;max-width:100%!important;
+  overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
 }
+
+/* Every column except player name is centered inside its own track. */
+#view-auction .auction-free-table thead th:not(:nth-child(2)),
+#view-auction .auction-free-table tbody td:not(:nth-child(2)){
+  text-align:center!important;
+}
+#view-auction .auction-free-table thead th:not(:nth-child(2)) [data-auction-sort]{
+  justify-content:center!important;text-align:center!important;
+}
+#view-auction .auction-free-table thead th:nth-child(2) [data-auction-sort]{
+  justify-content:flex-start!important;text-align:left!important;
+}
+#view-auction .auction-free-table tbody td:not(:nth-child(2)) .rolebadge,
+#view-auction .auction-free-table tbody td:not(:nth-child(2)) button,
+#view-auction .auction-free-table tbody td:not(:nth-child(2)) .badge{
+  margin-left:auto!important;margin-right:auto!important;
+}
+#view-auction .auction-free-filter-row th:not(:nth-child(2)) > select,
+#view-auction .auction-free-filter-row th:not(:nth-child(2)) > input,
+#view-auction .auction-free-filter-row th:not(:nth-child(2)) .auction-range-toggle{
+  text-align:center!important;text-align-last:center!important;
+}
+#view-auction .auction-free-filter-row th:nth-child(2) input[type=search]{
+  text-align:left!important;text-align-last:auto!important;
+}
+#view-auction .auction-range-toggle{
+  justify-content:center!important;position:relative!important;padding-right:18px!important;
+}
+#view-auction .auction-range-toggle i{
+  position:absolute!important;right:5px!important;top:50%!important;transform:translateY(-50%)!important;
+}
+#view-auction .auction-range.open .auction-range-toggle i{
+  transform:translateY(-50%) rotate(180deg)!important;
+}
+
 #view-auction .auction-free-table th:nth-last-child(2),
 #view-auction .auction-free-table td:nth-last-child(2){
   min-width:46px!important;width:46px!important;overflow:visible!important;
@@ -13627,6 +13668,22 @@
 #view-auction .auction-free-table .num,
 #view-auction .auction-free-table td:nth-child(n+4):nth-child(-n+9){
   font-size:9.5px!important;font-variant-numeric:tabular-nums!important;
+}
+
+/* Range popovers float above the scrollable table instead of being clipped by it. */
+#view-auction .auction-range-popover.v25-floating-range{
+  position:fixed!important;
+  width:220px!important;
+  min-width:220px!important;
+  max-width:calc(100vw - 16px)!important;
+  z-index:10000!important;
+  transform:none!important;
+  right:auto!important;
+  bottom:auto!important;
+  overflow:visible!important;
+}
+#view-auction .auction-range-popover.v25-floating-range .auction-dual-range{
+  min-height:28px!important;
 }
 
 /* The mobile profile switch belongs to the visible live-auction header. */
@@ -33957,10 +34014,14 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
 
 </script>
 
+
+
 <script id="v25-auction-layout-mobile-runtime">
 (()=>{
   const qs=(s,r=document)=>r.querySelector(s);
+  const qsa=(s,r=document)=>[...r.querySelectorAll(s)];
   const isPhone=()=>window.matchMedia('(max-width:820px)').matches;
+  const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
 
   function enforceCallRow(){
     const host=qs('#view-auction .auction-caller-controls');
@@ -33972,6 +34033,16 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
     call.classList.add('auction-top-call');
   }
 
+  function sizeNameColumn(){
+    const table=qs('#view-auction .auction-free-table');
+    if(!table)return;
+    const names=qsa('tbody td:nth-child(2) .player-name',table);
+    let natural=0;
+    names.forEach(node=>{natural=Math.max(natural,node.scrollWidth||0);});
+    const width=clamp(Math.ceil(natural+34),128,190);
+    table.style.setProperty('--v25-name-width',`${width}px`);
+  }
+
   function moveMobileModeToLiveHeader(){
     if(!isPhone()||!document.body.classList.contains('auction-live'))return;
     const mode=qs('.v23-header-mode');
@@ -33979,17 +34050,94 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
     if(mode&&status&&mode.parentElement!==status) status.appendChild(mode);
   }
 
-  function refresh(){
-    enforceCallRow();
-    moveMobileModeToLiveHeader();
+  function rangePopover(key){
+    return qs(`#view-auction [data-auction-range-popover="${key}"]`);
   }
 
-  const observer=new MutationObserver(()=>requestAnimationFrame(refresh));
+  function rangeToggle(key){
+    return qs(`#view-auction [data-auction-range-toggle="${key}"]`);
+  }
+
+  function positionRangePopover(toggle,pop){
+    if(!toggle||!pop||pop.hidden)return;
+    pop.classList.add('v25-floating-range');
+    const rect=toggle.getBoundingClientRect();
+    const width=Math.min(220,Math.max(160,window.innerWidth-16));
+    const left=clamp(rect.left+rect.width/2-width/2,8,Math.max(8,window.innerWidth-width-8));
+    const estimatedHeight=Math.max(88,pop.offsetHeight||88);
+    let top=rect.bottom+5;
+    if(top+estimatedHeight>window.innerHeight-8){
+      top=Math.max(8,rect.top-estimatedHeight-5);
+    }
+    pop.style.setProperty('left',`${Math.round(left)}px`,'important');
+    pop.style.setProperty('top',`${Math.round(top)}px`,'important');
+    pop.style.setProperty('right','auto','important');
+    pop.style.setProperty('bottom','auto','important');
+    pop.style.setProperty('transform','none','important');
+  }
+
+  function closeFloatingRanges(){
+    qsa('#view-auction .auction-range-popover.v25-floating-range').forEach(pop=>{
+      pop.hidden=true;
+      pop.classList.remove('v25-floating-range');
+      pop.closest('[data-auction-range-box]')?.classList.remove('open');
+    });
+  }
+
+  function repositionOpenRanges(){
+    qsa('#view-auction .auction-range-popover.v25-floating-range').forEach(pop=>{
+      if(pop.hidden)return;
+      const key=pop.dataset.auctionRangePopover;
+      positionRangePopover(rangeToggle(key),pop);
+    });
+  }
+
+  function refresh(){
+    enforceCallRow();
+    sizeNameColumn();
+    moveMobileModeToLiveHeader();
+    repositionOpenRanges();
+  }
+
+  let refreshQueued=false;
+  function scheduleRefresh(){
+    if(refreshQueued)return;
+    refreshQueued=true;
+    requestAnimationFrame(()=>{refreshQueued=false;refresh();});
+  }
+
+  document.addEventListener('click',event=>{
+    const toggle=event.target.closest('#view-auction [data-auction-range-toggle]');
+    if(toggle){
+      const key=toggle.dataset.auctionRangeToggle;
+      const pop=rangePopover(key);
+      const wasOpen=Boolean(pop&&!pop.hidden);
+      setTimeout(()=>{
+        const current=rangePopover(key);
+        if(!current)return;
+        if(wasOpen){
+          if(!current.hidden) current.hidden=true;
+          current.classList.remove('v25-floating-range');
+          current.closest('[data-auction-range-box]')?.classList.remove('open');
+          return;
+        }
+        if(current.hidden) current.hidden=false;
+        current.closest('[data-auction-range-box]')?.classList.add('open');
+        positionRangePopover(toggle,current);
+      },0);
+      return;
+    }
+    if(event.target.closest('#view-auction .auction-range-popover'))return;
+    setTimeout(closeFloatingRanges,0);
+  },true);
+
+  const observer=new MutationObserver(scheduleRefresh);
   observer.observe(document.documentElement,{subtree:true,childList:true});
-  window.addEventListener('resize',refresh,{passive:true});
-  window.addEventListener('hashchange',refresh);
-  document.addEventListener('DOMContentLoaded',refresh,{once:true});
-  setTimeout(refresh,0);
+  window.addEventListener('resize',scheduleRefresh,{passive:true});
+  window.addEventListener('hashchange',scheduleRefresh);
+  document.addEventListener('scroll',scheduleRefresh,true);
+  document.addEventListener('DOMContentLoaded',scheduleRefresh,{once:true});
+  setTimeout(scheduleRefresh,0);
 })();
 </script>
 
