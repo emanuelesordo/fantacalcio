@@ -1,0 +1,186 @@
+name: Apply V19 auction list
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-v19-auction-list.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build V19 runtime
+        run: |
+          cat > /tmp/v19.js <<'JS'
+          (()=>{
+            'use strict';
+            if(window.__FANTA_V19_AUCTION_LIST__)return;
+            window.__FANTA_V19_AUCTION_LIST__=1;
+
+            const view=()=>document.querySelector('#view-auction');
+            const box=()=>document.querySelector('#view-auction .auction-free-fixed');
+            const candidates=()=>state.auction?.callCandidates||[];
+            const num=v=>Number.isFinite(Number(v))?Number(v):null;
+            const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+            const fmt=(v,step=1)=>{const n=Number(v);if(!Number.isFinite(n))return '—';return step<1?n.toFixed(step<=.01?2:1).replace('.',','):String(Math.round(n));};
+            const esc19=v=>typeof esc==='function'?esc(v):String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+            const presence=p=>{const v=typeof strategicPresencePercent==='function'?strategicPresencePercent(p):p?.expected_titolarity;return num(v)??0;};
+            const fmv=p=>{const v=typeof strategicExpectedFantasyAverage==='function'?strategicExpectedFantasyAverage(p):p?.expected_fantasy_avg;return num(v)??0;};
+            const delta=p=>num(p?.pfc_pma_delta)??((num(p?.pfc)??0)-(num(p?.pma)??0));
+            const index=p=>num(typeof strategicValueIndex==='function'?strategicValueIndex(p):null)??0;
+            const pref=p=>state.v7Preferences?.get?.(String(p?.source_player_id||p?.id))||null;
+            const favorite=p=>pref(p)?.is_favorite===true;
+
+            const NUM={
+              presence:{label:'%Tit',step:1,get:presence},
+              pfc:{label:'PFC',step:1,get:p=>num(p?.pfc)},
+              pma:{label:'PMA',step:1,get:p=>num(p?.pma)},
+              delta:{label:'Delta',step:1,get:delta},
+              fm:{label:'FM',step:.01,get:fmv},
+              index:{label:'Indice',step:1,get:index}
+            };
+
+            state.v19AuctionText=state.v19AuctionText||{name:'',badge:'',favorite:''};
+            state.v19AuctionRanges=state.v19AuctionRanges||{};
+            state.v19AuctionRangeKey=state.v19AuctionRangeKey||'';
+            state.auctionFilterTeam='all';state.auctionFilterSlot='all';state.auctionFilterFlag='all';
+
+            function rangeBounds(key,players){
+              const d=NUM[key],vals=players.map(d.get).filter(Number.isFinite);let min=vals.length?Math.min(...vals):0,max=vals.length?Math.max(...vals):d.step;
+              min=d.step<1?Math.floor(min/d.step)*d.step:Math.floor(min);max=d.step<1?Math.ceil(max/d.step)*d.step:Math.ceil(max);if(min===max)max=min+d.step;return{min,max,step:d.step};
+            }
+            function ensureRanges(){
+              const ps=candidates(),key=ps.map(p=>`${p.id}:${p.updated_at||p.source_updated_at||''}`).join('|');
+              if(state.v19AuctionRangeKey===key&&Object.keys(state.v19AuctionRanges||{}).length)return;
+              const old=state.v19AuctionRanges||{},next={};
+              Object.keys(NUM).forEach(k=>{const b=rangeBounds(k,ps),o=old[k];next[k]={...b,lo:o?clamp(Number(o.lo),b.min,b.max):b.min,hi:o?clamp(Number(o.hi),b.min,b.max):b.max};if(next[k].lo>next[k].hi){next[k].lo=b.min;next[k].hi=b.max;}});
+              state.v19AuctionRanges=next;state.v19AuctionRangeKey=key;
+            }
+            function rangeFull(k){const r=state.v19AuctionRanges[k];return !r||(Math.abs(r.lo-r.min)<1e-9&&Math.abs(r.hi-r.max)<1e-9);}
+            function rangeLabel(k){const r=state.v19AuctionRanges[k],d=NUM[k];return !r||rangeFull(k)?'tutto':`${fmt(r.lo,d.step)}–${fmt(r.hi,d.step)}`;}
+            function rangeControl(k){const r=state.v19AuctionRanges[k],d=NUM[k];if(!r)return'';return `<div class="v19-range" data-v19-range-box="${k}"><button type="button" class="v19-range-toggle" data-v19-range-toggle="${k}" title="Seleziona intervallo ${esc19(d.label)}"><span data-v19-range-label="${k}">${rangeLabel(k)}</span><i>⌄</i></button><div class="v19-range-popover" data-v19-range-popover="${k}" hidden><div class="v19-range-values"><b data-v19-lo-label="${k}">${fmt(r.lo,d.step)}</b><span>${esc19(d.label)}</span><b data-v19-hi-label="${k}">${fmt(r.hi,d.step)}</b></div><div class="v19-dual-range"><div class="v19-range-base"></div><div class="v19-range-fill" data-v19-range-fill="${k}"></div><input type="range" data-v19-range="${k}" data-bound="lo" min="${r.min}" max="${r.max}" step="${r.step}" value="${r.lo}"><input type="range" data-v19-range="${k}" data-bound="hi" min="${r.min}" max="${r.max}" step="${r.step}" value="${r.hi}"></div><div class="v19-range-ends"><small>${fmt(r.min,d.step)}</small><button type="button" data-v19-range-reset="${k}">azzera</button><small>${fmt(r.max,d.step)}</small></div></div></div>`;}
+            function updateRange(k){const r=state.v19AuctionRanges[k],d=NUM[k];if(!r)return;document.querySelectorAll(`[data-v19-range-label="${k}"]`).forEach(x=>x.textContent=rangeLabel(k));document.querySelectorAll(`[data-v19-lo-label="${k}"]`).forEach(x=>x.textContent=fmt(r.lo,d.step));document.querySelectorAll(`[data-v19-hi-label="${k}"]`).forEach(x=>x.textContent=fmt(r.hi,d.step));const span=Math.max(r.step,r.max-r.min),a=(r.lo-r.min)/span*100,b=(r.hi-r.min)/span*100;document.querySelectorAll(`[data-v19-range-fill="${k}"]`).forEach(x=>{x.style.left=`${a}%`;x.style.width=`${Math.max(0,b-a)}%`;});}
+            function closeRanges(except=''){document.querySelectorAll('[data-v19-range-popover]').forEach(x=>{if(x.dataset.v19RangePopover!==except)x.hidden=true;});document.querySelectorAll('[data-v19-range-box]').forEach(x=>x.classList.toggle('open',x.dataset.v19RangeBox===except&&!x.querySelector('[data-v19-range-popover]')?.hidden));}
+            function rangeMatch(p,k){const r=state.v19AuctionRanges[k],v=NUM[k].get(p);return !r||(Number.isFinite(v)&&v>=r.lo-1e-9&&v<=r.hi+1e-9);}
+            function fuzzyMatch(p,q){if(!q)return true;if(typeof playerSearchRank==='function')return playerSearchRank(p,q,state.auction?.settings?.fantasy_mode||'classic')!==null;return String(p?.name||'').toLocaleLowerCase('it').includes(String(q).toLocaleLowerCase('it'));}
+            function badgeMatch(p,k){if(!k||k==='all')return true;return typeof matchesFlag==='function'?matchesFlag(p,k):true;}
+            function match(p){const f=state.v19AuctionText||{};if(!fuzzyMatch(p,String(f.name||'').trim()))return false;if(!badgeMatch(p,f.badge))return false;if(f.favorite==='on'&&!favorite(p))return false;if(f.favorite==='off'&&favorite(p))return false;return Object.keys(NUM).every(k=>rangeMatch(p,k));}
+
+            function ensureHeader(){
+              const thead=box()?.querySelector('.player-table thead');if(!thead)return null;
+              thead.querySelector('.v18-auction-filter-row')?.remove();thead.querySelector('.v19-auction-filter-row')?.remove();
+              const head=[...thead.querySelectorAll('tr')].find(r=>!r.classList.contains('v18-auction-filter-row')&&!r.classList.contains('v19-auction-filter-row'));if(!head)return thead;
+              const cells=[...head.children];
+              if(!head.dataset.v19Decorated&&cells.length>=8){
+                const [role,name,badge,pfc,fm,pma,idx,action]=cells;
+                role.classList.add('v19-col-role');name.classList.add('v19-col-name');badge.classList.add('v19-col-badge');pfc.classList.add('v19-col-pfc');fm.classList.add('v19-col-fm');pma.classList.add('v19-col-pma');idx.classList.add('v19-col-index');action.classList.add('v19-col-action');
+                const mk=(cls,label)=>{const th=document.createElement('th');th.className=cls;th.textContent=label;return th;};
+                const pr=mk('v19-col-presence num-head','% TIT');const de=mk('v19-col-delta num-head','DELTA');const fav=mk('v19-col-favorite','♥');
+                const frag=document.createDocumentFragment();[role,name,badge,pr,pfc,pma,de,fm,idx,fav,action].forEach(x=>frag.appendChild(x));head.appendChild(frag);head.dataset.v19Decorated='1';
+              }
+              return thead;
+            }
+            function decorateRows(){
+              const body=document.getElementById('auction-player-body');if(!body)return;const by=new Map(candidates().map(p=>[String(p.id),p]));
+              body.querySelectorAll('tr[data-player-id]').forEach(row=>{const p=by.get(String(row.dataset.playerId));if(!p)return;
+                if(!row.querySelector('.v19-col-delta')){
+                  const cells=[...row.children];if(cells.length<8)return;const [role,name,badge,pfc,fm,pma,idx,action]=cells;
+                  role.classList.add('v19-col-role');name.classList.add('v19-col-name');badge.classList.add('v19-col-badge');pfc.classList.add('v19-col-pfc');fm.classList.add('v19-col-fm');pma.classList.add('v19-col-pma');idx.classList.add('v19-col-index');action.classList.add('v19-col-action');
+                  const pr=document.createElement('td'),de=document.createElement('td'),fav=document.createElement('td');pr.className='v19-col-presence num';de.className='v19-col-delta num';fav.className='v19-col-favorite';const frag=document.createDocumentFragment();[role,name,badge,pr,pfc,pma,de,fm,idx,fav,action].forEach(x=>frag.appendChild(x));row.appendChild(frag);
+                }
+                const pr=row.querySelector('.v19-col-presence'),de=row.querySelector('.v19-col-delta'),fv=row.querySelector('.v19-col-favorite');
+                if(pr)pr.textContent=`${Math.round(presence(p))}%`;if(de){const d=delta(p);de.textContent=`${d>0?'+':''}${fmt(d,1)}`;de.classList.toggle('positive',d>0);de.classList.toggle('negative',d<0);}if(fv){const on=favorite(p);fv.innerHTML=`<button type="button" class="v19-heart ${on?'on':''}" data-v19-heart="${esc19(p.id)}" title="${on?'Rimuovi dai preferiti':'Aggiungi ai preferiti'}">${on?'♥':'♡'}</button>`;}
+              });
+            }
+            function mountFilters(){
+              const thead=ensureHeader();if(!thead)return;ensureRanges();const f=state.v19AuctionText||{};const row=document.createElement('tr');row.className='v19-auction-filter-row';row.innerHTML=`<th><span class="v19-role-note">ruoli sopra</span></th><th><input type="search" class="v19-text-filter" data-v19-text="name" value="${esc19(f.name||'')}" placeholder="nome simile…" autocomplete="off"></th><th><select class="v19-text-filter v19-select" data-v19-text="badge"><option value="">tutti</option><option value="market" ${f.badge==='market'?'selected':''}>mercato</option><option value="injury" ${f.badge==='injury'?'selected':''}>indisp.</option><option value="new" ${f.badge==='new'?'selected':''}>nuovo</option><option value="penalties" ${f.badge==='penalties'?'selected':''}>rigori</option><option value="free_kicks" ${f.badge==='free_kicks'?'selected':''}>piazzati</option></select></th><th>${rangeControl('presence')}</th><th>${rangeControl('pfc')}</th><th>${rangeControl('pma')}</th><th>${rangeControl('delta')}</th><th>${rangeControl('fm')}</th><th>${rangeControl('index')}</th><th><select class="v19-text-filter v19-select" data-v19-text="favorite"><option value="">tutti</option><option value="on" ${f.favorite==='on'?'selected':''}>♥</option><option value="off" ${f.favorite==='off'?'selected':''}>♡</option></select></th><th></th>`;thead.appendChild(row);requestAnimationFrame(()=>Object.keys(NUM).forEach(updateRange));
+            }
+            function applyFilters(){const body=document.getElementById('auction-player-body');if(!body)return;const by=new Map(candidates().map(p=>[String(p.id),p]));body.querySelectorAll('tr[data-player-id]').forEach(r=>{const p=by.get(String(r.dataset.playerId));r.hidden=Boolean(p&&!match(p));});}
+
+            async function toggleFavorite19(p,button){button.disabled=true;try{const z=await api(ENDPOINTS.v6y,{action:'toggleFavorite',sourcePlayerId:p.source_player_id||p.id},{quiet:true});if(z?.preference)state.v7Preferences?.set?.(String(z.preference.source_player_id),z.preference);decorateRows();applyFilters();}catch(e){msg(e.message||'Errore aggiornamento preferito.','error');}finally{button.disabled=false;}}
+
+            function bestSearchMatch(q){const ps=candidates();if(!q)return null;const mode=state.auction?.settings?.fantasy_mode||'classic';if(typeof playerSearchRank!=='function')return ps.find(p=>String(p?.name||'').toLowerCase()===q.toLowerCase())||null;return ps.map(p=>({p,r:playerSearchRank(p,q,mode)})).filter(x=>x.r!==null).sort((a,b)=>(Number.isFinite(Number(a.r))?Number(a.r):0)-(Number.isFinite(Number(b.r))?Number(b.r):0))[0]?.p||null;}
+            async function proxyCall(){
+              const s=typeof auctionSession==='function'?auctionSession():state.auction?.auctionSession;if(!s||s.status!=='live')return;let player=candidates().find(p=>String(p.id)===String(state.auctionSelectedPlayerId||''));if(!player){player=bestSearchMatch(String(document.getElementById('auction-top-search')?.value||'').trim());if(player)state.auctionSelectedPlayerId=player.id;}if(!player)return msg('Seleziona prima il giocatore da chiamare.','warning');if(s.current_player_id)return msg('C’è già un giocatore in asta.','warning');
+              const mode=state.auction?.settings?.auction_base_mode;const openingBid=['pfc','quotation'].includes(mode)?null:Math.max(1,Number(state.auctionOpeningBid||1));const b=document.getElementById('v19-top-call');if(b)b.disabled=true;
+              try{const response=await api(ENDPOINTS.auction,{action:'callPlayer',sessionId:s.id,playerId:player.id,openingBid});if(response?.state&&typeof applyAuctionHotState==='function')applyAuctionHotState(response.state,{fromMutation:true});state.auctionSelectedPlayerId=null;state.auctionFilterSearch='';state.auctionOpeningBid=1;if(typeof window.v11ScheduleAuctionRefresh==='function')window.v11ScheduleAuctionRefresh('callPlayer',45);else if(typeof scheduleAuctionReconcile==='function')scheduleAuctionReconcile(80);}catch(e){msg(e.message||'Chiamata non riuscita.','error');}finally{if(b)b.disabled=false;}
+            }
+            function ensureTopCall(){
+              const top=document.querySelector('#view-auction .auction-caller-controls');if(!top)return;let original=document.getElementById('auction-call-confirm');let proxy=document.getElementById('v19-top-call');
+              if(original){if(proxy)proxy.remove();if(original.parentElement!==top)top.appendChild(original);original.classList.add('v18-top-call','v19-top-call');return;}
+              if(!proxy){proxy=document.createElement('button');proxy.type='button';proxy.id='v19-top-call';proxy.className='v19-top-call good';proxy.textContent='CHIAMA';proxy.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();proxyCall();});top.appendChild(proxy);}
+              const s=typeof auctionSession==='function'?auctionSession():state.auction?.auctionSession;const q=String(document.getElementById('auction-top-search')?.value||'').trim();proxy.disabled=Boolean(s?.current_player_id)||(!state.auctionSelectedPlayerId&&!q);proxy.title='Conferma la chiamata del giocatore selezionato';
+            }
+            function mount(){if(state.view!=='auction')return;const b=box();if(!b)return;b.querySelector('.drawer-filters')?.setAttribute('hidden','');ensureTopCall();ensureHeader();decorateRows();mountFilters();applyFilters();}
+
+            const auctionView=view();
+            auctionView?.addEventListener('click',e=>{
+              const toggle=e.target.closest?.('[data-v19-range-toggle]');if(toggle){e.preventDefault();e.stopPropagation();const k=toggle.dataset.v19RangeToggle,pop=auctionView.querySelector(`[data-v19-range-popover="${k}"]`),open=pop?.hidden!==false;closeRanges(open?k:'');if(pop)pop.hidden=!open;toggle.closest('.v19-range')?.classList.toggle('open',open);if(open)updateRange(k);return;}
+              const reset=e.target.closest?.('[data-v19-range-reset]');if(reset){e.preventDefault();e.stopPropagation();const k=reset.dataset.v19RangeReset,r=state.v19AuctionRanges[k];if(r){r.lo=r.min;r.hi=r.max;auctionView.querySelectorAll(`[data-v19-range="${k}"][data-bound="lo"]`).forEach(x=>x.value=r.lo);auctionView.querySelectorAll(`[data-v19-range="${k}"][data-bound="hi"]`).forEach(x=>x.value=r.hi);updateRange(k);applyFilters();}return;}
+              const heart=e.target.closest?.('[data-v19-heart]');if(heart){e.preventDefault();e.stopImmediatePropagation();const p=candidates().find(x=>String(x.id)===String(heart.dataset.v19Heart));if(p)toggleFavorite19(p,heart);return;}
+              if(!e.target.closest?.('.v19-range'))closeRanges('');
+            },true);
+            auctionView?.addEventListener('input',e=>{const range=e.target.closest?.('[data-v19-range]');if(range){e.stopImmediatePropagation();const k=range.dataset.v19Range,bound=range.dataset.bound,r=state.v19AuctionRanges[k];if(!r)return;const v=Number(range.value);if(bound==='lo'){r.lo=Math.min(v,r.hi);range.value=r.lo;}else{r.hi=Math.max(v,r.lo);range.value=r.hi;}updateRange(k);applyFilters();return;}const text=e.target.closest?.('[data-v19-text]');if(text&&text.tagName!=='SELECT'){e.stopImmediatePropagation();state.v19AuctionText[text.dataset.v19Text]=text.value;applyFilters();}},true);
+            auctionView?.addEventListener('change',e=>{const text=e.target.closest?.('[data-v19-text]');if(text){e.stopImmediatePropagation();state.v19AuctionText[text.dataset.v19Text]=text.value;applyFilters();}},true);
+            auctionView?.addEventListener('input',e=>{if(e.target?.id==='auction-top-search'||e.target?.id==='auction-top-base')queueMicrotask(ensureTopCall);},true);
+
+            if(typeof renderAuctionPlayers==='function'){const old=renderAuctionPlayers;renderAuctionPlayers=function(...a){const r=old(...a);mount();return r;};}
+            if(typeof renderAuctionLive==='function'){const old=renderAuctionLive;renderAuctionLive=function(...a){const r=old(...a);queueMicrotask(mount);return r;};}
+
+            const css=document.createElement('style');css.id='v19-auction-list-style';css.textContent=`
+              #view-auction .auction-caller-controls{grid-template-columns:minmax(110px,1fr) minmax(52px,72px) minmax(62px,82px)!important;align-items:end!important}
+              #view-auction .auction-caller-controls .v19-top-call{width:100%!important;height:32px!important;min-height:32px!important;margin:0!important;padding:2px 6px!important;font-size:8.5px!important;background:var(--good)!important}
+              #view-auction .auction-free-fixed .drawer-filters{display:none!important}
+              #view-auction .auction-free-fixed .drawer-table{position:relative!important;overflow:auto!important;isolation:isolate}
+              #view-auction .auction-free-fixed .player-table{width:100%!important;min-width:850px!important;table-layout:auto!important;border-collapse:separate!important;border-spacing:0!important}
+              #view-auction .auction-free-fixed .player-table thead{position:relative;z-index:30}
+              #view-auction .auction-free-fixed .player-table thead>tr:first-child>th{position:sticky!important;top:0!important;z-index:32!important;height:30px!important;background:#0d2b46!important}
+              #view-auction .v19-auction-filter-row th{position:sticky!important;top:30px!important;z-index:31!important;height:30px!important;padding:2px 3px!important;background:#0a253e!important;border-bottom:1px solid rgba(91,151,216,.38)!important;overflow:visible!important}
+              #view-auction .v19-text-filter,#view-auction .v19-range-toggle{width:100%!important;height:23px!important;min-height:23px!important;margin:0!important;padding:1px 4px!important;border-radius:5px!important;border:1px solid rgba(91,151,216,.28)!important;background:rgba(5,22,38,.96)!important;color:var(--text)!important;font-size:7px!important}
+              #view-auction input[type=search].v19-text-filter{text-align:left!important}
+              #view-auction .v19-role-note{display:block;text-align:center;color:var(--muted);font-size:5.5px;white-space:nowrap}
+              #view-auction .v19-range{position:relative;min-width:52px}
+              #view-auction .v19-range-toggle{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:3px!important;white-space:nowrap!important}
+              #view-auction .v19-range-toggle i{font-style:normal;color:var(--soft);transition:transform .15s ease}#view-auction .v19-range.open .v19-range-toggle i{transform:rotate(180deg)}
+              #view-auction .v19-range-popover{position:absolute;top:25px;left:50%;transform:translateX(-50%);width:190px;padding:8px;border:1px solid rgba(104,164,225,.48);border-radius:8px;background:#081f35;box-shadow:0 12px 32px rgba(0,0,0,.48);z-index:100}
+              #view-auction .v19-auction-filter-row th:nth-child(n+8) .v19-range-popover{left:auto;right:0;transform:none}
+              #view-auction .v19-range-values{display:grid;grid-template-columns:48px 1fr 48px;gap:4px;align-items:center;margin-bottom:7px;font-size:8px}#view-auction .v19-range-values b:last-child{text-align:right}#view-auction .v19-range-values span{text-align:center;color:var(--soft);font-size:6px;text-transform:uppercase}
+              #view-auction .v19-dual-range{position:relative;height:24px;margin:0 7px}#view-auction .v19-range-base,#view-auction .v19-range-fill{position:absolute;left:0;right:0;top:11px;height:3px;border-radius:99px;background:rgba(255,255,255,.14)}#view-auction .v19-range-fill{right:auto;background:#4f9bea}
+              #view-auction .v19-dual-range input[type=range]{position:absolute;left:0;top:3px;width:100%!important;height:18px!important;min-height:18px!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;pointer-events:none;-webkit-appearance:none;appearance:none}#view-auction .v19-dual-range input[type=range]::-webkit-slider-runnable-track{height:3px;background:transparent}#view-auction .v19-dual-range input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;margin-top:-5px;border-radius:50%;border:2px solid #9ed0ff;background:#1765ad;pointer-events:auto;cursor:ew-resize}
+              #view-auction .v19-range-ends{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:4px;font-size:6px;color:var(--soft)}#view-auction .v19-range-ends small:last-child{text-align:right}#view-auction .v19-range-ends button{height:18px!important;min-height:18px!important;padding:1px 4px!important;font-size:6px!important}
+              #view-auction .v19-col-role{width:58px!important}#view-auction .v19-col-name{min-width:170px!important}#view-auction .v19-col-badge{width:72px!important}#view-auction .v19-col-presence{width:58px!important;text-align:right!important}#view-auction .v19-col-pfc,#view-auction .v19-col-pma,#view-auction .v19-col-delta,#view-auction .v19-col-fm{width:58px!important;text-align:right!important}#view-auction .v19-col-index{width:62px!important;text-align:right!important}#view-auction .v19-col-favorite{width:46px!important;text-align:center!important}#view-auction .v19-col-action{width:62px!important;text-align:center!important}
+              #view-auction .v19-heart{width:26px!important;min-width:26px!important;height:24px!important;min-height:24px!important;padding:0!important;border-radius:50%!important;border:1px solid rgba(111,171,224,.28)!important;background:rgba(8,31,54,.5)!important;color:#7994ae!important;font-size:16px!important;line-height:1!important}#view-auction .v19-heart.on{color:#ff688c!important;border-color:#ff688c!important;background:rgba(100,24,50,.28)!important}
+              @container free-agents (max-width:760px){#view-auction .auction-free-fixed .player-table{min-width:760px!important}#view-auction .v19-col-badge{display:none!important}}
+            `;document.head.appendChild(css);
+            queueMicrotask(mount);
+          })();
+          JS
+          node --check /tmp/v19.js
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('home.html')
+          s=p.read_text()
+          marker='<script id="v19-auction-list-controls-runtime">'
+          if marker in s:
+              raise SystemExit('V19 already present')
+          js=Path('/tmp/v19.js').read_text()
+          block='\n\n<script id="v19-auction-list-controls-runtime">\n'+js+'\n</script>\n'
+          pos=s.rfind('</body>')
+          if pos<0: raise SystemExit('missing </body>')
+          s=s[:pos]+block+s[pos:]
+          p.write_text(s)
+          PY
+          grep -q 'v19-auction-list-controls-runtime' home.html
+          grep -q 'v19-col-delta' home.html
+          grep -q 'data-v19-range-toggle' home.html
+          grep -q 'id=.v19-top-call' home.html
+          git diff --check
+      - name: Commit patch
+        run: |
+          rm -f .github/workflows/apply-v19-auction-list.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add home.html .github/workflows/apply-v19-auction-list.yml
+          git commit -m 'fix: complete auction list columns filters and call action'
+          git push
