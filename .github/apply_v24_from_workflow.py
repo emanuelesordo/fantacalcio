@@ -22,10 +22,7 @@ try:
     normalized = [line[10:] if line.startswith('          ') else line for line in lines]
     code = '\n'.join(normalized) + '\n'
 
-    # The original one-shot used an overly exact whitespace marker inside
-    # patchAuctionTopSelection. Replace that patch fragment with a structural
-    # insertion before patchAuctionLiveDynamic instead.
-    structural = r'''          patch_start = text.find('    function patchAuctionTopSelection() {')
+    structural = r"""          patch_start = text.find('    function patchAuctionTopSelection() {')
           patch_end = text.find('    function patchAuctionLiveDynamic() {', patch_start)
           if patch_start < 0 or patch_end < 0:
               raise RuntimeError('patchAuctionTopSelection function markers not found')
@@ -34,7 +31,7 @@ try:
               raise RuntimeError('patchAuctionTopSelection closing brace not found')
           call_state_block = '''\n      const callButton = $('auction-call-confirm');\n      if (callButton) {\n        const session = auctionSession();\n        callButton.disabled = !(\n          selected\n          && session?.status === 'live'\n          && !session.current_player_id\n          && session.prestart_hold !== true\n          && auctionHasPresidentRole()\n          && auctionOwnCallTurn()\n        );\n      }\n'''
           text = text[:patch_close] + call_state_block + text[patch_close:]
-'''
+"""
     code, n = re.subn(
         r"          patch_marker = '''.*?          text = text\.replace\(patch_marker, patch_insert, 1\)\n",
         structural,
