@@ -1,6 +1,0 @@
-Traceback (most recent call last):
-  File "/home/runner/work/fantacalcio/fantacalcio/.github/apply_v24_from_workflow.py", line 66, in <module>
-    exec(code, {'__name__': '__main__'})
-    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<string>", line 1013, in <module>
-RuntimeError: mobile shell mode markup removal count=0
