@@ -1,0 +1,56 @@
+name: Apply V23 device profiles
+on:
+  push:
+    paths:
+      - '.github/apply_v23_device_profiles.py'
+      - '.github/workflows/apply-v23-device-profiles.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Apply V23
+        run: python3 .github/apply_v23_device_profiles.py
+      - name: Validate
+        run: |
+          python3 - <<'PY'
+          import re, pathlib, subprocess, sys
+          s=pathlib.Path('home.html').read_text(encoding='utf-8')
+          for i,js in enumerate(re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',s,re.S)):
+              if not js.strip(): continue
+              p=pathlib.Path(f'/tmp/v23-{i}.js'); p.write_text(js,encoding='utf-8')
+              r=subprocess.run(['node','--check',str(p)],capture_output=True,text=True)
+              if r.returncode:
+                  print(r.stdout); print(r.stderr); sys.exit(r.returncode)
+          PY
+          grep -q '<title>Fantacalcio Live</title>' home.html
+          grep -q 'Fantacalcio Live - tool per asta online' home.html
+          grep -q 'v23-device-profiles-runtime' home.html
+          grep -q 'smartphone_only' home.html
+          grep -q 'pc_plus_phone' home.html
+          ! grep -n -E '\b(confirm|prompt|alert)\(' home.html
+          git diff --check
+      - name: Cleanup inspection artifacts and commit
+        run: |
+          rm -f \
+            .github/workflows/inspect-v23-device-layout.yml \
+            .github/workflows/capture-v23-snippets.yml \
+            .github/workflows/capture-v23-manage.yml \
+            .github/workflows/capture-v23-auction.yml \
+            .github/workflows/capture-v23-president.yml \
+            .github/v23-snippets.txt \
+            .github/v23-manage.txt \
+            .github/v23-auction.txt \
+            .github/v23-president.txt \
+            .github/apply_v23_device_profiles.py \
+            .github/workflows/apply-v23-device-profiles.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'feat: add per-user mobile auction device profiles'
+          git push origin main
