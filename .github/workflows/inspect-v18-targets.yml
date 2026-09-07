@@ -1,0 +1,22 @@
+name: Inspect V18 targets
+on:
+  push:
+    paths:
+      - '.github/workflows/inspect-v18-targets.yml'
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect
+        run: |
+          echo '=== browser dialogs ==='
+          grep -n -E '\b(confirm|alert|prompt)\(' home.html | head -n 200 || true
+          echo '=== pause/hold/pass controls ==='
+          grep -n -C 16 -E 'PAUSA ASTA|PASSA CHIAMATA|setAuctionPause|setHold|passNominationTurn|auction-admin-team|operativa|SQUADRA OPERATIVA' home.html | head -n 700 || true
+          echo '=== called details ==='
+          grep -n -C 25 -E 'v14-called-details|Dati giocatore|v14-called-grid' home.html | tail -n 300 || true
+          echo '=== auction filter/table ==='
+          grep -n -C 35 -E 'drawer-filters|auction-team-filter|auction-player-body|data-auction-sort|auction-top-search|auction-top-base' home.html | head -n 900 || true
+          echo '=== call bindings ==='
+          grep -n -C 25 -E 'auction-call-confirm|callSelected|callPlayer|data-queue-call|pass-nomination|auction-pause|auction-hold' home.html | tail -n 900 || true
