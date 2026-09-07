@@ -42,6 +42,26 @@ text = text[:patch_close] + call_state_block + text[patch_close:]
     if n != 1:
         raise RuntimeError(f'Unable to replace brittle top-call patch fragment: {n}')
 
+    mobile_structural = r"""mob, mode_markup_count = re.subn(
+    r'(<header class=\\"v23-mobile-head\\">\\s*)<div class=\\"v23-mobile-mode\\".*?</div>\\s*(<div class=\\"v23-mobile-credit\\">)',
+    lambda match: match.group(1) + match.group(2),
+    mob,
+    count=1,
+    flags=re.S,
+)
+if mode_markup_count != 1:
+    raise RuntimeError(f'mobile shell mode markup removal count={mode_markup_count}')
+"""
+    code, n = re.subn(
+        r"shell_mode_markup = '''.*?mob = mob\.replace\(shell_mode_markup, shell_credit_markup, 1\)\n",
+        lambda _match: mobile_structural,
+        code,
+        count=1,
+        flags=re.S,
+    )
+    if n != 1:
+        raise RuntimeError(f'Unable to replace brittle mobile markup patch fragment: {n}')
+
     compile(code, '<v24-consolidator>', 'exec')
     exec(code, {'__name__': '__main__'})
     ERROR_PATH.unlink(missing_ok=True)
