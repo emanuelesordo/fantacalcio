@@ -34152,7 +34152,6 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
   function renderMobileDrawer(which){if(which==='roster')renderMobileRosterDrawer();if(which==='free')renderMobileFreeDrawer();}
   function closeDrawer(){document.body.classList.remove('v23-roster-open','v23-free-open');const ui=qs('.v23-mobile-drawer-ui');if(ui)ui.hidden=true;}
   function openDrawer(which){
-    if(getMode()!=='full')return;
     document.body.classList.toggle('v23-roster-open',which==='roster');
     document.body.classList.toggle('v23-free-open',which==='free');
     const ui=ensureDrawerUi();ui.hidden=false;renderMobileDrawer(which);
@@ -34224,7 +34223,7 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
       <section class="v23-mobile-drawer-panel v23-mobile-drawer-free-panel"><header><strong>SVINCOLATI</strong><button type="button" class="v23-drawer-close" aria-label="Chiudi">×</button></header><div class="v23-mobile-drawer-search"><input type="search" data-v23-free-search placeholder="Cerca giocatore…" autocomplete="off"></div><div class="v23-mobile-drawer-list" data-v23-free-list></div></section>`;
     document.body.appendChild(ui);
     ui.addEventListener('click',async e=>{
-      if(e.target.closest('.v23-drawer-close')||e.target.classList.contains('v23-drawer-backdrop')){closeDrawer();return;}
+      if(e.target.closest('.v23-drawer-close')){closeDrawer();return;}
       const call=e.target.closest('[data-v23-mobile-call]');if(!call)return;
       const p=(state.auction?.callCandidates||[]).find(x=>String(x.id)===String(call.dataset.v23MobileCall));
       if(!p||!mobileCanCall())return;
@@ -34249,6 +34248,12 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
     if(!Number.isFinite(deadline))return '—';
     return `${Math.max(0,Math.ceil((deadline-now)/1000))}s`;
   }
+  function normalizeMobileActionRow(shell){
+    const freeRow=qs('.v23-free-bid',shell),leave=qs('[data-v23-proxy="leave"]',shell);
+    if(freeRow&&leave&&leave.parentElement!==freeRow)freeRow.appendChild(leave);
+    if(leave)leave.classList.add('danger');
+  }
+
   function syncButtons(shell){
     ['inc1','inc2','inc3','inc5','inc10','hold','done','leave'].forEach(k=>{
       const local=qs(`[data-v23-proxy="${k}"]`,shell),orig=findOriginalButton(k);if(!local)return;local.disabled=!orig||orig.disabled;local.hidden=(k==='done'&&!orig)||(k==='hold'&&!orig);
@@ -34258,11 +34263,11 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
   }
   function sync(){
     const shell=ensureShell();ensureDrawerUi();const headerMode=ensureHeaderMode();
-    const active=isPhone()&&isLive();shell.hidden=!active;if(headerMode)headerMode.hidden=!active;
+    const active=isPhone()&&isLive();shell.hidden=!active;if(headerMode){headerMode.hidden=true;headerMode.remove();}
     const mobileHead=qs('.v23-mobile-head',shell);if(active&&headerMode&&mobileHead&&headerMode.parentElement!==mobileHead){mobileHead.insertBefore(headerMode,mobileHead.querySelector('.v23-mobile-credit'));}
     document.body.classList.toggle('v23-mobile-auction',active);
     if(!active){document.body.classList.remove('v23-mobile-full','v23-mobile-compact','v23-roster-open','v23-free-open');syncDrawerTargets();return;}
-    const mode=getMode();document.body.classList.toggle('v23-mobile-full',mode==='full');document.body.classList.toggle('v23-mobile-compact',mode==='compact');
+    const mode='full';document.body.classList.toggle('v23-mobile-full',mode==='full');document.body.classList.toggle('v23-mobile-compact',mode==='compact');
     qsa('[data-v23-mode]',headerMode||document).forEach(b=>b.classList.toggle('active',b.dataset.v23Mode===mode));
     if(mode==='compact')closeDrawer();
     const info=myInfo(),p=currentPlayer(),s=session();
@@ -34270,7 +34275,7 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
     qs('[data-v23-credits]',shell).textContent=info?.remaining??'—';qs('[data-v23-max]',shell).textContent=info?.maxBid??'—';
     qs('[data-v23-player]',shell).textContent=p?.name||'—';qs('[data-v23-player-meta]',shell).textContent=p?[roles(p).join(' · '),p.serie_a_team].filter(Boolean).join(' · '):'attesa chiamata';
     qs('[data-v23-timer]',shell).textContent=timerText();qs('[data-v23-bid]',shell).textContent=s?.current_player_id?Math.max(1,Number(s.current_bid||1)):'—';qs('[data-v23-bidder]',shell).textContent=s?.current_player_id?teamName(s.current_bidder_team_id):'—';
-    const drawers=qs('.v23-mobile-drawers',shell);if(drawers)drawers.hidden=mode!=='full';syncButtons(shell);syncDrawerTargets();
+    const drawers=qs('.v23-mobile-drawers',shell);if(drawers)drawers.hidden=false;normalizeMobileActionRow(shell);syncButtons(shell);syncDrawerTargets();
   }
 
   if(typeof renderAuctionLive==='function'){
@@ -34325,6 +34330,25 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
       .v23-mobile-drawer-price{align-self:center!important;justify-self:end!important;min-width:0!important;color:var(--text)!important;font-size:11px!important;font-weight:900!important;white-space:nowrap!important;text-align:right!important}
       .v23-mobile-empty{padding:16px!important;text-align:center!important;color:var(--soft)!important}
       @media(max-width:390px){.v23-mobile-drawer-row{grid-template-columns:86px minmax(0,1fr) 78px!important;gap:6px!important}.v23-mobile-drawer-roles .rolebadge{min-width:25px!important;height:26px!important;padding:2px 5px!important;font-size:9px!important}.v23-mobile-drawer-row>button{font-size:9px!important}}
+      /* V29: phone auction has only COMPLETE mode. */
+      body.v23-mobile-auction .v23-header-mode{display:none!important}
+
+      /* The drawer itself never scrolls: only its row list does. */
+      .v23-mobile-drawer-panel{overflow:hidden!important;min-height:0!important;max-height:none!important;pointer-events:auto!important;z-index:2101!important}
+      .v23-mobile-drawer-list{height:100%!important;min-height:0!important;max-height:100%!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior:contain!important;touch-action:pan-y!important;scrollbar-gutter:stable!important}
+      .v23-mobile-drawer-row{flex:none!important;min-width:0!important}
+
+      /* Backdrop is visual only: closing is exclusively through the X. */
+      .v23-drawer-backdrop{pointer-events:none!important}
+      .v23-mobile-drawer-search,.v23-mobile-drawer-search input,.v23-mobile-drawer-list{pointer-events:auto!important}
+
+      /* LIBERO | OK | LASCIA always share one row. */
+      .v23-free-bid{grid-template-columns:minmax(0,1fr) 72px 86px!important;align-items:stretch!important}
+      .v23-free-bid [data-v23-proxy="leave"]{display:block!important;grid-column:3!important;grid-row:1!important;width:100%!important;min-width:0!important;max-width:none!important;height:48px!important;min-height:48px!important;margin:0!important;padding:4px 6px!important;background:var(--danger)!important;border-color:#c4526d!important;color:#fff!important;font-size:10px!important;font-weight:900!important;border-radius:10px!important}
+      .v23-free-bid [data-v23-free-ok]{grid-column:2!important;grid-row:1!important}
+      .v23-free-bid label{grid-column:1!important;grid-row:1!important}
+      .v23-main-actions:empty{display:none!important}
+
     }
   `;document.head.appendChild(css);
   sync();
