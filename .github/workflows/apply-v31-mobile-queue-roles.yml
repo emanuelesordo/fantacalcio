@@ -1,0 +1,46 @@
+name: Apply V31 mobile queue pause and role filters
+on:
+  push:
+    paths:
+      - '.github/apply_v31_mobile_queue_roles.py'
+      - '.github/workflows/apply-v31-mobile-queue-roles.yml'
+  workflow_dispatch:
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Apply V31
+        run: python .github/apply_v31_mobile_queue_roles.py
+      - name: Validate
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('home.html').read_text(encoding='utf-8')
+          assert '<title>Fantacalcio Live</title>' in s
+          assert 'Fantacalcio Live - tool per asta online' in s
+          assert 'v31-mobile-queue-roles-runtime' in s
+          assert 'data-v31-queue-pause' in s
+          assert 'data-v31-role-strip' in s
+          scripts=re.findall(r'<script(?![^>]*\\bsrc=)[^>]*>(.*?)</script>',s,re.S|re.I)
+          out=Path('/tmp/v31js');out.mkdir(exist_ok=True)
+          for i,code in enumerate(scripts):(out/f'{i:03d}.js').write_text(code,encoding='utf-8')
+          PY
+          for f in /tmp/v31js/*.js; do node --check "$f"; done
+          git diff --check
+      - name: Commit
+        run: |
+          if git diff --quiet -- home.html; then echo 'No changes'; exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add home.html
+          git commit -m 'fix: move mobile queue pause and add phase role filters'
+          git push
