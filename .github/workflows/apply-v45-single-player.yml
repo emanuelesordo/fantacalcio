@@ -1,0 +1,48 @@
+name: Apply V45 single player
+on:
+  push:
+    paths:
+      - '.github/apply_v45_single_player.py'
+      - '.github/workflows/apply-v45-single-player.yml'
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Apply patch
+        run: python .github/apply_v45_single_player.py
+      - name: Validate embedded JS
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('home.html').read_text()
+          for i,m in enumerate(re.finditer(r'<script(?:[^>]*)>(.*?)</script>',s,re.S)):
+              Path(f'/tmp/v45-script{i}.js').write_text(m.group(1))
+          PY
+          for f in /tmp/v45-script*.js; do node --check "$f"; done
+      - name: Regression checks
+        run: |
+          grep -q 'single-player-mode-v45' home.html
+          grep -q 'single-player-api' home.html
+          grep -q "action:'assignPlayer'" home.html
+          grep -q 'v45SinglePlayerAssign' home.html
+          ! grep -q 'SINGLE_PLAYER_MODE_NO_BIDS' home.html || true
+      - name: Diff check
+        run: git diff --check
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add home.html
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'feat: add single player auction mode'
+          git push origin main
