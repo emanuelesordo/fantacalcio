@@ -1,0 +1,24 @@
+name: Diagnose V31 queue roles
+on:
+  push:
+    paths:
+      - '.github/diag_v31_queue_roles.py'
+      - '.github/workflows/diag-v31-queue-roles.yml'
+  workflow_dispatch:
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: python .github/diag_v31_queue_roles.py
+      - run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/V31_QUEUE_ROLES_DIAG.txt
+          git commit -m 'debug: capture V31 queue and role context' || exit 0
+          git push
