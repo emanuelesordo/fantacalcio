@@ -14736,6 +14736,7 @@ html body.auction-live #view-auction tr.v33-index-market-row{
 
 
 
+
 /* V43 · queue single confirm + manual direct award. */
 
 /* Queue confirmation uses the same compact square footprint as the red X.
@@ -36498,6 +36499,8 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
       return `<section class="auction-suggested-calls" aria-label="Consulente Strategico"><div class="auction-suggested-head"><div><strong>Consulente Strategico</strong><small>IDX matematico · PMA mercato · scarsità · concorrenza</small></div><span>LIVE</span></div><div class="auction-suggested-list">${items.map((x,i)=>`<div class="auction-suggested-row ${i===0?'is-must-have':''}"><span class="auction-suggested-roles">${roles34(x.p).map(r=>`<span class="rolebadge" data-role="${esc34(r)}">${esc34(r)}</span>`).join('')}</span><div class="auction-suggested-copy"><div class="v8n"><strong>${esc34(x.p.name||'Giocatore')}</strong></div><small>${esc34(x.p.serie_a_team||'—')} · IDX ${Math.round(x.idx)} · PMA ${num(x.p.pma)!=null?Math.round(Number(x.p.pma)):'—'}</small></div><span class="v34-suggest-metrics"><span class="v34-suggest-metric ud ${x.ud>.5?'pos':x.ud<-.5?'neg':'zero'}"><small>UD</small><b>${x.ud>0?'+':''}${x.ud.toFixed(1).replace('.',',')}</b></span><span class="v34-suggest-metric"><small>O</small><b>${x.o}</b></span><span class="v34-suggest-metric"><small>MAX</small><b>${x.mx}</b></span></span><span class="auction-v7-suggest-actions"><button type="button" class="auction-v7-dismiss" data-v8-hide="${esc34(x.p.id)}" title="Nascondi per ora">×</button>${can?`<button type="button" class="auction-suggested-action" data-suggest-call="${esc34(x.p.id)}">${label}</button>`:'<span class="auction-suggested-action-placeholder">VICE</span>'}</span></div>`).join('')}</div></section>`;
     };
   }
+
+
 
 
 
