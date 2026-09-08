@@ -1,0 +1,45 @@
+name: Apply V27 mobile auction fixes
+on:
+  push:
+    paths:
+      - '.github/apply_v27_mobile_fix.py'
+      - '.github/workflows/apply-v27-mobile-fix.yml'
+  workflow_dispatch:
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: python .github/apply_v27_mobile_fix.py
+      - name: Validate
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          t=Path('home.html').read_text(encoding='utf-8')
+          assert '<title>Fantacalcio Live</title>' in t
+          assert 'Fantacalcio Live - tool per asta online' in t
+          scripts=re.findall(r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>',t,re.S|re.I)
+          out=Path('/tmp/v27-inline');out.mkdir(exist_ok=True)
+          for i,c in enumerate(scripts):(out/f'{i:03d}.js').write_text(c,encoding='utf-8')
+          PY
+          for f in /tmp/v27-inline/*.js; do node --check "$f"; done
+          git diff --check
+      - name: Commit patch
+        run: |
+          if git diff --quiet -- home.html; then
+            echo 'No home.html changes required'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add home.html
+          git commit -m 'fix: stabilize mobile auction layout and drawers'
+          git push
