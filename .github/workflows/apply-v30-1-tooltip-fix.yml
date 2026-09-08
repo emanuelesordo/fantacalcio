@@ -1,0 +1,41 @@
+name: Apply V30.1 index tooltip fix
+on:
+  push:
+    paths:
+      - '.github/apply_v30_1_tooltip_fix.py'
+      - '.github/workflows/apply-v30-1-tooltip-fix.yml'
+  workflow_dispatch:
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: python .github/apply_v30_1_tooltip_fix.py
+      - name: Validate
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          t=Path('home.html').read_text(encoding='utf-8')
+          assert 'x.playerTarget.toFixed(2)' in t
+          scripts=re.findall(r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>',t,re.S|re.I)
+          out=Path('/tmp/v301-inline');out.mkdir(exist_ok=True)
+          for i,c in enumerate(scripts):(out/f'{i:03d}.js').write_text(c,encoding='utf-8')
+          PY
+          for f in /tmp/v301-inline/*.js; do node --check "$f"; done
+          git diff --check
+      - name: Commit patch
+        run: |
+          if git diff --quiet -- home.html; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add home.html
+          git commit -m 'fix: clarify index tooltip target formula'
+          git push
