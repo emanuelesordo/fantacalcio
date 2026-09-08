@@ -1,0 +1,50 @@
+name: Apply V32 mobile sort and Listone fix
+on:
+  push:
+    paths:
+      - '.github/apply_v32_mobile_sort_listone_fix.py'
+      - '.github/workflows/apply-v32-mobile-sort-listone-fix.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Apply V32
+        run: python .github/apply_v32_mobile_sort_listone_fix.py
+      - name: Validate
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          text=Path('home.html').read_text(encoding='utf-8')
+          assert '<title>Fantacalcio Live</title>' in text
+          assert 'Fantacalcio Live - tool per asta online' in text
+          assert 'v32-mobile-sort-listone-runtime' in text
+          assert 'raw,x.rawPoints' in text
+          assert 'v32-mobile-sort-strip' in text
+          scripts=re.findall(r'<script(?![^>]*\\bsrc=)[^>]*>(.*?)</script>',text,re.S|re.I)
+          out=Path('/tmp/v32-inline');out.mkdir(exist_ok=True)
+          for i,code in enumerate(scripts):
+              (out/f'{i:03d}.js').write_text(code,encoding='utf-8')
+          PY
+          for f in /tmp/v32-inline/*.js; do node --check "$f"; done
+          git diff --check
+      - name: Commit
+        run: |
+          if git diff --quiet -- home.html; then
+            echo 'No home.html changes required'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add home.html
+          git commit -m 'fix: restore mobile Listone and add live sorting'
+          git push
