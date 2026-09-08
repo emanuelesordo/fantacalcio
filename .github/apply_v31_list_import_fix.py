@@ -5,24 +5,56 @@ p=Path('home.html')
 s=p.read_text(encoding='utf-8')
 assert '<title>Fantacalcio Live</title>' in s
 
+if 'v31-list-import-style' in s and 'function v13RowsFromSheet' in s:
+    print('V31 list import fix already applied')
+    raise SystemExit(0)
+
 start=s.find('<script id="v13-list-index-import-runtime">')
 end=s.find('</script>',start)
 if start<0 or end<0:
     raise SystemExit('V13 runtime not found')
 block=s[start:end]
 
-# 1) SheetJS: use current official full build and a single shared loader promise.
-block=re.sub(
-    r"  function v13LoadXlsx\(\)\{.*?\}\n  const v13Pick=",
-    """  let v13XlsxPromise=null;\n  function v13LoadXlsx(){\n    if(window.XLSX)return Promise.resolve(window.XLSX);\n    if(v13XlsxPromise)return v13XlsxPromise;\n    v13XlsxPromise=new Promise((resolve,reject)=>{\n      const existing=document.querySelector('script[data-fanta-sheetjs]');\n      if(existing){\n        existing.addEventListener('load',()=>window.XLSX?resolve(window.XLSX):reject(new Error('Parser Excel non disponibile.')),{once:true});\n        existing.addEventListener('error',()=>reject(new Error('Impossibile caricare il parser Excel.')),{once:true});\n        return;\n      }\n      const sc=document.createElement('script');\n      sc.dataset.fantaSheetjs='1';\n      sc.src='https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js';\n      sc.onload=()=>window.XLSX?resolve(window.XLSX):reject(new Error('Parser Excel non disponibile.'));\n      sc.onerror=()=>reject(new Error('Impossibile caricare il parser Excel.'));\n      document.head.appendChild(sc);\n    }).catch(e=>{v13XlsxPromise=null;throw e});\n    return v13XlsxPromise;\n  }\n  const v13Key=v=>String(v??'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');\n  const v13Pick=(row,names)=>{\n    const entries=Object.entries(row||{}),wanted=new Set(names.map(v13Key));\n    for(const [k,v] of entries){if(wanted.has(v13Key(k))&&v!==''&&v!==null&&v!==undefined)return v;}\n    return null;\n  };\n  const v13PickLegacy=""",
-    block,
-    count=1,
-    flags=re.S,
+# 1) SheetJS: current official full build (includes Apple Numbers support),
+#    one shared loader promise, and tolerant normalized header lookup.
+load_pick_pat=re.compile(
+    r"  function v13LoadXlsx\(\)\{.*?\}\n"
+    r"  const v13Pick=.*?;\n",
+    re.S,
 )
-# Remove the original v13Pick expression left after the replacement anchor.
-block=re.sub(r"  const v13PickLegacy=.*?;\n  const v13Bool=", "  const v13Bool=", block, count=1, flags=re.S)
+loader_pick=r'''  let v13XlsxPromise=null;
+  function v13LoadXlsx(){
+    const version=String(window.XLSX?.version||'');
+    if(window.XLSX&&/^0\.(2[0-9]|[3-9][0-9])\./.test(version))return Promise.resolve(window.XLSX);
+    if(v13XlsxPromise)return v13XlsxPromise;
+    v13XlsxPromise=new Promise((resolve,reject)=>{
+      const existing=document.querySelector('script[data-fanta-sheetjs]');
+      if(existing){
+        existing.addEventListener('load',()=>window.XLSX?resolve(window.XLSX):reject(new Error('Parser Excel non disponibile.')),{once:true});
+        existing.addEventListener('error',()=>reject(new Error('Impossibile caricare il parser Excel.')),{once:true});
+        return;
+      }
+      const sc=document.createElement('script');
+      sc.dataset.fantaSheetjs='1';
+      sc.src='https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js';
+      sc.onload=()=>window.XLSX?resolve(window.XLSX):reject(new Error('Parser Excel non disponibile.'));
+      sc.onerror=()=>reject(new Error('Impossibile caricare il parser Excel.'));
+      document.head.appendChild(sc);
+    }).catch(e=>{v13XlsxPromise=null;throw e});
+    return v13XlsxPromise;
+  }
+  const v13Key=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
+  const v13Pick=(row,names)=>{
+    const entries=Object.entries(row||{}),wanted=new Set(names.map(v13Key));
+    for(const [k,v] of entries){if(wanted.has(v13Key(k))&&v!==''&&v!==null&&v!==undefined)return v;}
+    return null;
+  };
+'''
+if not load_pick_pat.search(block):
+    raise SystemExit('V13 XLSX loader/header picker block not found')
+block=load_pick_pat.sub(lambda _m: loader_pick,block,count=1)
 
-# 2) Aliases found in the attached Fantaculo workbook.
+# 2) Header aliases actually present in the attached Fantaculo workbook.
 block=block.replace(
     "expected_fantasy_avg:v13Number(v13Pick(row,['expectedFantamedia','expected_fantasy_avg']))",
     "expected_fantasy_avg:v13Number(v13Pick(row,['expectedFantamedia','xFantamedia','fantamedia','expected_fantasy_avg']))"
@@ -32,7 +64,7 @@ block=block.replace(
     "free_kick_probability:v13Number(v13Pick(row,['freeKickProbability','freeKickP','free_kick_probability']))"
 )
 
-# 3) Replace import + mount with multi-sheet/header detection and one stable control.
+# 3) Replace import + mount with multi-sheet/header detection and a single stable control.
 pat=re.compile(r"  async function v13ImportFile\(file\)\{.*?\n  \}\n  function v13MountImport\(\)\{.*?\n  \}\n\n  if\(typeof loadList==='function'\)\{",re.S)
 new=r'''  function v13LooksLikeNumbers(buffer){
     try{
@@ -88,7 +120,8 @@ new=r'''  function v13LooksLikeNumbers(buffer){
     }
     const rows=chosen.rows;
     const ext=(file.name.split('.').pop()||'').toLowerCase();
-    const begin=await api(ENDPOINTS.list,{action:'beginListImport',sourceFilename:file.name,sourceFormat:ext,sourceColumns:chosen.headers.filter(Boolean),referenceDate:new Date().toISOString().slice(0,10)});
+    const sourceFormat=['csv','xls','xlsx'].includes(ext)?ext:(isNumbers?'xlsx':ext);
+    const begin=await api(ENDPOINTS.list,{action:'beginListImport',sourceFilename:file.name,sourceFormat,sourceColumns:chosen.headers.filter(Boolean),referenceDate:new Date().toISOString().slice(0,10)});
     const batchId=begin?.batchId;if(!batchId)throw new Error('Impossibile iniziare l’import.');
     for(let i=0;i<rows.length;i+=80)await api(ENDPOINTS.list,{action:'appendListImport',batchId,rows:rows.slice(i,i+80)});
     const fin=await api(ENDPOINTS.list,{action:'finishListImport',batchId});
@@ -123,11 +156,11 @@ new=r'''  function v13LooksLikeNumbers(buffer){
   if(typeof loadList==='function'){'''
 if not pat.search(block):
     raise SystemExit('V13 import/mount block not found')
-block=pat.sub(new,block,count=1)
+block=pat.sub(lambda _m:new,block,count=1)
 
 s=s[:start]+block+s[end:]
 
-# Add small stable-layout style once.
+# 4) Stable toolbar footprint for the single import control.
 if 'v31-list-import-style' not in s:
     style='''\n<style id="v31-list-import-style">\n#view-list .v13-import-control{display:inline-flex!important;align-items:center!important;flex:0 0 auto!important}\n#view-list .v13-import-control #v13-import-button{height:28px!important;min-height:28px!important;padding:2px 7px!important;white-space:nowrap!important}\n</style>\n'''
     s=s.replace('</head>',style+'</head>',1)
