@@ -1,0 +1,42 @@
+name: Apply V34b manual queue cleanup
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/apply_v34b_manual_queue_cleanup.py'
+      - '.github/workflows/apply-v34b-manual-queue-cleanup.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply cleanup
+        run: python .github/apply_v34b_manual_queue_cleanup.py
+      - name: Validate
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          t=Path('home.html').read_text(encoding='utf-8')
+          assert '<title>Fantacalcio Live</title>' in t
+          assert 'Fantacalcio Live - tool per asta online' in t
+          assert 'manualFlowQueue' in t
+          scripts=re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',t,re.S)
+          Path('/tmp/v34bscripts').mkdir(exist_ok=True)
+          for i,s in enumerate(scripts): Path(f'/tmp/v34bscripts/{i}.js').write_text(s,encoding='utf-8')
+          PY
+          for f in /tmp/v34bscripts/*.js; do node --check "$f"; done
+          git diff --check
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add home.html
+          git diff --cached --quiet || git commit -m "fix: keep manual auction queue available"
+          git push
