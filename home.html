@@ -14155,6 +14155,11 @@ body.v10-index-owner #view-auction tr.v30-index-market-row{
 }
 </style>
 
+
+<style id="v31-list-import-style">
+#view-list .v13-import-control{display:inline-flex!important;align-items:center!important;flex:0 0 auto!important}
+#view-list .v13-import-control #v13-import-button{height:28px!important;min-height:28px!important;padding:2px 7px!important;white-space:nowrap!important}
+</style>
 </head>
 <body class="modern-glass">
   <div id="global-message" class="message" aria-live="polite"></div>
@@ -32882,8 +32887,33 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
 
   /* Import CSV/XLS/XLSX: il file resta nel browser; al termine staging e batch incompleti
      vengono ripuliti dal trigger DB e l'input file viene azzerato. */
-  function v13LoadXlsx(){return new Promise((resolve,reject)=>{if(window.XLSX)return resolve(window.XLSX);const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';sc.onload=()=>resolve(window.XLSX);sc.onerror=()=>reject(new Error('Impossibile caricare il parser Excel.'));document.head.appendChild(sc);});}
-  const v13Pick=(row,names)=>{for(const n of names){if(Object.prototype.hasOwnProperty.call(row,n)&&row[n]!==''&&row[n]!==null&&row[n]!==undefined)return row[n];const k=Object.keys(row).find(k=>String(k).toLowerCase()===String(n).toLowerCase());if(k&&row[k]!==''&&row[k]!==null&&row[k]!==undefined)return row[k];}return null};
+  let v13XlsxPromise=null;
+  function v13LoadXlsx(){
+    const version=String(window.XLSX?.version||'');
+    if(window.XLSX&&/^0\.(2[0-9]|[3-9][0-9])\./.test(version))return Promise.resolve(window.XLSX);
+    if(v13XlsxPromise)return v13XlsxPromise;
+    v13XlsxPromise=new Promise((resolve,reject)=>{
+      const existing=document.querySelector('script[data-fanta-sheetjs]');
+      if(existing){
+        existing.addEventListener('load',()=>window.XLSX?resolve(window.XLSX):reject(new Error('Parser Excel non disponibile.')),{once:true});
+        existing.addEventListener('error',()=>reject(new Error('Impossibile caricare il parser Excel.')),{once:true});
+        return;
+      }
+      const sc=document.createElement('script');
+      sc.dataset.fantaSheetjs='1';
+      sc.src='https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js';
+      sc.onload=()=>window.XLSX?resolve(window.XLSX):reject(new Error('Parser Excel non disponibile.'));
+      sc.onerror=()=>reject(new Error('Impossibile caricare il parser Excel.'));
+      document.head.appendChild(sc);
+    }).catch(e=>{v13XlsxPromise=null;throw e});
+    return v13XlsxPromise;
+  }
+  const v13Key=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
+  const v13Pick=(row,names)=>{
+    const entries=Object.entries(row||{}),wanted=new Set(names.map(v13Key));
+    for(const [k,v] of entries){if(wanted.has(v13Key(k))&&v!==''&&v!==null&&v!==undefined)return v;}
+    return null;
+  };
   const v13Bool=v=>{if(typeof v==='boolean')return v;const x=String(v??'').trim().toLowerCase();return ['1','true','si','sì','yes','y','x'].includes(x)||(x!==''&&!['0','false','no','n'].includes(x))};
   const v13Number=v=>{if(v===null||v===undefined||v==='')return null;const n=Number(String(v).replace(',','.'));return Number.isFinite(n)?n:null};
   function v13NormalizeRow(row,index){
@@ -32895,8 +32925,8 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
       name,team,classic_role:String(v13Pick(row,['role','classic_role','ruolo'])||'').trim(),mantra_roles:mantra,
       pma,pfc,pfc_pma_delta:v13Number(v13Pick(row,['dpfcpma','pfc_pma_delta','delta']))??(pfc!==null&&pma!==null?pfc-pma:null),
       pma_range:v13Pick(row,['pmaRange','pma_range']),pfc_range:v13Pick(row,['pfcRange','pfc_range']),slot:v13Number(v13Pick(row,['slot'])),
-      expected_titolarity:v13Number(v13Pick(row,['expectedTitolarita','expectedTitolarity','expected_titolarity'])),expected_fantasy_avg:v13Number(v13Pick(row,['expectedFantamedia','expected_fantasy_avg'])),
-      penalty_probability:v13Number(v13Pick(row,['penaltyProbability','penalty_probability'])),free_kick_probability:v13Number(v13Pick(row,['freeKickProbability','free_kick_probability'])),
+      expected_titolarity:v13Number(v13Pick(row,['expectedTitolarita','expectedTitolarity','expected_titolarity'])),expected_fantasy_avg:v13Number(v13Pick(row,['expectedFantamedia','xFantamedia','fantamedia','expected_fantasy_avg'])),
+      penalty_probability:v13Number(v13Pick(row,['penaltyProbability','penalty_probability'])),free_kick_probability:v13Number(v13Pick(row,['freeKickProbability','freeKickP','free_kick_probability'])),
       unavailable_until_round:v13Number(v13Pick(row,['unavailableUntilRound','unavailable_until_round'])),tier_classic:v13Pick(row,['fasciaFc','tier_classic']),tier_mantra:v13Pick(row,['fasciaFr','tier_mantra']),
       uncertain_return:v13Bool(v13Pick(row,['rientroIncerto','uncertain_return'])),new_arrival:v13Bool(v13Pick(row,['newArrival','new_arrival'])),market_flag:v13Bool(v13Pick(row,['calciomercato','market_flag'])),
       source_updated_at:v13Pick(row,['updatedAt','source_updated_at']),last_three_year_titolarity:v13Number(v13Pick(row,['lastThreeYearTitolarity','last_three_year_titolarity'])),
@@ -32908,30 +32938,91 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
     const source=String(v13Pick(row,['id','playerId','sourcePlayerId','source_player_id'])||`${name}|${team}`).trim();
     return {rowIndex:index+1,sourcePlayerId:source,normalized,raw:row};
   }
-  async function v13ImportFile(file){
-    if(!file) return;const XLSX=await v13LoadXlsx(),buffer=await file.arrayBuffer(),wb=XLSX.read(buffer,{type:'array',cellDates:true});
-    const sheet=wb.Sheets[wb.SheetNames[0]],rawRows=XLSX.utils.sheet_to_json(sheet,{defval:'',raw:false});
-    if(!rawRows.length)throw new Error('Il file non contiene righe.');
+  function v13LooksLikeNumbers(buffer){
+    try{
+      const u8=new Uint8Array(buffer),from=Math.max(0,u8.length-180000);
+      return new TextDecoder('latin1').decode(u8.subarray(from)).includes('Index/Document.iwa');
+    }catch{return false}
+  }
+  function v13HeaderScore(row){
+    const keys=(row||[]).map(v13Key),has=(...x)=>x.some(k=>keys.includes(v13Key(k)));
+    let score=0;
+    if(has('name','nome','player','calciatore'))score+=8;
+    if(has('team','squadra'))score+=3;
+    if(has('role','classic_role','ruolo','roleMantra','mantra_roles'))score+=3;
+    if(has('pfc'))score+=2;if(has('pma'))score+=2;if(has('slot'))score+=1;
+    if(has('expectedTitolarita','expectedTitolarity'))score+=1;
+    if(has('expectedFantamedia','xFantamedia','fantamedia'))score+=1;
+    return score;
+  }
+  function v13RowsFromSheet(XLSX,ws){
+    const matrix=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false,blankrows:false});
+    if(!matrix?.length)return null;
+    let headerIndex=-1,best=-1;
+    for(let i=0;i<Math.min(20,matrix.length);i++){
+      const score=v13HeaderScore(matrix[i]);
+      if(score>best){best=score;headerIndex=i;}
+    }
+    if(headerIndex<0||best<8)return null;
+    const headers=matrix[headerIndex].map(v=>String(v??'').trim());
+    const rawRows=matrix.slice(headerIndex+1).filter(r=>r.some(v=>String(v??'').trim()!==''))
+      .map(r=>Object.fromEntries(headers.map((h,i)=>[h||`col_${i+1}`,r[i]??''])));
     const rows=rawRows.map(v13NormalizeRow).filter(x=>x.normalized.name);
-    if(!rows.length)throw new Error('Nessun giocatore riconosciuto.');
+    return {rawRows,rows,headers,headerScore:best,headerIndex};
+  }
+  async function v13ImportFile(file){
+    if(!file)return;
+    const XLSX=await v13LoadXlsx(),buffer=await file.arrayBuffer(),isNumbers=v13LooksLikeNumbers(buffer);
+    let wb;
+    try{wb=XLSX.read(buffer,{type:'array',cellDates:true,dense:true});}
+    catch(error){
+      if(isNumbers)throw new Error('Il file ha estensione Excel ma contenuto Apple Numbers. Il parser aggiornato non riesce a leggerlo: in Numbers usa File → Esporta in → Excel e riprova.');
+      throw error;
+    }
+    const candidates=[];
+    for(const sheetName of wb.SheetNames||[]){
+      const parsed=v13RowsFromSheet(XLSX,wb.Sheets[sheetName]);
+      if(parsed?.rows?.length)candidates.push({sheetName,...parsed});
+    }
+    candidates.sort((a,b)=>b.rows.length-a.rows.length||b.headerScore-a.headerScore);
+    const chosen=candidates[0];
+    if(!chosen){
+      const kind=isNumbers?'Apple Numbers (anche se il nome termina in .xlsx)':'foglio di calcolo';
+      throw new Error(`Nessun giocatore riconosciuto nel ${kind}. Tabelle lette: ${(wb.SheetNames||[]).join(', ')||'nessuna'}.`);
+    }
+    const rows=chosen.rows;
     const ext=(file.name.split('.').pop()||'').toLowerCase();
-    const begin=await api(ENDPOINTS.list,{action:'beginListImport',sourceFilename:file.name,sourceFormat:ext,sourceColumns:Object.keys(rawRows[0]||{}),referenceDate:new Date().toISOString().slice(0,10)});
+    const sourceFormat=['csv','xls','xlsx'].includes(ext)?ext:(isNumbers?'xlsx':ext);
+    const begin=await api(ENDPOINTS.list,{action:'beginListImport',sourceFilename:file.name,sourceFormat,sourceColumns:chosen.headers.filter(Boolean),referenceDate:new Date().toISOString().slice(0,10)});
     const batchId=begin?.batchId;if(!batchId)throw new Error('Impossibile iniziare l’import.');
     for(let i=0;i<rows.length;i+=80)await api(ENDPOINTS.list,{action:'appendListImport',batchId,rows:rows.slice(i,i+80)});
     const fin=await api(ENDPOINTS.list,{action:'finishListImport',batchId});
     if(!fin?.ok&&fin?.rowCount==null)throw new Error('Import non finalizzato.');
     state.v13Filters={};
     await loadList();
-    msg(`Listone aggiornato: ${fin.rowCount??rows.length} giocatori. Area temporanea import pulita.`,'success');
+    msg(`Listone aggiornato: ${fin.rowCount??rows.length} giocatori · tabella ${chosen.sheetName}${isNumbers?' · sorgente Numbers':''}.`,'success');
   }
   function v13MountImport(){
     if(!state.list?.permissions?.canManageList)return;
-    const row=document.querySelector('#view-list #list-rolebar')||document.querySelector('#view-list .v12-toolbar-row');if(!row||row.querySelector('#v13-import-button'))return;
-    const input=document.createElement('input');input.type='file';input.id='v13-import-file';input.accept='.csv,.xls,.xlsx';input.hidden=true;
-    const button=document.createElement('button');button.type='button';button.id='v13-import-button';button.className='secondary';button.textContent='IMPORTA CSV/XLSX';
-    button.addEventListener('click',()=>input.click());
-    input.addEventListener('change',async()=>{const file=input.files?.[0];if(!file)return;button.disabled=true;button.textContent='IMPORT…';try{await v13ImportFile(file)}catch(e){msg(e.message||'Errore import.','error')}finally{input.value='';button.disabled=false;button.textContent='IMPORTA CSV/XLSX';}});
-    row.append(input,button);
+    const row=document.querySelector('#view-list .v12-toolbar-row')||document.querySelector('#view-list .v12-toolbar');
+    if(!row)return;
+    let wrap=document.getElementById('v13-import-control');
+    if(!wrap){
+      wrap=document.createElement('span');wrap.id='v13-import-control';wrap.className='v13-import-control';
+      const input=document.createElement('input');input.type='file';input.id='v13-import-file';input.accept='.csv,.xls,.xlsx,.numbers';input.hidden=true;
+      const button=document.createElement('button');button.type='button';button.id='v13-import-button';button.className='secondary';button.textContent='IMPORTA CSV/XLSX';
+      button.addEventListener('click',()=>{try{if(typeof input.showPicker==='function')input.showPicker();else input.click();}catch{input.click();}});
+      input.addEventListener('change',async()=>{
+        const file=input.files?.[0];if(!file)return;
+        button.disabled=true;button.textContent='IMPORT…';
+        try{await v13ImportFile(file)}catch(e){msg(e.message||'Errore import.','error')}
+        finally{input.value='';button.disabled=false;button.textContent='IMPORTA CSV/XLSX';}
+      });
+      wrap.append(input,button);
+    }
+    document.querySelectorAll('#v13-import-button').forEach(el=>{if(el!==wrap.querySelector('#v13-import-button'))el.remove()});
+    document.querySelectorAll('#v13-import-file').forEach(el=>{if(el!==wrap.querySelector('#v13-import-file'))el.remove()});
+    if(wrap.parentElement!==row)row.appendChild(wrap);
   }
 
   if(typeof loadList==='function'){
