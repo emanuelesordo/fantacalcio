@@ -14733,6 +14733,61 @@ html body.auction-live #view-auction tr.v33-index-market-row{
   box-shadow:inset 3px 0 0 hsl(var(--v33-market-hue) 84% 51% / .78)!important;
   transition:background .16s ease,box-shadow .16s ease!important;
 }
+
+/* V43 · queue single confirm + manual direct award. */
+
+/* Queue confirmation uses the same compact square footprint as the red X.
+   The canonical .auction-queue-call is retained on desktop; V34 remains only
+   as the fallback/mobile control. */
+html body #view-auction .auction-call-queue-row .auction-queue-call,
+html body #view-auction .v34-queue-call{
+  width:30px!important;
+  min-width:30px!important;
+  max-width:30px!important;
+  height:30px!important;
+  min-height:30px!important;
+  max-height:30px!important;
+  padding:0!important;
+  border-radius:8px!important;
+  font-size:15px!important;
+  line-height:1!important;
+  display:inline-grid!important;
+  place-items:center!important;
+  flex:0 0 30px!important;
+}
+html body #view-auction .auction-call-queue-row .auction-queue-call{
+  background:var(--good,#1d9b62)!important;
+  border-color:rgba(80,230,160,.72)!important;
+  color:#fff!important;
+}
+
+/* Direct award is an operational action, not another oversized primary CTA. */
+html body #view-auction #auction-direct-award-v43{
+  width:auto!important;
+  min-width:0!important;
+  max-width:100%!important;
+  min-height:30px!important;
+  height:30px!important;
+  padding:3px 8px!important;
+  border-radius:7px!important;
+  white-space:nowrap!important;
+  font-size:7px!important;
+  font-weight:950!important;
+  letter-spacing:.025em!important;
+}
+
+@media(max-width:390px){
+  html body #view-auction .auction-call-queue-row .auction-queue-call,
+  html body #view-auction .v34-queue-call{
+    width:28px!important;
+    min-width:28px!important;
+    max-width:28px!important;
+    height:28px!important;
+    min-height:28px!important;
+    max-height:28px!important;
+    flex-basis:28px!important;
+  }
+}
 </style>
 
 
@@ -36265,7 +36320,7 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
   function injectQueueCalls34(){
     const rows=typeof auctionQueueRows==='function'?auctionQueueRows():state.auction?.myCallQueue||[];const byPlayer=new Map(rows.map(x=>[String(x.player_id),x]));
     qsa('.v30-mobile-queue-row[data-v30-queue-player]').forEach(row=>{if(row.querySelector('.v34-queue-call'))return;const q=byPlayer.get(String(row.dataset.v30QueuePlayer));const del=row.querySelector('[data-v30-queue-remove]');if(!q||!del)return;const b=document.createElement('button');b.type='button';b.className='v34-queue-call';b.dataset.v34QueueCall=q.id;b.textContent='✓';b.title='Chiama ora dalla coda';b.disabled=!queueCanCall34();del.insertAdjacentElement('beforebegin',b)});
-    qsa('#view-auction [data-queue-player-id],#view-auction [data-queue-player]').forEach(row=>{if(row.classList.contains('v30-mobile-queue-row')||row.querySelector('.v34-queue-call'))return;const pid=row.dataset.queuePlayerId||row.dataset.queuePlayer;const q=byPlayer.get(String(pid));const del=row.querySelector('[data-queue-remove],[data-call-queue-remove],.auction-queue-remove');if(!q||!del)return;const b=document.createElement('button');b.type='button';b.className='v34-queue-call';b.dataset.v34QueueCall=q.id;b.textContent='✓';b.title='Chiama ora dalla coda';b.disabled=!queueCanCall34();del.insertAdjacentElement('beforebegin',b)});
+    qsa('#view-auction [data-queue-player-id],#view-auction [data-queue-player]').forEach(row=>{if(row.classList.contains('v30-mobile-queue-row'))return;const canonical=row.querySelector('.auction-queue-call'),injected=row.querySelector('.v34-queue-call');if(canonical){injected?.remove();return}if(injected)return;const pid=row.dataset.queuePlayerId||row.dataset.queuePlayer;const q=byPlayer.get(String(pid));const del=row.querySelector('[data-queue-remove],[data-call-queue-remove],.auction-queue-remove');if(!q||!del)return;const b=document.createElement('button');b.type='button';b.className='v34-queue-call';b.dataset.v34QueueCall=q.id;b.textContent='✓';b.title='Chiama ora dalla coda';b.disabled=!queueCanCall34();del.insertAdjacentElement('beforebegin',b)});
   }
 
   async function callQueue34(id,button){if(!id||!queueCanCall34())return;button.disabled=true;try{await api(ENDPOINTS.auction,{action:'callQueuedPlayer',sessionId:session34().id,queueId:id});if(typeof msg==='function')msg('Giocatore chiamato dalla coda.','success');if(typeof scheduleAuctionReconcile==='function')scheduleAuctionReconcile(50)}catch(e){if(typeof msg==='function')msg(e.message||'Chiamata non riuscita.','error');button.disabled=false}}
@@ -36295,9 +36350,161 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
     };
   }
 
+
+  /* V43 · direct award helper. */
+  function timerInactive43(){
+    const s=session34(),cfg=s?.setup_snapshot||state.auction?.settings||{};
+    if(manual34())return true;
+    if(cfg.timer_enabled===false||cfg.auction_timer_enabled===false)return true;
+    const mode=String(cfg.timer_mode??'').trim().toLowerCase();
+    if(['off','none','disabled','no_timer','notimer'].includes(mode))return true;
+    if(mode==='fixed'){
+      const seconds=Number(cfg.fixed_timer_seconds);
+      if(Number.isFinite(seconds)&&seconds<=0)return true;
+    }
+    return false;
+  }
+
+  function selectedAdminPlayer43(){
+    const id=state.auctionAdminPlayerId;
+    if(id==null)return null;
+    return (state.auction?.callCandidates||[]).find(p=>String(p.id)===String(id))||null;
+  }
+
+  function selectedOperationalTeam43(){
+    const s=session34();
+    const id=state.auctionAdminTeamId||s?.current_nomination_team_id||state.auction?.currentTurnTeam?.id||null;
+    if(id==null)return null;
+    return (state.auction?.teams||[]).find(t=>String(t.id)===String(id))||null;
+  }
+
+  function directAwardPrice43(){
+    const input=qs('#view-auction .auction-caller-controls input[type="number"]');
+    const raw=input?.value??state.auctionAdminPrice??state.auctionOpeningBid??1;
+    return Math.max(1,Math.floor(Number(raw)||1));
+  }
+
+  function canDirectAward43(){
+    const s=session34(),p=selectedAdminPlayer43(),team=selectedOperationalTeam43();
+    let controller=false;
+    try{controller=Boolean(state.auction?.permissions?.canControlAuction===true||typeof auctionCanControl==='function'&&auctionCanControl())}catch{}
+    if(!controller){
+      try{controller=Boolean(typeof auctionCanManage==='function'&&auctionCanManage())}catch{}
+    }
+    return Boolean(
+      timerInactive43()
+      && s?.id
+      && s.status==='live'
+      && !s.current_player_id
+      && p
+      && team
+      && controller
+    );
+  }
+
+  function mountDirectAward43(){
+    const call=qs('#auction-call-confirm');
+    const controls=call?.parentElement||qs('#view-auction .auction-caller-controls');
+    if(!controls)return;
+    let b=qs('#auction-direct-award-v43');
+    if(!b){
+      b=document.createElement('button');
+      b.id='auction-direct-award-v43';
+      b.type='button';
+      b.className='secondary';
+      b.textContent='ASSEGNA DIRETTO';
+      (call||controls.lastElementChild)?.insertAdjacentElement?.('afterend',b);
+      if(!b.isConnected)controls.appendChild(b);
+    }
+    const inactive=timerInactive43(),p=selectedAdminPlayer43(),team=selectedOperationalTeam43(),price=directAwardPrice43();
+    b.hidden=!inactive;
+    b.disabled=!canDirectAward43();
+    if(!inactive){
+      b.title='Disponibile solo con timer asta disattivato / modalità manuale';
+    }else if(!p){
+      b.title='Seleziona prima il giocatore';
+    }else if(!team){
+      b.title='Seleziona prima la squadra operativa';
+    }else{
+      b.title=`Assegna ${p.name||'giocatore'} direttamente a ${team.name||'squadra'} per ${price} crediti`;
+    }
+  }
+
+  async function directAward43(button){
+    if(!canDirectAward43())return;
+    const s=session34(),p=selectedAdminPlayer43(),team=selectedOperationalTeam43(),price=directAwardPrice43();
+    if(!s?.id||!p||!team)return;
+    const teamLabel=typeof auctionTeamReference==='function'
+      ? auctionTeamReference(team,team.name||'squadra')
+      : (team.name||'squadra');
+    const confirmed=typeof appConfirm==='function'
+      ? await appConfirm(
+          `${p.name||'Giocatore'} → ${teamLabel} per ${price} crediti?`,
+          {title:'Assegna direttamente',confirmText:'ASSEGNA'}
+        )
+      : true;
+    if(!confirmed)return;
+
+    button.disabled=true;
+    state.auctionAdminPrice=price;
+    const applyState=response=>{
+      if(response?.state&&typeof applyAuctionHotState==='function'){
+        applyAuctionHotState(response.state,{fromMutation:true});
+      }
+      if(response?.ok===false){
+        throw new Error(response?.error||'Operazione non consentita.');
+      }
+    };
+
+    try{
+      const called=await api(
+        ENDPOINTS.auction,
+        {action:'callPlayer',sessionId:s.id,playerId:p.id,openingBid:price}
+      );
+      applyState(called);
+
+      const bid=await api(
+        ENDPOINTS.auction,
+        {action:'placeBid',sessionId:s.id,teamId:team.id,amount:price,source:'VOCALE'}
+      );
+      applyState(bid);
+
+      const awarded=await api(
+        ENDPOINTS.auction,
+        {action:'awardPlayer',sessionId:s.id}
+      );
+      applyState(awarded);
+
+      state.auctionAdminPlayerId=null;
+      if(typeof msg==='function'){
+        msg(`${p.name||'Giocatore'} assegnato a ${teamLabel} per ${price}.`,'success');
+      }
+      if(typeof loadAuction==='function'){
+        await loadAuction();
+      }else if(typeof scheduleAuctionReconcile==='function'){
+        scheduleAuctionReconcile(40);
+      }
+    }catch(error){
+      if(typeof msg==='function')msg(error.message||'Assegnazione diretta non riuscita.','error');
+      if(typeof scheduleAuctionReconcile==='function')scheduleAuctionReconcile(80);
+    }finally{
+      button.disabled=false;
+      requestAnimationFrame(mountDirectAward43);
+    }
+  }
+
+  /* Keep button state aligned with the already-existing player/team/price controls. */
+  ['input','change'].forEach(type=>{
+    document.addEventListener(type,e=>{
+      if(!e.target.closest?.('#view-auction'))return;
+      queueMicrotask(mountDirectAward43);
+    });
+  });
+  /* V43 END direct award helper. */
+
   function patchAll34(){
     document.body.classList.toggle('v34-manual-flow',manual34());
-    console34();injectQueueCalls34();patchSuggested34();
+    console34();injectQueueCalls34();patchSuggested34();mountDirectAward43();
     const lp=state.list?.players||[],ap=state.auction?.callCandidates||[];
     paintDeal34(qs('#list-body'),lp);paintDeal34(qs('#auction-player-body'),ap);
     const lt=qs('#view-list table');if(lt){if(lt.dataset.v34UdReady!=='1')addUdColumn34(lt,lp,'list');sortUd34('list')}
@@ -36307,6 +36514,7 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
   document.addEventListener('click',e=>{
     const sort=e.target.closest?.('[data-v34-ud-sort]');if(sort){e.preventDefault();const k=sort.dataset.v34UdSort;state.v34UdSort[k]=state.v34UdSort[k]===-1?1:-1;sortUd34(k);return}
     const q=e.target.closest?.('[data-v34-queue-call]');if(q){e.preventDefault();e.stopImmediatePropagation();void callQueue34(q.dataset.v34QueueCall,q);return}
+    const direct=e.target.closest?.('#auction-direct-award-v43');if(direct){e.preventDefault();e.stopImmediatePropagation();void directAward43(direct);return}
   },true);
 
   const obs=new MutationObserver(()=>requestAnimationFrame(patchAll34));
