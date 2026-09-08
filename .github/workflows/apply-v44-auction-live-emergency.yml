@@ -1,0 +1,55 @@
+name: Apply V44 auction live emergency
+on:
+  push:
+    paths:
+      - '.github/apply_v44_auction_live_emergency.py'
+      - '.github/workflows/apply-v44-auction-live-emergency.yml'
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Apply emergency patch
+        run: python .github/apply_v44_auction_live_emergency.py
+      - name: Validate embedded JS
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('home.html').read_text()
+          for i,m in enumerate(re.finditer(r'<script(?:[^>]*)>(.*?)</script>',s,re.S)):
+              Path(f'/tmp/script{i}.js').write_text(m.group(1))
+          PY
+          for f in /tmp/script*.js; do node --check "$f"; done
+      - name: Verify emergency invariants
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('home.html').read_text()
+          assert 'id="auction-live-exit-btn"' in s
+          assert 'prestartHold || state.auctionAdminConsoleOpen' not in s
+          assert 'V44 · auction live emergency stability.' in s
+          m=re.search(r'<script id=["\']v34-market-strategy-runtime["\']>(.*?)</script>',s,re.S)
+          assert m
+          for iv in re.findall(r'setInterval\s*\(.*?\)\s*;',m.group(1),re.S):
+              assert not ('loadMarket34' in iv and '5000' in iv)
+          PY
+      - name: Diff check
+        run: git diff --check
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add home.html
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'fix: stabilize auction live before draft'
+          git push origin main
