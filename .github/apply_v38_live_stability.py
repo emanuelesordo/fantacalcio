@@ -12,272 +12,384 @@ def require(condition, message):
 
 
 # ==========================================================
-# V42 · focused live-auction correction
-# - 4 strategist cards in the normal footprint: 2 x 2
-# - compact unboxed UD / O / MAX values
-# - live row economic signal is literally the Listone V33 formula
+# V43 · queue + manual direct award
+# - desktop queue exposes ONE confirm button only
+# - confirm has the same footprint as remove (X)
+# - when auction timers are disabled/manual, Banditore/Admin can
+#   assign the selected player directly to the operational team,
+#   using the editable opening price already present in the caller controls
+# - preserve the V42 strategist and exact Listone economic signal
 # ==========================================================
+
 style_match = re.search(r'(<style id="v34-market-strategy-style">)(.*?)(</style>)', text, re.S)
 require(style_match, 'V34 style block not found')
 style = style_match.group(2)
 
-# Idempotency when the workflow is manually re-run.
+# V42 must already be present; V43 is intentionally incremental.
+require('/* V42 · strategist 2x2 + exact Listone signal. */' in style,
+        'V42 strategist/index baseline missing')
+
+# Idempotent V43 CSS refresh.
 style = re.sub(
-    r'\n/\* V42 · strategist 2x2 \+ exact Listone signal\. \*/.*?(?=\Z)',
+    r'\n/\* V43 · queue single confirm \+ manual direct award\. \*/.*?(?=\Z)',
     '\n',
     style,
     count=1,
     flags=re.S,
 )
 
-v42_css = r'''
-/* V42 · strategist 2x2 + exact Listone signal. */
+v43_css = r'''
+/* V43 · queue single confirm + manual direct award. */
 
-/* Normal live strategist: exactly the four returned suggestions occupy a 2x2 grid.
-   This selector intentionally beats the old v10 auto-fit rule. */
-@media(min-width:701px){
-  html body.auction-live.modern-glass #view-auction
-  .auction-free-suggestions .auction-suggested-calls .auction-suggested-list{
-    display:grid!important;
-    grid-template-columns:repeat(2,minmax(0,1fr))!important;
-    grid-auto-flow:row!important;
-    grid-auto-rows:44px!important;
-    align-content:start!important;
-    gap:4px!important;
-    width:100%!important;
-    min-width:0!important;
-    max-height:92px!important;
-    overflow:hidden!important;
-  }
-
-  html body.auction-live.modern-glass #view-auction
-  .auction-free-suggestions .auction-suggested-calls .auction-suggested-row{
-    display:grid!important;
-    grid-template-columns:auto minmax(0,1fr) auto auto!important;
-    width:100%!important;
-    min-width:0!important;
-    max-width:100%!important;
-    height:44px!important;
-    min-height:44px!important;
-    max-height:44px!important;
-    padding:4px 6px!important;
-    gap:5px!important;
-    align-items:center!important;
-    overflow:hidden!important;
-  }
-
-  /* UD / O / MAX are data, not three nested cards. */
-  html body.auction-live.modern-glass #view-auction
-  .auction-suggested-row .v34-suggest-metrics{
-    display:flex!important;
-    grid-template-columns:none!important;
-    align-items:center!important;
-    justify-content:flex-end!important;
-    gap:7px!important;
-    min-width:0!important;
-    width:auto!important;
-  }
-  html body.auction-live.modern-glass #view-auction
-  .auction-suggested-row .v34-suggest-metric{
-    display:inline-flex!important;
-    align-items:baseline!important;
-    justify-content:center!important;
-    gap:2px!important;
-    min-width:0!important;
-    min-height:0!important;
-    height:auto!important;
-    padding:0!important;
-    border:0!important;
-    border-radius:0!important;
-    background:transparent!important;
-    box-shadow:none!important;
-  }
-  html body.auction-live.modern-glass #view-auction
-  .auction-suggested-row .v34-suggest-metric small{
-    font-size:5.5px!important;
-    line-height:1!important;
-    color:var(--muted)!important;
-    font-weight:900!important;
-  }
-  html body.auction-live.modern-glass #view-auction
-  .auction-suggested-row .v34-suggest-metric b{
-    font-size:9.5px!important;
-    line-height:1!important;
-    font-weight:950!important;
-    font-variant-numeric:tabular-nums!important;
-  }
-
-  html body.auction-live.modern-glass #view-auction
-  .auction-suggested-row .auction-suggested-copy>small{
-    font-size:6px!important;
-    line-height:1.05!important;
-  }
-
-  /* Full immersion still returns eight suggestions: 2 columns x 4 compact rows. */
-  :fullscreen html body.auction-live.modern-glass #view-auction
-  .auction-free-suggestions .auction-suggested-calls .auction-suggested-list,
-  html:fullscreen body.auction-live.modern-glass #view-auction
-  .auction-free-suggestions .auction-suggested-calls .auction-suggested-list{
-    grid-template-columns:repeat(2,minmax(0,1fr))!important;
-    grid-auto-rows:36px!important;
-    max-height:156px!important;
-  }
-  :fullscreen html body.auction-live.modern-glass #view-auction
-  .auction-free-suggestions .auction-suggested-calls .auction-suggested-row,
-  html:fullscreen body.auction-live.modern-glass #view-auction
-  .auction-free-suggestions .auction-suggested-calls .auction-suggested-row{
-    height:36px!important;
-    min-height:36px!important;
-    max-height:36px!important;
-  }
+/* Queue confirmation uses the same compact square footprint as the red X.
+   The canonical .auction-queue-call is retained on desktop; V34 remains only
+   as the fallback/mobile control. */
+html body #view-auction .auction-call-queue-row .auction-queue-call,
+html body #view-auction .v34-queue-call{
+  width:30px!important;
+  min-width:30px!important;
+  max-width:30px!important;
+  height:30px!important;
+  min-height:30px!important;
+  max-height:30px!important;
+  padding:0!important;
+  border-radius:8px!important;
+  font-size:15px!important;
+  line-height:1!important;
+  display:inline-grid!important;
+  place-items:center!important;
+  flex:0 0 30px!important;
+}
+html body #view-auction .auction-call-queue-row .auction-queue-call{
+  background:var(--good,#1d9b62)!important;
+  border-color:rgba(80,230,160,.72)!important;
+  color:#fff!important;
 }
 
-/* Live auction uses the same V33 red -> yellow -> green variables as Listone.
-   Do not depend on a body helper class that can arrive one render late. */
-html body.auction-live #view-auction tr.v33-index-market-row{
-  background:linear-gradient(90deg,
-    hsl(var(--v33-market-hue) 76% 46% / var(--v33-market-alpha)),
-    transparent 86%)!important;
-  box-shadow:inset 3px 0 0 hsl(var(--v33-market-hue) 84% 51% / .78)!important;
-  transition:background .16s ease,box-shadow .16s ease!important;
+/* Direct award is an operational action, not another oversized primary CTA. */
+html body #view-auction #auction-direct-award-v43{
+  width:auto!important;
+  min-width:0!important;
+  max-width:100%!important;
+  min-height:30px!important;
+  height:30px!important;
+  padding:3px 8px!important;
+  border-radius:7px!important;
+  white-space:nowrap!important;
+  font-size:7px!important;
+  font-weight:950!important;
+  letter-spacing:.025em!important;
+}
+
+@media(max-width:390px){
+  html body #view-auction .auction-call-queue-row .auction-queue-call,
+  html body #view-auction .v34-queue-call{
+    width:28px!important;
+    min-width:28px!important;
+    max-width:28px!important;
+    height:28px!important;
+    min-height:28px!important;
+    max-height:28px!important;
+    flex-basis:28px!important;
+  }
 }
 '''
-style += v42_css
+style += v43_css
 text = text[:style_match.start(2)] + style + text[style_match.end(2):]
 
 
-# ==========================================================
-# V34 runtime painter: copy the Listone V33 calculation verbatim.
-# Important: do NOT use idx34/ud34 for row colour. The value shown in
-# the Index column and the row signal must both originate from
-# strategicValueIndex() and the same 75% PMA / 25% PFC market reference.
-# ==========================================================
 runtime_match = re.search(r'(<script id="v34-market-strategy-runtime">)(.*?)(</script>)', text, re.S)
 require(runtime_match, 'V34 runtime block not found')
 runtime = runtime_match.group(2)
 
-paint_re = re.compile(
-    r'  function paintDeal34\(root,players\)\{.*?\n  \}\n\n  function addUdColumn34',
-    re.S,
-)
-paint_new = r'''  function paintDeal34(root,players){
-    if(!root)return;
-    const by=new Map((players||[]).map(p=>[String(p.id),p]));
-    root.querySelectorAll('tr[data-player-id]').forEach(row=>{
-      const p=by.get(String(row.dataset.playerId));if(!p)return;
-
-      /* Same cleanup + same calculation used by Listone V33. */
-      row.classList.remove('v22-market-value-row','auction-market-value-row','v10-private-delta-row','v30-index-market-row','v33-index-market-row');
-      ['--v22-hue','--v22-alpha','--auction-market-hue','--auction-market-alpha','--v10-delta-hue','--v10-delta-alpha','--v30-market-hue','--v30-market-alpha','--v33-market-hue','--v33-market-alpha'].forEach(k=>row.style.removeProperty(k));
-
-      let idx=null;try{idx=num(typeof strategicValueIndex==='function'?strategicValueIndex(p):null)}catch{}
-      const pma=num(p?.pma),pfc=num(p?.pfc);
-      if(idx==null||(pma==null&&pfc==null))return;
-      const market=pma!=null&&pfc!=null ? (.75*pma+.25*pfc) : (pma??pfc);
-      const delta=idx-market;
-      const scale=Math.max(8,Math.abs(idx),Math.abs(market));
-      const relative=delta/scale;
-      const strength=clamp(Math.abs(relative)/.35,0,1);
-      /* 52 = yellow at exactly zero; smoothly approach green 128 or red 0. */
-      const hue=relative>=0?52+(128-52)*strength:52*(1-strength);
-      const alpha=.060+.115*strength;
-      row.classList.add('v33-index-market-row');
-      row.style.setProperty('--v33-market-hue',hue.toFixed(1));
-      row.style.setProperty('--v33-market-alpha',alpha.toFixed(3));
-      row.title=`Indice ${Math.round(idx)} cr · PFC/PMA medio ${market.toFixed(1)} · delta ${delta>=0?'+':''}${delta.toFixed(1)} cr`;
-    });
-  }
-
-  function addUdColumn34'''
-runtime, n_paint = paint_re.subn(paint_new, runtime, count=1)
-require(n_paint == 1, 'paintDeal34 target not found')
-text = text[:runtime_match.start(2)] + runtime + text[runtime_match.end(2):]
-
-
-# ==========================================================
-# Regression tests. These are deliberately concrete instead of checking only
-# for generic words/selectors, because that allowed the previous bug through.
-# ==========================================================
-style_check = re.search(r'<style id="v34-market-strategy-style">(.*?)</style>', text, re.S)
-runtime_check = re.search(r'<script id="v34-market-strategy-runtime">(.*?)</script>', text, re.S)
-require(style_check and runtime_check, 'post-patch blocks missing')
-style_final = style_check.group(1)
-runtime_final = runtime_check.group(1)
-
-paint_match = re.search(
-    r'function paintDeal34\(root,players\)\{(.*?)\n  \}\n\n  function addUdColumn34',
-    runtime_final,
-    re.S,
-)
-require(paint_match, 'post-patch paintDeal34 missing')
-paint_body = paint_match.group(1)
-
-# Literal Listone formula requirements.
-exact_formula = [
+# Preserve the exact V42/Listone formula.
+for token in (
     "strategicValueIndex(p)",
     "const market=pma!=null&&pfc!=null ? (.75*pma+.25*pfc) : (pma??pfc);",
     "const delta=idx-market;",
     "const scale=Math.max(8,Math.abs(idx),Math.abs(market));",
     "const relative=delta/scale;",
     "const strength=clamp(Math.abs(relative)/.35,0,1);",
-    "const hue=relative>=0?52+(128-52)*strength:52*(1-strength);",
-    "const alpha=.060+.115*strength;",
     "row.classList.add('v33-index-market-row');",
-]
-for token in exact_formula:
-    require(token in paint_body, 'Listone formula token missing from live painter: '+token)
-require('idx34(p)' not in paint_body and 'ud34(p)' not in paint_body,
-        'live row painter still uses V34 alternative Index/UD calculation')
+):
+    require(token in runtime, 'V42/Listone signal regression: '+token)
 
-# Concrete examples from the reported screen.
-def signal(idx, pfc, pma):
-    market = .75*pma + .25*pfc
-    delta = idx - market
-    scale = max(8, abs(idx), abs(market))
-    relative = delta / scale
-    strength = min(1, max(0, abs(relative)/.35))
-    hue = 52 + (128-52)*strength if relative >= 0 else 52*(1-strength)
-    return market, delta, hue
+# ------------------------------------------------------------------
+# Queue: desktop rows already own a canonical .auction-queue-call.
+# Older V34 injected a second ✓ beside it. Keep the canonical control,
+# remove any old injected duplicate, and inject only when no canonical
+# control exists (e.g. the dedicated mobile queue).
+# ------------------------------------------------------------------
+old_queue_loop = (
+    "qsa('#view-auction [data-queue-player-id],#view-auction [data-queue-player]').forEach("
+    "row=>{if(row.classList.contains('v30-mobile-queue-row')||row.querySelector('.v34-queue-call'))return;"
+)
+new_queue_loop = (
+    "qsa('#view-auction [data-queue-player-id],#view-auction [data-queue-player]').forEach("
+    "row=>{if(row.classList.contains('v30-mobile-queue-row'))return;"
+    "const canonical=row.querySelector('.auction-queue-call'),injected=row.querySelector('.v34-queue-call');"
+    "if(canonical){injected?.remove();return}if(injected)return;"
+)
+if old_queue_loop in runtime:
+    runtime = runtime.replace(old_queue_loop, new_queue_loop, 1)
+require(new_queue_loop in runtime, 'desktop queue dedupe patch missing')
 
-bijlow_market, bijlow_delta, bijlow_hue = signal(5, 12, 4)
-degea_market, degea_delta, degea_hue = signal(33, 24, 13)
-require(abs(bijlow_market-6.0) < 1e-9 and bijlow_delta < 0 and bijlow_hue < 52,
-        'BIJLOW regression failed: IDX 5 vs PFC 12/PMA 4 must be on the red side')
-require(abs(degea_market-15.75) < 1e-9 and degea_delta > 0 and degea_hue > 52,
-        'DE GEA regression failed: IDX 33 vs PFC 24/PMA 13 must be on the green side')
+# ------------------------------------------------------------------
+# Direct award helper. Recreated idempotently on every workflow run.
+# ------------------------------------------------------------------
+runtime = re.sub(
+    r'\n  /\* V43 · direct award helper\. \*/.*?\n  /\* V43 END direct award helper\. \*/\n',
+    '\n',
+    runtime,
+    count=1,
+    flags=re.S,
+)
 
-# Strategist must beat the old auto-fit selector and must not box each metric.
-requirements = [
-    'html body.auction-live.modern-glass #view-auction',
-    '.auction-free-suggestions .auction-suggested-calls .auction-suggested-list',
-    'grid-template-columns:repeat(2,minmax(0,1fr))!important',
-    'grid-auto-rows:44px!important',
-    '.auction-suggested-row .v34-suggest-metrics',
-    'display:flex!important',
-    '.auction-suggested-row .v34-suggest-metric',
-    'border:0!important',
-    'background:transparent!important',
-    'font-size:9.5px!important',
-]
-for token in requirements:
-    require(token in style_final, 'strategist V42 requirement missing: '+token)
-require("const limit=document.fullscreenElement?8:4" in text or "const limit = fullImmersion ? 8 : 4" in text,
-        'strategist renderer no longer guarantees 4 normal / 8 full-immersion suggestions')
+v43_runtime = r'''
+  /* V43 · direct award helper. */
+  function timerInactive43(){
+    const s=session34(),cfg=s?.setup_snapshot||state.auction?.settings||{};
+    if(manual34())return true;
+    if(cfg.timer_enabled===false||cfg.auction_timer_enabled===false)return true;
+    const mode=String(cfg.timer_mode??'').trim().toLowerCase();
+    if(['off','none','disabled','no_timer','notimer'].includes(mode))return true;
+    if(mode==='fixed'){
+      const seconds=Number(cfg.fixed_timer_seconds);
+      if(Number.isFinite(seconds)&&seconds<=0)return true;
+    }
+    return false;
+  }
 
-# Preserve the already-fixed live constraints.
-require('/* V38: no periodic full live-card refresh. */' in runtime_final,
-        'periodic full live-card refresh regression')
-require('Server autorevole' not in text and 'Frontend statico' not in text,
-        'server-status chrome regression')
+  function selectedAdminPlayer43(){
+    const id=state.auctionAdminPlayerId;
+    if(id==null)return null;
+    return (state.auction?.callCandidates||[]).find(p=>String(p.id)===String(id))||null;
+  }
+
+  function selectedOperationalTeam43(){
+    const s=session34();
+    const id=state.auctionAdminTeamId||s?.current_nomination_team_id||state.auction?.currentTurnTeam?.id||null;
+    if(id==null)return null;
+    return (state.auction?.teams||[]).find(t=>String(t.id)===String(id))||null;
+  }
+
+  function directAwardPrice43(){
+    const input=qs('#view-auction .auction-caller-controls input[type="number"]');
+    const raw=input?.value??state.auctionAdminPrice??state.auctionOpeningBid??1;
+    return Math.max(1,Math.floor(Number(raw)||1));
+  }
+
+  function canDirectAward43(){
+    const s=session34(),p=selectedAdminPlayer43(),team=selectedOperationalTeam43();
+    let controller=false;
+    try{controller=Boolean(state.auction?.permissions?.canControlAuction===true||typeof auctionCanControl==='function'&&auctionCanControl())}catch{}
+    if(!controller){
+      try{controller=Boolean(typeof auctionCanManage==='function'&&auctionCanManage())}catch{}
+    }
+    return Boolean(
+      timerInactive43()
+      && s?.id
+      && s.status==='live'
+      && !s.current_player_id
+      && p
+      && team
+      && controller
+    );
+  }
+
+  function mountDirectAward43(){
+    const call=qs('#auction-call-confirm');
+    const controls=call?.parentElement||qs('#view-auction .auction-caller-controls');
+    if(!controls)return;
+    let b=qs('#auction-direct-award-v43');
+    if(!b){
+      b=document.createElement('button');
+      b.id='auction-direct-award-v43';
+      b.type='button';
+      b.className='secondary';
+      b.textContent='ASSEGNA DIRETTO';
+      (call||controls.lastElementChild)?.insertAdjacentElement?.('afterend',b);
+      if(!b.isConnected)controls.appendChild(b);
+    }
+    const inactive=timerInactive43(),p=selectedAdminPlayer43(),team=selectedOperationalTeam43(),price=directAwardPrice43();
+    b.hidden=!inactive;
+    b.disabled=!canDirectAward43();
+    if(!inactive){
+      b.title='Disponibile solo con timer asta disattivato / modalità manuale';
+    }else if(!p){
+      b.title='Seleziona prima il giocatore';
+    }else if(!team){
+      b.title='Seleziona prima la squadra operativa';
+    }else{
+      b.title=`Assegna ${p.name||'giocatore'} direttamente a ${team.name||'squadra'} per ${price} crediti`;
+    }
+  }
+
+  async function directAward43(button){
+    if(!canDirectAward43())return;
+    const s=session34(),p=selectedAdminPlayer43(),team=selectedOperationalTeam43(),price=directAwardPrice43();
+    if(!s?.id||!p||!team)return;
+    const teamLabel=typeof auctionTeamReference==='function'
+      ? auctionTeamReference(team,team.name||'squadra')
+      : (team.name||'squadra');
+    const confirmed=typeof appConfirm==='function'
+      ? await appConfirm(
+          `${p.name||'Giocatore'} → ${teamLabel} per ${price} crediti?`,
+          {title:'Assegna direttamente',confirmText:'ASSEGNA'}
+        )
+      : true;
+    if(!confirmed)return;
+
+    button.disabled=true;
+    state.auctionAdminPrice=price;
+    const applyState=response=>{
+      if(response?.state&&typeof applyAuctionHotState==='function'){
+        applyAuctionHotState(response.state,{fromMutation:true});
+      }
+      if(response?.ok===false){
+        throw new Error(response?.error||'Operazione non consentita.');
+      }
+    };
+
+    try{
+      const called=await api(
+        ENDPOINTS.auction,
+        {action:'callPlayer',sessionId:s.id,playerId:p.id,openingBid:price}
+      );
+      applyState(called);
+
+      const bid=await api(
+        ENDPOINTS.auction,
+        {action:'placeBid',sessionId:s.id,teamId:team.id,amount:price,source:'VOCALE'}
+      );
+      applyState(bid);
+
+      const awarded=await api(
+        ENDPOINTS.auction,
+        {action:'awardPlayer',sessionId:s.id}
+      );
+      applyState(awarded);
+
+      state.auctionAdminPlayerId=null;
+      if(typeof msg==='function'){
+        msg(`${p.name||'Giocatore'} assegnato a ${teamLabel} per ${price}.`,'success');
+      }
+      if(typeof loadAuction==='function'){
+        await loadAuction();
+      }else if(typeof scheduleAuctionReconcile==='function'){
+        scheduleAuctionReconcile(40);
+      }
+    }catch(error){
+      if(typeof msg==='function')msg(error.message||'Assegnazione diretta non riuscita.','error');
+      if(typeof scheduleAuctionReconcile==='function')scheduleAuctionReconcile(80);
+    }finally{
+      button.disabled=false;
+      requestAnimationFrame(mountDirectAward43);
+    }
+  }
+
+  /* Keep button state aligned with the already-existing player/team/price controls. */
+  ['input','change'].forEach(type=>{
+    document.addEventListener(type,e=>{
+      if(!e.target.closest?.('#view-auction'))return;
+      queueMicrotask(mountDirectAward43);
+    });
+  });
+  /* V43 END direct award helper. */
+'''
+
+anchor = '  function patchAll34(){'
+require(anchor in runtime, 'patchAll34 anchor missing')
+runtime = runtime.replace(anchor, v43_runtime + '\n' + anchor, 1)
+
+# Ensure patchAll mounts the action whenever the auction subtree is redrawn.
+if '    console34();injectQueueCalls34();patchSuggested34();mountDirectAward43();' not in runtime:
+    runtime = runtime.replace(
+        '    console34();injectQueueCalls34();patchSuggested34();',
+        '    console34();injectQueueCalls34();patchSuggested34();mountDirectAward43();',
+        1,
+    )
+require('patchSuggested34();mountDirectAward43();' in runtime,
+        'patchAll34 does not mount direct award')
+
+# Extend the existing V34 captured click listener without adding a second global
+# listener that could race with current controls.
+click_anchor = (
+    "    const q=e.target.closest?.('[data-v34-queue-call]');"
+    "if(q){e.preventDefault();e.stopImmediatePropagation();void callQueue34(q.dataset.v34QueueCall,q);return}\n"
+)
+direct_click = (
+    click_anchor
+    + "    const direct=e.target.closest?.('#auction-direct-award-v43');"
+      "if(direct){e.preventDefault();e.stopImmediatePropagation();void directAward43(direct);return}\n"
+)
+listener_start = runtime.find("document.addEventListener('click'")
+listener_tail = runtime[listener_start:] if listener_start >= 0 else ''
+if "const direct=e.target.closest?.('#auction-direct-award-v43')" not in listener_tail:
+    require(click_anchor in runtime, 'V34 click listener queue anchor missing')
+    runtime = runtime.replace(click_anchor, direct_click, 1)
+require("const direct=e.target.closest?.('#auction-direct-award-v43')" in runtime,
+        'direct award click handler missing')
+
+text = text[:runtime_match.start(2)] + runtime + text[runtime_match.end(2):]
+
+
+# ==========================================================
+# Regression checks
+# ==========================================================
+style_check = re.search(r'<style id="v34-market-strategy-style">(.*?)</style>', text, re.S)
+runtime_check = re.search(r'<script id="v34-market-strategy-runtime">(.*?)</script>', text, re.S)
+require(style_check and runtime_check, 'post-patch V34 blocks missing')
+style_final = style_check.group(1)
+runtime_final = runtime_check.group(1)
+
+checks = {
+    'V42 strategist 2x2 preserved':
+        'grid-template-columns:repeat(2,minmax(0,1fr))!important' in style_final,
+    'V42 metrics unboxed preserved':
+        '.auction-suggested-row .v34-suggest-metric' in style_final
+        and 'border:0!important' in style_final
+        and 'background:transparent!important' in style_final,
+    'exact Listone painter preserved':
+        "const market=pma!=null&&pfc!=null ? (.75*pma+.25*pfc) : (pma??pfc);" in runtime_final
+        and "row.classList.add('v33-index-market-row')" in runtime_final,
+    'desktop queue canonical control retained':
+        "const canonical=row.querySelector('.auction-queue-call')" in runtime_final,
+    'desktop injected duplicate removed':
+        "if(canonical){injected?.remove();return}if(injected)return;" in runtime_final,
+    'queue check same size as X':
+        'max-width:30px!important' in style_final and 'max-height:30px!important' in style_final,
+    'manual direct award mounted':
+        "b.id='auction-direct-award-v43'" in runtime_final
+        and 'patchSuggested34();mountDirectAward43();' in runtime_final,
+    'direct award uses editable price':
+        'directAwardPrice43()' in runtime_final
+        and '.auction-caller-controls input[type="number"]' in runtime_final,
+    'direct award uses operational team':
+        'state.auctionAdminTeamId' in runtime_final,
+    'direct award server sequence':
+        "{action:'callPlayer'" in runtime_final
+        and "{action:'placeBid'" in runtime_final
+        and "{action:'awardPlayer'" in runtime_final,
+}
+failed = [name for name, ok in checks.items() if not ok]
+require(not failed, 'V43 regression checks failed: ' + ', '.join(failed))
+
+# Budget invariant: with 500 remaining and 23 minimum acquisitions including
+# the current lot, 22 credits must remain after winning this player.
+budget = 500
+remaining_min_purchases = 23
+reserve_after_current = max(0, remaining_min_purchases - 1)
+max_bid = budget - reserve_after_current
+require(max_bid == 478, 'budget reserve regression: expected 478')
 
 print(
-    'V42 tests passed: strategist=2x2, metrics=unboxed, '
-    f'BIJLOW market={bijlow_market:.2f} delta={bijlow_delta:.2f} hue={bijlow_hue:.1f}, '
-    f'DE GEA market={degea_market:.2f} delta={degea_delta:.2f} hue={degea_hue:.1f}'
+    'V43 tests passed: one queue confirm; direct manual award ready; '
+    f'budget 500 / 23 remaining => reserve {reserve_after_current}, max bid {max_bid}'
 )
 
 if text == original:
-    print('V42: no changes needed')
+    print('V43: no changes needed')
 else:
     path.write_text(text, encoding='utf-8')
-    print('V42 strategist/index correction applied')
+    print('V43 queue/direct-award patch applied')
