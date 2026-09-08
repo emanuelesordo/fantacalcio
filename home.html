@@ -14190,14 +14190,7 @@ body.v10-index-owner #view-auction tr.v33-index-market-row{
   transition:background .16s ease,box-shadow .16s ease!important;
 }
 
-/* Manual live mode: queue and countdown timers disappear; controls remain manual. */
-#view-auction.v33-manual-flow .v30-mobile-queue,
-#view-auction.v33-manual-flow .auction-queue-card,
-#view-auction.v33-manual-flow .auction-call-queue,
-#view-auction.v33-manual-flow [data-auction-queue],
-#view-auction.v33-manual-flow .v33-manual-hidden{
-  display:none!important;
-}
+/* V34: manual mode keeps the queue visible; timer controls alone are disabled by runtime. */
 #view-auction.v33-manual-flow .v33-manual-status{
   display:flex!important;
 }
@@ -14271,11 +14264,6 @@ body.v10-index-owner #view-auction tr.v33-index-market-row{
   #view-list .player-table th:nth-child(8),#view-list .player-table td:nth-child(8),
   #view-list .player-table th:nth-child(13),#view-list .player-table td:nth-child(13){width:54px!important;min-width:48px!important;text-align:center!important}
   #view-list .player-table th,#view-list .player-table td{padding-left:4px!important;padding-right:4px!important}
-
-  /* Manual mode also removes the mobile queue row from the shell. */
-  body.v23-mobile-auction #view-auction.v33-manual-flow .v23-mobile-shell{
-    grid-template-rows:auto auto minmax(0,1fr) auto!important;
-  }
 }
 </style>
 
@@ -14348,6 +14336,17 @@ body.v34-manual-flow .v30-mobile-queue[hidden]{display:grid!important}
 /* Numeric cells remain centered in all tables. */
 table td[data-type="number"],table th[data-type="number"],table td.num,table th.num,
 #view-list td:not(:first-child),#view-auction .auction-free-table td:not(:nth-child(2)){text-align:center}
+</style>
+
+
+<style id="v34b-manual-queue-cleanup-style">
+body.auction-live .auction-root{padding-top:0!important}
+#view-auction.v33-manual-flow .v33-manual-status{display:none!important}
+#view-auction.v33-manual-flow .v30-mobile-queue,
+#view-auction.v33-manual-flow .auction-queue-card,
+#view-auction.v33-manual-flow .auction-call-queue,
+#view-auction.v33-manual-flow [data-auction-queue]{display:grid!important}
+@media(max-width:820px){body.v23-mobile-auction #view-auction.v33-manual-flow .v23-mobile-shell{grid-template-rows:auto auto auto minmax(0,1fr) auto!important}}
 </style>
 
 </head>
@@ -19796,8 +19795,10 @@ table td[data-type="number"],table th[data-type="number"],table td.num,table th.
       const isPrivate =
         queueSettings.private === true;
 
+      const manualFlowQueue = auctionSession()?.setup_snapshot?.manual_auction_flow === true;
+
       const manualCallAvailable =
-        autoPaused
+        (autoPaused || manualFlowQueue)
         && auctionOwnCallTurn()
         && !auctionSession()?.current_player_id;
 
@@ -19933,14 +19934,14 @@ table td[data-type="number"],table th[data-type="number"],table td.num,table th.
                             ${
                               viceView
                                 ? '<span class="auction-queue-action-placeholder" aria-hidden="true"></span>'
-                                : autoPaused
+                                : (autoPaused || manualFlowQueue)
                                   ? `
                                       <button
                                         type="button"
                                         class="auction-queue-call"
                                         data-queue-call="${esc(item.id || '')}"
                                         ${manualCallAvailable && item.id ? '' : 'disabled'}
-                                        title="${manualCallAvailable ? 'Chiama questo giocatore adesso' : 'Disponibile al tuo turno quando la coda è in pausa'}"
+                                        title="${manualCallAvailable ? 'Chiama questo giocatore adesso' : 'Disponibile al tuo turno'}"
                                         aria-label="Chiama ${esc(item.player?.name || 'questo giocatore')}"
                                       >✓</button>
                                     `
@@ -35510,7 +35511,7 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
     view.classList.toggle('v33-manual-flow',enabled);
     markManualElements33(view,enabled);
     let status=view.querySelector('.v33-manual-status');
-    if(!status){status=document.createElement('div');status.className='v33-manual-status';status.textContent='MANUALE · timer e coda disattivati · aggiudica e passa turno dal banditore';const host=liveHost33();if(host&&host!==view)host.prepend(status);else view.prepend(status)}
+    if(!status){status=document.createElement('div');status.className='v33-manual-status';status.textContent='MANUALE · timer disattivati · coda a chiamata manuale';const host=liveHost33();if(host&&host!==view)host.prepend(status);else view.prepend(status)}
     if(!canControl33())return;
     let button=document.getElementById('v33-manual-live-toggle');
     const host=liveHost33();if(!host)return;
@@ -35526,7 +35527,7 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
             else if(state.auction?.session)state.auction.session=res.auctionSession;
           }else if(ses?.setup_snapshot){ses.setup_snapshot.manual_auction_flow=res?.enabled===true}
           if(typeof loadAuction==='function')await loadAuction({quiet:true,onlyIfChanged:false});
-          if(typeof msg==='function')msg(wanted?'Modalità manuale: coda e timer disattivati.':'Modalità automatica: coda e timer ripristinati.','success');
+          if(typeof msg==='function')msg(wanted?'Modalità manuale: timer disattivati, coda disponibile con chiamata manuale.':'Modalità automatica: coda e timer ripristinati.','success');
         }catch(e){if(typeof msg==='function')msg(e?.message||'Impossibile cambiare modalità asta.','error')}
         finally{button.disabled=false;requestAnimationFrame(mountLiveToggle33)}
       });
@@ -35536,13 +35537,13 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
       if(finish&&finish.parentElement===host)host.insertBefore(button,finish);else host.appendChild(button);
     }
     button.classList.toggle('active',enabled);
-    button.textContent=enabled?'MANUALE · NO TIMER/CODA':'AUTO · CODA+TIMER';
+    button.textContent=enabled?'MANUALE · NO TIMER':'AUTO · CODA+TIMER';
     button.setAttribute('aria-pressed',enabled?'true':'false');
   }
 
   function markManualElements33(view,enabled){
     if(!enabled){qa('.v33-manual-hidden',view).forEach(el=>el.classList.remove('v33-manual-hidden'));return}
-    const exactSelectors=['.v30-mobile-queue','.auction-queue-card','.auction-call-queue','[data-auction-queue]'];
+    const exactSelectors=[]; // V34: queue stays usable in manual mode
     exactSelectors.forEach(sel=>qa(sel,view).forEach(el=>el.classList.add('v33-manual-hidden')));
     qa('button',view).forEach(b=>{
       const t=(b.textContent||'').trim().toUpperCase();
