@@ -20,7 +20,7 @@ jobs:
           python-version: '3.x'
       - name: Apply live stability patch
         run: python .github/apply_v38_live_stability.py
-      - name: Apply PMA target-price patch
+      - name: Apply canonical strategy target patch
         run: python .github/apply_target_price_pma.py
       - name: Validate embedded JS
         run: |
@@ -40,5 +40,5 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add home.html
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m 'fix: use PMA as target price'
+          git commit -m 'fix: use strategy FP target as canonical target'
           git push origin main
