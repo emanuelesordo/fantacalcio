@@ -1,0 +1,2000 @@
+===== queue.*pause =====
+18742:      * locale: se il browser viene ricaricato prima che il POST termini,
+18743:      * l'interfaccia non torna ad autoplay e il nuovo caricamento ritenta
+18744:      * silenziosamente il salvataggio.
+18745:      */
+18746:     const auctionQueuePausePersistInFlight =
+18747:       new Set();
+18748: 
+18749: 
+18750:     function auctionQueuePauseContext(data = state.auction) {
+18751:       const sessionId =
+18752:         data?.auctionSession?.id
+---
+18746:     const auctionQueuePausePersistInFlight =
+18747:       new Set();
+18748: 
+18749: 
+18750:     function auctionQueuePauseContext(data = state.auction) {
+18751:       const sessionId =
+18752:         data?.auctionSession?.id
+18753:         ||
+18754:         null;
+18755: 
+18756:       const teamId =
+---
+18771:       return {
+18772:         sessionId,
+18773:         teamId,
+18774:         key:
+18775:           `fantacalcio:auction-queue-paused:${sessionId}:${teamId}`
+18776:       };
+18777:     }
+18778: 
+18779: 
+18780:     function auctionQueuePausePending(data = state.auction) {
+18781:       const context =
+---
+18776:       };
+18777:     }
+18778: 
+18779: 
+18780:     function auctionQueuePausePending(data = state.auction) {
+18781:       const context =
+18782:         auctionQueuePauseContext(data);
+18783: 
+18784:       if (!context) {
+18785:         return null;
+18786:       }
+---
+18778: 
+18779: 
+18780:     function auctionQueuePausePending(data = state.auction) {
+18781:       const context =
+18782:         auctionQueuePauseContext(data);
+18783: 
+18784:       if (!context) {
+18785:         return null;
+18786:       }
+18787: 
+18788:       try {
+---
+18820:       }
+18821:     }
+18822: 
+18823: 
+18824:     function setAuctionQueuePausePending(
+18825:       paused,
+18826:       data = state.auction
+18827:     ) {
+18828:       const context =
+18829:         auctionQueuePauseContext(data);
+18830: 
+---
+18825:       paused,
+18826:       data = state.auction
+18827:     ) {
+18828:       const context =
+18829:         auctionQueuePauseContext(data);
+18830: 
+18831:       if (!context) {
+18832:         return null;
+18833:       }
+18834: 
+18835:       localStorage.setItem(
+---
+18845:       return context;
+18846:     }
+18847: 
+18848: 
+18849:     function clearAuctionQueuePausePending(
+18850:       data = state.auction,
+18851:       expectedPaused = null
+18852:     ) {
+18853:       const pending =
+18854:         auctionQueuePausePending(data);
+18855: 
+---
+18850:       data = state.auction,
+18851:       expectedPaused = null
+18852:     ) {
+18853:       const pending =
+18854:         auctionQueuePausePending(data);
+18855: 
+18856:       if (!pending) {
+18857:         return;
+18858:       }
+18859: 
+18860:       if (
+---
+18871:       );
+18872:     }
+18873: 
+18874: 
+18875:     function persistAuctionQueuePaused(
+18876:       paused,
+18877:       {
+18878:         data = state.auction,
+18879:         quiet = false
+18880:       } = {}
+18881:     ) {
+---
+18879:         quiet = false
+18880:       } = {}
+18881:     ) {
+18882:       const context =
+18883:         auctionQueuePauseContext(data);
+18884: 
+18885:       if (!context) {
+18886:         return Promise.resolve(null);
+18887:       }
+18888: 
+18889:       const desired =
+---
+18892:       const flightKey =
+18893:         `${context.sessionId}:${context.teamId}:${desired ? '1' : '0'}`;
+18894: 
+18895:       if (
+18896:         auctionQueuePausePersistInFlight
+18897:           .has(flightKey)
+18898:       ) {
+18899:         return Promise.resolve(null);
+18900:       }
+18901: 
+18902:       auctionQueuePausePersistInFlight
+---
+18898:       ) {
+18899:         return Promise.resolve(null);
+18900:       }
+18901: 
+18902:       auctionQueuePausePersistInFlight
+18903:         .add(flightKey);
+18904: 
+18905:       return api(
+18906:         ENDPOINTS.auction,
+18907:         {
+18908:           action:
+---
+18905:       return api(
+18906:         ENDPOINTS.auction,
+18907:         {
+18908:           action:
+18909:             'setCallQueuePaused',
+18910:           sessionId:
+18911:             context.sessionId,
+18912:           paused:
+18913:             desired
+18914:         },
+18915:         {
+---
+18919:         }
+18920:       )
+18921:         .then(result => {
+18922:           if (result?.ok) {
+18923:             clearAuctionQueuePausePending(
+18924:               data,
+18925:               desired
+18926:             );
+18927: 
+18928:             if (
+18929:               state.auction
+---
+18957: 
+18958:           return null;
+18959:         })
+18960:         .finally(() => {
+18961:           auctionQueuePausePersistInFlight
+18962:             .delete(flightKey);
+18963:         });
+18964:     }
+18965: 
+18966: 
+18967:     function mergeAuctionQueuePausePending(
+---
+18963:         });
+18964:     }
+18965: 
+18966: 
+18967:     function mergeAuctionQueuePausePending(
+18968:       data
+18969:     ) {
+18970:       const pending =
+18971:         auctionQueuePausePending(data);
+18972: 
+18973:       if (!pending) {
+---
+18967:     function mergeAuctionQueuePausePending(
+18968:       data
+18969:     ) {
+18970:       const pending =
+18971:         auctionQueuePausePending(data);
+18972: 
+18973:       if (!pending) {
+18974:         return data;
+18975:       }
+18976: 
+18977:       const serverPaused =
+---
+18987:       if (
+18988:         serverPaused
+18989:         === pending.paused
+18990:       ) {
+18991:         clearAuctionQueuePausePending(
+18992:           data,
+18993:           pending.paused
+18994:         );
+18995:       } else {
+18996:         /*
+18997:          * Un refresh può aver interrotto il POST precedente. Non blocchiamo
+---
+18996:         /*
+18997:          * Un refresh può aver interrotto il POST precedente. Non blocchiamo
+18998:          * il rendering: riproviamo in background con fetch keepalive.
+18999:          */
+19000:         void persistAuctionQueuePaused(
+19001:           pending.paused,
+19002:           {
+19003:             data,
+19004:             quiet:
+19005:               true
+19006:           }
+---
+19479:         state.auction?.callQueueSettings
+19480:         || {};
+19481: 
+19482:       const autoPaused =
+19483:         queueSettings.autoPaused === true;
+19484: 
+19485:       const isPrivate =
+19486:         queueSettings.private === true;
+19487: 
+19488:       const manualCallAvailable =
+19489:         autoPaused
+---
+20021:              * Aggiornamento immediato + intent persistente locale.
+20022:              * Il POST parte in background e usa keepalive, quindi un refresh
+20023:              * immediato non deve riattivare l'autoplay.
+20024:              */
+20025:             setAuctionQueuePausePending(
+20026:               next
+20027:             );
+20028: 
+20029:             state.auction.callQueueSettings = {
+20030:               ...(state.auction.callQueueSettings || {}),
+20031:               autoPaused:
+---
+20033:             };
+20034: 
+20035:             patchAuctionCallQueueUi();
+20036: 
+20037:             void persistAuctionQueuePaused(
+20038:               next,
+20039:               {
+20040:                 quiet:
+20041:                   false
+20042:               }
+20043:             );
+---
+23566:             item.credits_spent || 0,
+23567:             item.credit_adjustment || 0,
+23568:             item.nomination_penalty_credits || 0,
+23569:             item.missed_nominations || 0,
+23570:             item.call_queue_auto_paused === true,
+23571:             item.call_queue_private === true
+23572:           ]);
+23573: 
+23574:       const operations =
+23575:         (data?.recentOperations || [])
+23576:           .map(item => [
+---
+24544: 
+24545:       if (
+24546:         [
+24547:           'CALL_QUEUE_UPDATED',
+24548:           'CALL_QUEUE_AUTOPLAY_PAUSED',
+24549:           'CALL_QUEUE_PRIVACY_CHANGED',
+24550:           'TEAM_PRIVATE_DIRTY'
+24551:         ].includes(eventType)
+24552:       ) {
+24553:         const sameTeam =
+24554:           Boolean(
+---
+24663:       /*
+24664:        * Se il click PAUSA/RIPRENDI è avvenuto immediatamente prima di un
+24665:        * refresh, conserva l'intent locale e ritenta il salvataggio in bg.
+24666:        */
+24667:       mergeAuctionQueuePausePending(
+24668:         data
+24669:       );
+24670: 
+24671: 
+24672:       const nextStructureSignature =
+24673:         auctionStructureSignature(
+---
+31484:         v7Api({ action: 'getAuctionEventsSince', sessionId, afterId: state.v7LastEventId || 0, limit: 100 })
+31485:       ]);
+31486:       const evs = events?.events || [];
+31487:       state.v7LastEventId = Number(events?.lastEventId || hot?.lastEventId || state.v7LastEventId || 0);
+31488:       const structural = evs.some(e => /AWARD|ASSIGN|ROSTER|QUEUE|ROLE_PHASE|NOMINATION|CALL|UNDO|CREDIT|PASS|VICE|RESET|START|PREPARE|FINISH|CANCEL|PAUSE|READY|DONE|TEAM_ORDER|ABANDON/i.test(String(e.event_type || '')));
+31489:       if (structural) {
+31490:         /* Structural events change the shape of the whole auction view.
+31491:            Always reload the canonical auction payload; a hot patch is not enough. */
+31492:         await loadAuction({ quiet: true, onlyIfChanged: false });
+31493:         await v7SyncCatalog();
+31494:         return;
+---
+33172: 
+33173:   function v16PreselectQueue(){
+33174:     const session=typeof auctionSession==='function'?auctionSession():state.auction?.auctionSession;
+33175:     if(!session||session.status!=='live'||session.current_player_id||!ownPresident()||!ownCallTurn())return;
+33176:     if(state.auction?.callQueueSettings?.autoPaused===true)return;
+33177:     const q=v16FirstValidQueued();if(!q)return;
+33178:     const key=[session.id,session.current_nomination_team_id,session.nomination_deadline||session.nomination_starts_at||'',q.id].join('|');
+33179:     if(state.v16QueuePreselectKey===key&&String(state.auctionSelectedPlayerId||'')===String(q.player_id||q.player?.id||''))return;
+33180:     state.v16QueuePreselectKey=key;
+33181:     state.auctionSelectedPlayerId=q.player_id||q.player?.id||null;
+33182:     state.auctionOpeningBid=Math.max(1,Number(q.opening_bid||1));
+---
+hits=28
+===== pause.*queue =====
+hits=0
+===== offusca =====
+7983:     .auction-call-queue-row .auction-queue-call-placeholder{
+7984:       display:none!important;
+7985:     }
+7986: 
+7987:     /* Se l'utente offusca il proprio schermo, anche la maniglia resta visibile ma
+7988:        ruolo, nome e prezzo diventano illeggibili a colpo d'occhio. */
+7989:     .auction-call-queue.is-private .auction-call-queue-row .auction-roster-mini-roles,
+7990:     .auction-call-queue.is-private .auction-call-queue-row .auction-queue-player strong,
+7991:     .auction-call-queue.is-private .auction-call-queue-row .auction-queue-price input{
+7992:       filter:blur(4.5px)!important;
+7993:       opacity:.62!important;
+---
+19522:                           </button>
+19523: 
+19524:                           <label
+19525:                             class="auction-queue-private-toggle ${isPrivate ? 'is-private' : ''}"
+19526:                             title="${isPrivate ? 'La coda è offuscata sullo schermo' : 'Offusca nome, ruolo e prezzo della coda sullo schermo'}"
+19527:                           >
+19528:                             <input
+19529:                               id="auction-queue-private"
+19530:                               type="checkbox"
+19531:                               ${isPrivate ? 'checked' : ''}
+19532:                               ${editable ? '' : 'disabled'}
+---
+19530:                               type="checkbox"
+19531:                               ${isPrivate ? 'checked' : ''}
+19532:                               ${editable ? '' : 'disabled'}
+19533:                             >
+19534:                             <span>${isPrivate ? 'OFFUSCATA' : 'OFFUSCA'}</span>
+19535:                           </label>
+19536:                         </div>
+19537:                       `
+19538:                 }
+19539: 
+19540:               </div>
+---
+hits=3
+===== auctionQueueRows =====
+16660:     }
+16661: 
+16662: 
+16663:     function auctionPlayerIsQueued(playerId) {
+16664:       return auctionQueueRows()
+16665:         .some(item => item.player_id === playerId);
+16666:     }
+16667: 
+16668: 
+16669:     function auctionViceInterestTitle(item) {
+16670:       if (!item) {
+---
+17966:           .join('');
+17967: 
+17968:       const allQueueEntries =
+17969:         auctionQueueProjection(
+17970:           auctionQueueRows()
+17971:         )
+17972:           .filter(entry =>
+17973:             entry?.item?.player
+17974:             && entry.backup !== true
+17975:           )
+17976:           .map(entry => ({
+---
+18723:       );
+18724:     }
+18725: 
+18726: 
+18727:     function auctionQueueRows() {
+18728:       return (
+18729:         state.auction
+18730:           ?.myCallQueue
+18731:         ||
+18732:         []
+18733:       );
+---
+19010:       return data;
+19011:     }
+19012: 
+19013: 
+19014:     function auctionQueueProjection(rows = auctionQueueRows()) {
+19015:       const info =
+19016:         auctionMyTeamDashboardData();
+19017: 
+19018:       const normalizedRows =
+19019:         Array.isArray(rows)
+19020:           ? rows
+---
+19184: 
+19185: 
+19186:     function auctionQueueCapacityForPlayer(player) {
+19187:       const queue =
+19188:         auctionQueueRows();
+19189: 
+19190:       /*
+19191:        * La Coda è una lista strategica, non una proiezione vincolante della
+19192:        * rosa finale: può quindi contenere anche giocatori di backup oltre i
+19193:        * massimi di rosa/ruolo. L'unico limite tecnico resta quello del backend
+19194:        * (50 record per salvataggio della Coda).
+---
+19254:         return null;
+19255:       }
+19256: 
+19257:       if (
+19258:         auctionQueueRows()
+19259:           .some(item => item.player_id === player.id)
+19260:       ) {
+19261:         return null;
+19262:       }
+19263: 
+19264:       const mode = d.settings?.fantasy_mode || 'classic';
+---
+19262:       }
+19263: 
+19264:       const mode = d.settings?.fantasy_mode || 'classic';
+19265:       const assignments = info.assignments || [];
+19266:       const queue = auctionQueueRows();
+19267:       let needScore = 0;
+19268:       let needLabel = '';
+19269: 
+19270:       if (mode === 'classic') {
+19271:         const role = player.classic_role || '—';
+19272:         const min = Number(info.roleLimits?.[role]?.min || 0);
+---
+19402:         return '';
+19403:       }
+19404: 
+19405:       const canQueue = auctionHasPresidentRole();
+19406:       const queueIsEmpty = auctionQueueRows().length === 0;
+19407:       const ownTurn = auctionOwnCallTurn();
+19408: 
+19409:       return `
+19410:         <section class="auction-suggested-calls ${fullImmersion ? 'is-full-immersion' : ''}" aria-label="Chiamate suggerite">
+19411:           <div class="auction-suggested-head">
+19412:             <div>
+---
+19454:         return '';
+19455:       }
+19456: 
+19457:       const rows =
+19458:         auctionQueueRows();
+19459: 
+19460:       const projectedQueue =
+19461:         auctionQueueProjection(rows);
+19462: 
+19463:       const backupByPlayerId =
+19464:         new Map(
+---
+19688: 
+19689: 
+19690:     function auctionOptimisticQueueRows(items) {
+19691:       const currentRows =
+19692:         auctionQueueRows();
+19693: 
+19694:       const candidates =
+19695:         state.auction?.callCandidates
+19696:         || [];
+19697: 
+19698:       return items.map((item, index) => {
+---
+19799:         return;
+19800:       }
+19801: 
+19802:       const previousRows =
+19803:         [...auctionQueueRows()];
+19804: 
+19805:       const mutationVersion =
+19806:         ++state.auctionQueueMutationVersion;
+19807: 
+19808:       state.auctionQueueMutationPending =
+19809:         true;
+---
+19911:         );
+19912:       }
+19913: 
+19914:       const existing =
+19915:         auctionQueueRows();
+19916: 
+19917:       if (
+19918:         existing.some(
+19919:           item =>
+19920:             item.player_id
+19921:             === playerId
+---
+20124:                 const playerId =
+20125:                   button.dataset.queueRemove;
+20126: 
+20127:                 const items =
+20128:                   auctionQueueRows()
+20129:                     .filter(
+20130:                       item =>
+20131:                         item.player_id
+20132:                         !== playerId
+20133:                     )
+20134:                     .map(
+---
+20184:                     )
+20185:                   );
+20186: 
+20187:                 const items =
+20188:                   auctionQueueRows()
+20189:                     .map(
+20190:                       item => ({
+20191:                         playerId:
+20192:                           item.player_id,
+20193: 
+20194:                         openingBid:
+---
+20277:                 return;
+20278:               }
+20279: 
+20280:               const rows =
+20281:                 auctionQueueRows();
+20282: 
+20283:               const from =
+20284:                 rows.findIndex(
+20285:                   item =>
+20286:                     item.player_id
+20287:                     === dragged
+---
+28978:     }
+28979: 
+28980:     function auctionPlayerRow(player, mode) {
+28981:       const roles = playerRoles(player, mode);
+28982:       const queuedIndex = auctionQueueRows().findIndex(item => item.player_id === player.id);
+28983:       const showQueue = auctionCallMode() && auctionHasPresidentRole();
+28984:       const queueCapacity = auctionQueueCapacityForPlayer(player);
+28985:       const rolePhaseAllowed = auctionPlayerMatchesCurrentRolePhase(player);
+28986:       const queueAllowed = queueCapacity.allowed && rolePhaseAllowed;
+28987:       const queueBlockedMessage = !rolePhaseAllowed
+28988:         ? `Giocatore fuori dalla fase ${auctionRolePhaseLabel(state.auction?.rolePhase?.key)}: puoi consultarlo, ma non accodarlo o chiamarlo.`
+---
+28987:       const queueBlockedMessage = !rolePhaseAllowed
+28988:         ? `Giocatore fuori dalla fase ${auctionRolePhaseLabel(state.auction?.rolePhase?.key)}: puoi consultarlo, ma non accodarlo o chiamarlo.`
+28989:         : queueCapacity.message;
+28990:       const queueBackupHint = queueCapacity.backup ? ` Verrà inserito come backup: ${queueCapacity.message}` : '';
+28991:       const queueIsEmpty = auctionQueueRows().length === 0;
+28992:       const queueActionLabel = queueIsEmpty ? 'CHIAMA' : 'CODA';
+28993:       const queueAction = queuedIndex >= 0 && auctionHasPresidentRole()
+28994:         ? `<span class="auction-queue-added" title="Già in coda">#${queuedIndex + 1}</span>`
+28995:         : `<button type="button" class="auction-queue-add ${queueIsEmpty ? 'call-now' : ''}" data-queue-add="${esc(player.id)}" ${auctionCanManageCallQueue() && queueAllowed ? '' : 'disabled'} title="${!queueAllowed ? esc(queueBlockedMessage) : auctionHasPresidentRole() ? (queueIsEmpty ? `Inserisci come prima chiamata: verrà elaborato automaticamente dalla coda.${queueBackupHint}` : `Aggiungi subito alla coda.${queueBackupHint}`) : 'Solo il Presidente può usare la coda'}">${queueActionLabel}</button>`;
+28996:       const delta = auctionFreeDelta(player);
+28997:       const favorite = auctionFreeFavorite(player);
+---
+31348:     const full = Boolean(document.fullscreenElement);
+31349:     const suggestions = auctionSuggestedCalls(full ? 8 : 4);
+31350:     if (!suggestions.length) return '';
+31351:     const canQueue = auctionHasPresidentRole();
+31352:     const actionLabel = auctionOwnCallTurn() && auctionQueueRows().length === 0 ? 'CHIAMA' : 'CODA';
+31353:     return `<section class="auction-suggested-calls ${full ? 'is-full-immersion' : ''}" aria-label="Chiamate suggerite"><div class="auction-suggested-head"><div><strong>Chiamate suggerite</strong><small>rosa · valore · trend · mercato live</small></div><span>LIVE</span></div><div class="auction-suggested-list">${suggestions.map((item, index) => {
+31354:       const player = item.player || {};
+31355:       const roles = playerRoles(player, state.auction?.settings?.fantasy_mode);
+31356:       const prices = item.prices || v7StrategicPrices(player, item.score);
+31357:       return `<div class="auction-suggested-row ${index === 0 ? 'is-must-have' : ''}" data-v7-detail="${esc(player.id)}" tabindex="0">
+31358:         <span class="auction-suggested-roles">${roles.map(role => `<span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>`).join('')}</span>
+---
+31577:  const oldScore=auctionSuggestedCallScore;auctionSuggestedCallScore=function(p){state.v7Stats=new Map();const x=oldScore(p);if(!x)return null;const i=quick(p),o=opp(p,i);x.score=cl(x.score+Math.round(trend(p)*15)+Math.round((prs(p)-60)*.08)+Math.round(Math.max(0,i.completionDelta)*.22)+Math.round(i.fantasyDelta*12)+Math.round(i.solidityDelta*.16)+i.anchorFit+Math.round((o-50)*.12),0,100);x.opportunity=o;x.rosterImpact=i;x.features=feat(p);x.prices=prices(p,x.score,o);return x};
+31578:  const oldCalls=auctionSuggestedCalls;function rows(limit){const a=oldCalls(Math.max(12,limit)).map(x=>{const i=impact(x.player),o=opp(x.player,i);x.rosterImpact=i;x.opportunity=o;x.score=cl(Number(x.score||0)+Math.round(Math.max(0,i.completionDelta)*.30)+Math.round(i.fantasyDelta*14)+Math.round(i.solidityDelta*.18)+i.anchorFit,0,100);x.prices=prices(x.player,x.score,o);return x}).sort((a,b)=>b.score-a.score||b.opportunity-a.opportunity);if(!a.length)return[];const info=auctionMyTeamDashboardData(),ctx=[auctionSession()?.id||'',state.auction?.auctionSession?.role_phase_index||0,info?.assignments?.length||0].join('|'),cur=a.find(x=>String(x.player?.id)===String(state.v8Moment||'')),ch=a[0];if(state.v8MomentCtx!==ctx||!cur||ch.score>=cur.score+9){state.v8MomentCtx=ctx;state.v8Moment=ch.player?.id}const m=a.find(x=>String(x.player?.id)===String(state.v8Moment||''))||ch;return[m,...a.filter(x=>x!==m)].slice(0,limit)}
+31579:  function conv(x,y){const gap=Math.max(0,Number(x?.score||0)-Number(y?.score||0)),v=Math.round(cl(48+Number(x?.opportunity||50)*.28+gap*2.1+Number(x?.rosterImpact?.completionDelta||0)*.22,0,100));return{v,label:v>=82?'MOLTO ALTA':v>=68?'ALTA':v>=52?'MEDIA':'PRUDENTE'}}
+31580:  function objective(info,extra=null,cost=0){if(!info)return metrics(info,extra);const ps=(info.assignments||[]).map(x=>x.player).filter(Boolean);if(extra)ps.push(extra);let budget=Math.max(0,Number(info.remaining||0)-Number(cost||0)),max=Math.max(ps.length,Number(info.rosterMin||info.rosterLimit||25)),owned=new Set(ps.map(p=>String(p.id))),cand=(state.auction?.callCandidates||[]).filter(p=>!owned.has(String(p.id))).map(p=>{const o=opp(p,quick(p)),pr=prices(p,60,o).suggested;return{p,pr,v:weight(p)+o/40+Math.max(0,4-Number(p.slot||4))*.15}}).sort((a,b)=>b.v-a.v).slice(0,45);for(const c of cand){if(ps.length>=max)break;const reserve=Math.max(0,max-ps.length-1);if(c.pr+reserve>budget)continue;ps.push(c.p);budget-=c.pr}return metrics({...info,assignments:ps.map(p=>({player:p}))})}
+31581:  renderAuctionSuggestedCalls=function(){const limit=document.fullscreenElement?8:4,a=rows(limit);if(!a.length)return'';const can=auctionHasPresidentRole(),lab=auctionOwnCallTurn()&&auctionQueueRows().length===0?'CHIAMA':'CODA',runner=a[1];return`<section class="auction-suggested-calls" aria-label="Consulente Strategico"><div class="auction-suggested-head"><div><strong>Consulente Strategico</strong><small>rosa · moduli · trend import · mercato pubblico</small></div><span>LIVE</span></div><div class="auction-suggested-list">${a.map((x,i)=>{const p=x.player||{},cv=i===0?conv(x,runner):null;return`<div class="auction-suggested-row ${i===0?'is-must-have':''}" data-v8-detail="${esc(p.id)}" tabindex="0"><span class="auction-suggested-roles">${playerRoles(p,state.auction?.settings?.fantasy_mode).map(r=>`<span class="rolebadge" data-role="${esc(r)}">${esc(r)}</span>`).join('')}</span><div class="auction-suggested-copy"><div class="v8n"><strong>${esc(p.name||'Giocatore')}</strong>${i===0?'<em>GIOCATORE DEL MOMENTO</em>':''}${pref(p)?.is_favorite?'<i>♥</i>':''}</div><small>${esc(p.serie_a_team||'—')} · score ${Math.round(x.score)} · opp ${x.opportunity}${cv?` · conv ${cv.v}%`:''}</small></div><span class="auction-v7-prices"><b>SUGG ${x.prices?.suggested??'—'}</b><small>MAX ${x.prices?.ceiling??'—'}</small></span><span class="auction-v7-suggest-actions"><button type="button" class="auction-v7-dismiss" data-v8-hide="${esc(p.id)}" title="Nascondi per ora">×</button>${can?`<button type="button" class="auction-suggested-action" data-suggest-call="${esc(p.id)}">${lab}</button>`:'<span class="auction-suggested-action-placeholder">VICE</span>'}</span></div>`}).join('')}</div></section>`};
+31582:  function modal(id){const p=(state.auction?.callCandidates||[]).find(x=>String(x.id)===String(id)),x=p?auctionSuggestedCallScore(p):null;if(!x)return;const info=auctionMyTeamDashboardData(),i=impact(p),ob=objective(info),oa=objective(info,p,x.prices?.suggested||0),cv=conv(x,rows(2).find(z=>z.player?.id!==p.id)),f=feat(p),pf=pref(p)||{};let d=document.getElementById('v8dlg');if(!d){d=document.createElement('dialog');d.id='v8dlg';d.className='auction-v7-strategy-dialog';document.body.appendChild(d)}d.innerHTML=`<form class="auction-v7-modal" method="dialog"><header><div><small>CONSULENTE · OPPORTUNITÀ ${x.opportunity}/100</small><h3>${esc(p.name)}</h3><p>${esc(playerRoles(p,state.auction?.settings?.fantasy_mode).join('/'))} · ${esc(p.serie_a_team||'—')}</p></div><button value="cancel" class="secondary">×</button></header><div class="auction-v7-kpis"><span><small>SCORE</small><b>${Math.round(x.score)}</b></span><span><small>CONV.</small><b>${cv.v}%</b></span><span><small>SUGG.</small><b>${x.prices?.suggested}</b></span><span><small>MAX</small><b>${x.prices?.ceiling}</b></span><span><small>COMP</small><b>${i.before?.completion||0}%→${i.after?.completion||0}%</b></span><span><small>FV</small><b>${fmt(i.before?.fantasy)}→${fmt(i.after?.fantasy)}</b></span><span><small>OBIETTIVO</small><b>${fmt(ob.fantasy)}→${fmt(oa.fantasy)}</b></span><span><small>SOL</small><b>${i.before?.solidity||0}→${i.after?.solidity||0}</b></span></div><div class="v8ana"><span><small>TREND IMPORT</small><b>${esc(f.trend_direction||'stable')}</b></span><span><small>PRESENZA</small><b>${fmt(prs(p),0)}%</b></span><span><small>RISCHIO</small><b>${fmt(vol(p)*100,0)}%</b></span><span><small>MERCATO</small><b>${fmt((x.prices?.marketFactor||1)*100,0)}%</b></span></div><div class="auction-v7-reason"><b>Motivo:</b> impatto su ${i.after?.module||'rosa'}, trend pre-calcolato all'import, presenza prevista e prezzi delle sole aggiudicazioni pubbliche. Code e preferiti degli altri presidenti sono esclusi.</div><div class="auction-v7-actions"><button type="button" class="secondary" id="v8fav">${pf.is_favorite?'♥ PREFERITO':'♡ PREFERITO'}</button><button type="button" class="secondary" id="v8queue">+ CODA</button></div></form>`;d.querySelector('#v8fav')?.addEventListener('click',async()=>{const z=await api(ENDPOINTS.v6y,{action:'toggleFavorite',sourcePlayerId:p.source_player_id||p.id},{quiet:true});if(z?.preference)state.v7Preferences.set(String(z.preference.source_player_id),z.preference);d.close();renderAuctionLive()});d.querySelector('#v8queue')?.addEventListener('click',()=>{addPlayerToAuctionQueue(p.id,Math.max(1,Number(state.auctionOpeningBid||1)));d.close()});d.showModal()}
+31583:  function bind(root=document){root.querySelectorAll('[data-v8-hide]').forEach(b=>{if(b.dataset.v8b)return;b.dataset.v8b=1;b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const id=String(b.dataset.v8Hide);if(!state.v7SuggestedDismissed.includes(id))state.v7SuggestedDismissed.push(id);if(String(state.v8Moment||'')===id)state.v8Moment=null;const h=document.querySelector('.auction-free-suggestions');if(h){h.innerHTML=renderAuctionSuggestedCalls();attachAuctionCallQueueEvents()}})});root.querySelectorAll('[data-v8-detail]').forEach(r=>{if(r.dataset.v8b)return;r.dataset.v8b=1;const f=e=>{if(e.target.closest('button')||(e.type==='keydown'&&!['Enter',' '].includes(e.key)))return;e.preventDefault();modal(r.dataset.v8Detail)};r.addEventListener('click',f);r.addEventListener('keydown',f)})}
+31584:  const oldAttach=attachAuctionCallQueueEvents;attachAuctionCallQueueEvents=function(...a){const r=oldAttach(...a);bind();return r};
+31585:  function hearts(){const by=new Map((state.list?.players||[]).map(p=>[String(p.id),p]));document.querySelectorAll('#list-body tr[data-player-id]').forEach(r=>{const p=by.get(String(r.dataset.playerId)),h=r.querySelector('.list-fav-slot')||r.querySelector('.player-main');if(!p||!h||h.querySelector('.v8heart'))return;const fav=pref(p)?.is_favorite===true,b=document.createElement('button');b.type='button';b.className=`v8heart ${fav?'on':''}`;b.textContent=fav?'♥':'♡';b.title=fav?'Rimuovi dai preferiti':'Aggiungi ai preferiti';b.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();const z=await api(ENDPOINTS.v6y,{action:'toggleFavorite',sourcePlayerId:p.source_player_id||p.id},{quiet:true});if(z?.preference)state.v7Preferences.set(String(z.preference.source_player_id),z.preference);renderListTable()});h.appendChild(b)})}
+31586:  const oldRLT=renderListTable;renderListTable=function(...a){const r=oldRLT(...a);hearts();return r};const oldLL=loadList;loadList=async function(...a){const r=await oldLL(...a);await hydrate();try{const z=await api(ENDPOINTS.strategy,{action:'getStrategicFeatures'},{quiet:true});if(z?.players?.length&&state.list?.players){const by=new Map(z.players.map(p=>[String(p.id),p]));state.list.players=state.list.players.map(p=>{const x=by.get(String(p.id));return x?{...p,strategic_features:x.strategic_features??p.strategic_features}:p});renderListTable()}}catch(e){console.warn('List strategic features',e)}hearts();return r};
+31587:  const budgets=()=>((state.auction?.settings?.fantasy_mode||'classic')==='mantra'?[['POR','Por'],['DC/B','Dc/B'],['DD/DS','Dd/Ds'],['E','E'],['M/C','M/C'],['W/T','W/T'],['A/PC','A/Pc']]:[['P','P'],['D','D'],['C','C'],['A','A']]);
+---
+33157:   window.__FANTA_V16_AUCTION__=1;
+33158: 
+33159:   const ownPresident=()=>typeof auctionHasPresidentRole==='function'&&auctionHasPresidentRole();
+33160:   const ownCallTurn=()=>typeof auctionOwnCallTurn==='function'&&auctionOwnCallTurn();
+33161:   const queueRows=()=>typeof auctionQueueRows==='function'?(auctionQueueRows()||[]):[];
+33162: 
+33163:   function v16FirstValidQueued(){
+33164:     const candidates=new Set((state.auction?.callCandidates||[]).map(p=>String(p.id)));
+33165:     return queueRows().find(q=>{
+33166:       const id=String(q?.player_id||q?.player?.id||'');
+33167:       if(!id||!candidates.has(id)||!q?.player)return false;
+---
+34781:      --------------------------------------------------------- */
+34782:   const phone30=()=>window.matchMedia('(max-width:820px)').matches&&document.body.classList.contains('v23-mobile-auction');
+34783:   const canCall30=()=>{const s=state.auction?.auctionSession;if(!s||s.current_player_id)return false;try{return typeof auctionOwnCallTurn==='function'&&auctionOwnCallTurn()}catch{return false}};
+34784:   const canQueue30=()=>{try{return typeof auctionCanManageCallQueue==='function'&&auctionCanManageCallQueue()}catch{return false}};
+34785:   const queueRows30=()=>{try{return typeof auctionQueueRows==='function'?auctionQueueRows():[]}catch{return[]}};
+34786:   const playerById30=id=>(state.auction?.callCandidates||[]).find(p=>String(p.id)===String(id))||queueRows30().find(q=>String(q.player_id)===String(id))?.player||null;
+34787: 
+34788:   function ensureQueueCard30(){
+34789:     const shell=qs('.v23-mobile-shell'),drawers=qs('.v23-mobile-drawers',shell);if(!shell||!drawers)return null;
+34790:     let card=qs('.v30-mobile-queue',shell);
+34791:     if(!card){
+---
+hits=21
+===== allowed.*role =====
+28981:       const roles = playerRoles(player, mode);
+28982:       const queuedIndex = auctionQueueRows().findIndex(item => item.player_id === player.id);
+28983:       const showQueue = auctionCallMode() && auctionHasPresidentRole();
+28984:       const queueCapacity = auctionQueueCapacityForPlayer(player);
+28985:       const rolePhaseAllowed = auctionPlayerMatchesCurrentRolePhase(player);
+28986:       const queueAllowed = queueCapacity.allowed && rolePhaseAllowed;
+28987:       const queueBlockedMessage = !rolePhaseAllowed
+28988:         ? `Giocatore fuori dalla fase ${auctionRolePhaseLabel(state.auction?.rolePhase?.key)}: puoi consultarlo, ma non accodarlo o chiamarlo.`
+28989:         : queueCapacity.message;
+28990:       const queueBackupHint = queueCapacity.backup ? ` Verrà inserito come backup: ${queueCapacity.message}` : '';
+28991:       const queueIsEmpty = auctionQueueRows().length === 0;
+---
+28982:       const queuedIndex = auctionQueueRows().findIndex(item => item.player_id === player.id);
+28983:       const showQueue = auctionCallMode() && auctionHasPresidentRole();
+28984:       const queueCapacity = auctionQueueCapacityForPlayer(player);
+28985:       const rolePhaseAllowed = auctionPlayerMatchesCurrentRolePhase(player);
+28986:       const queueAllowed = queueCapacity.allowed && rolePhaseAllowed;
+28987:       const queueBlockedMessage = !rolePhaseAllowed
+28988:         ? `Giocatore fuori dalla fase ${auctionRolePhaseLabel(state.auction?.rolePhase?.key)}: puoi consultarlo, ma non accodarlo o chiamarlo.`
+28989:         : queueCapacity.message;
+28990:       const queueBackupHint = queueCapacity.backup ? ` Verrà inserito come backup: ${queueCapacity.message}` : '';
+28991:       const queueIsEmpty = auctionQueueRows().length === 0;
+28992:       const queueActionLabel = queueIsEmpty ? 'CHIAMA' : 'CODA';
+---
+28991:       const queueIsEmpty = auctionQueueRows().length === 0;
+28992:       const queueActionLabel = queueIsEmpty ? 'CHIAMA' : 'CODA';
+28993:       const queueAction = queuedIndex >= 0 && auctionHasPresidentRole()
+28994:         ? `<span class="auction-queue-added" title="Già in coda">#${queuedIndex + 1}</span>`
+28995:         : `<button type="button" class="auction-queue-add ${queueIsEmpty ? 'call-now' : ''}" data-queue-add="${esc(player.id)}" ${auctionCanManageCallQueue() && queueAllowed ? '' : 'disabled'} title="${!queueAllowed ? esc(queueBlockedMessage) : auctionHasPresidentRole() ? (queueIsEmpty ? `Inserisci come prima chiamata: verrà elaborato automaticamente dalla coda.${queueBackupHint}` : `Aggiungi subito alla coda.${queueBackupHint}`) : 'Solo il Presidente può usare la coda'}">${queueActionLabel}</button>`;
+28996:       const delta = auctionFreeDelta(player);
+28997:       const favorite = auctionFreeFavorite(player);
+28998: 
+28999:       return `
+29000:         <tr data-player-id="${esc(player.id)}" class="${player.id === state.auctionSelectedPlayerId ? 'selected-player' : ''} ${rolePhaseAllowed ? '' : 'outside-role-phase'}">
+29001: <td class="player-role-cell auction-player-col-role" data-auction-column="role">
+---
+28996:       const delta = auctionFreeDelta(player);
+28997:       const favorite = auctionFreeFavorite(player);
+28998: 
+28999:       return `
+29000:         <tr data-player-id="${esc(player.id)}" class="${player.id === state.auctionSelectedPlayerId ? 'selected-player' : ''} ${rolePhaseAllowed ? '' : 'outside-role-phase'}">
+29001: <td class="player-role-cell auction-player-col-role" data-auction-column="role">
+29002:   ${roles.map(role => `<span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>`).join('')}
+29003: </td>
+29004: <td class="auction-player-col-name" data-auction-column="name">
+29005:   <div class="player-main">
+29006:     <span class="auction-player-name-line">
+---
+hits=4
+===== phase.*role =====
+7034:       grid-column:1 / -1;
+7035:       background:rgba(118,80,14,.22);
+7036:     }
+7037: 
+7038:     .auction-role-phase-admin-card .auction-role-phase-teams{
+7039:       display:grid;
+7040:       grid-template-columns:repeat(auto-fit,minmax(92px,1fr));
+7041:     }
+7042: 
+7043:     .auction-role-phase-admin-card .auction-role-phase-teams .badge{
+7044:       min-width:0;
+---
+7039:       display:grid;
+7040:       grid-template-columns:repeat(auto-fit,minmax(92px,1fr));
+7041:     }
+7042: 
+7043:     .auction-role-phase-admin-card .auction-role-phase-teams .badge{
+7044:       min-width:0;
+7045:       overflow:hidden;
+7046:       text-overflow:ellipsis;
+7047:     }
+7048: 
+7049:     .auction-free-fixed tr.outside-role-phase{
+---
+7624:       min-height:38px!important;
+7625:     }
+7626: 
+7627:     /* Regia Banditore: i nomi squadra SONO il selettore. */
+7628:     .auction-role-phase-admin-card .auction-role-phase-teams{
+7629:       grid-template-columns:repeat(auto-fit,minmax(110px,1fr))!important;
+7630:       gap:5px;
+7631:     }
+7632: 
+7633:     .auction-role-team-choice{
+7634:       min-width:0;
+---
+8325:       padding-top:5px;
+8326:       border-top:1px solid rgba(149,192,233,.13);
+8327:     }
+8328: 
+8329:     .auction-role-phase-admin-footer .auction-role-phase-action{
+8330:       width:100%;
+8331:       min-height:30px!important;
+8332:       font-size:7px!important;
+8333:     }
+8334: 
+8335:     @container auctioneer (max-width:430px){
+---
+19905:       }
+19906: 
+19907:       if (!auctionPlayerMatchesCurrentRolePhase(player)) {
+19908:         return msg(
+19909:           `Durante la fase ${auctionRolePhaseLabel(state.auction?.rolePhase?.key)} puoi consultare questo giocatore, ma non inserirlo in coda.`,
+19910:           'warning'
+19911:         );
+19912:       }
+19913: 
+19914:       const existing =
+19915:         auctionQueueRows();
+---
+22420:                 : Math.max(0, rosterMax - rosterCount);
+22421: 
+22422:           const phaseLabel =
+22423:             phaseActive
+22424:               ? auctionRolePhaseLabel(state.auction?.rolePhase?.key)
+22425:               : 'Rosa';
+22426: 
+22427:           return `
+22428:             <section
+22429:               class="auction-roster-team-card"
+22430:               data-roster-drop-team="${esc(team.id)}"
+---
+25370:       return true;
+25371:     }
+25372: 
+25373:     function auctionCurrentRolePhaseTeam() {
+25374:       const phase = state.auction?.rolePhase;
+25375: 
+25376:       return (phase?.teams || [])
+25377:         .find(team => team.teamId === auctionMyTeamId()) || null;
+25378:     }
+25379: 
+25380:     function renderAuctionRolePhasePresidentControl({ inline = false, mobile = false } = {}) {
+---
+25377:         .find(team => team.teamId === auctionMyTeamId()) || null;
+25378:     }
+25379: 
+25380:     function renderAuctionRolePhasePresidentControl({ inline = false, mobile = false } = {}) {
+25381:       const phase = state.auction?.rolePhase;
+25382:       const session = auctionSession();
+25383: 
+25384:       if (
+25385:         !phase
+25386:         || !session
+25387:         || !auctionCallMode()
+---
+25432:     }
+25433: 
+25434: 
+25435:     async function confirmAuctionRoleReady(teamId, teamName = '') {
+25436:       const phase = state.auction?.rolePhase;
+25437:       const session = auctionSession();
+25438: 
+25439:       if (!phase || !session?.id || !teamId) {
+25440:         return;
+25441:       }
+25442: 
+---
+25532:       const rosterTarget = rosterCount <= rosterMin
+25533:         ? rosterMin
+25534:         : Math.max(rosterMin, rosterMax);
+25535: 
+25536:       const phase = d.rolePhase || {};
+25537:       const phaseTeam = (phase.teams || []).find(item => item.teamId === teamId) || null;
+25538:       const phaseCurrent = Number(phaseTeam?.current || 0);
+25539:       let phaseMin = Number(phaseTeam?.minimum || 0);
+25540:       const rawPhaseMax = phaseTeam?.maximum ?? phaseTeam?.max;
+25541:       let phaseMax = Number(rawPhaseMax ?? 0);
+25542: 
+---
+25858:               );
+25859: 
+25860:         const targetLabel =
+25861:           phaseActive
+25862:             ? `${auctionRolePhaseLabel(d.rolePhase?.key)} · fase corrente`
+25863:             : remainingToMin > 0
+25864:               ? 'per raggiungere il minimo'
+25865:               : rosterCount < rosterMax
+25866:                 ? 'per raggiungere il massimo'
+25867:                 : 'rosa completa';
+25868: 
+---
+25959:     }
+25960: 
+25961: 
+25962:     function renderAuctionRolePhaseAdminPanel() {
+25963:       const phase = state.auction?.rolePhase;
+25964:       const session = auctionSession();
+25965: 
+25966:       if (
+25967:         !phase
+25968:         || !session
+25969:         || !auctionCallMode()
+---
+25976:         phase.allReady
+25977:         && !session.current_player_id
+25978:           ? phase.hasNext
+25979:             ? `
+25980:                 <button id="auction-advance-role-phase" class="auction-role-phase-action" type="button">
+25981:                   CONFERMA FASE SUCCESSIVA
+25982:                 </button>
+25983:               `
+25984:             : '<span class="badge good">ULTIMA FASE COMPLETA · PUOI TERMINARE L’ASTA</span>'
+25985:           : '';
+25986: 
+---
+27562:         }
+27563: 
+27564:         const readyButton = $('auction-admin-confirm-role-ready');
+27565:         const readyMeta = $('auction-admin-ready-meta');
+27566:         const phaseLabel = auctionRolePhaseLabel(state.auction?.rolePhase?.key);
+27567:         const phaseMin = Number(selectedMetrics?.phaseMin || selectedPhaseTeam?.minimum || 0);
+27568:         const phaseMax = Number(selectedMetrics?.phaseMax || phaseMin || 0);
+27569:         const phaseCurrent = Number(selectedMetrics?.phaseCurrent || selectedPhaseTeam?.current || 0);
+27570:         const phaseRange = phaseMax > phaseMin
+27571:           ? `${phaseCurrent}/${phaseMin}-${phaseMax}`
+27572:           : `${phaseCurrent}/${phaseMin || '—'}`;
+---
+28981:       const roles = playerRoles(player, mode);
+28982:       const queuedIndex = auctionQueueRows().findIndex(item => item.player_id === player.id);
+28983:       const showQueue = auctionCallMode() && auctionHasPresidentRole();
+28984:       const queueCapacity = auctionQueueCapacityForPlayer(player);
+28985:       const rolePhaseAllowed = auctionPlayerMatchesCurrentRolePhase(player);
+28986:       const queueAllowed = queueCapacity.allowed && rolePhaseAllowed;
+28987:       const queueBlockedMessage = !rolePhaseAllowed
+28988:         ? `Giocatore fuori dalla fase ${auctionRolePhaseLabel(state.auction?.rolePhase?.key)}: puoi consultarlo, ma non accodarlo o chiamarlo.`
+28989:         : queueCapacity.message;
+28990:       const queueBackupHint = queueCapacity.backup ? ` Verrà inserito come backup: ${queueCapacity.message}` : '';
+28991:       const queueIsEmpty = auctionQueueRows().length === 0;
+---
+28984:       const queueCapacity = auctionQueueCapacityForPlayer(player);
+28985:       const rolePhaseAllowed = auctionPlayerMatchesCurrentRolePhase(player);
+28986:       const queueAllowed = queueCapacity.allowed && rolePhaseAllowed;
+28987:       const queueBlockedMessage = !rolePhaseAllowed
+28988:         ? `Giocatore fuori dalla fase ${auctionRolePhaseLabel(state.auction?.rolePhase?.key)}: puoi consultarlo, ma non accodarlo o chiamarlo.`
+28989:         : queueCapacity.message;
+28990:       const queueBackupHint = queueCapacity.backup ? ` Verrà inserito come backup: ${queueCapacity.message}` : '';
+28991:       const queueIsEmpty = auctionQueueRows().length === 0;
+28992:       const queueActionLabel = queueIsEmpty ? 'CHIAMA' : 'CODA';
+28993:       const queueAction = queuedIndex >= 0 && auctionHasPresidentRole()
+28994:         ? `<span class="auction-queue-added" title="Già in coda">#${queuedIndex + 1}</span>`
+---
+28996:       const delta = auctionFreeDelta(player);
+28997:       const favorite = auctionFreeFavorite(player);
+28998: 
+28999:       return `
+29000:         <tr data-player-id="${esc(player.id)}" class="${player.id === state.auctionSelectedPlayerId ? 'selected-player' : ''} ${rolePhaseAllowed ? '' : 'outside-role-phase'}">
+29001: <td class="player-role-cell auction-player-col-role" data-auction-column="role">
+29002:   ${roles.map(role => `<span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>`).join('')}
+29003: </td>
+29004: <td class="auction-player-col-name" data-auction-column="name">
+29005:   <div class="player-main">
+29006:     <span class="auction-player-name-line">
+---
+29063: const player = (data.callCandidates || []).find(item => item.id === row.dataset.playerId);
+29064: if (!player) return;
+29065: if (!auctionPlayerMatchesCurrentRolePhase(player)) {
+29066:   return msg(
+29067:     `Durante la fase ${auctionRolePhaseLabel(state.auction?.rolePhase?.key)} puoi consultare questo giocatore, ma non inserirlo in coda.`,
+29068:     'warning'
+29069:   );
+29070: }
+29071: state.auctionSelectedPlayerId = player.id;
+29072: state.auctionFilterSearch = '';
+29073: state.auctionOpeningBid = 1;
+---
+32355:   const lifecycle=new Set([
+32356:     'createAuction','prepareAuction','cancelPreparedAuction','saveTeamOrder','startAuction',
+32357:     'callPlayer','awardPlayer','manualAward','editRosterPrice','removeRosterPlayer',
+32358:     'transferRosterPlayer','undoLastAssignment','undoOperation','undoLastBid','resetAuction',
+32359:     'cancelCall','passNominationTurn','advanceRolePhase','finishAuction','confirmRoleReady',
+32360:     'setTeamCredits','abandonTurn'
+32361:   ]);
+32362:   const structuralAction=action=>lifecycle.has(action)||/(Queue|Roster|TeamOrder|TeamCredits|RoleReady)/i.test(action);
+32363:   api=async function(endpoint,payload={},options={}){
+32364:     const response=await oldApiV11(endpoint,payload,options);
+32365:     const action=String(payload?.action||'');
+---
+33164:     const candidates=new Set((state.auction?.callCandidates||[]).map(p=>String(p.id)));
+33165:     return queueRows().find(q=>{
+33166:       const id=String(q?.player_id||q?.player?.id||'');
+33167:       if(!id||!candidates.has(id)||!q?.player)return false;
+33168:       if(typeof auctionPlayerMatchesCurrentRolePhase==='function'&&!auctionPlayerMatchesCurrentRolePhase(q.player))return false;
+33169:       return q.player.status==='available'||q.player.status==null;
+33170:     })||null;
+33171:   }
+33172: 
+33173:   function v16PreselectQueue(){
+33174:     const session=typeof auctionSession==='function'?auctionSession():state.auction?.auctionSession;
+---
+33387:       const after=v17Session();
+33388:       const structural=Boolean(before&&after&&(
+33389:         before.current_player_id!==after.current_player_id||
+33390:         before.current_nomination_team_id!==after.current_nomination_team_id||
+33391:         before.role_phase_index!==after.role_phase_index||
+33392:         before.role_phase_status!==after.role_phase_status||
+33393:         before.status!==after.status||
+33394:         before.pause_after_award!==after.pause_after_award
+33395:       ));
+33396:       if(structural&&state.view==='auction'&&after?.status==='live'){
+33397:         state.v17CriticalPaint=true;
+---
+33388:       const structural=Boolean(before&&after&&(
+33389:         before.current_player_id!==after.current_player_id||
+33390:         before.current_nomination_team_id!==after.current_nomination_team_id||
+33391:         before.role_phase_index!==after.role_phase_index||
+33392:         before.role_phase_status!==after.role_phase_status||
+33393:         before.status!==after.status||
+33394:         before.pause_after_award!==after.pause_after_award
+33395:       ));
+33396:       if(structural&&state.view==='auction'&&after?.status==='live'){
+33397:         state.v17CriticalPaint=true;
+33398:         try{renderAuctionLive();}finally{state.v17CriticalPaint=false;}
+---
+hits=22
+===== role.*phase =====
+6946:     .auction-rosters-resize-handle{
+6947:       pointer-events:none!important;
+6948:     }
+6949: 
+6950:     .auction-role-phase-card{
+6951:       display:grid;
+6952:       gap:5px;
+6953:       padding:6px;
+6954:       border:1px solid rgba(255,199,73,.30);
+6955:       border-radius:8px;
+6956:       background:rgba(118,80,14,.16);
+---
+6955:       border-radius:8px;
+6956:       background:rgba(118,80,14,.16);
+6957:     }
+6958: 
+6959:     .auction-role-phase-head{
+6960:       display:flex;
+6961:       align-items:center;
+6962:       justify-content:space-between;
+6963:       gap:6px;
+6964:     }
+6965: 
+---
+6962:       justify-content:space-between;
+6963:       gap:6px;
+6964:     }
+6965: 
+6966:     .auction-role-phase-action{
+6967:       min-height:30px!important;
+6968:       background:linear-gradient(145deg,#e4ad37,#b87b12)!important;
+6969:       border-color:rgba(255,220,126,.52)!important;
+6970:       color:#191203!important;
+6971:       font-size:8px!important;
+6972:     }
+---
+6970:       color:#191203!important;
+6971:       font-size:8px!important;
+6972:     }
+6973: 
+6974:     .auction-role-phase-teams{
+6975:       display:flex;
+6976:       flex-wrap:wrap;
+6977:       gap:3px;
+6978:     }
+6979: 
+6980:     .auction-role-phase-teams .badge{
+---
+6976:       flex-wrap:wrap;
+6977:       gap:3px;
+6978:     }
+6979: 
+6980:     .auction-role-phase-teams .badge{
+6981:       font-size:6px;
+6982:     }
+6983: 
+6984:     @media(max-width:620px){
+6985:       .setup-dynamic-timer-head{
+6986:         align-items:stretch;
+---
+7005:     }
+7006: 
+7007:     .auction-middle-column>.auction-command-bar,
+7008:     .auction-middle-column>.auction-middle-quick,
+7009:     .auction-middle-column>.auction-role-phase-president-action{
+7010:       margin-bottom:5px;
+7011:     }
+7012: 
+7013:     .auction-middle-column>.auction-central-queue,
+7014:     .auction-middle-column>.auction-bid-history{
+7015:       margin:0!important;
+---
+7022:     .auction-middle-vice-slot:not(:empty){
+7023:       margin-top:5px;
+7024:     }
+7025: 
+7026:     .auction-role-phase-president-action{
+7027:       width:100%;
+7028:       min-height:36px!important;
+7029:       border-radius:9px!important;
+7030:       font-size:9px!important;
+7031:     }
+7032: 
+---
+7029:       border-radius:9px!important;
+7030:       font-size:9px!important;
+7031:     }
+7032: 
+7033:     .auction-role-phase-admin-card{
+7034:       grid-column:1 / -1;
+7035:       background:rgba(118,80,14,.22);
+7036:     }
+7037: 
+7038:     .auction-role-phase-admin-card .auction-role-phase-teams{
+7039:       display:grid;
+---
+7034:       grid-column:1 / -1;
+7035:       background:rgba(118,80,14,.22);
+7036:     }
+7037: 
+7038:     .auction-role-phase-admin-card .auction-role-phase-teams{
+7039:       display:grid;
+7040:       grid-template-columns:repeat(auto-fit,minmax(92px,1fr));
+7041:     }
+7042: 
+7043:     .auction-role-phase-admin-card .auction-role-phase-teams .badge{
+7044:       min-width:0;
+---
+7039:       display:grid;
+7040:       grid-template-columns:repeat(auto-fit,minmax(92px,1fr));
+7041:     }
+7042: 
+7043:     .auction-role-phase-admin-card .auction-role-phase-teams .badge{
+7044:       min-width:0;
+7045:       overflow:hidden;
+7046:       text-overflow:ellipsis;
+7047:     }
+7048: 
+7049:     .auction-free-fixed tr.outside-role-phase{
+---
+7045:       overflow:hidden;
+7046:       text-overflow:ellipsis;
+7047:     }
+7048: 
+7049:     .auction-free-fixed tr.outside-role-phase{
+7050:       opacity:.48;
+7051:     }
+7052: 
+7053:     .auction-free-fixed tr.outside-role-phase .auction-queue-add{
+7054:       cursor:not-allowed;
+7055:       filter:grayscale(.45);
+---
+7049:     .auction-free-fixed tr.outside-role-phase{
+7050:       opacity:.48;
+7051:     }
+7052: 
+7053:     .auction-free-fixed tr.outside-role-phase .auction-queue-add{
+7054:       cursor:not-allowed;
+7055:       filter:grayscale(.45);
+7056:     }
+7057: 
+7058:     .auction-team-roster{
+7059:       grid-template-rows:auto minmax(0,1fr)!important;
+---
+7230:       padding:3px 5px;
+7231:       font-size:6px;
+7232:     }
+7233: 
+7234:     .auction-role-phase-president-action.is-confirmed{
+7235:       display:grid;
+7236:       place-items:center;
+7237:       border:1px solid rgba(82,228,168,.48)!important;
+7238:       background:linear-gradient(145deg,rgba(35,164,116,.92),rgba(18,112,82,.92))!important;
+7239:       color:#fff!important;
+7240:       cursor:default;
+---
+7239:       color:#fff!important;
+7240:       cursor:default;
+7241:     }
+7242: 
+7243:     .auction-role-phase-president-action:disabled{
+7244:       opacity:.48;
+7245:       filter:saturate(.5);
+7246:       cursor:not-allowed;
+7247:     }
+7248: 
+7249:     .auction-role-ready-controller{
+---
+7513:     .auction-middle-column{
+7514:       grid-template-rows:auto auto minmax(92px,1fr) auto auto!important;
+7515:     }
+7516: 
+7517:     .auction-middle-column>.auction-role-phase-president-action{
+7518:       margin-bottom:0!important;
+7519:     }
+7520: 
+7521:     /* I filtri ruolo mantengono SEMPRE il colore del ruolo anche quando attivi. */
+7522:     .rolebtn.active[data-role="P"],
+7523:     .rolebtn.active[data-role="Por"],
+---
+7573:       line-height:1.05;
+7574:     }
+7575: 
+7576:     /* A POSTO vive sulla stessa riga di libero / OK / lascia. */
+7577:     .auction-role-phase-president-action.is-inline{
+7578:       width:100%;
+7579:       min-width:0;
+7580:       min-height:30px!important;
+7581:       height:30px;
+7582:       margin:0!important;
+7583:       padding:2px 5px!important;
+---
+7597:     .auction-middle-quick .auction-status-quick.has-role-ready .auction-command-leave{
+7598:       grid-column:4!important;
+7599:     }
+7600: 
+7601:     .auction-middle-quick .auction-status-quick.has-role-ready .auction-role-phase-president-action{
+7602:       grid-column:5!important;
+7603:     }
+7604: 
+7605:     .auction-mobile-final-actions.has-role-ready{
+7606:       grid-template-columns:minmax(0,1.45fr) minmax(74px,.72fr) minmax(78px,.82fr)!important;
+7607:     }
+---
+7605:     .auction-mobile-final-actions.has-role-ready{
+7606:       grid-template-columns:minmax(0,1.45fr) minmax(74px,.72fr) minmax(78px,.82fr)!important;
+7607:     }
+7608: 
+7609:     .auction-mobile-final-actions .auction-role-phase-president-action.is-mobile{
+7610:       min-height:55px!important;
+7611:       height:auto!important;
+7612:       font-size:10px!important;
+7613:     }
+7614: 
+7615:     .auction-mobile-idle-footer{
+---
+7618:       min-height:34px;
+7619:       text-align:center;
+7620:     }
+7621: 
+7622:     .auction-mobile-idle-footer .auction-role-phase-president-action{
+7623:       width:100%;
+7624:       min-height:38px!important;
+7625:     }
+7626: 
+7627:     /* Regia Banditore: i nomi squadra SONO il selettore. */
+7628:     .auction-role-phase-admin-card .auction-role-phase-teams{
+---
+7624:       min-height:38px!important;
+7625:     }
+7626: 
+7627:     /* Regia Banditore: i nomi squadra SONO il selettore. */
+7628:     .auction-role-phase-admin-card .auction-role-phase-teams{
+7629:       grid-template-columns:repeat(auto-fit,minmax(110px,1fr))!important;
+7630:       gap:5px;
+7631:     }
+7632: 
+7633:     .auction-role-team-choice{
+7634:       min-width:0;
+---
+7821:       outline-offset:2px;
+7822:     }
+7823: 
+7824:     @media(max-width:720px){
+7825:       .auction-mobile-final-actions.has-role-ready .auction-role-phase-president-action.is-mobile{
+7826:         min-height:48px!important;
+7827:         font-size:8px!important;
+7828:       }
+7829: 
+7830:       .auction-rosters-drawer{
+7831:         bottom:6px!important;
+---
+8064:       color:#fff;
+8065:       font-weight:950;
+8066:     }
+8067: 
+8068:     .auction-role-phase-admin-card{
+8069:       gap:4px!important;
+8070:     }
+8071: 
+8072:     .auction-admin-phase-team-status{
+8073:       min-height:20px;
+8074:       padding:3px 5px;
+---
+8086:     .auction-role-ready-controller{
+8087:       padding-top:0!important;
+8088:     }
+8089: 
+8090:     .auction-role-ready-controller .auction-role-phase-action{
+8091:       min-height:30px!important;
+8092:       padding:3px 6px!important;
+8093:       font-size:7px!important;
+8094:     }
+8095: 
+8096:     /* Rose di tutti: ancoraggio al viewport, così la linguetta non può più finire
+---
+8317:       white-space:normal!important;
+8318:       overflow-wrap:anywhere;
+8319:     }
+8320: 
+8321:     .auction-role-phase-admin-footer{
+8322:       min-width:0;
+8323:       display:grid;
+8324:       gap:3px;
+8325:       padding-top:5px;
+8326:       border-top:1px solid rgba(149,192,233,.13);
+8327:     }
+---
+8325:       padding-top:5px;
+8326:       border-top:1px solid rgba(149,192,233,.13);
+8327:     }
+8328: 
+8329:     .auction-role-phase-admin-footer .auction-role-phase-action{
+8330:       width:100%;
+8331:       min-height:30px!important;
+8332:       font-size:7px!important;
+8333:     }
+8334: 
+8335:     @container auctioneer (max-width:430px){
+---
+9680:     }
+9681: 
+9682:     .auction-middle-column>.auction-command-bar,
+9683:     .auction-middle-column>.auction-middle-quick,
+9684:     .auction-middle-column>.auction-role-phase-president-action{
+9685:       flex:0 0 auto!important;
+9686:       margin:0!important;
+9687:     }
+9688: 
+9689:     .auction-middle-lower-zone{
+9690:       flex:1 1 0!important;
+---
+11277: 
+11278:     body.modern-glass #view-auction
+11279:       .auctioneer-bid-panel>.auctioneer-section:not(.auctioneer-functions-section),
+11280:     body.modern-glass #view-auction
+11281:       .auctioneer-bid-panel>.auction-role-phase-admin-footer,
+11282:     body.modern-glass #view-auction
+11283:       .auctioneer-bid-panel>.auctioneer-pause-note{
+11284:       flex:0 0 auto!important;
+11285:     }
+11286: 
+11287:     body.modern-glass #view-auction
+---
+11453: 
+11454:     body.modern-glass #view-auction
+11455:       .auctioneer-bid-panel>.auctioneer-section:not(.auctioneer-functions-section),
+11456:     body.modern-glass #view-auction
+11457:       .auctioneer-bid-panel>.auction-role-phase-admin-footer,
+11458:     body.modern-glass #view-auction
+11459:       .auctioneer-bid-panel>.auctioneer-pause-note{
+11460:       flex:0 0 auto!important;
+11461:     }
+11462: 
+11463:     /* Funzioni asta = tutto lo spazio verticale rimasto. */
+---
+14569:       listRoles: new Set(['all']),
+14570:       listSort: { key: 'name', direction: 'asc' },
+14571: 
+14572:       auctionRoles: new Set(['all']),
+14573:       auctionRolePhaseFilterKey: '',
+14574:       auctionSort: { key: 'name', direction: 'asc' },
+14575:       auctionFilterSearch: '',
+14576:       auctionFilterTeam: 'all',
+14577:       auctionFilterSlot: 'all',
+14578:       auctionFilterFlag: 'all',
+14579:       auctionOpeningBid: 1,
+---
+19244:       if (!player || !info) {
+19245:         return null;
+19246:       }
+19247: 
+19248:       if (!auctionPlayerMatchesCurrentRolePhase(player)) {
+19249:         return null;
+19250:       }
+19251: 
+19252:       const capacity = auctionQueueCapacityForPlayer(player);
+19253:       if (!capacity.allowed) {
+19254:         return null;
+---
+hits=30
+===== call.*role =====
+5189:       white-space:nowrap;
+5190:     }
+5191: 
+5192:     .auction-team-roster .rolebadge,
+5193:     .auction-call-queue-drawer .rolebadge,
+5194:     .auction-awards-drawer .rolebadge,
+5195:     .auction-free-fixed .rolebadge,
+5196:     .auction-free-fixed .rolebtn{
+5197:       min-width:20px!important;
+5198:       min-height:var(--auction-role-chip-height)!important;
+5199:       height:var(--auction-role-chip-height)!important;
+---
+7724:       grid-template-columns:minmax(27px,auto) minmax(72px,1fr) 44px 22px 22px!important;
+7725:       border-radius:4px!important;
+7726:     }
+7727: 
+7728:     .auction-call-queue-row .auction-roster-mini-roles .rolebadge{
+7729:       height:11px!important;
+7730:       line-height:11px!important;
+7731:       font-size:5px!important;
+7732:     }
+7733: 
+7734:     .auction-call-queue-row .auction-queue-handle{
+---
+7754:       min-height:21px!important;
+7755:       height:21px!important;
+7756:     }
+7757: 
+7758:     .auction-call-queue.is-private .auction-call-queue-row .auction-roster-mini-roles,
+7759:     .auction-call-queue.is-private .auction-call-queue-row .auction-queue-player strong,
+7760:     .auction-call-queue.is-private .auction-call-queue-row .auction-queue-price input{
+7761:       filter:blur(4px)!important;
+7762:       opacity:.66;
+7763:       user-select:none;
+7764:     }
+---
+7929:       text-align:left!important;
+7930:       order:0;
+7931:     }
+7932: 
+7933:     .auction-call-queue-row .auction-roster-mini-roles{
+7934:       min-width:0!important;
+7935:       gap:1px!important;
+7936:     }
+7937: 
+7938:     .auction-call-queue-row .auction-roster-mini-roles .rolebadge{
+7939:       min-width:19px!important;
+---
+7934:       min-width:0!important;
+7935:       gap:1px!important;
+7936:     }
+7937: 
+7938:     .auction-call-queue-row .auction-roster-mini-roles .rolebadge{
+7939:       min-width:19px!important;
+7940:       height:10px!important;
+7941:       min-height:10px!important;
+7942:       padding:0 3px!important;
+7943:       font-size:4.5px!important;
+7944:       line-height:10px!important;
+---
+7985:     }
+7986: 
+7987:     /* Se l'utente offusca il proprio schermo, anche la maniglia resta visibile ma
+7988:        ruolo, nome e prezzo diventano illeggibili a colpo d'occhio. */
+7989:     .auction-call-queue.is-private .auction-call-queue-row .auction-roster-mini-roles,
+7990:     .auction-call-queue.is-private .auction-call-queue-row .auction-queue-player strong,
+7991:     .auction-call-queue.is-private .auction-call-queue-row .auction-queue-price input{
+7992:       filter:blur(4.5px)!important;
+7993:       opacity:.62!important;
+7994:     }
+7995: 
+---
+9260:       color:rgba(151,184,216,.58)!important;
+9261:       font-size:8px!important;
+9262:     }
+9263: 
+9264:     .auction-call-queue-row .auction-roster-mini-roles{
+9265:       min-width:0!important;
+9266:       gap:1px!important;
+9267:     }
+9268: 
+9269:     .auction-call-queue-row .auction-roster-mini-roles .rolebadge{
+9270:       min-width:18px!important;
+---
+9265:       min-width:0!important;
+9266:       gap:1px!important;
+9267:     }
+9268: 
+9269:     .auction-call-queue-row .auction-roster-mini-roles .rolebadge{
+9270:       min-width:18px!important;
+9271:       height:13px!important;
+9272:       min-height:13px!important;
+9273:       padding:0 2px!important;
+9274:       border-radius:3px!important;
+9275:       font-size:5.5px!important;
+---
+14468:             <div class="tv-call-main">
+14469:               <span class="tv-call-label">Giocatore chiamato</span>
+14470:               <h1 id="tv-player-name">In attesa</h1>
+14471:             </div>
+14472:             <div class="tv-call-stat"><span>Ruolo</span><strong id="tv-player-role">—</strong></div>
+14473:             <div class="tv-call-stat"><span>Squadra</span><strong id="tv-player-team">—</strong></div>
+14474:             <div class="tv-call-stat"><span>Offerta più alta</span><strong id="tv-bid">—</strong></div>
+14475:             <div class="tv-call-stat"><span>Miglior offerente</span><strong id="tv-leader">—</strong></div>
+14476:             <div class="tv-call-stat"><span>Timer</span><strong id="tv-timer">—</strong></div>
+14477:             <div class="tv-call-actions">
+14478:               <span id="tv-status-badge" class="badge"></span>
+---
+25684:         hasPlayer
+25685:         && bidTimerActive
+25686:         && (canPresidentBid || auctionCanControl())
+25687:       );
+25688:       const calledRoles = hasPlayer
+25689:         ? playerRoles(player || {}, d.settings?.fantasy_mode)
+25690:         : [];
+25691:       const playerSerieATeam =
+25692:         hasPlayer
+25693:           ? String(player?.serie_a_team || '—')
+25694:           : '—';
+---
+25718:               <div class="auction-rosters-live-cell auction-rosters-live-roles">
+25719:                 <span>RUOLI</span>
+25720:                 <div>
+25721:                   ${
+25722:                     calledRoles.length
+25723:                       ? calledRoles.map(role => `<span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>`).join('')
+25724:                       : '<b>—</b>'
+25725:                   }
+25726:                 </div>
+25727:               </div>
+25728: 
+---
+25719:                 <span>RUOLI</span>
+25720:                 <div>
+25721:                   ${
+25722:                     calledRoles.length
+25723:                       ? calledRoles.map(role => `<span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>`).join('')
+25724:                       : '<b>—</b>'
+25725:                   }
+25726:                 </div>
+25727:               </div>
+25728: 
+25729:               <div class="auction-rosters-live-cell auction-rosters-live-player">
+---
+26127:         return;
+26128:       }
+26129: 
+26130: 
+26131:       const calledRoles =
+26132:         hasPlayer
+26133:           ? playerRoles(
+26134:               p || {},
+26135:               d.settings?.fantasy_mode
+26136:             )
+26137:           : [];
+---
+26220: 
+26221:             <small>
+26222:               ${
+26223:                 hasPlayer
+26224:                   ? `${calledRoles.map(role => `
+26225:                       <span class="rolebadge" data-role="${esc(role)}">${esc(role)}</span>
+26226:                     `).join('')}
+26227:                     <span>${esc(p?.serie_a_team || '')} · Slot ${esc(p?.slot ?? '—')}</span>`
+26228:                   : `Turno: ${esc(auctionTeamReference(d.currentNominationTeam, d.currentNominationTeam?.name || '—'))}`
+26229:               }
+26230:             </small>
+---
+27494:           selectedTeam
+27495:           && nominationTeamId
+27496:           && selectedTeam.id === nominationTeamId
+27497:         );
+27498:         const callRoleAllowed =
+27499:           selectedPlayer
+27500:             ? auctionPlayerMatchesCurrentRolePhase(selectedPlayer)
+27501:             : false;
+27502:         const callAllowed = Boolean(
+27503:           !prestartHold
+27504:           && !hasPlayer
+---
+27505:           && !s.pause_after_award
+27506:           && selectedTeam
+27507:           && selectedPlayer
+27508:           && callMatchesTurn
+27509:           && callRoleAllowed
+27510:         );
+27511: 
+27512:         if (callButton) callButton.disabled = !callAllowed;
+27513:         if (callMeta) {
+27514:           callMeta.textContent =
+27515:             prestartHold
+---
+27523:                   : !callMatchesTurn
+27524:                     ? `TURNO: ${nominationTeam?.name || 'altra squadra'}`
+27525:                     : !selectedPlayer
+27526:                       ? 'SELEZIONA SVINCOLATO'
+27527:                       : !callRoleAllowed
+27528:                         ? 'FUORI FASE RUOLO'
+27529:                         : selectedPlayer.name;
+27530:         }
+27531: 
+27532:         const confirmButton = $('auction-admin-place-bid');
+27533:         const bidMeta = $('auction-admin-bid-meta');
+---
+28979: 
+28980:     function auctionPlayerRow(player, mode) {
+28981:       const roles = playerRoles(player, mode);
+28982:       const queuedIndex = auctionQueueRows().findIndex(item => item.player_id === player.id);
+28983:       const showQueue = auctionCallMode() && auctionHasPresidentRole();
+28984:       const queueCapacity = auctionQueueCapacityForPlayer(player);
+28985:       const rolePhaseAllowed = auctionPlayerMatchesCurrentRolePhase(player);
+28986:       const queueAllowed = queueCapacity.allowed && rolePhaseAllowed;
+28987:       const queueBlockedMessage = !rolePhaseAllowed
+28988:         ? `Giocatore fuori dalla fase ${auctionRolePhaseLabel(state.auction?.rolePhase?.key)}: puoi consultarlo, ma non accodarlo o chiamarlo.`
+28989:         : queueCapacity.message;
+---
+28991:       const queueIsEmpty = auctionQueueRows().length === 0;
+28992:       const queueActionLabel = queueIsEmpty ? 'CHIAMA' : 'CODA';
+28993:       const queueAction = queuedIndex >= 0 && auctionHasPresidentRole()
+28994:         ? `<span class="auction-queue-added" title="Già in coda">#${queuedIndex + 1}</span>`
+28995:         : `<button type="button" class="auction-queue-add ${queueIsEmpty ? 'call-now' : ''}" data-queue-add="${esc(player.id)}" ${auctionCanManageCallQueue() && queueAllowed ? '' : 'disabled'} title="${!queueAllowed ? esc(queueBlockedMessage) : auctionHasPresidentRole() ? (queueIsEmpty ? `Inserisci come prima chiamata: verrà elaborato automaticamente dalla coda.${queueBackupHint}` : `Aggiungi subito alla coda.${queueBackupHint}`) : 'Solo il Presidente può usare la coda'}">${queueActionLabel}</button>`;
+28996:       const delta = auctionFreeDelta(player);
+28997:       const favorite = auctionFreeFavorite(player);
+28998: 
+28999:       return `
+29000:         <tr data-player-id="${esc(player.id)}" class="${player.id === state.auctionSelectedPlayerId ? 'selected-player' : ''} ${rolePhaseAllowed ? '' : 'outside-role-phase'}">
+29001: <td class="player-role-cell auction-player-col-role" data-auction-column="role">
+---
+31574:  function market(p){const rr=new Set(roles(p)),a=(state.auction?.recentAwards||[]).filter(x=>{const q=x.player||{},ref=Number(q.pfc||q.pma||q.quotation||0),pr=Number(x.price||x.amount||0);return ref>0&&pr>0&&roles(q).some(r=>rr.has(r))}).slice(0,12).map(x=>cl(Number(x.price||x.amount)/Number(x.player?.pfc||x.player?.pma||x.player?.quotation||1),.55,1.65));return a.length?cl(a.reduce((s,x)=>s+x,0)/a.length,.75,1.3):1}
+31575:  function opp(p,i){const pf=pref(p),mk=market(p),sl=Number(p.slot||99);return Math.round(cl(43+trend(p)*13+(prs(p)-60)*.16+(sl<=1?9:sl===2?6:sl===3?3:0)+Math.max(0,i.completionDelta)*.55+Math.max(-8,Math.min(12,i.fantasyDelta*18))+i.anchorFit+(mk<.95?(.95-mk)*35:-(mk-1.05)*16)+(pf?.strategy==='top'?9:pf?.is_favorite?4:pf?.strategy==='avoid'?-35:0),0,100))}
+31576:  function prices(p,score,o){const info=auctionMyTeamDashboardData(),pf=pref(p),ref=Math.max(1,Number(p.pfc||p.pma||p.quotation||1)),mk=market(p),prf=state.v8Profile?.profile||'balanced',mult=prf==='aggressive'?1.06:prf==='conservative'?.95:1,q=1+cl(trend(p),-.15,.15)*.25+(prs(p)/100-.65)*.08;let s=Math.max(1,Math.round(ref*mk*q*(.93+o/100*.15)*mult)),c=Math.max(s,Math.round(s*(1.10+Math.max(0,score-65)/500)));if(pf?.expected_spend!=null&&String(pf.expected_spend).trim()!=='')s=Math.max(1,Math.round((s*2+Number(pf.expected_spend))/3));if(pf?.max_price!=null&&String(pf.max_price).trim()!=='')c=Math.min(c,Math.max(1,Number(pf.max_price)));const rawMb=info?.maxBid,mb=rawMb===null||rawMb===undefined||String(rawMb).trim()===''?null:Number(rawMb);if(Number.isFinite(mb)&&mb>0){c=Math.min(c,mb);s=Math.min(s,c)}return{suggested:Math.max(1,s),ceiling:Math.max(1,c),marketFactor:mk}}
+31577:  const oldScore=auctionSuggestedCallScore;auctionSuggestedCallScore=function(p){state.v7Stats=new Map();const x=oldScore(p);if(!x)return null;const i=quick(p),o=opp(p,i);x.score=cl(x.score+Math.round(trend(p)*15)+Math.round((prs(p)-60)*.08)+Math.round(Math.max(0,i.completionDelta)*.22)+Math.round(i.fantasyDelta*12)+Math.round(i.solidityDelta*.16)+i.anchorFit+Math.round((o-50)*.12),0,100);x.opportunity=o;x.rosterImpact=i;x.features=feat(p);x.prices=prices(p,x.score,o);return x};
+31578:  const oldCalls=auctionSuggestedCalls;function rows(limit){const a=oldCalls(Math.max(12,limit)).map(x=>{const i=impact(x.player),o=opp(x.player,i);x.rosterImpact=i;x.opportunity=o;x.score=cl(Number(x.score||0)+Math.round(Math.max(0,i.completionDelta)*.30)+Math.round(i.fantasyDelta*14)+Math.round(i.solidityDelta*.18)+i.anchorFit,0,100);x.prices=prices(x.player,x.score,o);return x}).sort((a,b)=>b.score-a.score||b.opportunity-a.opportunity);if(!a.length)return[];const info=auctionMyTeamDashboardData(),ctx=[auctionSession()?.id||'',state.auction?.auctionSession?.role_phase_index||0,info?.assignments?.length||0].join('|'),cur=a.find(x=>String(x.player?.id)===String(state.v8Moment||'')),ch=a[0];if(state.v8MomentCtx!==ctx||!cur||ch.score>=cur.score+9){state.v8MomentCtx=ctx;state.v8Moment=ch.player?.id}const m=a.find(x=>String(x.player?.id)===String(state.v8Moment||''))||ch;return[m,...a.filter(x=>x!==m)].slice(0,limit)}
+31579:  function conv(x,y){const gap=Math.max(0,Number(x?.score||0)-Number(y?.score||0)),v=Math.round(cl(48+Number(x?.opportunity||50)*.28+gap*2.1+Number(x?.rosterImpact?.completionDelta||0)*.22,0,100));return{v,label:v>=82?'MOLTO ALTA':v>=68?'ALTA':v>=52?'MEDIA':'PRUDENTE'}}
+31580:  function objective(info,extra=null,cost=0){if(!info)return metrics(info,extra);const ps=(info.assignments||[]).map(x=>x.player).filter(Boolean);if(extra)ps.push(extra);let budget=Math.max(0,Number(info.remaining||0)-Number(cost||0)),max=Math.max(ps.length,Number(info.rosterMin||info.rosterLimit||25)),owned=new Set(ps.map(p=>String(p.id))),cand=(state.auction?.callCandidates||[]).filter(p=>!owned.has(String(p.id))).map(p=>{const o=opp(p,quick(p)),pr=prices(p,60,o).suggested;return{p,pr,v:weight(p)+o/40+Math.max(0,4-Number(p.slot||4))*.15}}).sort((a,b)=>b.v-a.v).slice(0,45);for(const c of cand){if(ps.length>=max)break;const reserve=Math.max(0,max-ps.length-1);if(c.pr+reserve>budget)continue;ps.push(c.p);budget-=c.pr}return metrics({...info,assignments:ps.map(p=>({player:p}))})}
+31581:  renderAuctionSuggestedCalls=function(){const limit=document.fullscreenElement?8:4,a=rows(limit);if(!a.length)return'';const can=auctionHasPresidentRole(),lab=auctionOwnCallTurn()&&auctionQueueRows().length===0?'CHIAMA':'CODA',runner=a[1];return`<section class="auction-suggested-calls" aria-label="Consulente Strategico"><div class="auction-suggested-head"><div><strong>Consulente Strategico</strong><small>rosa · moduli · trend import · mercato pubblico</small></div><span>LIVE</span></div><div class="auction-suggested-list">${a.map((x,i)=>{const p=x.player||{},cv=i===0?conv(x,runner):null;return`<div class="auction-suggested-row ${i===0?'is-must-have':''}" data-v8-detail="${esc(p.id)}" tabindex="0"><span class="auction-suggested-roles">${playerRoles(p,state.auction?.settings?.fantasy_mode).map(r=>`<span class="rolebadge" data-role="${esc(r)}">${esc(r)}</span>`).join('')}</span><div class="auction-suggested-copy"><div class="v8n"><strong>${esc(p.name||'Giocatore')}</strong>${i===0?'<em>GIOCATORE DEL MOMENTO</em>':''}${pref(p)?.is_favorite?'<i>♥</i>':''}</div><small>${esc(p.serie_a_team||'—')} · score ${Math.round(x.score)} · opp ${x.opportunity}${cv?` · conv ${cv.v}%`:''}</small></div><span class="auction-v7-prices"><b>SUGG ${x.prices?.suggested??'—'}</b><small>MAX ${x.prices?.ceiling??'—'}</small></span><span class="auction-v7-suggest-actions"><button type="button" class="auction-v7-dismiss" data-v8-hide="${esc(p.id)}" title="Nascondi per ora">×</button>${can?`<button type="button" class="auction-suggested-action" data-suggest-call="${esc(p.id)}">${lab}</button>`:'<span class="auction-suggested-action-placeholder">VICE</span>'}</span></div>`}).join('')}</div></section>`};
+31582:  function modal(id){const p=(state.auction?.callCandidates||[]).find(x=>String(x.id)===String(id)),x=p?auctionSuggestedCallScore(p):null;if(!x)return;const info=auctionMyTeamDashboardData(),i=impact(p),ob=objective(info),oa=objective(info,p,x.prices?.suggested||0),cv=conv(x,rows(2).find(z=>z.player?.id!==p.id)),f=feat(p),pf=pref(p)||{};let d=document.getElementById('v8dlg');if(!d){d=document.createElement('dialog');d.id='v8dlg';d.className='auction-v7-strategy-dialog';document.body.appendChild(d)}d.innerHTML=`<form class="auction-v7-modal" method="dialog"><header><div><small>CONSULENTE · OPPORTUNITÀ ${x.opportunity}/100</small><h3>${esc(p.name)}</h3><p>${esc(playerRoles(p,state.auction?.settings?.fantasy_mode).join('/'))} · ${esc(p.serie_a_team||'—')}</p></div><button value="cancel" class="secondary">×</button></header><div class="auction-v7-kpis"><span><small>SCORE</small><b>${Math.round(x.score)}</b></span><span><small>CONV.</small><b>${cv.v}%</b></span><span><small>SUGG.</small><b>${x.prices?.suggested}</b></span><span><small>MAX</small><b>${x.prices?.ceiling}</b></span><span><small>COMP</small><b>${i.before?.completion||0}%→${i.after?.completion||0}%</b></span><span><small>FV</small><b>${fmt(i.before?.fantasy)}→${fmt(i.after?.fantasy)}</b></span><span><small>OBIETTIVO</small><b>${fmt(ob.fantasy)}→${fmt(oa.fantasy)}</b></span><span><small>SOL</small><b>${i.before?.solidity||0}→${i.after?.solidity||0}</b></span></div><div class="v8ana"><span><small>TREND IMPORT</small><b>${esc(f.trend_direction||'stable')}</b></span><span><small>PRESENZA</small><b>${fmt(prs(p),0)}%</b></span><span><small>RISCHIO</small><b>${fmt(vol(p)*100,0)}%</b></span><span><small>MERCATO</small><b>${fmt((x.prices?.marketFactor||1)*100,0)}%</b></span></div><div class="auction-v7-reason"><b>Motivo:</b> impatto su ${i.after?.module||'rosa'}, trend pre-calcolato all'import, presenza prevista e prezzi delle sole aggiudicazioni pubbliche. Code e preferiti degli altri presidenti sono esclusi.</div><div class="auction-v7-actions"><button type="button" class="secondary" id="v8fav">${pf.is_favorite?'♥ PREFERITO':'♡ PREFERITO'}</button><button type="button" class="secondary" id="v8queue">+ CODA</button></div></form>`;d.querySelector('#v8fav')?.addEventListener('click',async()=>{const z=await api(ENDPOINTS.v6y,{action:'toggleFavorite',sourcePlayerId:p.source_player_id||p.id},{quiet:true});if(z?.preference)state.v7Preferences.set(String(z.preference.source_player_id),z.preference);d.close();renderAuctionLive()});d.querySelector('#v8queue')?.addEventListener('click',()=>{addPlayerToAuctionQueue(p.id,Math.max(1,Number(state.auctionOpeningBid||1)));d.close()});d.showModal()}
+31583:  function bind(root=document){root.querySelectorAll('[data-v8-hide]').forEach(b=>{if(b.dataset.v8b)return;b.dataset.v8b=1;b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const id=String(b.dataset.v8Hide);if(!state.v7SuggestedDismissed.includes(id))state.v7SuggestedDismissed.push(id);if(String(state.v8Moment||'')===id)state.v8Moment=null;const h=document.querySelector('.auction-free-suggestions');if(h){h.innerHTML=renderAuctionSuggestedCalls();attachAuctionCallQueueEvents()}})});root.querySelectorAll('[data-v8-detail]').forEach(r=>{if(r.dataset.v8b)return;r.dataset.v8b=1;const f=e=>{if(e.target.closest('button')||(e.type==='keydown'&&!['Enter',' '].includes(e.key)))return;e.preventDefault();modal(r.dataset.v8Detail)};r.addEventListener('click',f);r.addEventListener('keydown',f)})}
+31584:  const oldAttach=attachAuctionCallQueueEvents;attachAuctionCallQueueEvents=function(...a){const r=oldAttach(...a);bind();return r};
+---
+31577:  const oldScore=auctionSuggestedCallScore;auctionSuggestedCallScore=function(p){state.v7Stats=new Map();const x=oldScore(p);if(!x)return null;const i=quick(p),o=opp(p,i);x.score=cl(x.score+Math.round(trend(p)*15)+Math.round((prs(p)-60)*.08)+Math.round(Math.max(0,i.completionDelta)*.22)+Math.round(i.fantasyDelta*12)+Math.round(i.solidityDelta*.16)+i.anchorFit+Math.round((o-50)*.12),0,100);x.opportunity=o;x.rosterImpact=i;x.features=feat(p);x.prices=prices(p,x.score,o);return x};
+31578:  const oldCalls=auctionSuggestedCalls;function rows(limit){const a=oldCalls(Math.max(12,limit)).map(x=>{const i=impact(x.player),o=opp(x.player,i);x.rosterImpact=i;x.opportunity=o;x.score=cl(Number(x.score||0)+Math.round(Math.max(0,i.completionDelta)*.30)+Math.round(i.fantasyDelta*14)+Math.round(i.solidityDelta*.18)+i.anchorFit,0,100);x.prices=prices(x.player,x.score,o);return x}).sort((a,b)=>b.score-a.score||b.opportunity-a.opportunity);if(!a.length)return[];const info=auctionMyTeamDashboardData(),ctx=[auctionSession()?.id||'',state.auction?.auctionSession?.role_phase_index||0,info?.assignments?.length||0].join('|'),cur=a.find(x=>String(x.player?.id)===String(state.v8Moment||'')),ch=a[0];if(state.v8MomentCtx!==ctx||!cur||ch.score>=cur.score+9){state.v8MomentCtx=ctx;state.v8Moment=ch.player?.id}const m=a.find(x=>String(x.player?.id)===String(state.v8Moment||''))||ch;return[m,...a.filter(x=>x!==m)].slice(0,limit)}
+31579:  function conv(x,y){const gap=Math.max(0,Number(x?.score||0)-Number(y?.score||0)),v=Math.round(cl(48+Number(x?.opportunity||50)*.28+gap*2.1+Number(x?.rosterImpact?.completionDelta||0)*.22,0,100));return{v,label:v>=82?'MOLTO ALTA':v>=68?'ALTA':v>=52?'MEDIA':'PRUDENTE'}}
+31580:  function objective(info,extra=null,cost=0){if(!info)return metrics(info,extra);const ps=(info.assignments||[]).map(x=>x.player).filter(Boolean);if(extra)ps.push(extra);let budget=Math.max(0,Number(info.remaining||0)-Number(cost||0)),max=Math.max(ps.length,Number(info.rosterMin||info.rosterLimit||25)),owned=new Set(ps.map(p=>String(p.id))),cand=(state.auction?.callCandidates||[]).filter(p=>!owned.has(String(p.id))).map(p=>{const o=opp(p,quick(p)),pr=prices(p,60,o).suggested;return{p,pr,v:weight(p)+o/40+Math.max(0,4-Number(p.slot||4))*.15}}).sort((a,b)=>b.v-a.v).slice(0,45);for(const c of cand){if(ps.length>=max)break;const reserve=Math.max(0,max-ps.length-1);if(c.pr+reserve>budget)continue;ps.push(c.p);budget-=c.pr}return metrics({...info,assignments:ps.map(p=>({player:p}))})}
+31581:  renderAuctionSuggestedCalls=function(){const limit=document.fullscreenElement?8:4,a=rows(limit);if(!a.length)return'';const can=auctionHasPresidentRole(),lab=auctionOwnCallTurn()&&auctionQueueRows().length===0?'CHIAMA':'CODA',runner=a[1];return`<section class="auction-suggested-calls" aria-label="Consulente Strategico"><div class="auction-suggested-head"><div><strong>Consulente Strategico</strong><small>rosa · moduli · trend import · mercato pubblico</small></div><span>LIVE</span></div><div class="auction-suggested-list">${a.map((x,i)=>{const p=x.player||{},cv=i===0?conv(x,runner):null;return`<div class="auction-suggested-row ${i===0?'is-must-have':''}" data-v8-detail="${esc(p.id)}" tabindex="0"><span class="auction-suggested-roles">${playerRoles(p,state.auction?.settings?.fantasy_mode).map(r=>`<span class="rolebadge" data-role="${esc(r)}">${esc(r)}</span>`).join('')}</span><div class="auction-suggested-copy"><div class="v8n"><strong>${esc(p.name||'Giocatore')}</strong>${i===0?'<em>GIOCATORE DEL MOMENTO</em>':''}${pref(p)?.is_favorite?'<i>♥</i>':''}</div><small>${esc(p.serie_a_team||'—')} · score ${Math.round(x.score)} · opp ${x.opportunity}${cv?` · conv ${cv.v}%`:''}</small></div><span class="auction-v7-prices"><b>SUGG ${x.prices?.suggested??'—'}</b><small>MAX ${x.prices?.ceiling??'—'}</small></span><span class="auction-v7-suggest-actions"><button type="button" class="auction-v7-dismiss" data-v8-hide="${esc(p.id)}" title="Nascondi per ora">×</button>${can?`<button type="button" class="auction-suggested-action" data-suggest-call="${esc(p.id)}">${lab}</button>`:'<span class="auction-suggested-action-placeholder">VICE</span>'}</span></div>`}).join('')}</div></section>`};
+31582:  function modal(id){const p=(state.auction?.callCandidates||[]).find(x=>String(x.id)===String(id)),x=p?auctionSuggestedCallScore(p):null;if(!x)return;const info=auctionMyTeamDashboardData(),i=impact(p),ob=objective(info),oa=objective(info,p,x.prices?.suggested||0),cv=conv(x,rows(2).find(z=>z.player?.id!==p.id)),f=feat(p),pf=pref(p)||{};let d=document.getElementById('v8dlg');if(!d){d=document.createElement('dialog');d.id='v8dlg';d.className='auction-v7-strategy-dialog';document.body.appendChild(d)}d.innerHTML=`<form class="auction-v7-modal" method="dialog"><header><div><small>CONSULENTE · OPPORTUNITÀ ${x.opportunity}/100</small><h3>${esc(p.name)}</h3><p>${esc(playerRoles(p,state.auction?.settings?.fantasy_mode).join('/'))} · ${esc(p.serie_a_team||'—')}</p></div><button value="cancel" class="secondary">×</button></header><div class="auction-v7-kpis"><span><small>SCORE</small><b>${Math.round(x.score)}</b></span><span><small>CONV.</small><b>${cv.v}%</b></span><span><small>SUGG.</small><b>${x.prices?.suggested}</b></span><span><small>MAX</small><b>${x.prices?.ceiling}</b></span><span><small>COMP</small><b>${i.before?.completion||0}%→${i.after?.completion||0}%</b></span><span><small>FV</small><b>${fmt(i.before?.fantasy)}→${fmt(i.after?.fantasy)}</b></span><span><small>OBIETTIVO</small><b>${fmt(ob.fantasy)}→${fmt(oa.fantasy)}</b></span><span><small>SOL</small><b>${i.before?.solidity||0}→${i.after?.solidity||0}</b></span></div><div class="v8ana"><span><small>TREND IMPORT</small><b>${esc(f.trend_direction||'stable')}</b></span><span><small>PRESENZA</small><b>${fmt(prs(p),0)}%</b></span><span><small>RISCHIO</small><b>${fmt(vol(p)*100,0)}%</b></span><span><small>MERCATO</small><b>${fmt((x.prices?.marketFactor||1)*100,0)}%</b></span></div><div class="auction-v7-reason"><b>Motivo:</b> impatto su ${i.after?.module||'rosa'}, trend pre-calcolato all'import, presenza prevista e prezzi delle sole aggiudicazioni pubbliche. Code e preferiti degli altri presidenti sono esclusi.</div><div class="auction-v7-actions"><button type="button" class="secondary" id="v8fav">${pf.is_favorite?'♥ PREFERITO':'♡ PREFERITO'}</button><button type="button" class="secondary" id="v8queue">+ CODA</button></div></form>`;d.querySelector('#v8fav')?.addEventListener('click',async()=>{const z=await api(ENDPOINTS.v6y,{action:'toggleFavorite',sourcePlayerId:p.source_player_id||p.id},{quiet:true});if(z?.preference)state.v7Preferences.set(String(z.preference.source_player_id),z.preference);d.close();renderAuctionLive()});d.querySelector('#v8queue')?.addEventListener('click',()=>{addPlayerToAuctionQueue(p.id,Math.max(1,Number(state.auctionOpeningBid||1)));d.close()});d.showModal()}
+31583:  function bind(root=document){root.querySelectorAll('[data-v8-hide]').forEach(b=>{if(b.dataset.v8b)return;b.dataset.v8b=1;b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const id=String(b.dataset.v8Hide);if(!state.v7SuggestedDismissed.includes(id))state.v7SuggestedDismissed.push(id);if(String(state.v8Moment||'')===id)state.v8Moment=null;const h=document.querySelector('.auction-free-suggestions');if(h){h.innerHTML=renderAuctionSuggestedCalls();attachAuctionCallQueueEvents()}})});root.querySelectorAll('[data-v8-detail]').forEach(r=>{if(r.dataset.v8b)return;r.dataset.v8b=1;const f=e=>{if(e.target.closest('button')||(e.type==='keydown'&&!['Enter',' '].includes(e.key)))return;e.preventDefault();modal(r.dataset.v8Detail)};r.addEventListener('click',f);r.addEventListener('keydown',f)})}
+31584:  const oldAttach=attachAuctionCallQueueEvents;attachAuctionCallQueueEvents=function(...a){const r=oldAttach(...a);bind();return r};
+31585:  function hearts(){const by=new Map((state.list?.players||[]).map(p=>[String(p.id),p]));document.querySelectorAll('#list-body tr[data-player-id]').forEach(r=>{const p=by.get(String(r.dataset.playerId)),h=r.querySelector('.list-fav-slot')||r.querySelector('.player-main');if(!p||!h||h.querySelector('.v8heart'))return;const fav=pref(p)?.is_favorite===true,b=document.createElement('button');b.type='button';b.className=`v8heart ${fav?'on':''}`;b.textContent=fav?'♥':'♡';b.title=fav?'Rimuovi dai preferiti':'Aggiungi ai preferiti';b.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();const z=await api(ENDPOINTS.v6y,{action:'toggleFavorite',sourcePlayerId:p.source_player_id||p.id},{quiet:true});if(z?.preference)state.v7Preferences.set(String(z.preference.source_player_id),z.preference);renderListTable()});h.appendChild(b)})}
+31586:  const oldRLT=renderListTable;renderListTable=function(...a){const r=oldRLT(...a);hearts();return r};const oldLL=loadList;loadList=async function(...a){const r=await oldLL(...a);await hydrate();try{const z=await api(ENDPOINTS.strategy,{action:'getStrategicFeatures'},{quiet:true});if(z?.players?.length&&state.list?.players){const by=new Map(z.players.map(p=>[String(p.id),p]));state.list.players=state.list.players.map(p=>{const x=by.get(String(p.id));return x?{...p,strategic_features:x.strategic_features??p.strategic_features}:p});renderListTable()}}catch(e){console.warn('List strategic features',e)}hearts();return r};
+31587:  const budgets=()=>((state.auction?.settings?.fantasy_mode||'classic')==='mantra'?[['POR','Por'],['DC/B','Dc/B'],['DD/DS','Dd/Ds'],['E','E'],['M/C','M/C'],['W/T','W/T'],['A/PC','A/Pc']]:[['P','P'],['D','D'],['C','C'],['A','A']]);
+---
+31578:  const oldCalls=auctionSuggestedCalls;function rows(limit){const a=oldCalls(Math.max(12,limit)).map(x=>{const i=impact(x.player),o=opp(x.player,i);x.rosterImpact=i;x.opportunity=o;x.score=cl(Number(x.score||0)+Math.round(Math.max(0,i.completionDelta)*.30)+Math.round(i.fantasyDelta*14)+Math.round(i.solidityDelta*.18)+i.anchorFit,0,100);x.prices=prices(x.player,x.score,o);return x}).sort((a,b)=>b.score-a.score||b.opportunity-a.opportunity);if(!a.length)return[];const info=auctionMyTeamDashboardData(),ctx=[auctionSession()?.id||'',state.auction?.auctionSession?.role_phase_index||0,info?.assignments?.length||0].join('|'),cur=a.find(x=>String(x.player?.id)===String(state.v8Moment||'')),ch=a[0];if(state.v8MomentCtx!==ctx||!cur||ch.score>=cur.score+9){state.v8MomentCtx=ctx;state.v8Moment=ch.player?.id}const m=a.find(x=>String(x.player?.id)===String(state.v8Moment||''))||ch;return[m,...a.filter(x=>x!==m)].slice(0,limit)}
+31579:  function conv(x,y){const gap=Math.max(0,Number(x?.score||0)-Number(y?.score||0)),v=Math.round(cl(48+Number(x?.opportunity||50)*.28+gap*2.1+Number(x?.rosterImpact?.completionDelta||0)*.22,0,100));return{v,label:v>=82?'MOLTO ALTA':v>=68?'ALTA':v>=52?'MEDIA':'PRUDENTE'}}
+31580:  function objective(info,extra=null,cost=0){if(!info)return metrics(info,extra);const ps=(info.assignments||[]).map(x=>x.player).filter(Boolean);if(extra)ps.push(extra);let budget=Math.max(0,Number(info.remaining||0)-Number(cost||0)),max=Math.max(ps.length,Number(info.rosterMin||info.rosterLimit||25)),owned=new Set(ps.map(p=>String(p.id))),cand=(state.auction?.callCandidates||[]).filter(p=>!owned.has(String(p.id))).map(p=>{const o=opp(p,quick(p)),pr=prices(p,60,o).suggested;return{p,pr,v:weight(p)+o/40+Math.max(0,4-Number(p.slot||4))*.15}}).sort((a,b)=>b.v-a.v).slice(0,45);for(const c of cand){if(ps.length>=max)break;const reserve=Math.max(0,max-ps.length-1);if(c.pr+reserve>budget)continue;ps.push(c.p);budget-=c.pr}return metrics({...info,assignments:ps.map(p=>({player:p}))})}
+31581:  renderAuctionSuggestedCalls=function(){const limit=document.fullscreenElement?8:4,a=rows(limit);if(!a.length)return'';const can=auctionHasPresidentRole(),lab=auctionOwnCallTurn()&&auctionQueueRows().length===0?'CHIAMA':'CODA',runner=a[1];return`<section class="auction-suggested-calls" aria-label="Consulente Strategico"><div class="auction-suggested-head"><div><strong>Consulente Strategico</strong><small>rosa · moduli · trend import · mercato pubblico</small></div><span>LIVE</span></div><div class="auction-suggested-list">${a.map((x,i)=>{const p=x.player||{},cv=i===0?conv(x,runner):null;return`<div class="auction-suggested-row ${i===0?'is-must-have':''}" data-v8-detail="${esc(p.id)}" tabindex="0"><span class="auction-suggested-roles">${playerRoles(p,state.auction?.settings?.fantasy_mode).map(r=>`<span class="rolebadge" data-role="${esc(r)}">${esc(r)}</span>`).join('')}</span><div class="auction-suggested-copy"><div class="v8n"><strong>${esc(p.name||'Giocatore')}</strong>${i===0?'<em>GIOCATORE DEL MOMENTO</em>':''}${pref(p)?.is_favorite?'<i>♥</i>':''}</div><small>${esc(p.serie_a_team||'—')} · score ${Math.round(x.score)} · opp ${x.opportunity}${cv?` · conv ${cv.v}%`:''}</small></div><span class="auction-v7-prices"><b>SUGG ${x.prices?.suggested??'—'}</b><small>MAX ${x.prices?.ceiling??'—'}</small></span><span class="auction-v7-suggest-actions"><button type="button" class="auction-v7-dismiss" data-v8-hide="${esc(p.id)}" title="Nascondi per ora">×</button>${can?`<button type="button" class="auction-suggested-action" data-suggest-call="${esc(p.id)}">${lab}</button>`:'<span class="auction-suggested-action-placeholder">VICE</span>'}</span></div>`}).join('')}</div></section>`};
+31582:  function modal(id){const p=(state.auction?.callCandidates||[]).find(x=>String(x.id)===String(id)),x=p?auctionSuggestedCallScore(p):null;if(!x)return;const info=auctionMyTeamDashboardData(),i=impact(p),ob=objective(info),oa=objective(info,p,x.prices?.suggested||0),cv=conv(x,rows(2).find(z=>z.player?.id!==p.id)),f=feat(p),pf=pref(p)||{};let d=document.getElementById('v8dlg');if(!d){d=document.createElement('dialog');d.id='v8dlg';d.className='auction-v7-strategy-dialog';document.body.appendChild(d)}d.innerHTML=`<form class="auction-v7-modal" method="dialog"><header><div><small>CONSULENTE · OPPORTUNITÀ ${x.opportunity}/100</small><h3>${esc(p.name)}</h3><p>${esc(playerRoles(p,state.auction?.settings?.fantasy_mode).join('/'))} · ${esc(p.serie_a_team||'—')}</p></div><button value="cancel" class="secondary">×</button></header><div class="auction-v7-kpis"><span><small>SCORE</small><b>${Math.round(x.score)}</b></span><span><small>CONV.</small><b>${cv.v}%</b></span><span><small>SUGG.</small><b>${x.prices?.suggested}</b></span><span><small>MAX</small><b>${x.prices?.ceiling}</b></span><span><small>COMP</small><b>${i.before?.completion||0}%→${i.after?.completion||0}%</b></span><span><small>FV</small><b>${fmt(i.before?.fantasy)}→${fmt(i.after?.fantasy)}</b></span><span><small>OBIETTIVO</small><b>${fmt(ob.fantasy)}→${fmt(oa.fantasy)}</b></span><span><small>SOL</small><b>${i.before?.solidity||0}→${i.after?.solidity||0}</b></span></div><div class="v8ana"><span><small>TREND IMPORT</small><b>${esc(f.trend_direction||'stable')}</b></span><span><small>PRESENZA</small><b>${fmt(prs(p),0)}%</b></span><span><small>RISCHIO</small><b>${fmt(vol(p)*100,0)}%</b></span><span><small>MERCATO</small><b>${fmt((x.prices?.marketFactor||1)*100,0)}%</b></span></div><div class="auction-v7-reason"><b>Motivo:</b> impatto su ${i.after?.module||'rosa'}, trend pre-calcolato all'import, presenza prevista e prezzi delle sole aggiudicazioni pubbliche. Code e preferiti degli altri presidenti sono esclusi.</div><div class="auction-v7-actions"><button type="button" class="secondary" id="v8fav">${pf.is_favorite?'♥ PREFERITO':'♡ PREFERITO'}</button><button type="button" class="secondary" id="v8queue">+ CODA</button></div></form>`;d.querySelector('#v8fav')?.addEventListener('click',async()=>{const z=await api(ENDPOINTS.v6y,{action:'toggleFavorite',sourcePlayerId:p.source_player_id||p.id},{quiet:true});if(z?.preference)state.v7Preferences.set(String(z.preference.source_player_id),z.preference);d.close();renderAuctionLive()});d.querySelector('#v8queue')?.addEventListener('click',()=>{addPlayerToAuctionQueue(p.id,Math.max(1,Number(state.auctionOpeningBid||1)));d.close()});d.showModal()}
+31583:  function bind(root=document){root.querySelectorAll('[data-v8-hide]').forEach(b=>{if(b.dataset.v8b)return;b.dataset.v8b=1;b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const id=String(b.dataset.v8Hide);if(!state.v7SuggestedDismissed.includes(id))state.v7SuggestedDismissed.push(id);if(String(state.v8Moment||'')===id)state.v8Moment=null;const h=document.querySelector('.auction-free-suggestions');if(h){h.innerHTML=renderAuctionSuggestedCalls();attachAuctionCallQueueEvents()}})});root.querySelectorAll('[data-v8-detail]').forEach(r=>{if(r.dataset.v8b)return;r.dataset.v8b=1;const f=e=>{if(e.target.closest('button')||(e.type==='keydown'&&!['Enter',' '].includes(e.key)))return;e.preventDefault();modal(r.dataset.v8Detail)};r.addEventListener('click',f);r.addEventListener('keydown',f)})}
+31584:  const oldAttach=attachAuctionCallQueueEvents;attachAuctionCallQueueEvents=function(...a){const r=oldAttach(...a);bind();return r};
+31585:  function hearts(){const by=new Map((state.list?.players||[]).map(p=>[String(p.id),p]));document.querySelectorAll('#list-body tr[data-player-id]').forEach(r=>{const p=by.get(String(r.dataset.playerId)),h=r.querySelector('.list-fav-slot')||r.querySelector('.player-main');if(!p||!h||h.querySelector('.v8heart'))return;const fav=pref(p)?.is_favorite===true,b=document.createElement('button');b.type='button';b.className=`v8heart ${fav?'on':''}`;b.textContent=fav?'♥':'♡';b.title=fav?'Rimuovi dai preferiti':'Aggiungi ai preferiti';b.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();const z=await api(ENDPOINTS.v6y,{action:'toggleFavorite',sourcePlayerId:p.source_player_id||p.id},{quiet:true});if(z?.preference)state.v7Preferences.set(String(z.preference.source_player_id),z.preference);renderListTable()});h.appendChild(b)})}
+31586:  const oldRLT=renderListTable;renderListTable=function(...a){const r=oldRLT(...a);hearts();return r};const oldLL=loadList;loadList=async function(...a){const r=await oldLL(...a);await hydrate();try{const z=await api(ENDPOINTS.strategy,{action:'getStrategicFeatures'},{quiet:true});if(z?.players?.length&&state.list?.players){const by=new Map(z.players.map(p=>[String(p.id),p]));state.list.players=state.list.players.map(p=>{const x=by.get(String(p.id));return x?{...p,strategic_features:x.strategic_features??p.strategic_features}:p});renderListTable()}}catch(e){console.warn('List strategic features',e)}hearts();return r};
+31587:  const budgets=()=>((state.auction?.settings?.fantasy_mode||'classic')==='mantra'?[['POR','Por'],['DC/B','Dc/B'],['DD/DS','Dd/Ds'],['E','E'],['M/C','M/C'],['W/T','W/T'],['A/PC','A/Pc']]:[['P','P'],['D','D'],['C','C'],['A','A']]);
+31588:  function pname(s){return known().find(p=>String(p.source_player_id||p.id)===String(s))?.name||'Giocatore'}
+---
+31585:  function hearts(){const by=new Map((state.list?.players||[]).map(p=>[String(p.id),p]));document.querySelectorAll('#list-body tr[data-player-id]').forEach(r=>{const p=by.get(String(r.dataset.playerId)),h=r.querySelector('.list-fav-slot')||r.querySelector('.player-main');if(!p||!h||h.querySelector('.v8heart'))return;const fav=pref(p)?.is_favorite===true,b=document.createElement('button');b.type='button';b.className=`v8heart ${fav?'on':''}`;b.textContent=fav?'♥':'♡';b.title=fav?'Rimuovi dai preferiti':'Aggiungi ai preferiti';b.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();const z=await api(ENDPOINTS.v6y,{action:'toggleFavorite',sourcePlayerId:p.source_player_id||p.id},{quiet:true});if(z?.preference)state.v7Preferences.set(String(z.preference.source_player_id),z.preference);renderListTable()});h.appendChild(b)})}
+31586:  const oldRLT=renderListTable;renderListTable=function(...a){const r=oldRLT(...a);hearts();return r};const oldLL=loadList;loadList=async function(...a){const r=await oldLL(...a);await hydrate();try{const z=await api(ENDPOINTS.strategy,{action:'getStrategicFeatures'},{quiet:true});if(z?.players?.length&&state.list?.players){const by=new Map(z.players.map(p=>[String(p.id),p]));state.list.players=state.list.players.map(p=>{const x=by.get(String(p.id));return x?{...p,strategic_features:x.strategic_features??p.strategic_features}:p});renderListTable()}}catch(e){console.warn('List strategic features',e)}hearts();return r};
+31587:  const budgets=()=>((state.auction?.settings?.fantasy_mode||'classic')==='mantra'?[['POR','Por'],['DC/B','Dc/B'],['DD/DS','Dd/Ds'],['E','E'],['M/C','M/C'],['W/T','W/T'],['A/PC','A/Pc']]:[['P','P'],['D','D'],['C','C'],['A','A']]);
+31588:  function pname(s){return known().find(p=>String(p.source_player_id||p.id)===String(s))?.name||'Giocatore'}
+31589:  function center(){const pr=state.v8Profile||{},sel=new Set(pr.preferred_modules||[]),ps=[...(state.v7Preferences?.values?.()||[])].filter(x=>x.is_favorite||x.strategy==='top'),top=state.auction?.callCandidates?.length?rows(5):[],mantra=(state.auction?.settings?.fantasy_mode||'classic')==='mantra';return`<details class="v8center" open><summary><div><strong>Centro Strategico pre-asta</strong><small>moduli · budget · profilo · preferiti</small></div><span class="badge primary">PRIVATO</span></summary><div class="v8cb"><section><label>Profilo<select id="v8prof"><option value="conservative">Conservativo</option><option value="balanced">Bilanciato</option><option value="aggressive">Aggressivo</option></select></label>${mantra?`<div class="v8mods"><b>Moduli preferiti</b><small>nessuno = tutti</small><div>${Object.keys(state.v8Modules).map(id=>`<label><input type="checkbox" data-v8m="${id}" ${sel.has(id)?'checked':''}>${id}</label>`).join('')}</div></div>`:''}<div class="v8buds"><b>Budget per ruolo</b><div>${budgets().map(([l,k])=>`<label>${l}<input type="number" min="0" data-v8bud="${k}" value="${Number(pr.role_budgets?.[k]||0)||''}"></label>`).join('')}</div></div><label>Note<textarea id="v8notes" rows="2">${esc(pr.notes||'')}</textarea></label><button id="v8save" type="button">SALVA STRATEGIA</button></section><section><div class="between"><strong>Preferiti / Top</strong><span class="badge">${ps.length}</span></div><div class="v8prefs">${ps.length?ps.slice(0,12).map(x=>`<span><b>${esc(pname(x.source_player_id))}</b><small>${x.strategy==='top'?'TOP':'♥'}${x.max_price!=null?` · max ${x.max_price}`:''}</small></span>`).join(''):'<small class="soft">Aggiungili dal Listone con il cuore.</small>'}</div></section><section><div class="v8th"><strong>Top 5 pre-asta</strong><span>Score</span><span>Sugg</span><span>Max</span></div>${top.length?top.map((x,i)=>`<div class="v8tr ${i?'':'mom'}"><b>${i+1}. ${esc(x.player?.name||'')}</b><span>${Math.round(x.score)}</span><span>${x.prices?.suggested??'—'}</span><span>${x.prices?.ceiling??'—'}</span></div>`).join(''):'<small class="soft">Catalogo non ancora disponibile.</small>'}</section></div></details>`}
+31590:  function patchCenter(){const root=document.getElementById('auction-root');if(!root)return;root.querySelector('.auction-v7-center')?.remove();if(root.querySelector('.v8center')||auctionSession()?.status==='live')return;(root.querySelector('.auction-lobby')||root).insertAdjacentHTML('afterbegin',center());const s=document.getElementById('v8prof');if(s)s.value=state.v8Profile?.profile||'balanced';document.getElementById('v8save')?.addEventListener('click',async e=>{const b=e.currentTarget;b.disabled=true;try{const roleBudgets={};document.querySelectorAll('[data-v8bud]').forEach(i=>{const v=Number(i.value);if(Number.isFinite(v)&&v>=0)roleBudgets[i.dataset.v8bud]=Math.floor(v)});const z=await sapi({action:'saveProfile',preferredModules:[...document.querySelectorAll('[data-v8m]:checked')].map(i=>i.dataset.v8m),profile:s?.value||'balanced',roleBudgets,notes:document.getElementById('v8notes')?.value||''});if(z?.profile)state.v8Profile=z.profile;if(z?.mantraModules)state.v8Modules=z.mantraModules;state.v8MetricKey='';msg('Strategia pre-asta salvata.','success');root.querySelector('.v8center')?.remove();patchCenter()}catch(er){msg(er.message||'Errore salvataggio strategia.','error')}finally{b.disabled=false}})}
+31591:  function patchLive(){const h=document.querySelector('.auction-team-column-roster-only .auction-team-roster-head');if(h){h.querySelector('.auction-v7-roster-metrics')?.remove();h.querySelector('.v8rm')?.remove();}const p=state.auction?.currentPlayer;if(p){const x=auctionSuggestedCallScore(p);document.querySelectorAll('.auction-command-player small').forEach(h=>{h.querySelector('.auction-v7-live-price')?.remove();h.querySelector('.v8lp')?.remove();h.insertAdjacentHTML('beforeend',`<span class="v8lp"> · SUGG ${x?.prices?.suggested??'—'} · MAX ${x?.prices?.ceiling??'—'}</span>`)})}bind()}
+31592:  const oldLive=renderAuctionLive;renderAuctionLive=function(...a){const r=oldLive(...a);patchLive();return r};const oldLobby=renderAuctionLobby;renderAuctionLobby=function(...a){const r=oldLobby(...a);patchCenter();return r};const oldPrep=renderAuctionPrepared;renderAuctionPrepared=function(...a){const r=oldPrep(...a);patchCenter();return r};const oldLA=loadAuction;loadAuction=async function(...a){const r=await oldLA(...a);await hydrate();state.v7Stats=new Map();merge();const dx=[auctionSession()?.id||'',state.auction?.auctionSession?.role_phase_index||0,auctionMyTeamDashboardData()?.assignments?.length||0].join('|');if(state.v8DismissCtx!==undefined&&state.v8DismissCtx!==dx){state.v7SuggestedDismissed=[];state.v7SuggestedDismissKey='';state.v8Moment=null}state.v8DismissCtx=dx;auctionSession()?.status==='live'?patchLive():patchCenter();return r};
+31593:  const st=document.createElement('style');st.textContent=`.v8heart{width:22px!important;min-width:22px!important;height:22px!important;min-height:22px!important;padding:0!important;margin-left:auto!important;border:0!important;background:transparent!important;color:#718aa3!important;font-size:16px!important}.v8heart.on{color:#ff6681!important}.v8n{display:flex;align-items:center;gap:3px;min-width:0}.v8n strong{min-width:0;flex:1}.v8n em{font-style:normal;font-size:5px;font-weight:1000;color:#f0d276;border:1px solid rgba(220,180,70,.52);border-radius:99px;padding:1px 3px;white-space:nowrap}.v8n i{font-style:normal;color:#ff6f88}.v8lp{color:#79bcff;font-weight:950}.v8rm{color:#c6d8e8;font-size:6.5px;font-weight:1000;white-space:nowrap}.v8rm i{color:#56738d;font-style:normal;margin:0 2px}.v8center{margin-bottom:6px;border:1px solid rgba(91,151,216,.34);border-radius:10px;background:rgba(8,30,52,.92);overflow:hidden}.v8center>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;gap:8px;padding:7px 9px}.v8center>summary strong,.v8center>summary small{display:block}.v8center>summary small{color:var(--soft);font-size:7px}.v8cb{display:grid;grid-template-columns:1.1fr .75fr 1fr;gap:6px;padding:7px}.v8cb>section{padding:7px;border:1px solid rgba(91,151,216,.2);border-radius:8px;background:rgba(5,25,44,.56);display:grid;gap:6px}.v8mods>div{display:flex;flex-wrap:wrap;gap:3px}.v8mods label{display:flex;align-items:center;gap:3px;padding:3px 5px;border:1px solid var(--line);border-radius:6px}.v8mods input{width:13px;min-width:13px;height:13px;min-height:13px}.v8buds>div{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}.v8prefs{max-height:190px;overflow:auto;display:grid;gap:3px}.v8prefs>span{display:flex;justify-content:space-between;padding:4px 5px;background:rgba(37,79,119,.42);border-radius:5px;font-size:7px}.v8th,.v8tr{display:grid;grid-template-columns:minmax(0,1fr) 42px 54px 54px;gap:4px;align-items:center}.v8th{color:var(--soft);font-size:6px}.v8tr{min-height:27px;padding:3px 4px;border-bottom:1px solid rgba(91,151,216,.14);font-size:7px}.v8tr.mom{border:1px solid rgba(220,180,70,.44);border-radius:5px}.v8tr span{text-align:right}.v8ana{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}.v8ana>span{padding:6px;border:1px solid #28598e;border-radius:7px;background:#0d2b4a}.v8ana small,.v8ana b{display:block}@media(max-width:1050px){.v8cb{grid-template-columns:1fr 1fr}.v8cb>section:last-child{grid-column:1/-1}}@media(max-width:680px){.v8cb{grid-template-columns:1fr}.v8cb>section:last-child{grid-column:auto}.v8buds>div,.v8ana{grid-template-columns:repeat(2,minmax(0,1fr))}.v8rm{font-size:5.5px}}`;document.head.appendChild(st);
+31594:  void hydrate(true).then(()=>{if(state.view==='list')hearts();if(state.view==='auction')(auctionSession()?.status==='live'?patchLive():patchCenter())});
+31595: })();
+---
+32355:   const lifecycle=new Set([
+32356:     'createAuction','prepareAuction','cancelPreparedAuction','saveTeamOrder','startAuction',
+32357:     'callPlayer','awardPlayer','manualAward','editRosterPrice','removeRosterPlayer',
+32358:     'transferRosterPlayer','undoLastAssignment','undoOperation','undoLastBid','resetAuction',
+32359:     'cancelCall','passNominationTurn','advanceRolePhase','finishAuction','confirmRoleReady',
+32360:     'setTeamCredits','abandonTurn'
+32361:   ]);
+32362:   const structuralAction=action=>lifecycle.has(action)||/(Queue|Roster|TeamOrder|TeamCredits|RoleReady)/i.test(action);
+32363:   api=async function(endpoint,payload={},options={}){
+32364:     const response=await oldApiV11(endpoint,payload,options);
+32365:     const action=String(payload?.action||'');
+---
+32871:   if(window.__FANTA_V14_CALLED__)return;window.__FANTA_V14_CALLED__=1;
+32872:   const owner=()=>String(state.dashboard?.currentUser?.username||state.session?.user?.username||'').trim().toLowerCase()==='emanuelesordo';
+32873:   const fmt=(v,d=2)=>{const n=Number(v);return Number.isFinite(n)?n.toFixed(d):'—'};
+32874:   function expectedGames(p){const next=Math.max(1,Math.min(38,Number(state.v13NextRound||1))),remaining=Math.max(0,39-next),until=Math.max(0,Number(p?.unavailable_until_round||0)),miss=until>=next?Math.min(remaining,until-next+1):0,available=Math.max(0,remaining-miss),pres=typeof strategicPresencePercent==='function'?Number(strategicPresencePercent(p)||0):Number(p?.expected_titolarity||0);return available*Math.max(0,Math.min(100,pres))/100;}
+32875:   function html(p){const sf=p?.strategic_features||{},roles=typeof playerRoles==='function'?playerRoles(p,typeof fantasyMode==='function'?fantasyMode():'classic'):[],delta=Number.isFinite(Number(p?.pfc_pma_delta))?Number(p.pfc_pma_delta):Number(p?.pfc||0)-Number(p?.pma||0),idx=typeof strategicValueIndex==='function'?strategicValueIndex(p):null,thr=typeof strategicThresholdPrice==='function'?strategicThresholdPrice(p):null,exp=typeof strategicExpectedPrice==='function'?strategicExpectedPrice(p):null,fmv=typeof strategicExpectedFantasyAverage==='function'?strategicExpectedFantasyAverage(p):p?.expected_fantasy_avg,pres=typeof strategicPresencePercent==='function'?strategicPresencePercent(p):p?.expected_titolarity,signals=typeof auctionPlayerSignalBadges==='function'?auctionPlayerSignalBadges(p):'—';return `<section class="v14-called-details"><div class="v14-called-title"><strong>DATI GIOCATORE</strong><span>${signals}</span></div><div class="v14-called-grid"><span><small>Ruoli</small><b>${roles.map(r=>`<i class="rolebadge" data-role="${esc(r)}">${esc(r)}</i>`).join(' ')||'—'}</b></span><span><small>Squadra</small><b>${esc(p?.serie_a_team||'—')}</b></span><span><small>Slot</small><b>${esc(p?.slot??'—')}</b></span><span><small>% Tit.</small><b>${Number.isFinite(Number(pres))?Math.round(Number(pres))+'%':'—'}</b></span><span><small>PFC</small><b>${fmt(p?.pfc,0)}</b></span><span><small>PMA</small><b>${fmt(p?.pma,0)}</b></span><span><small>Δ PFC-PMA</small><b>${delta>=0?'+':''}${fmt(delta,0)}</b></span><span><small>FMV</small><b>${fmt(fmv,2)}</b></span><span><small>Indice</small><b>${idx??'—'} cr</b></span><span><small>Soglia</small><b>${thr??'—'} cr</b></span><span><small>Prezzo atteso</small><b>${exp?Math.round(exp):'—'} cr</b></span><span><small>Gare attese</small><b>${fmt(expectedGames(p),1)}</b></span><span><small>Trend</small><b>${esc(sf.trend_direction||'—')}</b></span><span><small>Volatilità</small><b>${Number.isFinite(Number(sf.volatility))?Math.round(Number(sf.volatility)*100)+'%':'—'}</b></span><span><small>FV ultimo anno</small><b>${fmt(p?.last_year_fantasy_avg,2)}</b></span><span><small>FV ultimi 5</small><b>${fmt(p?.last_five_year_fantasy_avg,2)}</b></span></div></section>`;}
+32876:   function mount(){document.querySelectorAll('.v14-called-details').forEach(x=>x.remove());if(!owner()||state.view!=='auction')return;const p=state.auction?.currentPlayer;if(!p)return;const command=document.querySelector('.auction-middle-column .auction-command-bar')||document.querySelector('.auction-command-bar');if(command)command.insertAdjacentHTML('afterend',html(p));}
+32877:   if(typeof renderAuctionLive==='function'){const old=renderAuctionLive;renderAuctionLive=function(...a){const r=old(...a);queueMicrotask(mount);return r;};}
+32878:   const st=document.createElement('style');st.textContent=`.v14-called-details{padding:5px 6px;border:1px solid rgba(91,151,216,.32);border-radius:8px;background:linear-gradient(145deg,rgba(18,50,80,.78),rgba(7,27,48,.88));display:grid;gap:4px;overflow:hidden}.v14-called-title{display:flex;justify-content:space-between;gap:6px;font-size:6px;color:#a9c7e7;letter-spacing:.08em}.v14-called-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}.v14-called-grid>span{padding:3px 4px;border:1px solid rgba(91,151,216,.14);border-radius:5px;background:rgba(8,31,54,.48);min-width:0}.v14-called-grid small,.v14-called-grid b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.v14-called-grid small{font-size:5px;color:var(--soft)}.v14-called-grid b{font-size:7px;margin-top:1px;font-weight:900}.v14-called-grid .rolebadge{display:inline-flex!important;font-style:normal}@media(max-width:900px){.v14-called-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}`;document.head.appendChild(st);queueMicrotask(mount);
+32879: })();
+32880: </script>
+32881: 
+---
+32874:   function expectedGames(p){const next=Math.max(1,Math.min(38,Number(state.v13NextRound||1))),remaining=Math.max(0,39-next),until=Math.max(0,Number(p?.unavailable_until_round||0)),miss=until>=next?Math.min(remaining,until-next+1):0,available=Math.max(0,remaining-miss),pres=typeof strategicPresencePercent==='function'?Number(strategicPresencePercent(p)||0):Number(p?.expected_titolarity||0);return available*Math.max(0,Math.min(100,pres))/100;}
+32875:   function html(p){const sf=p?.strategic_features||{},roles=typeof playerRoles==='function'?playerRoles(p,typeof fantasyMode==='function'?fantasyMode():'classic'):[],delta=Number.isFinite(Number(p?.pfc_pma_delta))?Number(p.pfc_pma_delta):Number(p?.pfc||0)-Number(p?.pma||0),idx=typeof strategicValueIndex==='function'?strategicValueIndex(p):null,thr=typeof strategicThresholdPrice==='function'?strategicThresholdPrice(p):null,exp=typeof strategicExpectedPrice==='function'?strategicExpectedPrice(p):null,fmv=typeof strategicExpectedFantasyAverage==='function'?strategicExpectedFantasyAverage(p):p?.expected_fantasy_avg,pres=typeof strategicPresencePercent==='function'?strategicPresencePercent(p):p?.expected_titolarity,signals=typeof auctionPlayerSignalBadges==='function'?auctionPlayerSignalBadges(p):'—';return `<section class="v14-called-details"><div class="v14-called-title"><strong>DATI GIOCATORE</strong><span>${signals}</span></div><div class="v14-called-grid"><span><small>Ruoli</small><b>${roles.map(r=>`<i class="rolebadge" data-role="${esc(r)}">${esc(r)}</i>`).join(' ')||'—'}</b></span><span><small>Squadra</small><b>${esc(p?.serie_a_team||'—')}</b></span><span><small>Slot</small><b>${esc(p?.slot??'—')}</b></span><span><small>% Tit.</small><b>${Number.isFinite(Number(pres))?Math.round(Number(pres))+'%':'—'}</b></span><span><small>PFC</small><b>${fmt(p?.pfc,0)}</b></span><span><small>PMA</small><b>${fmt(p?.pma,0)}</b></span><span><small>Δ PFC-PMA</small><b>${delta>=0?'+':''}${fmt(delta,0)}</b></span><span><small>FMV</small><b>${fmt(fmv,2)}</b></span><span><small>Indice</small><b>${idx??'—'} cr</b></span><span><small>Soglia</small><b>${thr??'—'} cr</b></span><span><small>Prezzo atteso</small><b>${exp?Math.round(exp):'—'} cr</b></span><span><small>Gare attese</small><b>${fmt(expectedGames(p),1)}</b></span><span><small>Trend</small><b>${esc(sf.trend_direction||'—')}</b></span><span><small>Volatilità</small><b>${Number.isFinite(Number(sf.volatility))?Math.round(Number(sf.volatility)*100)+'%':'—'}</b></span><span><small>FV ultimo anno</small><b>${fmt(p?.last_year_fantasy_avg,2)}</b></span><span><small>FV ultimi 5</small><b>${fmt(p?.last_five_year_fantasy_avg,2)}</b></span></div></section>`;}
+32876:   function mount(){document.querySelectorAll('.v14-called-details').forEach(x=>x.remove());if(!owner()||state.view!=='auction')return;const p=state.auction?.currentPlayer;if(!p)return;const command=document.querySelector('.auction-middle-column .auction-command-bar')||document.querySelector('.auction-command-bar');if(command)command.insertAdjacentHTML('afterend',html(p));}
+32877:   if(typeof renderAuctionLive==='function'){const old=renderAuctionLive;renderAuctionLive=function(...a){const r=old(...a);queueMicrotask(mount);return r;};}
+32878:   const st=document.createElement('style');st.textContent=`.v14-called-details{padding:5px 6px;border:1px solid rgba(91,151,216,.32);border-radius:8px;background:linear-gradient(145deg,rgba(18,50,80,.78),rgba(7,27,48,.88));display:grid;gap:4px;overflow:hidden}.v14-called-title{display:flex;justify-content:space-between;gap:6px;font-size:6px;color:#a9c7e7;letter-spacing:.08em}.v14-called-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}.v14-called-grid>span{padding:3px 4px;border:1px solid rgba(91,151,216,.14);border-radius:5px;background:rgba(8,31,54,.48);min-width:0}.v14-called-grid small,.v14-called-grid b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.v14-called-grid small{font-size:5px;color:var(--soft)}.v14-called-grid b{font-size:7px;margin-top:1px;font-weight:900}.v14-called-grid .rolebadge{display:inline-flex!important;font-style:normal}@media(max-width:900px){.v14-called-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}`;document.head.appendChild(st);queueMicrotask(mount);
+32879: })();
+32880: </script>
+32881: 
+32882: 
+32883: <script id="v15-range-listone-runtime">
+32884: (()=>{
+---
+34835:     });
+34836:     return d;
+34837:   }
+34838:   function openCallDialog30(p){
+34839:     const d=ensureCallDialog30();d.dataset.playerId=String(p.id);qs('[data-v30-call-name]',d).textContent=p.name||'Giocatore';qs('[data-v30-call-meta]',d).textContent=[playerRoles30(p).join('/'),p.serie_a_team].filter(Boolean).join(' · ');const input=qs('[data-v30-call-price]',d);if(input)input.value=String(Math.max(1,Number(state.auctionOpeningBid||1)));if(!d.open)d.showModal();requestAnimationFrame(()=>{try{input?.focus({preventScroll:true});input?.select()}catch{input?.focus();}});
+34840:   }
+34841: 
+34842:   async function addQueue30(id){
+34843:     if(!canQueue30()||typeof addPlayerToAuctionQueue!=='function')return;
+34844:     const promise=addPlayerToAuctionQueue(id,1);queueMicrotask(()=>{renderQueue30();renderFree30();});try{await promise}finally{renderQueue30();renderFree30();}
+34845:   }
+---
+hits=27
+===== auction-phase =====
+hits=0
+===== auction.*phase =====
+851:       color:var(--soft);
+852:       font-size:8px;
+853:     }
+854: 
+855:     .auction-status-phase{
+856:       display:flex;
+857:       align-items:center;
+858:       gap:4px;
+859:       white-space:nowrap;
+860:     }
+861: 
+---
+1479:         grid-template-columns:auto minmax(0,1fr) auto;
+1480:         gap:4px;
+1481:       }
+1482: 
+1483:       .auction-status-phase{
+1484:         display:none;
+1485:       }
+1486: 
+1487:       .auction-status-timer{
+1488:         min-width:52px;
+1489:         height:29px;
+---
+5103:     .auction-status-team-kpis b{
+5104:       font-size:9px;
+5105:     }
+5106: 
+5107:     .auction-status-phase .badge{
+5108:       cursor:default;
+5109:       white-space:nowrap;
+5110:     }
+5111: 
+5112:     .auction-lower-stage{
+5113:       grid-template-columns:auto minmax(0,1fr)!important;
+---
+6946:     .auction-rosters-resize-handle{
+6947:       pointer-events:none!important;
+6948:     }
+6949: 
+6950:     .auction-role-phase-card{
+6951:       display:grid;
+6952:       gap:5px;
+6953:       padding:6px;
+6954:       border:1px solid rgba(255,199,73,.30);
+6955:       border-radius:8px;
+6956:       background:rgba(118,80,14,.16);
+---
+6955:       border-radius:8px;
+6956:       background:rgba(118,80,14,.16);
+6957:     }
+6958: 
+6959:     .auction-role-phase-head{
+6960:       display:flex;
+6961:       align-items:center;
+6962:       justify-content:space-between;
+6963:       gap:6px;
+6964:     }
+6965: 
+---
+6962:       justify-content:space-between;
+6963:       gap:6px;
+6964:     }
+6965: 
+6966:     .auction-role-phase-action{
+6967:       min-height:30px!important;
+6968:       background:linear-gradient(145deg,#e4ad37,#b87b12)!important;
+6969:       border-color:rgba(255,220,126,.52)!important;
+6970:       color:#191203!important;
+6971:       font-size:8px!important;
+6972:     }
+---
+6970:       color:#191203!important;
+6971:       font-size:8px!important;
+6972:     }
+6973: 
+6974:     .auction-role-phase-teams{
+6975:       display:flex;
+6976:       flex-wrap:wrap;
+6977:       gap:3px;
+6978:     }
+6979: 
+6980:     .auction-role-phase-teams .badge{
+---
+6976:       flex-wrap:wrap;
+6977:       gap:3px;
+6978:     }
+6979: 
+6980:     .auction-role-phase-teams .badge{
+6981:       font-size:6px;
+6982:     }
+6983: 
+6984:     @media(max-width:620px){
+6985:       .setup-dynamic-timer-head{
+6986:         align-items:stretch;
+---
+7005:     }
+7006: 
+7007:     .auction-middle-column>.auction-command-bar,
+7008:     .auction-middle-column>.auction-middle-quick,
+7009:     .auction-middle-column>.auction-role-phase-president-action{
+7010:       margin-bottom:5px;
+7011:     }
+7012: 
+7013:     .auction-middle-column>.auction-central-queue,
+7014:     .auction-middle-column>.auction-bid-history{
+7015:       margin:0!important;
+---
+7022:     .auction-middle-vice-slot:not(:empty){
+7023:       margin-top:5px;
+7024:     }
+7025: 
+7026:     .auction-role-phase-president-action{
+7027:       width:100%;
+7028:       min-height:36px!important;
+7029:       border-radius:9px!important;
+7030:       font-size:9px!important;
+7031:     }
+7032: 
+---
+7029:       border-radius:9px!important;
+7030:       font-size:9px!important;
+7031:     }
+7032: 
+7033:     .auction-role-phase-admin-card{
+7034:       grid-column:1 / -1;
+7035:       background:rgba(118,80,14,.22);
+7036:     }
+7037: 
+7038:     .auction-role-phase-admin-card .auction-role-phase-teams{
+7039:       display:grid;
+---
+7034:       grid-column:1 / -1;
+7035:       background:rgba(118,80,14,.22);
+7036:     }
+7037: 
+7038:     .auction-role-phase-admin-card .auction-role-phase-teams{
+7039:       display:grid;
+7040:       grid-template-columns:repeat(auto-fit,minmax(92px,1fr));
+7041:     }
+7042: 
+7043:     .auction-role-phase-admin-card .auction-role-phase-teams .badge{
+7044:       min-width:0;
+---
+7039:       display:grid;
+7040:       grid-template-columns:repeat(auto-fit,minmax(92px,1fr));
+7041:     }
+7042: 
+7043:     .auction-role-phase-admin-card .auction-role-phase-teams .badge{
+7044:       min-width:0;
+7045:       overflow:hidden;
+7046:       text-overflow:ellipsis;
+7047:     }
+7048: 
+7049:     .auction-free-fixed tr.outside-role-phase{
+---
+7045:       overflow:hidden;
+7046:       text-overflow:ellipsis;
+7047:     }
+7048: 
+7049:     .auction-free-fixed tr.outside-role-phase{
+7050:       opacity:.48;
+7051:     }
+7052: 
+7053:     .auction-free-fixed tr.outside-role-phase .auction-queue-add{
+7054:       cursor:not-allowed;
+7055:       filter:grayscale(.45);
+---
+7049:     .auction-free-fixed tr.outside-role-phase{
+7050:       opacity:.48;
+7051:     }
+7052: 
+7053:     .auction-free-fixed tr.outside-role-phase .auction-queue-add{
+7054:       cursor:not-allowed;
+7055:       filter:grayscale(.45);
+7056:     }
+7057: 
+7058:     .auction-team-roster{
+7059:       grid-template-rows:auto minmax(0,1fr)!important;
+---
+7230:       padding:3px 5px;
+7231:       font-size:6px;
+7232:     }
+7233: 
+7234:     .auction-role-phase-president-action.is-confirmed{
+7235:       display:grid;
+7236:       place-items:center;
+7237:       border:1px solid rgba(82,228,168,.48)!important;
+7238:       background:linear-gradient(145deg,rgba(35,164,116,.92),rgba(18,112,82,.92))!important;
+7239:       color:#fff!important;
+7240:       cursor:default;
+---
+7239:       color:#fff!important;
+7240:       cursor:default;
+7241:     }
+7242: 
+7243:     .auction-role-phase-president-action:disabled{
+7244:       opacity:.48;
+7245:       filter:saturate(.5);
+7246:       cursor:not-allowed;
+7247:     }
+7248: 
+7249:     .auction-role-ready-controller{
+---
+7513:     .auction-middle-column{
+7514:       grid-template-rows:auto auto minmax(92px,1fr) auto auto!important;
+7515:     }
+7516: 
+7517:     .auction-middle-column>.auction-role-phase-president-action{
+7518:       margin-bottom:0!important;
+7519:     }
+7520: 
+7521:     /* I filtri ruolo mantengono SEMPRE il colore del ruolo anche quando attivi. */
+7522:     .rolebtn.active[data-role="P"],
+7523:     .rolebtn.active[data-role="Por"],
+---
+7573:       line-height:1.05;
+7574:     }
+7575: 
+7576:     /* A POSTO vive sulla stessa riga di libero / OK / lascia. */
+7577:     .auction-role-phase-president-action.is-inline{
+7578:       width:100%;
+7579:       min-width:0;
+7580:       min-height:30px!important;
+7581:       height:30px;
+7582:       margin:0!important;
+7583:       padding:2px 5px!important;
+---
+7597:     .auction-middle-quick .auction-status-quick.has-role-ready .auction-command-leave{
+7598:       grid-column:4!important;
+7599:     }
+7600: 
+7601:     .auction-middle-quick .auction-status-quick.has-role-ready .auction-role-phase-president-action{
+7602:       grid-column:5!important;
+7603:     }
+7604: 
+7605:     .auction-mobile-final-actions.has-role-ready{
+7606:       grid-template-columns:minmax(0,1.45fr) minmax(74px,.72fr) minmax(78px,.82fr)!important;
+7607:     }
+---
+7605:     .auction-mobile-final-actions.has-role-ready{
+7606:       grid-template-columns:minmax(0,1.45fr) minmax(74px,.72fr) minmax(78px,.82fr)!important;
+7607:     }
+7608: 
+7609:     .auction-mobile-final-actions .auction-role-phase-president-action.is-mobile{
+7610:       min-height:55px!important;
+7611:       height:auto!important;
+7612:       font-size:10px!important;
+7613:     }
+7614: 
+7615:     .auction-mobile-idle-footer{
+---
+7618:       min-height:34px;
+7619:       text-align:center;
+7620:     }
+7621: 
+7622:     .auction-mobile-idle-footer .auction-role-phase-president-action{
+7623:       width:100%;
+7624:       min-height:38px!important;
+7625:     }
+7626: 
+7627:     /* Regia Banditore: i nomi squadra SONO il selettore. */
+7628:     .auction-role-phase-admin-card .auction-role-phase-teams{
+---
+7624:       min-height:38px!important;
+7625:     }
+7626: 
+7627:     /* Regia Banditore: i nomi squadra SONO il selettore. */
+7628:     .auction-role-phase-admin-card .auction-role-phase-teams{
+7629:       grid-template-columns:repeat(auto-fit,minmax(110px,1fr))!important;
+7630:       gap:5px;
+7631:     }
+7632: 
+7633:     .auction-role-team-choice{
+7634:       min-width:0;
+---
+7821:       outline-offset:2px;
+7822:     }
+7823: 
+7824:     @media(max-width:720px){
+7825:       .auction-mobile-final-actions.has-role-ready .auction-role-phase-president-action.is-mobile{
+7826:         min-height:48px!important;
+7827:         font-size:8px!important;
+7828:       }
+7829: 
+7830:       .auction-rosters-drawer{
+7831:         bottom:6px!important;
+---
+8064:       color:#fff;
+8065:       font-weight:950;
+8066:     }
+8067: 
+8068:     .auction-role-phase-admin-card{
+8069:       gap:4px!important;
+8070:     }
+8071: 
+8072:     .auction-admin-phase-team-status{
+8073:       min-height:20px;
+8074:       padding:3px 5px;
+---
+8068:     .auction-role-phase-admin-card{
+8069:       gap:4px!important;
+8070:     }
+8071: 
+8072:     .auction-admin-phase-team-status{
+8073:       min-height:20px;
+8074:       padding:3px 5px;
+8075:       border:1px solid rgba(126,175,219,.18);
+8076:       border-radius:5px;
+8077:       background:rgba(10,33,57,.45);
+8078:       color:var(--soft);
+---
+8086:     .auction-role-ready-controller{
+8087:       padding-top:0!important;
+8088:     }
+8089: 
+8090:     .auction-role-ready-controller .auction-role-phase-action{
+8091:       min-height:30px!important;
+8092:       padding:3px 6px!important;
+8093:       font-size:7px!important;
+8094:     }
+8095: 
+8096:     /* Rose di tutti: ancoraggio al viewport, così la linguetta non può più finire
+---
+8317:       white-space:normal!important;
+8318:       overflow-wrap:anywhere;
+8319:     }
+8320: 
+8321:     .auction-role-phase-admin-footer{
+8322:       min-width:0;
+8323:       display:grid;
+8324:       gap:3px;
+8325:       padding-top:5px;
+8326:       border-top:1px solid rgba(149,192,233,.13);
+8327:     }
+---
+8325:       padding-top:5px;
+8326:       border-top:1px solid rgba(149,192,233,.13);
+8327:     }
+8328: 
+8329:     .auction-role-phase-admin-footer .auction-role-phase-action{
+8330:       width:100%;
+8331:       min-height:30px!important;
+8332:       font-size:7px!important;
+8333:     }
+8334: 
+8335:     @container auctioneer (max-width:430px){
+---
+9680:     }
+9681: 
+9682:     .auction-middle-column>.auction-command-bar,
+9683:     .auction-middle-column>.auction-middle-quick,
+9684:     .auction-middle-column>.auction-role-phase-president-action{
+9685:       flex:0 0 auto!important;
+9686:       margin:0!important;
+9687:     }
+9688: 
+9689:     .auction-middle-lower-zone{
+9690:       flex:1 1 0!important;
+---
+hits=30
