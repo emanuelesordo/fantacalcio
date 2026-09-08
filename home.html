@@ -14734,6 +14734,7 @@ html body.auction-live #view-auction tr.v33-index-market-row{
   transition:background .16s ease,box-shadow .16s ease!important;
 }
 
+
 /* V43 · queue single confirm + manual direct award. */
 
 /* Queue confirmation uses the same compact square footprint as the red X.
@@ -17527,10 +17528,8 @@ $('league-switch-btn')
     }
 
     function strategicExpectedPrice(player) {
-      const pfc = strategicFinite(player?.pfc);
       const pma = strategicFinite(player?.pma);
-      if (pfc !== null && pma !== null) return Math.max(1, pfc * .65 + pma * .35);
-      return Math.max(1, pfc ?? pma ?? 1);
+      return Math.max(1, pma ?? 1);
     }
 
     function strategicWinningTargetAverage() {
@@ -17569,7 +17568,7 @@ $('league-switch-btn')
     }
 
     function strategicIndexTitle(player) {
-      return `Indice valore/prezzo: ${strategicValueIndex(player)} · soglia ${strategicThresholdPrice(player)} cr · prezzo atteso ${Math.round(strategicExpectedPrice(player))} cr · FV ${strategicExpectedFantasyAverage(player).toFixed(2)} · presenza ${Math.round(strategicPresencePercent(player))}%`;
+      return `Indice valore/prezzo: ${strategicValueIndex(player)} · soglia ${strategicThresholdPrice(player)} cr · prezzo target ${Math.round(strategicExpectedPrice(player))} cr · FV ${strategicExpectedFantasyAverage(player).toFixed(2)} · presenza ${Math.round(strategicPresencePercent(player))}%`;
     }
 
     const AUCTION_VICE_INTERESTS = {
@@ -33460,7 +33459,7 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
       <th class="v12-col-delta">Delta</th>
       <th class="v12-col-index"><button data-list-sort="index">Indice ↕</button></th>
       <th class="v12-col-threshold">Soglia</th>
-      <th class="v12-col-expected">Prezzo atteso</th>
+      <th class="v12-col-expected">Prezzo target</th>
       <th class="v12-col-fmv"><button data-list-sort="fm">FMV ↕</button></th>
       <th class="v12-col-fav">Pref.</th>
     </tr>`;
@@ -33648,7 +33647,7 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
     const teams=[...new Set(players.map(p=>p.serie_a_team).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'it'));
     const slots=[...new Set(players.map(p=>p.slot).filter(v=>v!==null&&v!==undefined&&v!==''))].sort((a,b)=>Number(a)-Number(b));
     return `<tr class="v13-sort-row">
-      <th>${sortHead('role','Ruoli')}</th><th>${sortHead('name','Nome')}</th><th>${sortHead('team','Squadra')}</th><th>${sortHead('badge','Badge')}</th><th>${sortHead('slot','Slot')}</th><th>${sortHead('presence','%Tit')}</th><th>${sortHead('pfc','PFC')}</th><th>${sortHead('pma','PMA')}</th><th>${sortHead('delta','Delta')}</th><th>${sortHead('index','Indice cr')}</th><th>${sortHead('threshold','Soglia')}</th><th>${sortHead('expected','Prezzo atteso')}</th><th>${sortHead('fmv','FMV')}</th><th>${sortHead('favorite','Preferito')}</th>
+      <th>${sortHead('role','Ruoli')}</th><th>${sortHead('name','Nome')}</th><th>${sortHead('team','Squadra')}</th><th>${sortHead('badge','Badge')}</th><th>${sortHead('slot','Slot')}</th><th>${sortHead('presence','%Tit')}</th><th>${sortHead('pfc','PFC')}</th><th>${sortHead('pma','PMA')}</th><th>${sortHead('delta','Delta')}</th><th>${sortHead('index','Indice cr')}</th><th>${sortHead('threshold','Soglia')}</th><th>${sortHead('expected','Prezzo target')}</th><th>${sortHead('fmv','FMV')}</th><th>${sortHead('favorite','Preferito')}</th>
     </tr><tr class="v13-filter-row">
       <th><span class="v14-role-filter-note">↑ ruoli</span></th>
       <th>${filterInput('name','nome')}</th>
@@ -33911,7 +33910,7 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
   const owner=()=>String(state.dashboard?.currentUser?.username||state.session?.user?.username||'').trim().toLowerCase()==='emanuelesordo';
   const fmt=(v,d=2)=>{const n=Number(v);return Number.isFinite(n)?n.toFixed(d):'—'};
   function expectedGames(p){const next=Math.max(1,Math.min(38,Number(state.v13NextRound||1))),remaining=Math.max(0,39-next),until=Math.max(0,Number(p?.unavailable_until_round||0)),miss=until>=next?Math.min(remaining,until-next+1):0,available=Math.max(0,remaining-miss),pres=typeof strategicPresencePercent==='function'?Number(strategicPresencePercent(p)||0):Number(p?.expected_titolarity||0);return available*Math.max(0,Math.min(100,pres))/100;}
-  function html(p){const sf=p?.strategic_features||{},roles=typeof playerRoles==='function'?playerRoles(p,typeof fantasyMode==='function'?fantasyMode():'classic'):[],delta=Number.isFinite(Number(p?.pfc_pma_delta))?Number(p.pfc_pma_delta):Number(p?.pfc||0)-Number(p?.pma||0),idx=typeof strategicValueIndex==='function'?strategicValueIndex(p):null,thr=typeof strategicThresholdPrice==='function'?strategicThresholdPrice(p):null,exp=typeof strategicExpectedPrice==='function'?strategicExpectedPrice(p):null,fmv=typeof strategicExpectedFantasyAverage==='function'?strategicExpectedFantasyAverage(p):p?.expected_fantasy_avg,pres=typeof strategicPresencePercent==='function'?strategicPresencePercent(p):p?.expected_titolarity,signals=typeof auctionPlayerSignalBadges==='function'?auctionPlayerSignalBadges(p):'—';return `<section class="v14-called-details"><div class="v14-called-title"><strong>DATI GIOCATORE</strong><span>${signals}</span></div><div class="v14-called-grid"><span><small>Ruoli</small><b>${roles.map(r=>`<i class="rolebadge" data-role="${esc(r)}">${esc(r)}</i>`).join(' ')||'—'}</b></span><span><small>Squadra</small><b>${esc(p?.serie_a_team||'—')}</b></span><span><small>Slot</small><b>${esc(p?.slot??'—')}</b></span><span><small>% Tit.</small><b>${Number.isFinite(Number(pres))?Math.round(Number(pres))+'%':'—'}</b></span><span><small>PFC</small><b>${fmt(p?.pfc,0)}</b></span><span><small>PMA</small><b>${fmt(p?.pma,0)}</b></span><span><small>Δ PFC-PMA</small><b>${delta>=0?'+':''}${fmt(delta,0)}</b></span><span><small>FMV</small><b>${fmt(fmv,2)}</b></span><span><small>Indice</small><b>${idx??'—'} cr</b></span><span><small>Soglia</small><b>${thr??'—'} cr</b></span><span><small>Prezzo atteso</small><b>${exp?Math.round(exp):'—'} cr</b></span><span><small>Gare attese</small><b>${fmt(expectedGames(p),1)}</b></span><span><small>Trend</small><b>${esc(sf.trend_direction||'—')}</b></span><span><small>Volatilità</small><b>${Number.isFinite(Number(sf.volatility))?Math.round(Number(sf.volatility)*100)+'%':'—'}</b></span><span><small>FV ultimo anno</small><b>${fmt(p?.last_year_fantasy_avg,2)}</b></span><span><small>FV ultimi 5</small><b>${fmt(p?.last_five_year_fantasy_avg,2)}</b></span></div></section>`;}
+  function html(p){const sf=p?.strategic_features||{},roles=typeof playerRoles==='function'?playerRoles(p,typeof fantasyMode==='function'?fantasyMode():'classic'):[],delta=Number.isFinite(Number(p?.pfc_pma_delta))?Number(p.pfc_pma_delta):Number(p?.pfc||0)-Number(p?.pma||0),idx=typeof strategicValueIndex==='function'?strategicValueIndex(p):null,thr=typeof strategicThresholdPrice==='function'?strategicThresholdPrice(p):null,exp=typeof strategicExpectedPrice==='function'?strategicExpectedPrice(p):null,fmv=typeof strategicExpectedFantasyAverage==='function'?strategicExpectedFantasyAverage(p):p?.expected_fantasy_avg,pres=typeof strategicPresencePercent==='function'?strategicPresencePercent(p):p?.expected_titolarity,signals=typeof auctionPlayerSignalBadges==='function'?auctionPlayerSignalBadges(p):'—';return `<section class="v14-called-details"><div class="v14-called-title"><strong>DATI GIOCATORE</strong><span>${signals}</span></div><div class="v14-called-grid"><span><small>Ruoli</small><b>${roles.map(r=>`<i class="rolebadge" data-role="${esc(r)}">${esc(r)}</i>`).join(' ')||'—'}</b></span><span><small>Squadra</small><b>${esc(p?.serie_a_team||'—')}</b></span><span><small>Slot</small><b>${esc(p?.slot??'—')}</b></span><span><small>% Tit.</small><b>${Number.isFinite(Number(pres))?Math.round(Number(pres))+'%':'—'}</b></span><span><small>PFC</small><b>${fmt(p?.pfc,0)}</b></span><span><small>PMA</small><b>${fmt(p?.pma,0)}</b></span><span><small>Δ PFC-PMA</small><b>${delta>=0?'+':''}${fmt(delta,0)}</b></span><span><small>FMV</small><b>${fmt(fmv,2)}</b></span><span><small>Indice</small><b>${idx??'—'} cr</b></span><span><small>Soglia</small><b>${thr??'—'} cr</b></span><span><small>Prezzo target</small><b>${exp?Math.round(exp):'—'} cr</b></span><span><small>Gare attese</small><b>${fmt(expectedGames(p),1)}</b></span><span><small>Trend</small><b>${esc(sf.trend_direction||'—')}</b></span><span><small>Volatilità</small><b>${Number.isFinite(Number(sf.volatility))?Math.round(Number(sf.volatility)*100)+'%':'—'}</b></span><span><small>FV ultimo anno</small><b>${fmt(p?.last_year_fantasy_avg,2)}</b></span><span><small>FV ultimi 5</small><b>${fmt(p?.last_five_year_fantasy_avg,2)}</b></span></div></section>`;}
   function mount(){document.querySelectorAll('.v14-called-details').forEach(x=>x.remove());if(!owner()||state.view!=='auction')return;const p=state.auction?.currentPlayer;if(!p)return;const command=document.querySelector('.auction-middle-column .auction-command-bar')||document.querySelector('.auction-command-bar');if(command)command.insertAdjacentHTML('afterend',html(p));}
   if(typeof renderAuctionLive==='function'){const old=renderAuctionLive;renderAuctionLive=function(...a){const r=old(...a);queueMicrotask(mount);return r;};}
   const st=document.createElement('style');st.textContent=`.v14-called-details{padding:5px 6px;border:1px solid rgba(91,151,216,.32);border-radius:8px;background:linear-gradient(145deg,rgba(18,50,80,.78),rgba(7,27,48,.88));display:grid;gap:4px;overflow:hidden}.v14-called-title{display:flex;justify-content:space-between;gap:6px;font-size:6px;color:#a9c7e7;letter-spacing:.08em}.v14-called-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}.v14-called-grid>span{padding:3px 4px;border:1px solid rgba(91,151,216,.14);border-radius:5px;background:rgba(8,31,54,.48);min-width:0}.v14-called-grid small,.v14-called-grid b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.v14-called-grid small{font-size:5px;color:var(--soft)}.v14-called-grid b{font-size:7px;margin-top:1px;font-weight:900}.v14-called-grid .rolebadge{display:inline-flex!important;font-style:normal}@media(max-width:900px){.v14-called-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}`;document.head.appendChild(st);queueMicrotask(mount);
@@ -33934,7 +33933,7 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
     delta:{label:'Delta',step:1,get:p=>v15Delta(p)},
     index:{label:'Indice cr',step:1,get:p=>Number(typeof strategicValueIndex==='function'?strategicValueIndex(p):0)},
     threshold:{label:'Soglia',step:1,get:p=>Number(typeof strategicThresholdPrice==='function'?strategicThresholdPrice(p):0)},
-    expected:{label:'Prezzo atteso',step:1,get:p=>Number(typeof strategicExpectedPrice==='function'?strategicExpectedPrice(p):0)},
+    expected:{label:'Prezzo target',step:1,get:p=>Number(typeof strategicExpectedPrice==='function'?strategicExpectedPrice(p):0)},
     fmv:{label:'FMV',step:.01,get:p=>v15Fmv(p)}
   };
 
@@ -34073,7 +34072,7 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
     const players=state.list?.players||[];ensureRanges15(players);
     const teams=[...new Set(players.map(p=>p?.serie_a_team).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'it'));
     return `<tr class="v15-sort-row">
-      <th class="v15-role-col">${sortButton15('role','Ruoli')}</th><th>${sortButton15('name','Nome')}</th><th>${sortButton15('team','Squadra')}</th><th>${sortButton15('badge','Badge')}</th><th>${sortButton15('slot','Slot')}</th><th>${sortButton15('presence','%Tit')}</th><th>${sortButton15('pfc','PFC')}</th><th>${sortButton15('pma','PMA')}</th><th>${sortButton15('delta','Delta')}</th><th>${sortButton15('index','Indice cr')}</th><th>${sortButton15('threshold','Soglia')}</th><th>${sortButton15('expected','Prezzo atteso')}</th><th>${sortButton15('fmv','FMV')}</th><th>${sortButton15('favorite','Preferito')}</th>
+      <th class="v15-role-col">${sortButton15('role','Ruoli')}</th><th>${sortButton15('name','Nome')}</th><th>${sortButton15('team','Squadra')}</th><th>${sortButton15('badge','Badge')}</th><th>${sortButton15('slot','Slot')}</th><th>${sortButton15('presence','%Tit')}</th><th>${sortButton15('pfc','PFC')}</th><th>${sortButton15('pma','PMA')}</th><th>${sortButton15('delta','Delta')}</th><th>${sortButton15('index','Indice cr')}</th><th>${sortButton15('threshold','Soglia')}</th><th>${sortButton15('expected','Prezzo target')}</th><th>${sortButton15('fmv','FMV')}</th><th>${sortButton15('favorite','Preferito')}</th>
     </tr><tr class="v15-filter-row">
       <th class="v15-role-col"><span class="v15-role-note">filtrato sopra</span></th>
       <th>${textSearch15('name','cerca')}</th>
@@ -34976,7 +34975,7 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
   /* Auction filters consolidated into the core renderer. */
 
   function patchListSort22(){
-    const thead=document.querySelector('#view-list .player-table thead');if(!thead)return;const head=thead.querySelector('tr');if(!head)return;const specs=[['role','Ruoli'],['name','Nome'],['team','Squadra'],['badge','Badge'],['slot','Slot'],['presence','%Tit'],['pfc','PFC'],['pma','PMA'],['delta','Delta'],['index','Indice'],['threshold','Soglia'],['expected','Prezzo atteso'],['fmv','FMV'],['favorite','Preferito']];[...head.children].forEach((th,i)=>{const spec=specs[i];if(!spec)return;th.innerHTML=`<button type="button" class="v15-sort" data-v15-sort="${spec[0]}">${spec[1]} <span>↕</span></button>`;});paintRows22(document.getElementById('list-body'),state.list?.players||[]);
+    const thead=document.querySelector('#view-list .player-table thead');if(!thead)return;const head=thead.querySelector('tr');if(!head)return;const specs=[['role','Ruoli'],['name','Nome'],['team','Squadra'],['badge','Badge'],['slot','Slot'],['presence','%Tit'],['pfc','PFC'],['pma','PMA'],['delta','Delta'],['index','Indice'],['threshold','Soglia'],['expected','Prezzo target'],['fmv','FMV'],['favorite','Preferito']];[...head.children].forEach((th,i)=>{const spec=specs[i];if(!spec)return;th.innerHTML=`<button type="button" class="v15-sort" data-v15-sort="${spec[0]}">${spec[1]} <span>↕</span></button>`;});paintRows22(document.getElementById('list-body'),state.list?.players||[]);
   }
 
   if(typeof renderListTable==='function'){const old22=renderListTable;renderListTable=function(...a){const r=old22(...a);queueMicrotask(patchListSort22);return r;};}
@@ -36493,6 +36492,8 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
   }
 
 
+
+
   /* V43 · direct award helper. */
   function timerInactive43(){
     const s=session34(),cfg=s?.setup_snapshot||state.auction?.settings||{};
@@ -36534,7 +36535,7 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
       try{controller=Boolean(typeof auctionCanManage==='function'&&auctionCanManage())}catch{}
     }
     return Boolean(
-      (window.v45SinglePlayerActive?.()===true||timerInactive43())
+      timerInactive43()
       && s?.id
       && s.status==='live'
       && !s.current_player_id
@@ -36558,8 +36559,7 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
       (call||controls.lastElementChild)?.insertAdjacentElement?.('afterend',b);
       if(!b.isConnected)controls.appendChild(b);
     }
-    const single=window.v45SinglePlayerActive?.()===true,inactive=single||timerInactive43(),p=selectedAdminPlayer43(),team=selectedOperationalTeam43(),price=directAwardPrice43();
-    b.textContent=single?'ASSEGNA':'ASSEGNA DIRETTO';
+    const inactive=timerInactive43(),p=selectedAdminPlayer43(),team=selectedOperationalTeam43(),price=directAwardPrice43();
     b.hidden=!inactive;
     b.disabled=!canDirectAward43();
     if(!inactive){
@@ -36577,15 +36577,6 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
     if(!canDirectAward43())return;
     const s=session34(),p=selectedAdminPlayer43(),team=selectedOperationalTeam43(),price=directAwardPrice43();
     if(!s?.id||!p||!team)return;
-
-    if(window.v45SinglePlayerActive?.()===true){
-      if(typeof window.v45SinglePlayerAssign!=='function'){
-        if(typeof msg==='function')msg('Modulo Single Player non disponibile.','error');
-        return;
-      }
-      await window.v45SinglePlayerAssign(button,{session:s,player:p,team,price});
-      return;
-    }
     const teamLabel=typeof auctionTeamReference==='function'
       ? auctionTeamReference(team,team.name||'squadra')
       : (team.name||'squadra');
