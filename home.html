@@ -14788,6 +14788,33 @@ html body #view-auction #auction-direct-award-v43{
     flex-basis:28px!important;
   }
 }
+
+/* V44 · auction live emergency stability. */
+body.auction-live #view-auction .auction-cockpit{
+  grid-template-rows:auto minmax(0,1fr)!important;
+  min-height:0!important;
+  max-height:100%!important;
+  overflow:hidden!important;
+}
+body.auction-live #view-auction .auction-rosters-accordion-header{
+  grid-row:1!important;
+}
+body.auction-live #view-auction .auction-cockpit-stage,
+body.auction-live #view-auction .auction-rosters-overlay{
+  grid-row:2!important;
+  min-height:0!important;
+  max-height:100%!important;
+}
+body.auction-live #view-auction .auction-lower-main{
+  min-height:0!important;
+  max-height:100%!important;
+  overflow:hidden!important;
+}
+#auction-live-exit-btn{display:none}
+body.auction-live #auction-live-exit-btn{display:inline-flex!important;align-items:center;justify-content:center}
+@media(max-width:850px){
+  body.auction-live #auction-live-exit-btn{display:none!important}
+}
 </style>
 
 
@@ -14917,6 +14944,7 @@ body.auction-live .auction-root{padding-top:0!important}
       <div class="head-actions modern-head-actions">
         <span id="user-label" class="user-label"></span>
         <button id="modern-command-btn" class="secondary modern-command-trigger" type="button" title="Navigazione rapida (Ctrl/⌘ K)">⌘K</button>
+        <button id="auction-live-exit-btn" class="secondary" type="button" title="Torna alle tab">← TAB</button>
         <button id="league-switch-btn" class="secondary" type="button">Leghe</button>
         <button id="immersion-btn" class="secondary" type="button" title="Vista a schermo intero" aria-label="Vista a schermo intero">⛶</button>
         <button id="reload-btn" class="secondary" type="button" title="Aggiorna dati">↻</button>
@@ -36549,6 +36577,25 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
   const obs=new MutationObserver(()=>requestAnimationFrame(enforcePhoneNav34d));
   obs.observe(document.documentElement,{subtree:true,childList:true});
   enforcePhoneNav34d();
+})();
+</script>
+
+
+<script id="v44-live-emergency-runtime">
+(() => {
+  document.addEventListener('click', (event) => {
+    const button = event.target.closest?.('#auction-live-exit-btn');
+    if (!button) return;
+    event.preventDefault();
+    event.stopPropagation();
+    try { state.auctionMobileDrawerOpen = false; } catch {}
+    try { if (typeof clearAuctionTransient === 'function') clearAuctionTransient(); } catch {}
+    if (typeof switchView === 'function') {
+      switchView('home');
+    } else {
+      location.hash = '#/home';
+    }
+  }, true);
 })();
 </script>
 
