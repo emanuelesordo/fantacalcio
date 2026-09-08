@@ -1,0 +1,41 @@
+name: Apply V38 live stability
+on:
+  push:
+    paths:
+      - '.github/apply_v38_live_stability.py'
+      - '.github/workflows/apply-v38-live-stability.yml'
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Apply patch
+        run: python .github/apply_v38_live_stability.py
+      - name: Validate embedded JS
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('home.html').read_text()
+          for i,m in enumerate(re.finditer(r'<script(?:[^>]*)>(.*?)</script>',s,re.S)):
+              Path(f'/tmp/script{i}.js').write_text(m.group(1))
+          PY
+          for f in /tmp/script*.js; do node --check "$f"; done
+      - name: Diff check
+        run: git diff --check
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add home.html
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'fix: stabilize live auction layout and refresh'
+          git push origin main
