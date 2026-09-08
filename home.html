@@ -34107,6 +34107,18 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
   }
 
   function mobileEsc(v){try{return typeof esc==='function'?esc(v):String(v??'')}catch{return String(v??'')}}
+  function mobileRoleTone(role){
+    const r=String(role||'').trim().toLowerCase();
+    if(['p','por'].includes(r))return 'por';
+    if(['d','b','dc','dd','ds'].includes(r))return 'def';
+    if(['e','m','c'].includes(r))return 'mid';
+    if(['w','t'].includes(r))return 'wing';
+    if(['a','pc'].includes(r))return 'att';
+    return 'other';
+  }
+  function mobileRoleBadges(rr){
+    return (rr||[]).map(r=>`<i class="rolebadge v23-role-${mobileRoleTone(r)}">${mobileEsc(r)}</i>`).join('');
+  }
   function mobileAssignmentPlayer(a){
     if(a?.player)return a.player;if(a?.league_player)return a.league_player;
     const id=String(a?.player_id||a?.league_player_id||'');
@@ -34127,12 +34139,15 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
   function renderMobileRosterDrawer(){
     const host=qs('[data-v23-roster-list]');if(!host)return;
     const rows=myInfo()?.assignments||[];
-    host.innerHTML=rows.map(a=>{const p=mobileAssignmentPlayer(a),rr=roles(p),price=a?.purchase_price??a?.price??a?.amount??'—';return `<div class="v23-mobile-drawer-row"><div class="v23-mobile-drawer-player"><span>${rr.map(r=>`<i class="rolebadge">${mobileEsc(r)}</i>`).join('')}</span><strong>${mobileEsc(p?.name||a?.player_name||'Giocatore')}</strong><small>${mobileEsc(p?.serie_a_team||'')} · ${mobileEsc(price)} cr</small></div></div>`}).join('')||'<div class="v23-mobile-empty">Rosa vuota.</div>';
+    host.innerHTML=rows.map(a=>{
+      const p=mobileAssignmentPlayer(a),rr=roles(p),price=a?.purchase_price??a?.price??a?.amount??'—';
+      return `<div class="v23-mobile-drawer-row v23-mobile-roster-row"><div class="v23-mobile-drawer-roles">${mobileRoleBadges(rr)}</div><div class="v23-mobile-drawer-player"><strong>${mobileEsc(p?.name||a?.player_name||'Giocatore')}</strong><small>${mobileEsc(p?.serie_a_team||'—')}</small></div><div class="v23-mobile-drawer-price">${mobileEsc(price)} cr</div></div>`;
+    }).join('')||'<div class="v23-mobile-empty">Rosa vuota.</div>';
   }
   function renderMobileFreeDrawer(){
     const host=qs('[data-v23-free-list]');if(!host)return;
     const q=qs('[data-v23-free-search]')?.value||'';const can=mobileCanCall();
-    host.innerHTML=mobileFreeCandidates(q).map(p=>`<div class="v23-mobile-drawer-row"><div class="v23-mobile-drawer-player"><span>${roles(p).map(r=>`<i class="rolebadge">${mobileEsc(r)}</i>`).join('')}</span><strong>${mobileEsc(p?.name||'—')}</strong><small>${mobileEsc(p?.serie_a_team||'—')}</small></div><button type="button" data-v23-mobile-call="${mobileEsc(p.id)}" ${can?'':'disabled'}>CHIAMA</button></div>`).join('')||'<div class="v23-mobile-empty">Nessun giocatore disponibile.</div>';
+    host.innerHTML=mobileFreeCandidates(q).map(p=>`<div class="v23-mobile-drawer-row v23-mobile-free-row"><div class="v23-mobile-drawer-roles">${mobileRoleBadges(roles(p))}</div><div class="v23-mobile-drawer-player"><strong>${mobileEsc(p?.name||'—')}</strong><small>${mobileEsc(p?.serie_a_team||'—')}</small></div><button type="button" data-v23-mobile-call="${mobileEsc(p.id)}" ${can?'':'disabled'}>CHIAMA</button></div>`).join('')||'<div class="v23-mobile-empty">Nessun giocatore disponibile.</div>';
   }
   function renderMobileDrawer(which){if(which==='roster')renderMobileRosterDrawer();if(which==='free')renderMobileFreeDrawer();}
   function closeDrawer(){document.body.classList.remove('v23-roster-open','v23-free-open');const ui=qs('.v23-mobile-drawer-ui');if(ui)ui.hidden=true;}
@@ -34294,7 +34309,22 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
       .v23-mobile-drawer-panel>header{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;padding:8px 10px!important;border-bottom:1px solid var(--line)!important}.v23-mobile-drawer-panel>header strong{font-size:14px!important}.v23-mobile-drawer-panel .v23-drawer-close{position:static!important;width:34px!important;height:34px!important;min-height:34px!important;font-size:20px!important;pointer-events:auto!important}
       .v23-mobile-drawer-search{padding:7px!important;border-bottom:1px solid var(--line)!important}.v23-mobile-drawer-search input{height:38px!important;font-size:12px!important}
       .v23-mobile-drawer-list{min-height:0!important;overflow:auto!important;padding:6px!important;display:grid!important;align-content:start!important;gap:4px!important}
-      .v23-mobile-drawer-row{min-height:48px!important;display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:7px!important;align-items:center!important;padding:5px 7px!important;border:1px solid var(--line)!important;border-radius:8px!important;background:var(--panel2)!important}.v23-mobile-drawer-player{min-width:0!important}.v23-mobile-drawer-player strong{display:block!important;font-size:11px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}.v23-mobile-drawer-player small{display:block!important;margin-top:2px!important;color:var(--soft)!important;font-size:8px!important}.v23-mobile-drawer-player .rolebadge{font-style:normal!important;margin-right:2px!important}.v23-mobile-drawer-row>button{min-width:72px!important;height:36px!important;font-size:9px!important}.v23-mobile-empty{padding:16px!important;text-align:center!important;color:var(--soft)!important}
+      .v23-mobile-drawer-row{min-height:58px!important;display:grid!important;grid-template-columns:98px minmax(0,1fr) 88px!important;gap:8px!important;align-items:center!important;padding:5px 7px!important;border:1px solid var(--line)!important;border-radius:8px!important;background:var(--panel2)!important}
+      .v23-mobile-drawer-roles{min-width:0!important;display:flex!important;align-items:center!important;align-content:center!important;justify-content:flex-start!important;gap:3px!important;flex-wrap:wrap!important}
+      .v23-mobile-drawer-roles .rolebadge{min-width:28px!important;height:28px!important;padding:2px 7px!important;border-radius:7px!important;font-style:normal!important;font-size:10px!important;font-weight:950!important;line-height:1!important;border:1px solid rgba(255,255,255,.22)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.12)!important}
+      .v23-mobile-drawer-roles .v23-role-por{background:#f4b629!important;color:#152238!important}
+      .v23-mobile-drawer-roles .v23-role-def{background:#4f9d2f!important;color:#fff!important}
+      .v23-mobile-drawer-roles .v23-role-mid{background:#2f73d5!important;color:#fff!important}
+      .v23-mobile-drawer-roles .v23-role-wing{background:#b018b8!important;color:#fff!important}
+      .v23-mobile-drawer-roles .v23-role-att{background:#c82f45!important;color:#fff!important}
+      .v23-mobile-drawer-roles .v23-role-other{background:#486786!important;color:#fff!important}
+      .v23-mobile-drawer-player{min-width:0!important;min-height:48px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:flex-start!important;text-align:left!important}
+      .v23-mobile-drawer-player strong{display:block!important;width:100%!important;font-size:12px!important;line-height:1.1!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+      .v23-mobile-drawer-player small{display:block!important;width:100%!important;margin-top:4px!important;color:var(--soft)!important;font-size:9px!important;line-height:1.05!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+      .v23-mobile-drawer-row>button{align-self:center!important;justify-self:stretch!important;width:100%!important;min-width:0!important;height:42px!important;min-height:42px!important;max-height:42px!important;padding:4px 6px!important;border-radius:10px!important;font-size:10px!important;line-height:1!important}
+      .v23-mobile-drawer-price{align-self:center!important;justify-self:end!important;min-width:0!important;color:var(--text)!important;font-size:11px!important;font-weight:900!important;white-space:nowrap!important;text-align:right!important}
+      .v23-mobile-empty{padding:16px!important;text-align:center!important;color:var(--soft)!important}
+      @media(max-width:390px){.v23-mobile-drawer-row{grid-template-columns:86px minmax(0,1fr) 78px!important;gap:6px!important}.v23-mobile-drawer-roles .rolebadge{min-width:25px!important;height:26px!important;padding:2px 5px!important;font-size:9px!important}.v23-mobile-drawer-row>button{font-size:9px!important}}
     }
   `;document.head.appendChild(css);
   sync();
