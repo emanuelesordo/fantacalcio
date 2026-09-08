@@ -14039,6 +14039,49 @@ body.v10-index-owner #view-auction tr.v30-index-market-row{
 }
 </style>
 
+
+<style id="v31-mobile-queue-roles-style">
+@media(max-width:820px){
+  /* Main mobile header: BACK | TURN | CREDITS/MAX. No auction-pause button. */
+  body.v23-mobile-auction .v23-mobile-head{
+    grid-template-columns:40px minmax(0,1fr) 110px!important;
+  }
+  body.v23-mobile-auction .v30-mobile-pause,
+  body.v23-mobile-auction [data-v30-pause]{display:none!important}
+
+  /* Queue pause belongs to the queue card header. */
+  .v31-queue-head-actions{display:flex!important;align-items:center!important;gap:5px!important;margin-left:auto!important}
+  .v31-queue-pause{height:25px!important;min-height:25px!important;min-width:58px!important;padding:2px 6px!important;border-radius:7px!important;font-size:7px!important;font-weight:900!important}
+  .v31-queue-pause.is-paused{background:var(--good)!important;color:#fff!important}
+
+  /* Free-agent role strip: horizontal, scrollable, phase defaults active. */
+  .v31-mobile-role-strip{
+    display:flex!important;align-items:center!important;gap:3px!important;
+    min-height:36px!important;padding:4px 7px!important;overflow-x:auto!important;overflow-y:hidden!important;
+    -webkit-overflow-scrolling:touch!important;scrollbar-width:none!important;
+    border-bottom:1px solid var(--line)!important;background:#0a213b!important;
+  }
+  .v31-mobile-role-strip::-webkit-scrollbar{display:none!important}
+  .v31-mobile-role-strip button{
+    flex:0 0 auto!important;min-width:34px!important;height:27px!important;min-height:27px!important;
+    padding:2px 7px!important;border-radius:7px!important;background:#173554!important;color:#8ea5bc!important;
+    border:1px solid rgba(85,128,170,.45)!important;font-size:8px!important;font-weight:900!important;opacity:.48!important;
+  }
+  .v31-mobile-role-strip button.active{opacity:1!important;color:#fff!important;box-shadow:0 0 0 1px rgba(255,255,255,.18) inset!important}
+  .v31-mobile-role-strip button[data-v31-role="__ALL__"].active{background:var(--primary)!important}
+  .v31-mobile-role-strip .v23-role-por.active{background:#f4b629!important;color:#152238!important}
+  .v31-mobile-role-strip .v23-role-def.active{background:#4f9d2f!important}
+  .v31-mobile-role-strip .v23-role-mid.active{background:#2f73d5!important}
+  .v31-mobile-role-strip .v23-role-wing.active{background:#b018b8!important}
+  .v31-mobile-role-strip .v23-role-att.active{background:#c82f45!important}
+
+  /* Drawer rows gain one header row, without stealing list scroll space. */
+  body.v23-free-open .v23-mobile-drawer-free-panel{
+    grid-template-rows:auto auto auto minmax(0,1fr)!important;
+  }
+}
+</style>
+
 </head>
 <body class="modern-glass">
   <div id="global-message" class="message" aria-live="polite"></div>
@@ -34408,22 +34451,9 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
   function ensureV30MobileHeader(shell){
     qsa('.v23-header-mode').forEach(n=>n.remove());
     const head=qs('.v23-mobile-head',shell);if(!head)return;
+    qs('[data-v30-pause]',head)?.remove();
     let back=qs('[data-v30-back]',head);
     if(!back){back=document.createElement('button');back.type='button';back.className='secondary v30-mobile-back';back.dataset.v30Back='1';back.setAttribute('aria-label','Torna al menu principale');back.textContent='←';head.prepend(back);}
-    let pause=qs('[data-v30-pause]',head);
-    if(!pause){pause=document.createElement('button');pause.type='button';pause.className='secondary v30-mobile-pause';pause.dataset.v30Pause='1';pause.textContent='PAUSA';head.appendChild(pause);}
-  }
-  function syncV30MobilePause(shell){
-    const local=qs('[data-v30-pause]',shell);if(!local)return;
-    const orig=document.getElementById('auction-pause-cycle');
-    if(!orig){local.disabled=true;local.textContent='PAUSA';return;}
-    local.disabled=orig.disabled;
-    const t=String(orig.textContent||'').trim().toUpperCase();
-    const resume=t.includes('RIPRENDI');
-    local.textContent=resume?'RIPRENDI':'PAUSA';
-    local.classList.toggle('good',resume);
-    local.classList.toggle('warn',!resume);
-    local.title=orig.title||t;
   }
 
   function syncButtons(shell){
@@ -34447,15 +34477,13 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
     qs('[data-v23-credits]',shell).textContent=info?.remaining??'—';qs('[data-v23-max]',shell).textContent=info?.maxBid??'—';
     qs('[data-v23-player]',shell).textContent=p?.name||'—';qs('[data-v23-player-meta]',shell).textContent=p?[roles(p).join(' · '),p.serie_a_team].filter(Boolean).join(' · '):'attesa chiamata';
     qs('[data-v23-timer]',shell).textContent=timerText();qs('[data-v23-bid]',shell).textContent=s?.current_player_id?Math.max(1,Number(s.current_bid||1)):'—';qs('[data-v23-bidder]',shell).textContent=s?.current_player_id?teamName(s.current_bidder_team_id):'—';
-    const drawers=qs('.v23-mobile-drawers',shell);if(drawers)drawers.hidden=false;normalizeMobileActionRow(shell);syncButtons(shell);syncV30MobilePause(shell);syncDrawerTargets();
+    const drawers=qs('.v23-mobile-drawers',shell);if(drawers)drawers.hidden=false;normalizeMobileActionRow(shell);syncButtons(shell);syncDrawerTargets();
   }
 
   /* V30 mobile header controls */
   document.addEventListener('click',e=>{
     const back=e.target.closest?.('[data-v30-back]');
     if(back){e.preventDefault();e.stopPropagation();closeDrawer();window.location.hash='#/home';return;}
-    const pause=e.target.closest?.('[data-v30-pause]');
-    if(pause){e.preventDefault();e.stopPropagation();const orig=document.getElementById('auction-pause-cycle');if(orig&&!orig.disabled)orig.click();setTimeout(()=>syncV30MobilePause(qs('.v23-mobile-shell')),80);}
   },true);
 
   if(typeof renderAuctionLive==='function'){
@@ -34805,15 +34833,57 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
     list.scrollTop=oldTop;
   }
 
+  function phaseAllowed31(p){
+    try{return typeof auctionPlayerMatchesCurrentRolePhase==='function'?Boolean(auctionPlayerMatchesCurrentRolePhase(p)):true}catch{return true}
+  }
+  function roleOrder31(){
+    const mode=state.auction?.settings?.fantasy_mode||'classic';
+    const canonical=mode==='mantra'?['Por','B','Dc','Dd','Ds','E','M','C','W','T','A','Pc']:['P','D','C','A'];
+    const seen=new Set();
+    (state.auction?.callCandidates||[]).forEach(p=>playerRoles30(p).forEach(r=>seen.add(String(r))));
+    return [...canonical.filter(r=>seen.has(r)),...[...seen].filter(r=>!canonical.includes(r)).sort((a,b)=>a.localeCompare(b,'it'))];
+  }
+  function roleFilterContext31(){
+    const s=state.auction?.auctionSession||{};
+    return [s.id||'',state.auction?.rolePhase?.key||'',s.role_phase_index??'',(state.auction?.callCandidates||[]).length].join('|');
+  }
+  function ensureRoleFilter31(){
+    const ctx=roleFilterContext31(),all=roleOrder31();
+    if(!state.v31MobileRoleFilter||state.v31MobileRoleFilter.ctx!==ctx){
+      const enabled=new Set();
+      (state.auction?.callCandidates||[]).filter(phaseAllowed31).forEach(p=>playerRoles30(p).forEach(r=>enabled.add(String(r))));
+      const selected=all.filter(r=>enabled.has(r));
+      state.v31MobileRoleFilter={ctx,selected:selected.length?selected:[...all]};
+    }
+    return state.v31MobileRoleFilter;
+  }
+  function playerMatchesRoleFilter31(p){
+    const f=ensureRoleFilter31(),selected=new Set(f.selected||[]);
+    if(!selected.size)return true;
+    return playerRoles30(p).some(r=>selected.has(String(r)));
+  }
+  function ensureRoleStrip31(){
+    const search=qs('.v23-mobile-drawer-free-panel .v23-mobile-drawer-search');if(!search)return null;
+    let strip=qs('[data-v31-role-strip]');
+    if(!strip){strip=document.createElement('div');strip.className='v31-mobile-role-strip';strip.dataset.v31RoleStrip='1';search.insertAdjacentElement('afterend',strip);}
+    return strip;
+  }
+  function renderRoleStrip31(){
+    const strip=ensureRoleStrip31();if(!strip)return;
+    const f=ensureRoleFilter31(),all=roleOrder31(),selected=new Set(f.selected||[]),allOn=all.length>0&&all.every(r=>selected.has(r));
+    strip.innerHTML=`<button type="button" data-v31-role="__ALL__" class="${allOn?'active':''}">ALL</button>${all.map(r=>`<button type="button" data-v31-role="${esc30(r)}" class="v23-role-${roleTone30(r)} ${selected.has(r)?'active':''}">${esc30(r)}</button>`).join('')}`;
+  }
+
   function freeCandidates30(){
     const input=qs('[data-v23-free-search]'),q=String(input?.value||'').trim();
-    return (state.auction?.callCandidates||[]).filter(p=>(!p.status||p.status==='available')&&String(p.id)!==String(state.auction?.auctionSession?.current_player_id||'')).filter(p=>{if(!q)return true;try{return typeof playerSearchRank==='function'?playerSearchRank(p,q,state.auction?.settings?.fantasy_mode||'classic')!==null:String(p.name||'').toLowerCase().includes(q.toLowerCase())}catch{return true}}).sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'it')).slice(0,120);
+    return (state.auction?.callCandidates||[]).filter(p=>(!p.status||p.status==='available')&&String(p.id)!==String(state.auction?.auctionSession?.current_player_id||'')).filter(playerMatchesRoleFilter31).filter(p=>{if(!q)return true;try{return typeof playerSearchRank==='function'?playerSearchRank(p,q,state.auction?.settings?.fantasy_mode||'classic')!==null:String(p.name||'').toLowerCase().includes(q.toLowerCase())}catch{return true}}).sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'it')).slice(0,120);
   }
 
   function renderFree30(){
     const host=qs('[data-v23-free-list]');if(!host||!document.body.classList.contains('v23-free-open'))return;
+    renderRoleStrip31();
     const queued=new Set(queueRows30().map(x=>String(x.player_id))),callable=canCall30(),queueable=canQueue30(),oldTop=host.scrollTop;
-    host.innerHTML=freeCandidates30().map(p=>{const inQueue=queued.has(String(p.id)),fm=fmv30(p),tit=tit30(p);return `<div class="v23-mobile-drawer-row v23-mobile-free-row"><div class="v23-mobile-drawer-roles">${rolesHtml30(p)}</div><div class="v23-mobile-drawer-player"><strong>${esc30(p.name||'—')}</strong><small>${esc30(p.serie_a_team||'—')}</small></div><div class="v30-mobile-free-stats"><span>PFC <b>${fmt30(pfc30(p),0)}</b></span><span>FMV <b>${fmt30(fm,2)}</b></span><span>TIT <b>${fmt30(tit,0)}${tit==null?'':'%'}</b></span></div><div class="v30-mobile-free-actions"><button type="button" data-v30-mobile-direct="${esc30(p.id)}" ${callable?'':'disabled'}>CHIAMA</button><button type="button" class="v30-queue-add" data-v30-mobile-queue-add="${esc30(p.id)}" ${queueable&&!inQueue?'':'disabled'}>${inQueue?'IN CODA':'CODA'}</button></div></div>`}).join('')||'<div class="v23-mobile-empty">Nessun giocatore disponibile.</div>';
+    host.innerHTML=freeCandidates30().map(p=>{const inQueue=queued.has(String(p.id)),fm=fmv30(p),tit=tit30(p),phaseAllowed=phaseAllowed31(p);return `<div class="v23-mobile-drawer-row v23-mobile-free-row"><div class="v23-mobile-drawer-roles">${rolesHtml30(p)}</div><div class="v23-mobile-drawer-player"><strong>${esc30(p.name||'—')}</strong><small>${esc30(p.serie_a_team||'—')}</small></div><div class="v30-mobile-free-stats"><span>PFC <b>${fmt30(pfc30(p),0)}</b></span><span>FMV <b>${fmt30(fm,2)}</b></span><span>TIT <b>${fmt30(tit,0)}${tit==null?'':'%'}</b></span></div><div class="v30-mobile-free-actions"><button type="button" data-v30-mobile-direct="${esc30(p.id)}" ${callable&&phaseAllowed?'':'disabled'}>CHIAMA</button><button type="button" class="v30-queue-add" data-v30-mobile-queue-add="${esc30(p.id)}" ${queueable&&phaseAllowed&&!inQueue?'':'disabled'}>${inQueue?'IN CODA':'CODA'}</button></div></div>`}).join('')||'<div class="v23-mobile-empty">Nessun giocatore disponibile.</div>';
     host.scrollTop=oldTop;
   }
 
@@ -34858,6 +34928,17 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
   }
 
   document.addEventListener('click',e=>{
+    const role=e.target.closest?.('[data-v31-role]');if(role){
+      e.preventDefault();e.stopPropagation();
+      const f=ensureRoleFilter31(),all=roleOrder31(),key=role.dataset.v31Role;
+      if(key==='__ALL__'){f.selected=[...all];}
+      else{
+        const s=new Set(f.selected||[]);
+        if(s.has(key)&&s.size>1)s.delete(key);else s.add(key);
+        f.selected=all.filter(r=>s.has(r));
+      }
+      renderRoleStrip31();renderFree30();return;
+    }
     const direct=e.target.closest?.('[data-v30-mobile-direct]');if(direct){e.preventDefault();e.stopPropagation();const p=playerById30(direct.dataset.v30MobileDirect);if(p&&canCall30())openCallDialog30(p);return;}
     const add=e.target.closest?.('[data-v30-mobile-queue-add]');if(add){e.preventDefault();e.stopPropagation();void addQueue30(add.dataset.v30MobileQueueAdd);return;}
     const remove=e.target.closest?.('[data-v30-queue-remove]');if(remove){e.preventDefault();e.stopPropagation();void removeQueue30(remove.dataset.v30QueueRemove);return;}
@@ -34876,6 +34957,48 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
   window.addEventListener('hashchange',()=>setTimeout(scheduleUi30,0));
   setInterval(()=>{if(phone30())syncMobile30();},900);
   scheduleUi30();
+})();
+</script>
+
+
+<script id="v31-mobile-queue-roles-runtime">
+(()=>{
+  'use strict';
+  if(window.__FANTA_V31_MOBILE_QUEUE_ROLES__)return;
+  window.__FANTA_V31_MOBILE_QUEUE_ROLES__=1;
+  const qs=(s,r=document)=>r.querySelector(s);
+  function canManage(){try{return typeof auctionCanManageCallQueue==='function'&&auctionCanManageCallQueue()}catch{return false}}
+  function syncQueuePause(){
+    const card=qs('.v30-mobile-queue'),head=card?.querySelector(':scope>header');if(!head)return;
+    qs('[data-v30-pause]')?.remove();
+    let actions=qs('.v31-queue-head-actions',head);
+    if(!actions){
+      actions=document.createElement('div');actions.className='v31-queue-head-actions';
+      const count=qs('[data-v30-queue-count]',head);if(count)actions.appendChild(count);
+      const b=document.createElement('button');b.type='button';b.className='secondary v31-queue-pause';b.dataset.v31QueuePause='1';actions.appendChild(b);head.appendChild(actions);
+    }
+    const paused=state.auction?.callQueueSettings?.autoPaused===true,b=qs('[data-v31-queue-pause]',head);if(!b)return;
+    b.textContent=paused?'RIPRENDI':'PAUSA';b.classList.toggle('is-paused',paused);b.disabled=!canManage();
+    b.title=paused?'Riattiva l’autoplay della coda':'Metti in pausa l’autoplay della coda';
+  }
+  async function toggleQueuePause(){
+    if(!canManage())return;
+    const current=state.auction?.callQueueSettings?.autoPaused===true,next=!current;
+    try{if(typeof setAuctionQueuePausePending==='function')setAuctionQueuePausePending(next);}catch{}
+    state.auction.callQueueSettings={...(state.auction.callQueueSettings||{}),autoPaused:next};syncQueuePause();
+    try{if(typeof patchAuctionCallQueueUi==='function')patchAuctionCallQueueUi();}catch{}
+    try{
+      if(typeof persistAuctionQueuePaused==='function'){await persistAuctionQueuePaused(next,{quiet:false});}
+      else{
+        const s=state.auction?.auctionSession;if(!s?.id)throw new Error('Sessione asta non disponibile.');
+        await api(ENDPOINTS.auction,{action:'setCallQueuePaused',sessionId:s.id,paused:next},{quiet:false});
+      }
+    }catch(err){state.auction.callQueueSettings={...(state.auction.callQueueSettings||{}),autoPaused:current};syncQueuePause();if(typeof msg==='function')msg(err.message||'Aggiornamento coda non riuscito.','error');}
+  }
+  document.addEventListener('click',e=>{const b=e.target.closest?.('[data-v31-queue-pause]');if(!b)return;e.preventDefault();e.stopPropagation();void toggleQueuePause();},true);
+  let raf=0;function schedule(){cancelAnimationFrame(raf);raf=requestAnimationFrame(syncQueuePause)}
+  const root=document.getElementById('view-auction');if(root)new MutationObserver(schedule).observe(root,{subtree:true,childList:true});
+  window.addEventListener('hashchange',schedule);setInterval(()=>{if(document.body.classList.contains('v23-mobile-auction'))syncQueuePause();},900);schedule();
 })();
 </script>
 
