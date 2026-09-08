@@ -35570,9 +35570,9 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
     qa('#view-list tr[data-player-id],#view-auction tr[data-player-id]').forEach(row=>{
       const p=players.get(String(row.dataset.playerId));if(!p)return;
       let idx=null;try{idx=num(typeof strategicValueIndex==='function'?strategicValueIndex(p):null)}catch{}
-      const vals=[num(p?.pfc),num(p?.pma)].filter(v=>v!=null&&v>=0);
-      if(idx==null||!vals.length)return;
-      const market=vals.reduce((a,b)=>a+b,0)/vals.length;
+      const pma=num(p?.pma),pfc=num(p?.pfc);
+      if(idx==null||(pma==null&&pfc==null))return;
+      const market=pma!=null&&pfc!=null ? (.75*pma+.25*pfc) : (pma??pfc);
       const delta=idx-market;
       const scale=Math.max(8,Math.abs(idx),Math.abs(market));
       const relative=delta/scale;
