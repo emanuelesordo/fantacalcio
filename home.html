@@ -14271,7 +14271,7 @@ body.v10-index-owner #view-auction tr.v33-index-market-row{
 <style id="v34-market-strategy-style">
 /* V34 · live auction: remove the fixed cockpit banner and reclaim its row. */
 body.auction-live #view-auction .auction-statusbar{display:none!important}
-body.auction-live #view-auction .auction-cockpit{grid-template-rows:auto minmax(0,1fr)!important}
+body.auction-live #view-auction .auction-cockpit{grid-template-rows:minmax(0,1fr) auto!important}
 body.auction-live .v33-manual-live-banner,
 body.auction-live .v33-manual-flow-banner{display:none!important}
 
@@ -14337,22 +14337,104 @@ body.v34-manual-flow .v30-mobile-queue[hidden]{display:grid!important}
 table td[data-type="number"],table th[data-type="number"],table td.num,table th.num,
 #view-list td:not(:first-child),#view-auction .auction-free-table td:not(:nth-child(2)){text-align:center}
 
-/* V38 · live viewport + desktop exit control. */
-body.auction-live #view-auction .auction-cockpit{
-  grid-template-rows:auto minmax(0,1fr)!important;
-  min-height:0!important;
+
+/* V39 · restore original live flow and harden responsive cards. */
+body.auction-live #view-auction .auction-back-live{
+  display:inline-flex!important;
+  position:absolute!important;
+  top:5px!important;
+  left:5px!important;
+  z-index:120!important;
 }
-body.auction-live #view-auction .auction-rosters-accordion-header{
-  grid-row:1!important;
+body.auction-live #view-auction .auction-root{
+  padding-top:38px!important;
 }
-body.auction-live #view-auction .auction-cockpit-stage{
-  grid-row:2!important;
-  min-height:0!important;
+body.auction-live #view-auction :is(
+  .auction-cockpit,
+  .auction-cockpit-stage,
+  .auction-cockpit-stage-grid,
+  .auction-lower-stage,
+  .auction-lower-main,
+  .auction-team-column,
+  .auction-middle-column,
+  .auction-free-fixed,
+  .auction-team-roster,
+  .auction-call-queue,
+  .auction-bid-history,
+  .auction-suggested-calls,
+  .auction-suggested-list,
+  .auction-suggested-row
+){
+  min-width:0!important;
+  max-width:100%!important;
+}
+body.auction-live #view-auction .auction-lower-main{
+  width:100%!important;
+  min-width:0!important;
   overflow:hidden!important;
 }
-#auction-live-exit-btn{display:none}
-body.auction-live #auction-live-exit-btn{display:inline-flex}
-@media(max-width:850px){body.auction-live #auction-live-exit-btn{display:none!important}}
+body.auction-live #view-auction .auction-lower-main>*{
+  min-width:0!important;
+  max-width:100%!important;
+}
+body.auction-live #view-auction .auction-free-fixed .player-table{
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  table-layout:fixed!important;
+}
+body.auction-live #view-auction .auction-free-fixed .player-main,
+body.auction-live #view-auction .auction-free-fixed .player-name,
+body.auction-live #view-auction .auction-queue-player,
+body.auction-live #view-auction .auction-suggested-copy{
+  min-width:0!important;
+  max-width:100%!important;
+}
+body.auction-live #view-auction .auction-free-fixed .player-name,
+body.auction-live #view-auction .auction-queue-player strong,
+body.auction-live #view-auction .auction-suggested-copy strong{
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+@media(min-width:1101px){
+  html:not(:fullscreen) body.auction-live #view-auction .auction-lower-main{
+    grid-template-columns:
+      minmax(0,.75fr)
+      minmax(0,.80fr)
+      minmax(0,1.60fr)
+      auto!important;
+  }
+}
+@media(min-width:851px) and (max-width:1100px){
+  html:not(:fullscreen) body.auction-live #view-auction .auction-lower-main{
+    grid-template-columns:
+      minmax(0,.70fr)
+      minmax(0,.75fr)
+      minmax(0,1.55fr)
+      auto!important;
+  }
+  html:not(:fullscreen) body.auction-live #view-auction
+    .auction-lower-main>.auctioneer-console-drawer[open]{
+    width:clamp(240px,26vw,300px)!important;
+    min-width:0!important;
+    max-width:300px!important;
+  }
+}
+@media(min-width:701px) and (max-width:850px){
+  html:not(:fullscreen) body.auction-live #view-auction .auction-lower-main{
+    grid-template-columns:
+      minmax(0,.75fr)
+      minmax(0,1.25fr)
+      auto!important;
+  }
+  html:not(:fullscreen) body.auction-live #view-auction
+    .auction-lower-main>.auctioneer-console-drawer[open]{
+    width:clamp(220px,30vw,255px)!important;
+    min-width:0!important;
+    max-width:255px!important;
+  }
+}
 </style>
 
 
@@ -14480,10 +14562,8 @@ body.auction-live .auction-root{padding-top:0!important}
       </div>
 
       <div class="head-actions modern-head-actions">
-        <span class="modern-status-pill"><i></i> Server autorevole</span>
         <span id="user-label" class="user-label"></span>
         <button id="modern-command-btn" class="secondary modern-command-trigger" type="button" title="Navigazione rapida (Ctrl/⌘ K)">⌘K</button>
-        <button id="auction-live-exit-btn" class="secondary" type="button" title="Torna alle tab">← TAB</button>
         <button id="league-switch-btn" class="secondary" type="button">Leghe</button>
         <button id="immersion-btn" class="secondary" type="button" title="Vista a schermo intero" aria-label="Vista a schermo intero">⛶</button>
         <button id="reload-btn" class="secondary" type="button" title="Aggiorna dati">↻</button>
@@ -15305,7 +15385,7 @@ body.auction-live .auction-root{padding-top:0!important}
       list: { title: 'Listone', subtitle: 'Ricerca, filtri e dati statistici del dataset giocatori attivo.' },
       rosters: { title: 'Rose', subtitle: 'Crediti, assegnazioni e capacità residua di tutte le squadre.' },
       strategy: { title: 'Strategia', subtitle: 'Centro Strategico privato, preferiti, benchmark e statistiche pre-asta.' },
-      auction: { title: 'Asta live', subtitle: 'Cockpit operativo collegato allo stato autorevole del server.' },
+      auction: { title: 'Asta live', subtitle: 'Cockpit operativo dell’asta in corso.' },
       tv: { title: 'Vista TV', subtitle: 'Presentazione essenziale e leggibile dello stato live dell’asta.' }
     });
 
@@ -15629,19 +15709,7 @@ body.auction-live .auction-root{padding-top:0!important}
 
       switchView('home');
     }
-    $('auction-live-exit-btn')
-      .addEventListener(
-        'click',
-        () => {
-          state.auctionMobileDrawerOpen = false;
-          clearAuctionTransient();
-          switchView('home');
-        }
-      );
-
-
-
-    $('league-switch-btn')
+$('league-switch-btn')
       .addEventListener(
         'click',
         () =>
@@ -35894,14 +35962,7 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
 
   function console34(){
     const d=qs('#auctioneer-console-drawer');if(!d)return;
-    const pre=session34()?.prestart_hold===true;
-    if(pre){
-      if(!d.open)d.open=true;
-      state.auctionAdminConsoleOpen=true;
-      state.v34AuctioneerOpen=true;
-      return;
-    }
-    /* Native <details> + the existing toggle listener own the state. */
+    /* Native <details> + the existing toggle listener own the state, also prestart. */
     state.v34AuctioneerOpen=d.open===true;
   }
 
