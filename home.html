@@ -14271,7 +14271,7 @@ body.v10-index-owner #view-auction tr.v33-index-market-row{
 <style id="v34-market-strategy-style">
 /* V34 · live auction: remove the fixed cockpit banner and reclaim its row. */
 body.auction-live #view-auction .auction-statusbar{display:none!important}
-body.auction-live #view-auction .auction-cockpit{grid-template-rows:minmax(0,1fr) auto!important}
+body.auction-live #view-auction .auction-cockpit{grid-template-rows:auto minmax(0,1fr)!important}
 body.auction-live .v33-manual-live-banner,
 body.auction-live .v33-manual-flow-banner{display:none!important}
 
@@ -14336,6 +14336,23 @@ body.v34-manual-flow .v30-mobile-queue[hidden]{display:grid!important}
 /* Numeric cells remain centered in all tables. */
 table td[data-type="number"],table th[data-type="number"],table td.num,table th.num,
 #view-list td:not(:first-child),#view-auction .auction-free-table td:not(:nth-child(2)){text-align:center}
+
+/* V38 · live viewport + desktop exit control. */
+body.auction-live #view-auction .auction-cockpit{
+  grid-template-rows:auto minmax(0,1fr)!important;
+  min-height:0!important;
+}
+body.auction-live #view-auction .auction-rosters-accordion-header{
+  grid-row:1!important;
+}
+body.auction-live #view-auction .auction-cockpit-stage{
+  grid-row:2!important;
+  min-height:0!important;
+  overflow:hidden!important;
+}
+#auction-live-exit-btn{display:none}
+body.auction-live #auction-live-exit-btn{display:inline-flex}
+@media(max-width:850px){body.auction-live #auction-live-exit-btn{display:none!important}}
 </style>
 
 
@@ -14466,6 +14483,7 @@ body.auction-live .auction-root{padding-top:0!important}
         <span class="modern-status-pill"><i></i> Server autorevole</span>
         <span id="user-label" class="user-label"></span>
         <button id="modern-command-btn" class="secondary modern-command-trigger" type="button" title="Navigazione rapida (Ctrl/⌘ K)">⌘K</button>
+        <button id="auction-live-exit-btn" class="secondary" type="button" title="Torna alle tab">← TAB</button>
         <button id="league-switch-btn" class="secondary" type="button">Leghe</button>
         <button id="immersion-btn" class="secondary" type="button" title="Vista a schermo intero" aria-label="Vista a schermo intero">⛶</button>
         <button id="reload-btn" class="secondary" type="button" title="Aggiorna dati">↻</button>
@@ -15611,6 +15629,16 @@ body.auction-live .auction-root{padding-top:0!important}
 
       switchView('home');
     }
+    $('auction-live-exit-btn')
+      .addEventListener(
+        'click',
+        () => {
+          state.auctionMobileDrawerOpen = false;
+          clearAuctionTransient();
+          switchView('home');
+        }
+      );
+
 
 
     $('league-switch-btn')
@@ -27333,7 +27361,7 @@ await auctionAction(
               <details
                 id="auctioneer-console-drawer"
                 class="auctioneer-console-drawer"
-                ${prestartHold || state.auctionAdminConsoleOpen ? 'open' : ''}
+                ${state.auctionAdminConsoleOpen ? "open" : ""}
               >
                 <summary>
 
@@ -31854,6 +31882,9 @@ patchAuctionTopSelection();
       if (structural) {
         /* Structural events change the shape of the whole auction view.
            Always reload the canonical auction payload; a hot patch is not enough. */
+        if (typeof window.loadMarket34 === 'function') {
+          await window.loadMarket34(true, false);
+        }
         await loadAuction({ quiet: true, onlyIfChanged: false });
         await v7SyncCatalog();
         return;
@@ -35751,7 +35782,7 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
     return .62*fm+.38*tt;
   }
 
-  async function loadMarket34(force=false){
+  async function loadMarket34(force=false,renderAfter=true){
     const leagueId=state.selectedLeague?.id||state.dashboard?.league?.id||state.auction?.league?.id||'';
     const s=session34();if(!leagueId||!s||s.status!=='live')return;
     const key=`${leagueId}:${s.id}:${s.version||0}`;
@@ -35762,9 +35793,11 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
       const r=await api(MARKET_API,{action:'getMarketContext'},{quiet:true});
       state.v34MarketContext={teams:r?.teams||[],assignments:r?.assignments||[],key,loadedAt:Date.now()};
       patchAll34();
-      if(typeof renderAuctionLive==='function'&&state.view==='auction')renderAuctionLive();
+      if(renderAfter&&typeof renderAuctionLive==='function'&&state.view==='auction')renderAuctionLive();
     }catch(e){console.warn('V34 market context',e)}finally{state.v34MarketLoading=false}
   }
+
+  window.loadMarket34=loadMarket34;
 
   function marketStats34(p){
     const free=(state.auction?.callCandidates||[]).filter(x=>String(x.id)!==String(p.id));
@@ -35910,7 +35943,7 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
   window.addEventListener('resize',patchAll34,{passive:true});
   window.addEventListener('hashchange',()=>{setTimeout(()=>{patchAll34();void loadMarket34()},0)});
   document.addEventListener('DOMContentLoaded',()=>{patchAll34();void loadMarket34(true)},{once:true});
-  setInterval(()=>{if(state.view==='auction'&&session34()?.status==='live')void loadMarket34();},5000);
+  /* V38: no periodic full live-card refresh. */
   setTimeout(()=>{patchAll34();void loadMarket34(true)},0);
 })();
 </script>
