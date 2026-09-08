@@ -14271,7 +14271,7 @@ body.v10-index-owner #view-auction tr.v33-index-market-row{
 <style id="v34-market-strategy-style">
 /* V34 · live auction: remove the fixed cockpit banner and reclaim its row. */
 body.auction-live #view-auction .auction-statusbar{display:none!important}
-body.auction-live #view-auction .auction-cockpit{grid-template-rows:minmax(0,1fr) auto!important}
+body.auction-live #view-auction .auction-cockpit{grid-template-rows:42px minmax(0,1fr)!important}
 body.auction-live .v33-manual-live-banner,
 body.auction-live .v33-manual-flow-banner{display:none!important}
 
@@ -14338,103 +14338,198 @@ table td[data-type="number"],table th[data-type="number"],table td.num,table th.
 #view-list td:not(:first-child),#view-auction .auction-free-table td:not(:nth-child(2)){text-align:center}
 
 
-/* V39 · restore original live flow and harden responsive cards. */
-body.auction-live #view-auction .auction-back-live{
+
+/* V40 · compact live viewport baseline. */
+
+/* The back control belongs to the app header, never to a separate live row. */
+#auction-back-live{display:none}
+body.auction-live #auction-back-live{
   display:inline-flex!important;
-  position:absolute!important;
-  top:5px!important;
-  left:5px!important;
-  z-index:120!important;
+  position:static!important;
+  inset:auto!important;
+  z-index:auto!important;
+  min-height:30px!important;
+  height:30px!important;
+  padding:4px 9px!important;
+  margin:0 7px 0 0!important;
+  flex:0 0 auto!important;
+  box-shadow:none!important;
 }
-body.auction-live #view-auction .auction-root{
-  padding-top:38px!important;
+body.auction-live #view-auction .auction-root{padding-top:0!important}
+
+/* V34 removes the old statusbar: strip + stage are the only cockpit rows. */
+body.auction-live #view-auction .auction-cockpit{
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:42px minmax(0,1fr)!important;
+  height:100%!important;
+  min-height:0!important;
+  max-height:100%!important;
+  padding:0!important;
+  gap:3px!important;
+  overflow:hidden!important;
 }
-body.auction-live #view-auction :is(
-  .auction-cockpit,
-  .auction-cockpit-stage,
-  .auction-cockpit-stage-grid,
-  .auction-lower-stage,
-  .auction-lower-main,
-  .auction-team-column,
-  .auction-middle-column,
-  .auction-free-fixed,
-  .auction-team-roster,
-  .auction-call-queue,
-  .auction-bid-history,
-  .auction-suggested-calls,
-  .auction-suggested-list,
-  .auction-suggested-row
-){
-  min-width:0!important;
-  max-width:100%!important;
+body.auction-live #view-auction .auction-rosters-accordion-header{
+  grid-column:1!important;
+  grid-row:1!important;
+  min-height:0!important;
+  height:42px!important;
+  max-height:42px!important;
+}
+body.auction-live #view-auction .auction-cockpit-stage,
+body.auction-live #view-auction .auction-rosters-overlay{
+  grid-column:1!important;
+  grid-row:2!important;
+  min-height:0!important;
+  max-height:100%!important;
+}
+
+/* Hard viewport containment: no live region may increase page height. */
+body.auction-live #view-auction,
+body.auction-live #view-auction .auction-root,
+body.auction-live #view-auction .auction-live-shell,
+body.auction-live #view-auction .auction-cockpit-stage,
+body.auction-live #view-auction .auction-cockpit-stage-grid,
+body.auction-live #view-auction .auction-lower-stage,
+body.auction-live #view-auction .auction-lower-main{
+  height:100%!important;
+  min-height:0!important;
+  max-height:100%!important;
+  overflow:hidden!important;
 }
 body.auction-live #view-auction .auction-lower-main{
   width:100%!important;
   min-width:0!important;
-  overflow:hidden!important;
+  max-width:100%!important;
+  align-items:stretch!important;
 }
 body.auction-live #view-auction .auction-lower-main>*{
   min-width:0!important;
+  min-height:0!important;
   max-width:100%!important;
+  max-height:100%!important;
 }
-body.auction-live #view-auction .auction-free-fixed .player-table{
-  width:100%!important;
-  min-width:0!important;
-  max-width:100%!important;
-  table-layout:fixed!important;
-}
-body.auction-live #view-auction .auction-free-fixed .player-main,
-body.auction-live #view-auction .auction-free-fixed .player-name,
-body.auction-live #view-auction .auction-queue-player,
-body.auction-live #view-auction .auction-suggested-copy{
-  min-width:0!important;
-  max-width:100%!important;
-}
-body.auction-live #view-auction .auction-free-fixed .player-name,
-body.auction-live #view-auction .auction-queue-player strong,
-body.auction-live #view-auction .auction-suggested-copy strong{
+
+/* ROSA: card fixed to its column; only the player list scrolls. */
+body.auction-live #view-auction .auction-team-column-roster-only,
+body.auction-live #view-auction .auction-team-column-roster-only>.auction-team-roster{
+  height:100%!important;
+  min-height:0!important;
+  max-height:100%!important;
   overflow:hidden!important;
-  text-overflow:ellipsis!important;
-  white-space:nowrap!important;
 }
-@media(min-width:1101px){
-  html:not(:fullscreen) body.auction-live #view-auction .auction-lower-main{
-    grid-template-columns:
-      minmax(0,.75fr)
-      minmax(0,.80fr)
-      minmax(0,1.60fr)
-      auto!important;
+body.auction-live #view-auction .auction-team-column-roster-only>.auction-team-roster{
+  display:grid!important;
+  grid-template-rows:auto minmax(0,1fr)!important;
+}
+body.auction-live #view-auction .auction-team-column-roster-only .auction-team-roster-list{
+  height:auto!important;
+  min-height:0!important;
+  max-height:100%!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior:contain!important;
+}
+
+/* CENTRO: preserve the last-bids card at the bottom; queue absorbs free height. */
+body.auction-live #view-auction .auction-middle-column{
+  height:100%!important;
+  min-height:0!important;
+  max-height:100%!important;
+  overflow:hidden!important;
+}
+body.auction-live #view-auction .auction-middle-column .auction-central-queue{
+  min-height:0!important;
+  overflow:hidden!important;
+}
+body.auction-live #view-auction .auction-middle-column .auction-bid-history{
+  flex:0 0 clamp(72px,10vh,108px)!important;
+  min-height:72px!important;
+  max-height:108px!important;
+  overflow:hidden!important;
+}
+body.auction-live #view-auction .auction-middle-column .auction-bid-history-list{
+  min-height:0!important;
+  max-height:100%!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+}
+
+/* SVINCOLATI + CONSULENTE: table owns the flexible row, suggester stays visible. */
+body.auction-live #view-auction .auction-free-fixed{
+  height:100%!important;
+  min-height:0!important;
+  max-height:100%!important;
+  overflow:hidden!important;
+  grid-template-rows:auto auto minmax(0,1fr) auto!important;
+}
+body.auction-live #view-auction .auction-free-fixed .drawer-table,
+body.auction-live #view-auction .auction-free-fixed .table-wrap{
+  min-height:0!important;
+  max-height:100%!important;
+  overflow:auto!important;
+}
+body.auction-live #view-auction .auction-free-suggestions{
+  min-height:0!important;
+  max-height:170px!important;
+  overflow:hidden!important;
+}
+body.auction-live #view-auction .auction-free-suggestions .auction-suggested-calls{
+  height:auto!important;
+  min-height:0!important;
+  max-height:170px!important;
+  overflow:hidden!important;
+}
+body.auction-live #view-auction .auction-free-suggestions .auction-suggested-list{
+  min-height:0!important;
+  max-height:138px!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+}
+
+/* Text can shrink; names never make a column wider than the viewport budget. */
+body.auction-live #view-auction :is(
+  .auction-team-column,
+  .auction-middle-column,
+  .auction-free-fixed,
+  .auction-call-queue,
+  .auction-bid-history,
+  .auction-suggested-calls,
+  .auction-suggested-list,
+  .auction-suggested-row,
+  .auction-player-name-live,
+  .auction-queue-player,
+  .auction-suggested-copy
+){min-width:0!important;max-width:100%!important}
+body.auction-live #view-auction :is(
+  .auction-queue-player strong,
+  .auction-suggested-copy strong,
+  .auction-free-fixed .player-name
+){overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+
+/* Short desktop viewport: compact non-essential vertical whitespace, keep cards present. */
+@media(min-width:701px) and (max-height:760px){
+  body.auction-live #view-auction .auction-cockpit{
+    grid-template-rows:38px minmax(0,1fr)!important;
+  }
+  body.auction-live #view-auction .auction-rosters-accordion-header{
+    height:38px!important;
+    max-height:38px!important;
+  }
+  body.auction-live #view-auction .auction-middle-column .auction-bid-history{
+    flex-basis:68px!important;
+    min-height:68px!important;
+    max-height:86px!important;
+  }
+  body.auction-live #view-auction .auction-free-suggestions,
+  body.auction-live #view-auction .auction-free-suggestions .auction-suggested-calls{
+    max-height:142px!important;
+  }
+  body.auction-live #view-auction .auction-free-suggestions .auction-suggested-list{
+    max-height:112px!important;
   }
 }
-@media(min-width:851px) and (max-width:1100px){
-  html:not(:fullscreen) body.auction-live #view-auction .auction-lower-main{
-    grid-template-columns:
-      minmax(0,.70fr)
-      minmax(0,.75fr)
-      minmax(0,1.55fr)
-      auto!important;
-  }
-  html:not(:fullscreen) body.auction-live #view-auction
-    .auction-lower-main>.auctioneer-console-drawer[open]{
-    width:clamp(240px,26vw,300px)!important;
-    min-width:0!important;
-    max-width:300px!important;
-  }
-}
-@media(min-width:701px) and (max-width:850px){
-  html:not(:fullscreen) body.auction-live #view-auction .auction-lower-main{
-    grid-template-columns:
-      minmax(0,.75fr)
-      minmax(0,1.25fr)
-      auto!important;
-  }
-  html:not(:fullscreen) body.auction-live #view-auction
-    .auction-lower-main>.auctioneer-console-drawer[open]{
-    width:clamp(220px,30vw,255px)!important;
-    min-width:0!important;
-    max-width:255px!important;
-  }
-}
+
+/* Phone/tablet rules below 700px remain owned by the dedicated mobile layout. */
 </style>
 
 
@@ -14552,6 +14647,7 @@ body.auction-live .auction-root{padding-top:0!important}
       <div class="modern-page-heading">
         <div class="modern-kicker">FANTACALCIO LIVE</div>
         <div class="modern-title-line">
+          <button id="auction-back-live" class="auction-back-live secondary" type="button">← Lega</button>
           <h1 id="modern-page-title">Le mie leghe</h1>
           <div id="league-pill" class="league-pill" hidden>
             <strong id="league-pill-name">—</strong>
@@ -14918,7 +15014,6 @@ body.auction-live .auction-root{padding-top:0!important}
 
       <!-- ASTA -->
       <section id="view-auction" class="view no-page-scroll">
-        <button id="auction-back-live" class="auction-back-live secondary" type="button">← Torna alla lega</button>
         <div id="auction-root" class="auction-root"></div>
       </section>
 
