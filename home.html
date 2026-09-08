@@ -34677,7 +34677,7 @@ document.getElementById('setup-fantasy-mode')?.addEventListener('change',()=>que
       const classicBase=rules.defense_rule_enabled?(rules.clean_sheet_bonus_enabled?73.2:73.0):(rules.clean_sheet_bonus_enabled?72.0:71.1);
       const adjustment=mantra?-.5:0;
       const source=`benchmark ${classicBase.toFixed(2)}${mantra?' - 0.50 Mantra':''}`;
-      return `Indice ${value} cr · ${x.keeper?'POR':'MOV'} · target squadra ${x.targetAverage.toFixed(2)} (${source}) · target ruolo ${x.roleTarget.toFixed(2)} · quota teorica titolare ${x.equilibriumBudget.toFixed(1)} cr = ${x.budget.toFixed(0)} × ${x.roleTarget.toFixed(2)} / ${x.targetAverage.toFixed(2)} · FMV ${x.fmv.toFixed(2)} × ${x.games.toFixed(1)} gare = ${x.rawPoints.toFixed(1)} pt · peso utilizzo slot ${x.slot}: ${(x.usage*100).toFixed(0)}% → ${x.usefulPoints.toFixed(1)} pt utili · 1 pt = ${x.creditPerPoint.toFixed(3)} cr · nessun prezzo di mercato`;
+      return `Indice ${value} cr · ${x.keeper?'POR':'MOV'} · target squadra ${x.targetAverage.toFixed(2)} (${source}) · target ruolo ${x.playerTarget.toFixed(2)} · quota teorica titolare ${x.equilibriumBudget.toFixed(1)} cr = ${x.budget.toFixed(0)} × ${x.playerTarget.toFixed(2)} / ${x.targetAverage.toFixed(2)} · FMV ${x.fmv.toFixed(2)} × ${x.games.toFixed(1)} gare = ${x.rawPoints.toFixed(1)} pt · peso utilizzo slot ${x.slot}: ${(x.usage*100).toFixed(0)}% → ${x.usefulPoints.toFixed(1)} pt utili · 1 pt = ${x.creditPerPoint.toFixed(3)} cr · nessun prezzo di mercato`;
     };
   }
 
