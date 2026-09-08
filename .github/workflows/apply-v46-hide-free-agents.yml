@@ -1,0 +1,47 @@
+name: Apply V46 hide free agents
+on:
+  push:
+    paths:
+      - '.github/apply_v46_hide_free_agents.py'
+      - '.github/workflows/apply-v46-hide-free-agents.yml'
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Apply patch
+        run: python .github/apply_v46_hide_free_agents.py
+      - name: Validate embedded JS
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('home.html').read_text()
+          for i,m in enumerate(re.finditer(r'<script(?:[^>]*)>(.*?)</script>',s,re.S)):
+              Path(f'/tmp/script{i}.js').write_text(m.group(1))
+          PY
+          for f in /tmp/script*.js; do node --check "$f"; done
+      - name: Regression assertions
+        run: |
+          grep -q 'v46-hide-free-agents-runtime' home.html
+          grep -q 'data-v46-hide-free' home.html
+          grep -q 'sessionStorage' home.html
+          grep -q 'v46-free-restore' home.html
+      - name: Diff check
+        run: git diff --check
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add home.html
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'feat: hide free agents per browser tab'
+          git push origin main
