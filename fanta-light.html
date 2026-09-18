@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Fanta Light · Asta offline</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{
+  --bg:#061525;--bg2:#0a1d32;--panel:#0d2742;--panel2:#123353;--line:#2a5377;--soft:#8fb0cc;--text:#edf7ff;
+  --blue:#4a92ed;--green:#27b883;--red:#dc5269;--amber:#f0b943;--yellow:#ffd447;--shadow:0 10px 28px rgba(0,0,0,.22);
+  --r:12px;--gap:8px;
+}
+*{box-sizing:border-box}html,body{height:100%;margin:0;background:linear-gradient(145deg,var(--bg),#03101d);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}body{overflow:hidden}
+button,input,select{font:inherit;color:inherit}button{border:1px solid #3b6a96;background:#143a61;border-radius:8px;padding:8px 11px;font-weight:800;cursor:pointer}button:hover{filter:brightness(1.08)}button:disabled{opacity:.42;cursor:not-allowed}.primary{background:linear-gradient(145deg,#5ba0ff,#2b6fc5)}.good{background:linear-gradient(145deg,#2fc296,#178163)}.danger{background:linear-gradient(145deg,#e46478,#a6344d)}.warn{background:linear-gradient(145deg,#e7a53b,#a96d1e)}.ghost{background:transparent}.small{font-size:12px;color:var(--soft)}
+input,select{width:100%;background:#071a2d;border:1px solid #315777;border-radius:8px;padding:8px 10px;outline:none}input:focus,select:focus{border-color:#67a9ff;box-shadow:0 0 0 2px rgba(103,169,255,.12)}
+.app{height:100%;display:grid;grid-template-rows:auto 1fr;min-height:0}.topbar{display:flex;align-items:center;gap:6px;padding:7px 9px;border-bottom:1px solid var(--line);background:rgba(8,27,47,.96);box-shadow:0 4px 16px rgba(0,0,0,.22);z-index:20}.brand{font-weight:950;letter-spacing:.04em;margin-right:auto}.nav{display:flex;gap:5px}.nav button.active{background:linear-gradient(145deg,#5ba0ff,#2d6ec2);border-color:#78b1ff}.save-dot{font-size:11px;color:#7fd8b6;min-width:58px;text-align:right}
+.view{height:100%;min-height:0;display:none;overflow:hidden}.view.active{display:block}.page-scroll{overflow:auto;padding:12px}.panel{background:linear-gradient(180deg,rgba(18,48,79,.96),rgba(9,28,48,.97));border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}.panel.pad{padding:12px}.title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}.title h2,.title h3{margin:0}.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.stack{display:grid;gap:8px}.row{display:flex;gap:7px;align-items:center}.between{display:flex;justify-content:space-between;gap:8px;align-items:center}.badge{display:inline-grid;place-items:center;min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:#245d99;border:1px solid #4b86c4;font-size:12px;font-weight:900}
+.team-edit-row{display:grid;grid-template-columns:1fr 1fr 110px 34px;gap:6px;align-items:end;padding:7px;border:1px solid rgba(80,126,166,.35);border-radius:8px;background:rgba(6,24,42,.5)}.team-edit-row label{display:grid;gap:3px;font-size:11px;color:var(--soft)}
+.list-layout{height:100%;display:grid;grid-template-rows:auto auto 1fr;gap:6px;padding:8px;min-height:0}.filters{display:flex;gap:6px;align-items:end;flex-wrap:wrap}.filters label{display:grid;gap:3px;font-size:11px;color:var(--soft);min-width:140px}.table-wrap{min-height:0;overflow:auto;border:1px solid var(--line);border-radius:10px;background:#071a2d}.players{border-collapse:separate;border-spacing:0;width:100%;font-size:12px}.players th{position:sticky;top:0;z-index:3;background:#123353;color:#b8cee1;text-align:left;padding:7px;border-bottom:1px solid var(--line);white-space:nowrap}.players th button{padding:0;border:0;background:none;border-radius:0;color:inherit}.players td{padding:6px 7px;border-bottom:1px solid rgba(54,95,132,.35);white-space:nowrap}.players tr:hover td{background:rgba(61,123,181,.08)}.players .num{text-align:right;font-variant-numeric:tabular-nums}.fav{border:0;background:none;padding:0 4px;font-size:18px;color:#667f96}.fav.on{color:var(--yellow)}.role{display:inline-grid;place-items:center;min-width:27px;height:22px;border-radius:5px;font-weight:950;font-size:11px}.role.P{background:#ffd44f;color:#152033}.role.D{background:#35b26f;color:#07180e}.role.C{background:#4895ef;color:#081a2e}.role.A{background:#e95e6f;color:#25080c}
+.auction-shell{height:100%;padding:8px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;min-height:0}.auction-left,.auction-right{min-width:0;min-height:0}.auction-left{display:grid;grid-template-rows:auto 1fr;gap:6px}.auction-right{display:grid;grid-template-rows:auto auto auto minmax(0,1fr);gap:6px}.auction-search-line{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px}.auction-table{min-height:0;overflow:auto}.current-card{padding:10px;display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:10px;align-items:center}.current-name{font-size:28px;font-weight:950;line-height:1.05}.current-meta{color:#9db7cc;font-size:12px;margin-top:5px}.timer{height:82px;border-radius:12px;display:grid;place-items:center;text-align:center;border:2px solid #516d85;background:#102a45}.timer strong{font-size:42px;line-height:.9}.timer span{font-size:10px;letter-spacing:.1em;font-weight:900}.timer.green{background:#174d3e;border-color:#32bd8d}.timer.yellow{background:#5d4c18;border-color:#e9be47}.timer.red{background:#772637;border-color:#f05c70;box-shadow:0 0 20px rgba(240,92,112,.2)}
+.bid-console{padding:9px;display:grid;gap:7px}.bid-editor{display:grid;grid-template-columns:48px minmax(80px,1fr) 48px;gap:6px}.bid-editor button{font-size:20px}.bid-editor input{text-align:center;font-size:24px;font-weight:950}.quick-bids{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.team-buttons{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:5px}.team-button{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.team-button.active{background:linear-gradient(145deg,#36bd8c,#18775b);border-color:#5ad6aa}.team-button small{display:block;font-size:10px;color:#b5cadb;margin-top:2px}.actions{display:grid;grid-template-columns:2fr 1fr 1fr;gap:5px}.ops{min-height:0;display:grid;grid-template-rows:auto 1fr;overflow:hidden}.ops-list{min-height:0;overflow:auto;padding:6px;display:grid;align-content:start;gap:4px}.op{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px;align-items:center;padding:6px;border:1px solid rgba(69,111,148,.45);border-radius:6px;background:rgba(12,39,64,.72);font-size:11px}.op-actions{display:flex;gap:3px}.op-actions button{padding:4px 6px;font-size:10px}
+.tv{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);gap:6px;padding:7px;background:#04111e}.tv-live{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(140px,.5fr) minmax(160px,.6fr);gap:6px}.tv-live .panel{padding:9px}.tv-player-name{font-size:34px;font-weight:950;line-height:1}.tv-price{font-size:44px;font-weight:950;text-align:center}.tv-leader{font-size:19px;font-weight:900;text-align:center}.tv-rosters{min-height:0;display:grid;gap:5px;overflow:hidden}.roster-card{min-width:0;min-height:0;height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);border:1px solid var(--line);border-radius:8px;background:linear-gradient(180deg,#102d4b,#081e34);overflow:hidden}.roster-head{padding:5px 6px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px;align-items:center}.roster-head strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}.roster-head small{display:block;color:#91abc1;font-size:9px}.credit-pill{font-size:10px;font-weight:900;text-align:right;white-space:nowrap}.credit-edit{border:0;background:none;padding:1px 3px;font-size:11px}.roster-body{min-height:0;overflow:auto;padding:3px;display:grid;align-content:start;gap:2px}.slot-row{min-height:24px;display:grid;grid-template-columns:26px minmax(0,1fr) 42px 21px;align-items:center;gap:3px;padding:2px 4px;border:1px solid rgba(48,87,122,.42);border-radius:4px;background:rgba(9,30,51,.72);font-size:10px}.slot-row.empty{opacity:.48;border-style:dashed}.slot-row.dragging{opacity:.35}.slot-price{text-align:right;font-weight:900}.slot-remove{padding:1px!important;height:20px;border-radius:4px!important;font-size:11px!important}.drop-hot{outline:2px solid #55d6aa;outline-offset:-2px}
+.modal{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:rgba(0,7,13,.74);padding:18px}.modal[hidden]{display:none}.modal-card{width:min(520px,100%);max-height:90vh;overflow:auto;padding:14px}.suggestions{position:absolute;left:0;right:0;top:100%;z-index:50;margin-top:3px;max-height:280px;overflow:auto;border:1px solid var(--line);border-radius:8px;background:#081d31;box-shadow:var(--shadow)}.suggestions:empty{display:none}.suggestion{padding:7px;border-bottom:1px solid rgba(54,95,132,.35);cursor:pointer}.suggestion:hover{background:#123657}.search-wrap{position:relative}.notice{padding:8px 10px;border:1px solid #786027;background:#3e3416;border-radius:8px;color:#ffe59a;font-size:12px}
+@media(max-width:980px){.auction-shell{grid-template-columns:1fr}.auction-left{min-height:45vh}.auction-right{min-height:65vh}.grid2,.grid3{grid-template-columns:1fr}.tv-live{grid-template-columns:1fr 110px 140px}.current-name{font-size:22px}.team-edit-row{grid-template-columns:1fr 1fr 90px 34px}}
+@media(max-width:650px){body{overflow:auto}.app{height:auto;min-height:100vh}.topbar{position:sticky;top:0;flex-wrap:wrap}.view{height:auto;min-height:calc(100vh - 70px)}.nav{width:100%;overflow:auto}.auction-shell{height:auto}.auction-table{max-height:55vh}.tv{height:100vh}.tv-live{grid-template-columns:1fr 90px}.tv-live .leader-panel{grid-column:1/-1}.team-buttons{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header class="topbar" id="topbar">
+    <div class="brand">FANTA LIGHT</div>
+    <nav class="nav" id="nav">
+      <button data-view="setup" class="active">Setup</button>
+      <button data-view="list">Listone</button>
+      <button data-view="auction">Asta</button>
+      <button data-view="tv">TV</button>
+    </nav>
+    <span class="save-dot" id="save-dot">salvato</span>
+  </header>
+
+  <section class="view active page-scroll" id="view-setup">
+    <div class="grid2">
+      <section class="panel pad stack">
+        <div class="title"><div><h2>Setup rapido</h2><div class="small">Tutto resta nel browser. Nessun database.</div></div></div>
+        <div class="grid3">
+          <label class="stack small">Secondi timer<input id="setup-timer" type="number" min="1" max="120" value="5"></label>
+          <label class="stack small">Crediti predefiniti<input id="setup-default-credits" type="number" min="1" value="500"></label>
+          <div class="stack"><span class="small">Rosa Classic</span><div class="notice">3 P · 8 D · 8 C · 6 A</div></div>
+        </div>
+        <div class="between"><strong>Squadre</strong><button id="add-team" class="primary" type="button">+ Squadra</button></div>
+        <div id="teams-editor" class="stack"></div>
+        <div class="row">
+          <button id="save-setup" class="good" type="button">Salva setup</button>
+          <button id="start-auction" class="primary" type="button">Avvia asta</button>
+          <button id="reset-app" class="danger" type="button">Azzera tutto</button>
+        </div>
+      </section>
+      <section class="panel pad stack">
+        <div class="title"><div><h2>Backup / TV</h2><div class="small">Utile prima e durante l'asta.</div></div></div>
+        <button id="open-tv" class="primary" type="button">Apri TV in nuova finestra</button>
+        <button id="export-backup" type="button">Scarica backup JSON</button>
+        <label class="stack small">Ripristina backup<input id="import-backup" type="file" accept="application/json,.json"></label>
+        <div class="notice">Per la TV: trascina la finestra sul monitor HDMI e usa Schermo intero.</div>
+      </section>
+    </div>
+  </section>
+
+  <section class="view" id="view-list">
+    <div class="list-layout">
+      <section class="panel pad between">
+        <div><strong>Listone</strong> <span class="badge" id="list-count">0</span></div>
+        <div class="row"><label class="small">Importa CSV/XLS/XLSX <input id="list-file" type="file" accept=".csv,.tsv,.xls,.xlsx,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></label><button id="clear-list" class="danger" type="button">Svuota</button></div>
+      </section>
+      <section class="panel pad filters">
+        <label>Cerca<input id="list-search" type="search" placeholder="Nome o squadra"></label>
+        <label>Ruolo<select id="list-role"><option value="all">Tutti</option><option>P</option><option>D</option><option>C</option><option>A</option></select></label>
+        <label>Preferiti<select id="list-fav"><option value="all">Tutti</option><option value="yes">Solo preferiti</option></select></label>
+        <button id="list-reset" type="button">Azzera filtri</button>
+      </section>
+      <div class="table-wrap"><table class="players"><thead id="list-head"></thead><tbody id="list-body"></tbody></table></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-auction">
+    <div class="auction-shell">
+      <section class="auction-left">
+        <section class="panel pad filters">
+          <label>Cerca<input id="auction-list-search" type="search" placeholder="Svincolato..."></label>
+          <label>Ruolo<select id="auction-list-role"><option value="all">Tutti</option><option>P</option><option>D</option><option>C</option><option>A</option></select></label>
+          <label>Preferiti<select id="auction-list-fav"><option value="all">Tutti</option><option value="yes">Solo preferiti</option></select></label>
+          <span class="badge" id="available-count">0</span>
+        </section>
+        <div class="table-wrap auction-table"><table class="players"><thead id="auction-list-head"></thead><tbody id="auction-list-body"></tbody></table></div>
+      </section>
+
+      <section class="auction-right">
+        <section class="panel current-card">
+          <div>
+            <div class="small">CALCIATORE CHIAMATO</div>
+            <div class="current-name" id="current-name">NESSUNO</div>
+            <div class="current-meta" id="current-meta">Cerca uno svincolato o usa CHIAMA dalla lista.</div>
+            <div class="search-wrap" style="margin-top:8px"><input id="auction-search-player" type="search" placeholder="Cerca svincolato..."><div id="auction-search-suggestions" class="suggestions"></div></div>
+          </div>
+          <div class="timer" id="auction-timer"><span>TIMER</span><strong id="auction-timer-value">—</strong></div>
+        </section>
+
+        <section class="panel bid-console">
+          <div class="bid-editor"><button id="bid-minus" type="button">−</button><input id="bid-input" type="number" min="1" step="1" value="1"><button id="bid-plus" type="button">+</button></div>
+          <div class="quick-bids"><button data-quick="1">+1</button><button data-quick="2">+2</button><button data-quick="5">+5</button><button data-quick="10">+10</button></div>
+          <div class="small">Maggior offerente</div><div class="team-buttons" id="team-buttons"></div>
+          <div class="actions"><button id="award-player" class="good" type="button">AGGIUDICA</button><button id="cancel-call" class="warn" type="button">ANNULLA CHIAMATA</button><button id="undo-last" class="danger" type="button">ANNULLA ULTIMA</button></div>
+        </section>
+
+        <section class="panel pad between"><div><strong>Operazioni</strong><span class="small" id="op-hint"></span></div><div class="row"><button id="export-csv" type="button">Esporta CSV</button><button id="open-tv-2" class="primary" type="button">Apri TV</button></div></section>
+        <section class="panel ops"><div class="ops-list" id="ops-list"></div></section>
+      </section>
+    </div>
+  </section>
+
+  <section class="view" id="view-tv">
+    <div class="tv">
+      <div class="tv-live">
+        <section class="panel"><div class="between"><div class="small">GIOCATORE CHIAMATO</div><button id="tv-fullscreen" class="ghost" type="button" title="Schermo intero">⛶</button></div><div class="tv-player-name" id="tv-player-name">IN ATTESA</div><div class="small" id="tv-player-meta"></div></section>
+        <section class="panel"><div class="small" style="text-align:center">PREZZO</div><div class="tv-price" id="tv-price">—</div><div class="timer" id="tv-timer" style="height:48px;margin-top:4px"><strong id="tv-timer-value" style="font-size:25px">—</strong></div></section>
+        <section class="panel leader-panel"><div class="small" style="text-align:center">MIGLIOR OFFERENTE</div><div class="tv-leader" id="tv-leader">—</div><div class="small" style="text-align:center;margin-top:4px" id="tv-leader-meta"></div></section>
+      </div>
+      <div class="tv-rosters" id="tv-rosters"></div>
+    </div>
+  </section>
+</div>
+
+<div class="modal" id="edit-modal" hidden><div class="panel modal-card stack"><div class="between"><h3 id="edit-title" style="margin:0">Modifica</h3><button id="edit-close" class="ghost">×</button></div><div id="edit-body" class="stack"></div></div></div>
+
+<script>
+'use strict';
+const KEY='fanta-light-v1';
+const ROSTER={P:3,D:8,C:8,A:6};
+const ROLE_ORDER=['P','D','C','A'];
+let tvWindow=null;
+let channel=null;
+try{channel=new BroadcastChannel('fanta-light-sync')}catch{}
+const freshState=()=>({version:1,setup:{timerSeconds:5,defaultCredits:500,teams:[]},players:[],assignments:[],current:{playerId:null,bid:1,leaderTeamId:null,timerEnd:null},ops:[],auctionStarted:false,importColumns:[]});
+let state=loadState();
+let sortState={key:'name',dir:1};
+let currentView=location.hash==='#tv'?'tv':'setup';
+function $(id){return document.getElementById(id)}
+function uid(){return crypto?.randomUUID?.()||('id-'+Date.now().toString(36)+Math.random().toString(36).slice(2))}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function loadState(){try{const x=JSON.parse(localStorage.getItem(KEY));return x&&x.version?Object.assign(freshState(),x):freshState()}catch{return freshState()}}
+function saveState({broadcast=true}={}){state.version=1;try{localStorage.setItem(KEY,JSON.stringify(state))}catch{};$('save-dot')&&($('save-dot').textContent='salvato');if(broadcast){try{channel?.postMessage(state)}catch{};try{tvWindow?.postMessage({type:'fanta-light-state',state},'*')}catch{};try{if(window.opener&&!window.opener.closed)window.opener.postMessage({type:'fanta-light-state',state},'*')}catch{}}}
+window.addEventListener('storage',e=>{if(e.key===KEY&&e.newValue){try{state=JSON.parse(e.newValue);renderAll()}catch{}}});
+channel?.addEventListener('message',e=>{if(e.data?.version){state=e.data;renderAll(false)}});
+window.addEventListener('message',e=>{if(e.data?.type==='fanta-light-state'&&e.data.state?.version){state=e.data.state;renderAll(false)}if(e.data?.type==='fanta-light-request-state'){e.source?.postMessage({type:'fanta-light-state',state},'*')}});
+if(location.hash==='#tv'&&window.opener)window.opener.postMessage({type:'fanta-light-request-state'},'*');
+
+function normalizeText(s){return String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ß/g,'ss').replace(/æ/g,'ae').replace(/œ/g,'oe').replace(/ł/g,'l').replace(/đ/g,'d').replace(/ð/g,'d').replace(/þ/g,'th').replace(/ç/g,'c').replace(/ğ/g,'g').replace(/ş/g,'s').replace(/ı/g,'i').toLowerCase().replace(/[^a-z0-9]/g,'')}
+function fuzzyScore(text,q){const a=normalizeText(text),b=normalizeText(q);if(!b)return 0;if(a===b)return 1000;if(a.startsWith(b))return 800-b.length;if(a.includes(b))return 700-a.indexOf(b);let i=0,hits=0;for(const ch of b){const p=a.indexOf(ch,i);if(p<0)break;hits++;i=p+1}return hits===b.length?400-(a.length-b.length):0}
+function roleNorm(v){const s=normalizeText(v).toUpperCase();if(['P','POR','PORTIERE','PORTIERI'].includes(s))return'P';if(s.startsWith('D'))return'D';if(s.startsWith('C')||s.startsWith('M'))return'C';if(s.startsWith('A')||s.startsWith('W')||s.startsWith('T')||s.startsWith('PC'))return'A';return String(v||'').trim().toUpperCase().slice(0,1)}
+function numVal(v){if(typeof v==='number')return v;const s=String(v??'').replace(/\./g,'').replace(',','.').replace(/[^0-9.-]/g,'');const n=Number(s);return Number.isFinite(n)?n:null}
+function teamById(id){return state.setup.teams.find(t=>t.id===id)||null}
+function playerById(id){return state.players.find(p=>p.id===id)||null}
+function assignmentsFor(teamId){return state.assignments.filter(a=>a.teamId===teamId)}
+function usedByRole(teamId,role){return assignmentsFor(teamId).filter(a=>playerById(a.playerId)?.role===role).length}
+function slotsRemaining(teamId){return 25-assignmentsFor(teamId).length}
+function maxBid(team){const r=slotsRemaining(team.id);return Math.max(0,Number(team.creditsCurrent||0)-Math.max(0,r-1))}
+function canAssign(teamId,playerId,price){const t=teamById(teamId),p=playerById(playerId);if(!t||!p)return{ok:false,msg:'Squadra o giocatore non valido'};if(usedByRole(teamId,p.role)>=ROSTER[p.role])return{ok:false,msg:`Slot ${p.role} esauriti`};if(Number(price)>maxBid(t))return{ok:false,msg:`Offerta massima ${maxBid(t)}`};return{ok:true}}
+function addOp(type,text,data={}){state.ops.unshift({id:uid(),type,text,data,at:Date.now()});state.ops=state.ops.slice(0,150)}
+
+function setView(v){currentView=v;location.hash=v==='tv'?'tv':'';document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id==='view-'+v));document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===v));$('topbar').style.display=v==='tv'?'none':'flex';if(v==='tv')document.body.style.overflow='hidden';renderAll(false)}
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
+
+function renderSetup(){
+ $('setup-timer').value=state.setup.timerSeconds||5;$('setup-default-credits').value=state.setup.defaultCredits||500;
+ $('teams-editor').innerHTML=state.setup.teams.map((t,i)=>`<div class="team-edit-row" data-team-row="${t.id}"><label>Presidente<input data-team-field="president" value="${esc(t.president)}"></label><label>Squadra<input data-team-field="teamName" value="${esc(t.teamName)}"></label><label>Crediti<input data-team-field="creditsInitial" type="number" min="1" value="${Number(t.creditsInitial||state.setup.defaultCredits||500)}"></label><button class="danger" data-remove-team="${t.id}">×</button></div>`).join('')||'<div class="small">Aggiungi almeno due squadre.</div>';
+ document.querySelectorAll('[data-team-row]').forEach(row=>row.querySelectorAll('[data-team-field]').forEach(inp=>inp.addEventListener('change',()=>{const t=teamById(row.dataset.teamRow);const f=inp.dataset.teamField;if(f==='creditsInitial'){const prev=Number(t.creditsInitial||0),next=Math.max(1,Number(inp.value||1));t.creditsInitial=next;if(!state.auctionStarted||Number(t.creditsCurrent)===prev)t.creditsCurrent=next}else t[f]=inp.value.trim();saveState()})));
+ document.querySelectorAll('[data-remove-team]').forEach(b=>b.addEventListener('click',()=>{if(state.assignments.some(a=>a.teamId===b.dataset.removeTeam))return alert('Squadra con acquisti: rimuovi prima le assegnazioni.');state.setup.teams=state.setup.teams.filter(t=>t.id!==b.dataset.removeTeam);saveState();renderSetup()}));
+}
+$('add-team').addEventListener('click',()=>{const c=Number($('setup-default-credits').value||500);state.setup.teams.push({id:uid(),president:'',teamName:'',creditsInitial:c,creditsCurrent:c});saveState();renderSetup()});
+$('save-setup').addEventListener('click',()=>{state.setup.timerSeconds=Math.max(1,Number($('setup-timer').value||5));state.setup.defaultCredits=Math.max(1,Number($('setup-default-credits').value||500));saveState();renderAll();});
+$('start-auction').addEventListener('click',()=>{state.setup.timerSeconds=Math.max(1,Number($('setup-timer').value||5));if(state.setup.teams.length<2)return alert('Inserisci almeno 2 squadre.');if(state.setup.teams.some(t=>!t.president.trim()||!t.teamName.trim()))return alert('Completa nome Presidente e squadra.');if(!state.players.length)return alert('Carica prima il listone.');state.auctionStarted=true;saveState();setView('auction')});
+$('reset-app').addEventListener('click',()=>{if(!confirm('Azzerare squadre, listone, preferiti e asta?'))return;state=freshState();saveState();renderAll();});
+$('setup-default-credits').addEventListener('change',()=>state.setup.defaultCredits=Math.max(1,Number($('setup-default-credits').value||500)));
+$('setup-timer').addEventListener('change',()=>state.setup.timerSeconds=Math.max(1,Number($('setup-timer').value||5)));
+
+function inferField(keys,candidates){const normalized=new Map(keys.map(k=>[normalizeText(k),k]));for(const c of candidates){const exact=normalized.get(normalizeText(c));if(exact)return exact}for(const k of keys){const nk=normalizeText(k);if(candidates.some(c=>nk.includes(normalizeText(c))))return k}return null}
+async function importList(file){let rows=[];const ext=file.name.split('.').pop().toLowerCase();if(['xlsx','xls'].includes(ext)){if(!window.XLSX)throw new Error('Lettore Excel non disponibile. Connetti il PC a Internet oppure salva il file in CSV.');const ab=await file.arrayBuffer();const wb=XLSX.read(ab,{type:'array'});rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''})}else{const text=await file.text();const sep=(text.split('\n')[0].match(/;/g)||[]).length>(text.split('\n')[0].match(/,/g)||[]).length?';':',';const lines=text.replace(/^\uFEFF/,'').split(/\r?\n/).filter(Boolean);const heads=parseCsvLine(lines.shift(),sep);rows=lines.map(l=>{const vals=parseCsvLine(l,sep),o={};heads.forEach((h,i)=>o[h]=vals[i]??'');return o})}
+ if(!rows.length)throw new Error('Nessuna riga trovata.');const keys=[...new Set(rows.flatMap(r=>Object.keys(r)))];const nameKey=inferField(keys,['Nome','Calciatore','Giocatore','Player']);const roleKey=inferField(keys,['R','Ruolo','Role']);const teamKey=inferField(keys,['Squadra','Club','Team']);if(!nameKey||!roleKey)throw new Error('Non trovo le colonne Nome/Calciatore e Ruolo.');const oldFav=new Set(state.players.filter(p=>p.favorite).map(p=>normalizeText(p.name)+'|'+normalizeText(p.club)));state.players=rows.map((r,i)=>({id:uid(),name:String(r[nameKey]||'').trim(),role:roleNorm(r[roleKey]),club:String(teamKey?r[teamKey]:'').trim(),favorite:oldFav.has(normalizeText(r[nameKey])+'|'+normalizeText(teamKey?r[teamKey]:'')),source:r,status:'available',importIndex:i})).filter(p=>p.name&&ROSTER[p.role]);state.assignments=[];state.current={playerId:null,bid:1,leaderTeamId:null,timerEnd:null};state.importColumns=keys.filter(k=>![nameKey,roleKey,teamKey].includes(k)).slice(0,12);addOp('import',`Importati ${state.players.length} calciatori`);saveState();renderAll();}
+function parseCsvLine(line,sep){const out=[];let cur='',q=false;for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){if(q&&line[i+1]==='"'){cur+='"';i++}else q=!q}else if(ch===sep&&!q){out.push(cur);cur=''}else cur+=ch}out.push(cur);return out}
+$('list-file').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{await importList(f)}catch(err){alert(err.message)}e.target.value=''});
+$('clear-list').addEventListener('click',()=>{if(!confirm('Svuotare il listone e tutte le assegnazioni?'))return;state.players=[];state.assignments=[];state.current={playerId:null,bid:1,leaderTeamId:null,timerEnd:null};saveState();renderAll()});
+
+function visiblePlayers({auction=false}={}){const q=$(auction?'auction-list-search':'list-search')?.value||'';const role=$(auction?'auction-list-role':'list-role')?.value||'all';const fav=$(auction?'auction-list-fav':'list-fav')?.value||'all';let arr=state.players.filter(p=>!auction||p.status==='available');if(q){arr=arr.map(p=>({p,s:Math.max(fuzzyScore(p.name,q),fuzzyScore(p.club,q))})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).map(x=>x.p)}if(role!=='all')arr=arr.filter(p=>p.role===role);if(fav==='yes')arr=arr.filter(p=>p.favorite);const key=sortState.key,dir=sortState.dir;arr.sort((a,b)=>{let av=key==='name'?a.name:key==='role'?a.role:key==='club'?a.club:a.source?.[key],bv=key==='name'?b.name:key==='role'?b.role:key==='club'?b.club:b.source?.[key];const an=numVal(av),bn=numVal(bv);if(an!==null&&bn!==null)return(an-bn)*dir;return String(av??'').localeCompare(String(bv??''),'it',{numeric:true})*dir});return arr}
+function tableHead(auction=false){const extras=state.importColumns;return `<tr><th>★</th><th><button data-sort="role">R ↕</button></th><th><button data-sort="name">Calciatore ↕</button></th><th><button data-sort="club">Squadra ↕</button></th>${extras.map(c=>`<th><button data-sort="${esc(c)}">${esc(c)} ↕</button></th>`).join('')}${auction?'<th></th>':''}</tr>`}
+function tableBody(auction=false){return visiblePlayers({auction}).map(p=>`<tr><td><button class="fav ${p.favorite?'on':''}" data-fav="${p.id}">★</button></td><td><span class="role ${p.role}">${p.role}</span></td><td><strong>${esc(p.name)}</strong></td><td>${esc(p.club)}</td>${state.importColumns.map(c=>`<td class="${numVal(p.source?.[c])!==null?'num':''}">${esc(p.source?.[c]??'')}</td>`).join('')}${auction?`<td><button class="primary" data-call="${p.id}">CHIAMA</button></td>`:''}</tr>`).join('')}
+function bindTables(){document.querySelectorAll('[data-sort]').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.sort;if(sortState.key===k)sortState.dir*=-1;else{sortState.key=k;sortState.dir=1}renderLists()}));document.querySelectorAll('[data-fav]').forEach(b=>b.addEventListener('click',()=>{const p=playerById(b.dataset.fav);p.favorite=!p.favorite;saveState();renderLists()}));document.querySelectorAll('[data-call]').forEach(b=>b.addEventListener('click',()=>callPlayer(b.dataset.call)))}
+function renderLists(){const lh=tableHead(false),ah=tableHead(true);$('list-head').innerHTML=lh;$('auction-list-head').innerHTML=ah;$('list-body').innerHTML=tableBody(false);$('auction-list-body').innerHTML=tableBody(true);$('list-count').textContent=state.players.length;$('available-count').textContent=state.players.filter(p=>p.status==='available').length;bindTables()}
+['list-search','list-role','list-fav','auction-list-search','auction-list-role','auction-list-fav'].forEach(id=>$(id).addEventListener(id.includes('search')?'input':'change',renderLists));$('list-reset').addEventListener('click',()=>{$('list-search').value='';$('list-role').value='all';$('list-fav').value='all';renderLists()});
+
+function callPlayer(id){const p=playerById(id);if(!p||p.status!=='available')return;state.current={playerId:id,bid:1,leaderTeamId:null,timerEnd:Date.now()+state.setup.timerSeconds*1000};addOp('call',`Chiamato ${p.name}`,{playerId:id});saveState();renderAuction();}
+function setBid(v){state.current.bid=Math.max(1,Math.floor(Number(v)||1));state.current.timerEnd=Date.now()+Math.max(1,state.setup.timerSeconds||5)*1000;saveState();renderAuction(false)}
+function award(){const p=playerById(state.current.playerId),team=teamById(state.current.leaderTeamId),price=Number(state.current.bid||1);if(!p)return alert('Seleziona un giocatore.');if(!team)return alert('Seleziona il maggior offerente.');const check=canAssign(team.id,p.id,price);if(!check.ok)return alert(check.msg);const a={id:uid(),playerId:p.id,teamId:team.id,price,createdAt:Date.now()};state.assignments.push(a);p.status='assigned';team.creditsCurrent=Number(team.creditsCurrent)-price;addOp('award',`${p.name} → ${team.president} / ${team.teamName} · ${price}`,{assignmentId:a.id,playerId:p.id,teamId:team.id,price});state.current={playerId:null,bid:1,leaderTeamId:null,timerEnd:null};saveState();renderAll();}
+function cancelCall(){if(!state.current.playerId)return;const p=playerById(state.current.playerId);addOp('cancel',`Chiamata annullata: ${p?.name||''}`);state.current={playerId:null,bid:1,leaderTeamId:null,timerEnd:null};saveState();renderAll()}
+function undoLastAward(){const op=state.ops.find(o=>o.type==='award'&&state.assignments.some(a=>a.id===o.data.assignmentId));if(!op)return alert('Nessuna aggiudicazione da annullare.');removeAssignment(op.data.assignmentId,'Annullata ultima aggiudicazione')}
+function removeAssignment(id,label='Rimosso'){const a=state.assignments.find(x=>x.id===id);if(!a)return;const p=playerById(a.playerId),t=teamById(a.teamId);if(t)t.creditsCurrent=Number(t.creditsCurrent)+Number(a.price);if(p)p.status='available';state.assignments=state.assignments.filter(x=>x.id!==id);addOp('remove',`${label}: ${p?.name||''} da ${t?.teamName||''} · +${a.price} crediti`,{playerId:a.playerId,teamId:a.teamId,price:a.price});saveState();renderAll()}
+function editAssignmentPrice(id){const a=state.assignments.find(x=>x.id===id),t=a&&teamById(a.teamId),p=a&&playerById(a.playerId);if(!a||!t)return;const raw=prompt(`Nuovo prezzo per ${p?.name||'giocatore'}`,String(a.price));if(raw===null)return;const n=Math.max(1,Math.floor(Number(raw)||1));const delta=n-a.price;if(delta>0&&t.creditsCurrent<delta)return alert('Crediti residui insufficienti.');t.creditsCurrent-=delta;addOp('price',`Prezzo ${p?.name}: ${a.price} → ${n}`,{assignmentId:id,old:a.price,new:n});a.price=n;saveState();renderAll()}
+function editTeamCredits(teamId){const t=teamById(teamId);if(!t)return;const raw=prompt(`Crediti residui di ${t.teamName}`,String(t.creditsCurrent));if(raw===null)return;const n=Math.max(0,Math.floor(Number(raw)||0));const reason=prompt('Motivazione correzione crediti','correzione manuale')||'correzione manuale';addOp('credits',`${t.teamName}: crediti ${t.creditsCurrent} → ${n} · ${reason}`,{teamId,old:t.creditsCurrent,new:n,reason});t.creditsCurrent=n;saveState();renderAll()}
+function moveAssignment(id,targetTeamId){const a=state.assignments.find(x=>x.id===id);if(!a||a.teamId===targetTeamId)return;const from=teamById(a.teamId),to=teamById(targetTeamId),p=playerById(a.playerId);if(!to||!from||!p)return;const check=canAssign(to.id,p.id,a.price);if(!check.ok)return alert(check.msg);from.creditsCurrent+=Number(a.price);to.creditsCurrent-=Number(a.price);const old=from.teamName;a.teamId=to.id;addOp('move',`${p.name}: ${old} → ${to.teamName} · ${a.price}`,{assignmentId:id,from:from.id,to:to.id});saveState();renderAll()}
+
+function renderAuction(full=true){const p=playerById(state.current.playerId);$('current-name').textContent=p?.name||'NESSUNO';$('current-meta').textContent=p?`${p.role} · ${p.club||'—'}`:'Cerca uno svincolato o usa CHIAMA dalla lista.';$('bid-input').value=state.current.bid||1;$('team-buttons').innerHTML=state.setup.teams.map(t=>`<button class="team-button ${state.current.leaderTeamId===t.id?'active':''}" data-leader="${t.id}">${esc(t.president)}<small>${esc(t.teamName)} · ${t.creditsCurrent} cr · max ${maxBid(t)}</small></button>`).join('');document.querySelectorAll('[data-leader]').forEach(b=>b.addEventListener('click',()=>{state.current.leaderTeamId=b.dataset.leader;saveState();renderAuction(false)}));$('award-player').disabled=!p||!state.current.leaderTeamId;$('op-hint').textContent=` · ${state.assignments.length} acquisti`;
+ $('ops-list').innerHTML=state.ops.slice(0,40).map(o=>{let extra='';if(o.type==='award'&&o.data.assignmentId&&state.assignments.some(a=>a.id===o.data.assignmentId))extra=`<div class="op-actions"><button data-edit-price="${o.data.assignmentId}">prezzo</button><button class="danger" data-remove-assignment="${o.data.assignmentId}">×</button></div>`;return`<div class="op"><div><strong>${new Date(o.at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})}</strong> · ${esc(o.text)}</div>${extra}</div>`}).join('')||'<div class="small">Nessuna operazione.</div>';document.querySelectorAll('[data-edit-price]').forEach(b=>b.addEventListener('click',()=>editAssignmentPrice(b.dataset.editPrice)));document.querySelectorAll('[data-remove-assignment]').forEach(b=>b.addEventListener('click',()=>removeAssignment(b.dataset.removeAssignment)));
+ if(full)renderLists();renderTV();}
+$('bid-minus').addEventListener('click',()=>setBid((state.current.bid||1)-1));$('bid-plus').addEventListener('click',()=>setBid((state.current.bid||1)+1));$('bid-input').addEventListener('input',e=>setBid(e.target.value));document.querySelectorAll('[data-quick]').forEach(b=>b.addEventListener('click',()=>setBid((state.current.bid||1)+Number(b.dataset.quick))));$('award-player').addEventListener('click',award);$('cancel-call').addEventListener('click',cancelCall);$('undo-last').addEventListener('click',undoLastAward);
+$('auction-search-player').addEventListener('input',e=>{const q=e.target.value.trim();const box=$('auction-search-suggestions');if(!q){box.innerHTML='';return}const arr=state.players.filter(p=>p.status==='available').map(p=>({p,s:Math.max(fuzzyScore(p.name,q),fuzzyScore(p.club,q))})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).slice(0,10);box.innerHTML=arr.map(x=>`<div class="suggestion" data-suggest="${x.p.id}"><span class="role ${x.p.role}">${x.p.role}</span> <strong>${esc(x.p.name)}</strong> <span class="small">${esc(x.p.club)}</span></div>`).join('');box.querySelectorAll('[data-suggest]').forEach(d=>d.addEventListener('click',()=>{callPlayer(d.dataset.suggest);$('auction-search-player').value='';box.innerHTML=''}))});
+
+function rosterSlots(team){const as=assignmentsFor(team.id);const rows=[];for(const role of ROLE_ORDER){const own=as.filter(a=>playerById(a.playerId)?.role===role);for(let i=0;i<ROSTER[role];i++){const a=own[i];if(a){const p=playerById(a.playerId);rows.push(`<div class="slot-row" draggable="true" data-assignment="${a.id}"><span class="role ${role}">${role}</span><strong title="${esc(p?.name)}">${esc(p?.name||'—')}</strong><span class="slot-price">${a.price}</span><button class="slot-remove danger" data-slot-remove="${a.id}" title="Rimuovi">×</button></div>`)}else rows.push(`<div class="slot-row empty"><span class="role ${role}">${role}</span><span>Slot disponibile</span><span class="slot-price">—</span><span></span></div>`)}}return rows.join('')}
+function rosterLayout(n){if(n<=0)return{cols:1,rows:1};if(n<=6)return{cols:n,rows:1};const rows=Math.ceil(n/6),cols=Math.ceil(n/rows);return{cols,rows}}
+function renderTV(){const p=playerById(state.current.playerId),leader=teamById(state.current.leaderTeamId);$('tv-player-name').textContent=p?.name||'IN ATTESA';$('tv-player-meta').textContent=p?`${p.role} · ${p.club||'—'}`:'';$('tv-price').textContent=p?(state.current.bid||1):'—';$('tv-leader').textContent=leader?leader.president:'—';$('tv-leader-meta').textContent=leader?`${leader.teamName} · ${leader.creditsCurrent} cr · max ${maxBid(leader)}`:'';const n=state.setup.teams.length,{cols,rows}=rosterLayout(n);const grid=$('tv-rosters');grid.style.gridTemplateColumns=`repeat(${cols},minmax(0,1fr))`;grid.style.gridTemplateRows=`repeat(${rows},minmax(0,1fr))`;grid.innerHTML=state.setup.teams.map(t=>`<section class="roster-card" data-roster-drop="${t.id}"><header class="roster-head"><div><strong>${esc(t.president)} · ${esc(t.teamName)}</strong><small>${assignmentsFor(t.id).length}/25 giocatori</small></div><div class="credit-pill">${t.creditsCurrent} cr · max ${maxBid(t)} <button class="credit-edit" data-edit-credits="${t.id}" title="Correggi crediti">✎</button></div></header><div class="roster-body">${rosterSlots(t)}</div></section>`).join('');document.querySelectorAll('[data-slot-remove]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();removeAssignment(b.dataset.slotRemove)}));document.querySelectorAll('[data-edit-credits]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();editTeamCredits(b.dataset.editCredits)}));document.querySelectorAll('[data-assignment]').forEach(r=>{r.addEventListener('dragstart',e=>{r.classList.add('dragging');e.dataTransfer.setData('text/plain',r.dataset.assignment)});r.addEventListener('dragend',()=>r.classList.remove('dragging'))});document.querySelectorAll('[data-roster-drop]').forEach(card=>{card.addEventListener('dragover',e=>{e.preventDefault();card.classList.add('drop-hot')});card.addEventListener('dragleave',()=>card.classList.remove('drop-hot'));card.addEventListener('drop',e=>{e.preventDefault();card.classList.remove('drop-hot');moveAssignment(e.dataTransfer.getData('text/plain'),card.dataset.rosterDrop)})});}
+
+function timerRemaining(){if(!state.current.timerEnd||!state.current.playerId)return null;return Math.max(0,(state.current.timerEnd-Date.now())/1000)}
+function paintTimers(){const rem=timerRemaining();for(const [boxId,valId] of [['auction-timer','auction-timer-value'],['tv-timer','tv-timer-value']]){const box=$(boxId),val=$(valId);if(!box||!val)continue;box.classList.remove('green','yellow','red');if(rem===null){val.textContent='—';continue}const total=Math.max(1,state.setup.timerSeconds||5),pct=rem/total;box.classList.add(pct>.66?'green':pct>.33?'yellow':'red');val.textContent=Math.ceil(rem)+'s'}}
+setInterval(paintTimers,100);
+
+function openTV(){tvWindow=window.open(location.href.split('#')[0]+'#tv','fantaLightTV','popup=yes,width=1500,height=900');setTimeout(()=>{try{tvWindow?.postMessage({type:'fanta-light-state',state},'*')}catch{}},350)}
+$('open-tv').addEventListener('click',openTV);$('open-tv-2').addEventListener('click',openTV);$('tv-fullscreen').addEventListener('click',()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.()});
+
+function csvCell(v){const s=String(v??'');return/[;"\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}
+function exportCSV(){const rows=[['Presidente','Squadra','Ruolo','Calciatore','Club','Prezzo','Crediti residui','Offerta massima']];for(const t of state.setup.teams){for(const a of assignmentsFor(t.id)){const p=playerById(a.playerId);rows.push([t.president,t.teamName,p?.role,p?.name,p?.club,a.price,t.creditsCurrent,maxBid(t)])}}const blob=new Blob(['\uFEFF'+rows.map(r=>r.map(csvCell).join(';')).join('\n')],{type:'text/csv;charset=utf-8'});downloadBlob(blob,'rose-fanta-light.csv')}
+function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000)}
+$('export-csv').addEventListener('click',exportCSV);$('export-backup').addEventListener('click',()=>downloadBlob(new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),'fanta-light-backup.json'));
+$('import-backup').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{const x=JSON.parse(await f.text());if(!x?.version)throw new Error('Backup non valido');state=Object.assign(freshState(),x);saveState();renderAll()}catch(err){alert(err.message)}e.target.value=''});
+
+function renderAll(save=false){renderSetup();renderLists();renderAuction(false);if(currentView==='tv')renderTV();paintTimers();if(save)saveState()}
+renderAll();setView(currentView);
+</script>
+</body>
+</html>
